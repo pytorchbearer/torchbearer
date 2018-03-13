@@ -1,6 +1,3 @@
-from abc import ABC, abstractmethod
-
-
 class MetricBase(object):
     def __init__(self):
         super().__init__()
@@ -78,9 +75,6 @@ class SimpleMetric(MetricBase):
 class Average(MetricBase):
     def __init__(self, metric, v=0.0):
         super().__init__(metric.name, metric.process)
-        self._v = v
-        self._total = v
-        self._count = 0
 
     def _process(self, state):
         result = super()._process(state)
