@@ -1,26 +1,22 @@
 from abc import ABC, abstractmethod
 
 
-class MetricBase(ABC):
+class MetricBase(object):
     def __init__(self):
         super().__init__()
         self.reset()
 
-    @abstractmethod
     def process_train(self, state):
-        pass
+        return {}
 
-    @abstractmethod
     def process_val(self, state):
-        pass
+        return {}
 
-    @abstractmethod
     def process_final(self, state):
-        pass
+        return {}
 
-    @abstractmethod
     def reset(self):
-        pass
+        return {}
 
 
 class LossMetric(MetricBase):
@@ -79,9 +75,9 @@ class SimpleMetric(MetricBase):
 
 
 # TODO: better name for v
-class SimpleAveragingMetric(SimpleMetric):
-    def __init__(self, name, metric_function, v=0.0):
-        super().__init__(name, metric_function)
+class Average(MetricBase):
+    def __init__(self, metric, v=0.0):
+        super().__init__(metric.name, metric.process)
         self._v = v
         self._total = v
         self._count = 0
