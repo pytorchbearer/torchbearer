@@ -8,7 +8,8 @@ import torch.optim
 
 import torch.nn as nn
 
-from framework.metrics.metrics import LossMetric, Average
+import framework.metrics.accuracy as metrics
+import framework.metrics.wrappers as wrap
 
 # os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"]="0"
@@ -56,7 +57,7 @@ class Callback(object):
         pass
 
     def on_sample(self, state):
-        print('\r.', end='')
+        pass
 
     def on_forward(self, state):
         pass
@@ -71,7 +72,7 @@ class Callback(object):
         pass
 
     def on_update_parameters(self, state):
-        print(state['metrics'])
+        pass
 
     def on_end_epoch(self, state):
         print(state['metrics'])
@@ -79,7 +80,7 @@ class Callback(object):
     def on_end(self, state):
         pass
 
-model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[Average(LossMetric()), LossMetric()]).cuda()
-model.fit_generator(trainloader, callbacks=Callback())
+model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[wrap.mean(metrics.accuracy), wrap.std(metrics.accuracy)]).cuda()
+model.fit_generator(trainloader, callbacks=[Callback()])
 
 

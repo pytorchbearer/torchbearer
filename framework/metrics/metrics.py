@@ -84,7 +84,7 @@ class BasicMetric(Metric):
         pass
 
 
-class LossMetric(BasicMetric):
+class Loss(BasicMetric):
     def __init__(self):
         super().__init__('loss')
 
@@ -98,7 +98,7 @@ class LossMetric(BasicMetric):
         return state['loss']
 
 
-class LambdaMetric(BasicMetric):
+class Lambda(BasicMetric):
     def __init__(self, name, metric_function):
         super().__init__(name)
         self._metric_function = metric_function

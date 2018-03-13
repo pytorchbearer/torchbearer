@@ -4,66 +4,74 @@ import numpy as np
 
 
 def std(metric):
-    return AggregateMetric(metric, np.std, extension='_std')
+    return Std(metric)
 
 
 def mean(metric):
-    return AggregateMetric(metric, np.mean, extension='_mean')
+    return Mean(metric)
 
 
-def max(metric):
-    return ComparisonMetric(metric, lambda a, b: a > b, extension='_max')
-
-
-def min(metric):
-    return ComparisonMetric(metric, lambda a, b: a < b, extension='_min')
-
-
-class AggregateMetric(BasicMetric):
-    def __init__(self, metric, function, extension=''):
-        super().__init__(metric.name + extension)
+class Std(BasicMetric):
+    def __init__(self, metric):
+        super().__init__(metric.name + '_std')
         self._metric = metric
-        self._function = function
         self.reset()
 
     def train(self, state):
-        self._list_train += self._metric.train(state)
+        result = self._metric.train(state).float()
+        self._sum_train += result.sum()
+        self._sum_sq_train += result.pow(2).sum()
+        self._count_train += result.size(0)
 
     def validate(self, state):
-        self._list_val += self._metric.validate(state)
+        result = self._metric.validate(state).float()
+        self._sum_val += result.sum()
+        self._sum_sq_val += result.pow(2).sum()
+        self._count_val += result.size(0)
 
     def final_train(self, state):
-        return self._function(self._list_train)
+        mean = self._sum_train / self._count_train
+        mean = mean ** 2
+        return (self._sum_sq_train / self._count_train) - mean
 
     def final_validate(self, state):
-        return self._function(self._list_val)
+        mean = self._sum_val / self._count_val
+        mean = mean ** 2
+        return (self._sum_sq_val / self._count_val) - mean
 
     def reset(self):
-        self._list_train = []
-        self._list_val = []
+        self._sum_train = 0.0
+        self._sum_sq_train = 0.0
+        self._count_train = 0
+        self._sum_val = 0.0
+        self._sum_sq_val = 0.0
+        self._count_val = 0
 
 
-class ComparisonMetric(BasicMetric):
-    def __init__(self, metric, comparator, extension=''):
-        super().__init__(metric.name + extension)
+class Mean(BasicMetric):
+    def __init__(self, metric):
+        super().__init__(metric.name + '_mean')
         self._metric = metric
-        self._comparator = comparator
         self.reset()
 
     def train(self, state):
         result = self._metric.train(state)
-        self._ext_train = result if self._ext_train is None or self._comparator(result, self._ext_train) else self._ext_train
+        self._sum_train += result.sum()
+        self._count_train += result.size(0)
 
     def validate(self, state):
         result = self._metric.validate(state)
-        self._ext_val = result if self._ext_val is None or self._comparator(result, self._ext_val) else self._ext_val
+        self._sum_val += result.sum()
+        self._count_val += result.size(0)
 
     def final_train(self, state):
-        return self._ext_train
+        return self._sum_train / self._count_train
 
     def final_validate(self, state):
-        return self._ext_val
+        return self._sum_val / self._count_val
 
     def reset(self):
-        self._ext_train = None
-        self._ext_val = None
+        self._sum_train = 0.0
+        self._count_train = 0
+        self._sum_val = 0.0
+        self._count_val = 0
