@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader, TensorDataset
 from utils import get_train_valid_sets
-from framework.callbacks.callbacks import Callback
+from framework.callbacks.callbacks import CallbackList
 from torch.autograd import Variable
 from framework.metrics.metrics import MetricList
 
@@ -34,7 +34,7 @@ class Model:
                       validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
         self.stop_training = False
         history = None
-        _callbacks = callbacks  # TODO: Wrap in callback list
+        _callbacks = CallbackList(callbacks)
 
         if validation_steps is None and validation_generator is not None:
             validation_steps = len(validation_generator)
@@ -112,7 +112,6 @@ class Model:
         _callbacks.on_end(state)
 
         return history
-
 
     def _validate(self, validation_generator, num_validation_steps, state):
         validation_iterator = iter(validation_generator)
