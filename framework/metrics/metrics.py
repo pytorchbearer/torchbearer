@@ -88,10 +88,10 @@ class LossMetric(BasicMetric):
     def __init__(self):
         super().__init__('loss')
 
-    def process_train(self, state):
+    def train(self, state):
         return self._process(state)
 
-    def process_val(self, state):
+    def validate(self, state):
         return self._process(state)
 
     def _process(self, state):
@@ -103,10 +103,10 @@ class LambdaMetric(BasicMetric):
         super().__init__(name)
         self._metric_function = metric_function
 
-    def process_train(self, state):
+    def train(self, state):
         return self._process(state)
 
-    def process_val(self, state):
+    def validate(self, state):
         return self._process(state)
 
     def _process(self, state):
@@ -123,13 +123,11 @@ class Average(BasicMetric):
         result = self._metric.train(state)
         self._total_train += result * state['y_pred'].shape[0]
         self._count_train += state['y_pred'].shape[0]
-        return result
 
     def validate(self, state):
         result = self._metric.validate(state)
         self._total_val += result * state['y_pred'].shape[0]
         self._count_val += state['y_pred'].shape[0]
-        return result
 
     def final_train(self, state):
         return self._total_train / self._count_train
@@ -142,3 +140,39 @@ class Average(BasicMetric):
         self._count_train = 0
         self._total_val = 0.0
         self._count_val = 0
+
+
+class ComparisonMetric(BasicMetric):
+    def __init__(self, metric, comparator, extension=''):
+        super().__init__(metric.name + extension)
+        self._metric = metric
+        self._comparator = comparator
+        self.reset()
+
+    def train(self, state):
+        result = self._metric.train(state)
+        self._ext_train = result if self._ext_train is None or self._comparator(result, self._ext_train) else self._ext_train
+
+    def validate(self, state):
+        result = self._metric.validate(state)
+        self._ext_val = result if self._ext_val is None or self._comparator(result, self._ext_val) else self._ext_val
+
+    def final_train(self, state):
+        return self._ext_train
+
+    def final_validate(self, state):
+        return self._ext_val
+
+    def reset(self):
+        self._ext_train = None
+        self._ext_val = None
+
+
+class Max(ComparisonMetric):
+    def __init__(self, metric):
+        super().__init__(metric, lambda a, b: a > b, extension='max')
+
+
+class Min(ComparisonMetric):
+    def __init__(self, metric):
+        super().__init__(metric, lambda a, b: a < b, extension='min')
