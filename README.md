@@ -1,2 +1,2 @@
 # PyTorch-bink
-bink model training library for PyTorch
+bink: A model training library for PyTorch
