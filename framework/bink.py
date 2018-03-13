@@ -114,6 +114,7 @@ class Model:
         return history
 
     def _validate(self, validation_generator, num_validation_steps, state):
+        self._model.eval()
         validation_iterator = iter(validation_generator)
         for step in range(num_validation_steps):
 
