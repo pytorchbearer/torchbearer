@@ -8,18 +8,20 @@ import torch.optim
 
 import torch.nn as nn
 
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+from framework.metrics.metrics import LossMetric, Average
+
+# os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+# os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 ####### Paths #######
-dataset_path = '/home/matt/datasets/mnist'
+dataset_path = '/home/ethan/datasets'
 model_load_path = ''  # Path to a saved model which is loaded if "newmodel" is true
 logfile = 'logs.log'
 folderName = 'test'
 
 
 ####### Datasets #######
-batch_size = 32
+batch_size = 128
 num_workers = 8
 
 transform = transforms.Compose(
@@ -44,7 +46,40 @@ model = nm.InceptionSmall()
 
 ####### Trainer #######
 
-model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss())
-model.fit_generator(trainloader)
+
+class Callback(object):
+
+    def on_start(self, state):
+        pass
+
+    def on_start_epoch(self, state):
+        pass
+
+    def on_sample(self, state):
+        print('\r.', end='')
+
+    def on_forward(self, state):
+        pass
+
+    def on_forward_criterion(self, state):
+        pass
+
+    def on_backward_criterion(self, state):
+        pass
+
+    def on_backward(self, state):
+        pass
+
+    def on_update_parameters(self, state):
+        print(state['metrics'])
+
+    def on_end_epoch(self, state):
+        print(state['metrics'])
+
+    def on_end(self, state):
+        pass
+
+model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[Average(LossMetric()), LossMetric()]).cuda()
+model.fit_generator(trainloader, callbacks=Callback())
 
 

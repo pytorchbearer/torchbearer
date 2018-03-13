@@ -34,7 +34,7 @@ class Model:
                       validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
         self.stop_training = False
         history = None
-        _callbacks = Callback()  # TODO: Wrap in callback list
+        _callbacks = callbacks  # TODO: Wrap in callback list
 
         if validation_steps is None and validation_generator is not None:
             validation_steps = len(validation_generator)
@@ -55,7 +55,7 @@ class Model:
         _callbacks.on_start(state)
 
         self._model.train()
-        for epoch in range(initial_epoch, epochs+1):
+        for epoch in range(initial_epoch, epochs):
             _callbacks.on_start_epoch(state)
             state['epoch'] = epoch
 
@@ -95,11 +95,16 @@ class Model:
                 self._optimizer.step()
                 _callbacks.on_update_parameters(state)
 
+            metrics = self._metrics.final_train_dict(state)
+            state['metrics'].update(metrics)
+
             # Validate
             state['validation_generator'] = validation_generator
             if validation_generator is not None:
                 self._model.eval()
                 self._validate(validation_generator, validation_steps, state)
+                metrics = self._metrics.final_validate_dict(state)
+                state['metrics'].update(metrics)
 
             _callbacks.on_end_epoch(state)
             self._metrics.reset()
@@ -133,7 +138,9 @@ class Model:
     def cuda(self):
         self._model.cuda()
         self._use_cuda = True
+        return self
 
     def cpu(self):
         self._model.cpu()
         self._use_cuda = False
+        return self
