@@ -55,7 +55,7 @@ class Std(BasicMetric):
 
 class Mean(BasicMetric):
     def __init__(self, metric):
-        super().__init__(metric.name + '_mean')
+        super().__init__(metric.name)
         self._metric = metric
         self.reset()
 

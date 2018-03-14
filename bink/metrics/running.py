@@ -46,7 +46,7 @@ class RunningMetric(BasicMetric):
 
 class Mean(RunningMetric):
     def __init__(self, metric, batch_size=50, step_size=10):
-        super().__init__(metric.name + '_mean', batch_size=batch_size, step_size=step_size)
+        super().__init__(metric.name, batch_size=batch_size, step_size=step_size)
         self._metric = metric
 
     def _train(self, state):
