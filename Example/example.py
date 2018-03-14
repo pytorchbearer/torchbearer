@@ -2,15 +2,15 @@ import torchvision
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 import os
-from framework.bink import Model
-from framework.callbacks.tqdm import Tqdm
+from bink.bink import Model
+from bink.callbacks.tqdm import Tqdm
 from Example import inception_network as nm
 import torch.optim
 
 import torch.nn as nn
 
-import framework.metrics.primitives as metrics
-import framework.metrics.wrappers as wrap
+import bink.metrics.primitives as metrics
+import bink.metrics.wrappers as wrap
 
 # os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"]="0"

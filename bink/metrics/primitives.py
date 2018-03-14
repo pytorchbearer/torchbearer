@@ -1,5 +1,5 @@
-from framework.metrics.metrics import BasicMetric, Metric
-from framework.metrics.wrappers import Lambda
+from bink.metrics.metrics import BasicMetric, Metric
+from bink.metrics.wrappers import Lambda
 
 import torch
 

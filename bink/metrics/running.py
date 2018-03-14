@@ -1,4 +1,4 @@
-from framework.metrics.metrics import BasicMetric, MetricList
+from bink.metrics.metrics import BasicMetric, MetricList
 from abc import ABCMeta, abstractmethod
 from collections import deque
 
