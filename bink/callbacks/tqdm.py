@@ -8,7 +8,8 @@ class Tqdm(Callback):
         self._loader = None
 
     def on_start_epoch(self, state):
-        self._loader = tqdm(state['generator'])
+        bar_desc = '{:d}/{:d}'.format(state['epoch'] + 1, state['max_epochs'])
+        self._loader = tqdm(state['generator'], desc=bar_desc)
         state['generator'] = self._loader
 
     def on_update_parameters(self, state):
