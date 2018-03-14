@@ -76,7 +76,7 @@ class Callback(object):
 
     def on_end_epoch(self, state):
         print()
-        print(state['metrics'])
+        print(state['final_metrics'])
 
     def on_end(self, state):
         pass

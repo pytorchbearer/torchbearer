@@ -96,16 +96,14 @@ class Model:
                 self._optimizer.step()
                 _callbacks.on_update_parameters(state)
 
-            metrics = self._metrics.final_train_dict(state)
-            state['metrics'].update(metrics)
+            state['final_metrics'] = self._metrics.final_train_dict(state)
 
             # Validate
             state['validation_generator'] = validation_generator
             if validation_generator is not None:
                 self._model.eval()
                 self._validate(validation_generator, validation_steps, state)
-                metrics = self._metrics.final_validate_dict(state)
-                state['metrics'].update(metrics)
+                state['final_metrics'].update(self._metrics.final_validate_dict(state))
 
             _callbacks.on_end_epoch(state)
             self._metrics.reset()
@@ -133,8 +131,7 @@ class Model:
             # Loss and metrics
             loss = self._criterion(y_pred, y_true)
             state['loss'] = loss.data
-            metrics = self._metrics.validate_dict(state)
-            state['metrics'].update(metrics)
+            state['metrics'] = self._metrics.validate_dict(state)
 
     def cuda(self):
         self._model.cuda()

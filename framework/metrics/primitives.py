@@ -1,4 +1,4 @@
-from framework.metrics.metrics import BasicMetric
+from framework.metrics.metrics import BasicMetric, Metric
 from framework.metrics.wrappers import Lambda
 
 import torch
@@ -29,15 +29,22 @@ class Loss(BasicMetric):
 loss = Loss()
 
 
-class Epoch(BasicMetric):
+class Epoch(Metric):
     def __init__(self):
-        super().__init__('epoch')
+        super().__init__()
+        self._name = 'epoch'
 
-    def train(self, state):
-        return self._process(state)
+    def final_train_dict(self, state):
+        return {self._name: self._process(state)}
 
-    def validate(self, state):
-        return self._process(state)
+    def final_validate_dict(self, state):
+        return {self._name: self._process(state)}
+
+    def train_dict(self, state):
+        return {self._name: self._process(state)}
+
+    def validate_dict(self, state):
+        return {self._name: self._process(state)}
 
     def _process(self, state):
         return state['epoch']
