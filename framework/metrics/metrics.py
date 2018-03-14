@@ -21,13 +21,20 @@ class Metric(object):
 class MetricList(Metric):
     def __init__(self, list):
         super().__init__()
+        import framework.metrics.defaults as defaults
+
+        for i in range(len(list)):
+            metric = list[i]
+            if str(metric) == metric:
+                list[i] = getattr(defaults, metric)()
+
         self._list = list
 
     def _for_list(self, function):
         result = {}
         for metric in self._list:
             out = function(metric)
-            if out:
+            if out is not None:
                 result.update(out)
         return result
 
@@ -66,48 +73,19 @@ class BasicMetric(Metric):
 
     def train_dict(self, state):
         result = self.train(state)
-        return {'train_' + self.name: result} if result else {}
+        return {'train_' + self.name: result} if result is not None else {}
 
     def validate_dict(self, state):
         result = self.validate(state)
-        return {'val_' + self.name: result} if result else {}
+        return {'val_' + self.name: result} if result is not None else {}
 
     def final_train_dict(self, state):
         result = self.final_train(state)
-        return {'train_' + self.name: result} if result else {}
+        return {'train_' + self.name: result} if result is not None else {}
 
     def final_validate_dict(self, state):
         result = self.final_validate(state)
-        return {'val_' + self.name: result} if result else {}
+        return {'val_' + self.name: result} if result is not None else {}
 
     def reset(self):
         pass
-
-
-class Loss(BasicMetric):
-    def __init__(self):
-        super().__init__('loss')
-
-    def train(self, state):
-        return self._process(state)
-
-    def validate(self, state):
-        return self._process(state)
-
-    def _process(self, state):
-        return state['loss']
-
-
-class Lambda(BasicMetric):
-    def __init__(self, name, metric_function):
-        super().__init__(name)
-        self._metric_function = metric_function
-
-    def train(self, state):
-        return self._process(state)
-
-    def validate(self, state):
-        return self._process(state)
-
-    def _process(self, state):
-        return self._metric_function(state['y_true'], state['y_pred'])

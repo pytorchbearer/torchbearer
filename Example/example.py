@@ -8,7 +8,7 @@ import torch.optim
 
 import torch.nn as nn
 
-import framework.metrics.accuracy as metrics
+import framework.metrics.primitives as metrics
 import framework.metrics.wrappers as wrap
 
 # os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
@@ -72,15 +72,15 @@ class Callback(object):
         pass
 
     def on_update_parameters(self, state):
-        pass
+        print('\r' + str(state['metrics']), end='')
 
     def on_end_epoch(self, state):
+        print()
         print(state['metrics'])
 
     def on_end(self, state):
         pass
 
-model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[wrap.mean(metrics.accuracy), wrap.std(metrics.accuracy)]).cuda()
+
+model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
 model.fit_generator(trainloader, callbacks=[Callback()])
-
-

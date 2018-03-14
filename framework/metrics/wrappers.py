@@ -1,6 +1,4 @@
-from framework.metrics.metrics import BasicMetric
-
-import numpy as np
+from framework.metrics.metrics import BasicMetric, MetricList
 
 
 def std(metric):
@@ -11,6 +9,13 @@ def mean(metric):
     return Mean(metric)
 
 
+def statistics(metric):
+    return MetricList([mean(metric), std(metric)])
+
+
+stats = statistics
+
+
 class Std(BasicMetric):
     def __init__(self, metric):
         super().__init__(metric.name + '_std')
@@ -18,13 +23,13 @@ class Std(BasicMetric):
         self.reset()
 
     def train(self, state):
-        result = self._metric.train(state).float()
+        result = self._metric.train(state)
         self._sum_train += result.sum()
         self._sum_sq_train += result.pow(2).sum()
         self._count_train += result.size(0)
 
     def validate(self, state):
-        result = self._metric.validate(state).float()
+        result = self._metric.validate(state)
         self._sum_val += result.sum()
         self._sum_sq_val += result.pow(2).sum()
         self._count_val += result.size(0)
@@ -75,3 +80,18 @@ class Mean(BasicMetric):
         self._count_train = 0
         self._sum_val = 0.0
         self._count_val = 0
+
+
+class Lambda(BasicMetric):
+    def __init__(self, name, metric_function):
+        super().__init__(name)
+        self._metric_function = metric_function
+
+    def train(self, state):
+        return self._process(state)
+
+    def validate(self, state):
+        return self._process(state)
+
+    def _process(self, state):
+        return self._metric_function(state['y_true'], state['y_pred'])

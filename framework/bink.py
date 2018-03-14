@@ -3,6 +3,7 @@ from utils import get_train_valid_sets
 from framework.callbacks.callbacks import CallbackList
 from torch.autograd import Variable
 from framework.metrics.metrics import MetricList
+import framework.metrics.primitives as primitives
 
 
 class Model:
@@ -11,7 +12,7 @@ class Model:
         self._model = model
         self._optimizer = optimizer
         self._criterion = loss_criterion
-        self._metrics = MetricList(metrics)
+        self._metrics = MetricList([primitives.epoch] + metrics)
         self._use_cuda = False
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.0,
@@ -83,7 +84,7 @@ class Model:
 
                 # Loss Calculation
                 loss = self._criterion(y_pred, y_true)
-                state['loss'] = loss.data[0]
+                state['loss'] = loss.data
                 _callbacks.on_forward_criterion(state)
                 state['metrics'] = self._metrics.train_dict(state)
 
@@ -131,7 +132,7 @@ class Model:
 
             # Loss and metrics
             loss = self._criterion(y_pred, y_true)
-            state['loss'] = loss.data[0]
+            state['loss'] = loss.data
             metrics = self._metrics.validate_dict(state)
             state['metrics'].update(metrics)
 
