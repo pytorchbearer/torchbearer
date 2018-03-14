@@ -13,10 +13,10 @@ class Model:
         self._model = model
         self._optimizer = optimizer
         self._criterion = loss_criterion
-        self._metrics = MetricList([primitives.epoch] + metrics)
+        self._metrics = MetricList(metrics)
         self._use_cuda = False
 
-    def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.0,
+    def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
             validation_data=None, shuffle=True, class_weight=None, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, workers=1):
         
@@ -32,7 +32,7 @@ class Model:
                                   callbacks=callbacks, validation_generator=valloader, validation_steps=validation_steps,
                                   class_weight=class_weight, initial_epoch=initial_epoch)
 
-    def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=None,
+    def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
                       validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
         self.stop_training = False
         history = None
@@ -63,9 +63,9 @@ class Model:
 
         self._model.train()
         for epoch in range(initial_epoch, epochs):
-            _callbacks.on_start_epoch(state)
             state['epoch'] = epoch
             state['t'] = 0
+            _callbacks.on_start_epoch(state)
 
             train_iterator = iter(state['generator'])
             state['train_iterator'] = train_iterator
