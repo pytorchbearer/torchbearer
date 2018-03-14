@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 import os
 from framework.bink import Model
+from framework.callbacks.tqdm import Tqdm
 from Example import inception_network as nm
 import torch.optim
 
@@ -83,4 +84,4 @@ class Callback(object):
 
 
 model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
-model.fit_generator(trainloader, callbacks=[Callback()])
+model.fit_generator(trainloader, callbacks=[], epochs=10)

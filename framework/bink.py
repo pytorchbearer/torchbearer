@@ -1,6 +1,7 @@
 from torch.utils.data import DataLoader, TensorDataset
 from utils import get_train_valid_sets
 from framework.callbacks.callbacks import CallbackList
+from framework.callbacks.tqdm import Tqdm
 from torch.autograd import Variable
 from framework.metrics.metrics import MetricList
 import framework.metrics.primitives as primitives
@@ -35,6 +36,10 @@ class Model:
                       validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
         self.stop_training = False
         history = None
+
+        if verbose == 1:
+            callbacks = [Tqdm()] + callbacks
+
         _callbacks = CallbackList(callbacks)
 
         if validation_steps is None and validation_generator is not None:
@@ -50,7 +55,8 @@ class Model:
             'max_epochs': epochs,
             'train_steps': train_steps,
             'validation_steps': validation_steps,
-            't': 0
+            't': 0,
+            'generator': generator
         }
 
         _callbacks.on_start(state)
@@ -61,7 +67,7 @@ class Model:
             state['epoch'] = epoch
             state['t'] = 0
 
-            train_iterator = iter(generator)
+            train_iterator = iter(state['generator'])
             state['train_iterator'] = train_iterator
             for i in range(1, train_steps + 1):
                 data = next(train_iterator)
