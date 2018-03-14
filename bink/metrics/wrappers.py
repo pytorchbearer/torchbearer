@@ -1,4 +1,4 @@
-from framework.metrics.metrics import BasicMetric, MetricList
+from bink.metrics.metrics import BasicMetric, MetricList
 
 
 def std(metric):

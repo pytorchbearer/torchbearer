@@ -21,7 +21,7 @@ class Metric(object):
 class MetricList(Metric):
     def __init__(self, list):
         super().__init__()
-        import framework.metrics.defaults as defaults
+        import bink.metrics.defaults as defaults
 
         for i in range(len(list)):
             metric = list[i]

@@ -1,6 +1,6 @@
-import framework.metrics.primitives as metrics
-import framework.metrics.wrappers as wrap
-import framework.metrics.running as running
+import bink.metrics.primitives as metrics
+import bink.metrics.wrappers as wrap
+import bink.metrics.running as running
 
 
 def loss():

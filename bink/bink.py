@@ -1,10 +1,10 @@
 from torch.utils.data import DataLoader, TensorDataset
 from utils import get_train_valid_sets
-from framework.callbacks.callbacks import CallbackList
-from framework.callbacks.tqdm import Tqdm
+from bink.callbacks.callbacks import CallbackList
+from bink.callbacks.tqdm import Tqdm
 from torch.autograd import Variable
-from framework.metrics.metrics import MetricList
-import framework.metrics.primitives as primitives
+from bink.metrics.metrics import MetricList
+import bink.metrics.primitives as primitives
 
 
 class Model:
