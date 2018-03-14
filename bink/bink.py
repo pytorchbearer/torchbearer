@@ -63,9 +63,9 @@ class Model:
 
         self._model.train()
         for epoch in range(initial_epoch, epochs):
-            _callbacks.on_start_epoch(state)
             state['epoch'] = epoch
             state['t'] = 0
+            _callbacks.on_start_epoch(state)
 
             train_iterator = iter(state['generator'])
             state['train_iterator'] = train_iterator
