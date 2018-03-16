@@ -1,22 +1,18 @@
-import torchvision
-from torch.utils.data import DataLoader
-import torchvision.transforms as transforms
 import os
-from bink.bink import Model
-from bink.metrics import RocAucScore
-from Example import inception_network as nm
-import torch.optim
 
 import torch.nn as nn
+import torch.optim
+import torchvision
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
 
-import bink.metrics.primitives as metrics
-import bink.metrics.wrappers as wrap
+from Example import inception_network as nm
+from bink.bink import Model
+from bink.metrics import RocAucScore
 
-# os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-# os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 ####### Paths #######
-dataset_path = '/home/ethan/datasets'
+dataset_path = '/home/matt/datasets'
 model_load_path = ''  # Path to a saved model which is loaded if "newmodel" is true
 logfile = 'logs.log'
 folderName = 'test'
@@ -40,48 +36,11 @@ testloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_worker
 ####### Parameters #######
 modelType = nm.InceptionSmall
 modelName = modelType.name
-modelArgs = None
 modelPath = os.getcwd() + '/' + modelName + '/' + folderName + '/'
 
-# Create new model or load old one?
 model = nm.InceptionSmall()
 
 ####### Trainer #######
 
-
-class Callback(object):
-
-    def on_start(self, state):
-        pass
-
-    def on_start_epoch(self, state):
-        pass
-
-    def on_sample(self, state):
-        pass
-
-    def on_forward(self, state):
-        pass
-
-    def on_forward_criterion(self, state):
-        pass
-
-    def on_backward_criterion(self, state):
-        pass
-
-    def on_backward(self, state):
-        pass
-
-    def on_update_parameters(self, state):
-        print('\r' + str(state['metrics']), end='')
-
-    def on_end_epoch(self, state):
-        print()
-        print(state['final_metrics'])
-
-    def on_end(self, state):
-        pass
-
-
 model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[RocAucScore(), 'acc', 'loss']).cuda()
-model.fit_generator(trainloader, callbacks=[], epochs=10)
+model.fit_generator(trainloader, validation_generator=testloader, callbacks=[], epochs=10)
