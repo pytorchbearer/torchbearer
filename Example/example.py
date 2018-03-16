@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 import os
 from bink.bink import Model
-from bink.callbacks.tqdm import Tqdm
+from bink.metrics import RocAucScore
 from Example import inception_network as nm
 import torch.optim
 
@@ -83,5 +83,5 @@ class Callback(object):
         pass
 
 
-model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
+model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[RocAucScore(), 'acc', 'loss']).cuda()
 model.fit_generator(trainloader, callbacks=[], epochs=10)

@@ -3,8 +3,7 @@ from utils import get_train_valid_sets
 from bink.callbacks.callbacks import CallbackList
 from bink.callbacks.tqdm import Tqdm
 from torch.autograd import Variable
-from bink.metrics.metrics import MetricList
-import bink.metrics.primitives as primitives
+from bink import metrics as bink_metrics
 
 
 class Model:
@@ -13,7 +12,7 @@ class Model:
         self._model = model
         self._optimizer = optimizer
         self._criterion = loss_criterion
-        self._metrics = MetricList([primitives.epoch] + metrics)
+        self._metrics = bink_metrics.MetricList([bink_metrics.epoch_primitive] + metrics)
         self._use_cuda = False
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.0,
@@ -56,7 +55,8 @@ class Model:
             'train_steps': train_steps,
             'validation_steps': validation_steps,
             't': 0,
-            'generator': generator
+            'generator': generator,
+            'use_cuda': self._use_cuda
         }
 
         _callbacks.on_start(state)
@@ -64,6 +64,7 @@ class Model:
         self._model.train()
         for epoch in range(initial_epoch, epochs):
             _callbacks.on_start_epoch(state)
+            self._metrics.reset(state)
             state['epoch'] = epoch
             state['t'] = 0
 
@@ -108,12 +109,12 @@ class Model:
             # Validate
             state['validation_generator'] = validation_generator
             if validation_generator is not None:
+                self._metrics.reset(state)
                 self._model.eval()
                 self._validate(validation_generator, validation_steps, state)
                 state['final_metrics'].update(self._metrics.final_validate_dict(state))
 
             _callbacks.on_end_epoch(state)
-            self._metrics.reset()
 
         _callbacks.on_end(state)
 
