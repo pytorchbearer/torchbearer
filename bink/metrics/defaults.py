@@ -1,14 +1,12 @@
-import bink.metrics.primitives as metrics
-import bink.metrics.wrappers as wrap
-import bink.metrics.running as running
+from bink import metrics
 
 
 def loss():
-    return wrap.MetricList([running.stats(metrics.loss), wrap.stats(metrics.loss)])
+    return metrics.MetricList([metrics.running_stats(metrics.loss_primitive), metrics.stats(metrics.loss_primitive)])
 
 
 def accuracy():
-    return wrap.MetricList([running.stats(metrics.accuracy), wrap.stats(metrics.accuracy)])
+    return metrics.MetricList([metrics.running_stats(metrics.categorical_primitive), metrics.stats(metrics.categorical_primitive)])
 
 
 acc = accuracy

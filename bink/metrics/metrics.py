@@ -14,7 +14,7 @@ class Metric(object):
     def final_validate_dict(self, state):
         return {}
 
-    def reset(self):
+    def reset(self, state):
         pass
 
 
@@ -50,8 +50,8 @@ class MetricList(Metric):
     def final_validate_dict(self, state):
         return self._for_list(lambda metric: metric.final_validate_dict(state))
 
-    def reset(self):
-        self._for_list(lambda metric: metric.reset())
+    def reset(self, state):
+        self._for_list(lambda metric: metric.reset(state))
 
 
 class BasicMetric(Metric):
@@ -87,5 +87,5 @@ class BasicMetric(Metric):
         result = self.final_validate(state)
         return {'val_' + self.name: result} if result is not None else {}
 
-    def reset(self):
+    def reset(self, state):
         pass

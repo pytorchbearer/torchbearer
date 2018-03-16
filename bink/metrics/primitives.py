@@ -1,5 +1,4 @@
-from bink.metrics.metrics import BasicMetric, Metric
-from bink.metrics.wrappers import Lambda
+from bink import metrics
 
 import torch
 
@@ -9,10 +8,10 @@ def _categorical(y_true, y_pred):
     return (y_pred == y_true).float()
 
 
-categorical = accuracy = Lambda('acc', _categorical)
+categorical_primitive = metrics.BatchLambda('acc', _categorical)
 
 
-class Loss(BasicMetric):
+class Loss(metrics.BasicMetric):
     def __init__(self):
         super().__init__('loss')
 
@@ -26,10 +25,10 @@ class Loss(BasicMetric):
         return state['loss']
 
 
-loss = Loss()
+loss_primitive = Loss()
 
 
-class Epoch(Metric):
+class Epoch(metrics.Metric):
     def __init__(self):
         super().__init__()
         self._name = 'epoch'
@@ -50,4 +49,4 @@ class Epoch(Metric):
         return state['epoch']
 
 
-epoch = Epoch()
+epoch_primitive = Epoch()
