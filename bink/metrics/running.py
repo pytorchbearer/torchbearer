@@ -1,20 +1,20 @@
-from bink.metrics.metrics import BasicMetric, MetricList
+from bink import metrics
 from abc import ABCMeta, abstractmethod
 from collections import deque
 
 
-def mean(metric):
+def running_mean(metric):
     return Mean(metric)
 
 
-def statistics(metric):
-    return MetricList([mean(metric)])
+def running_statistics(metric):
+    return metrics.MetricList([running_mean(metric)])
 
 
-stats = statistics
+running_stats = running_statistics
 
 
-class RunningMetric(BasicMetric):
+class RunningMetric(metrics.BasicMetric):
     __metaclass__ = ABCMeta
 
     def __init__(self, name, batch_size=50, step_size=10):
@@ -23,7 +23,6 @@ class RunningMetric(BasicMetric):
         self._step_size = step_size
         self._cache = deque()
         self._result = {}
-        self.reset()
 
     @abstractmethod
     def _train(self, state): ...
@@ -40,7 +39,7 @@ class RunningMetric(BasicMetric):
         self._i += 1
         return self._result
 
-    def reset(self):
+    def reset(self, state):
         self._i = 0
 
 
