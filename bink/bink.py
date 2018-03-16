@@ -14,6 +14,7 @@ class Model:
         self._criterion = loss_criterion
         self._metrics = bink_metrics.MetricList(metrics)
         self._use_cuda = False
+        self._sample_device_function = self._cpu_sample
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
             validation_data=None, shuffle=True, class_weight=None, initial_epoch=0,
@@ -59,6 +60,11 @@ class Model:
             'use_cuda': self._use_cuda
         }
 
+        if self._use_cuda:
+            self._sample_device_function = self._cuda_sample
+        else:
+            self._sample_device_function = self._cpu_sample
+
         _callbacks.on_start(state)
 
         self._model.train()
@@ -76,8 +82,7 @@ class Model:
                 # Extract batch
                 x, y_true = data
                 x, y_true = Variable(x), Variable(y_true)
-                if self._use_cuda:
-                    x, y_true = x.cuda(), y_true.cuda()
+                x, y_true = self._sample_device_function(x, y_true)
                 _callbacks.on_sample(state)
 
                 # Zero grads
@@ -144,9 +149,19 @@ class Model:
     def cuda(self):
         self._model.cuda()
         self._use_cuda = True
+        self._sample_device_function = self._cuda_sample
         return self
 
     def cpu(self):
         self._model.cpu()
         self._use_cuda = False
+        self._sample_device_function = self._cpu_sample
         return self
+
+    @staticmethod
+    def _cuda_sample(x, y):
+        return x.cuda(), y.cuda()
+
+    @staticmethod
+    def _cpu_sample(x, y):
+        return x, y
