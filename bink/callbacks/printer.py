@@ -6,12 +6,12 @@ class ConsolePrinter(Callback):
     def on_update_parameters(self, state):
         epoch_str = '{:d}/{:d} '.format(state['epoch'] + 1, state['max_epochs'])
         batch_str = '{:d}/{:d} '.format(state['t']+1, state['train_steps'])
-        stats_str = ', '.join(['%s:%.03g' % (key, value) for (key, value) in state['metrics'].items()])
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['metrics'].items()])
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
     def on_end_epoch(self, state):
         epoch_str = '{:d}/{:d}: '.format(state['epoch'] + 1, state['max_epochs'])
-        stats_str = ', '.join(['%s:%.03g' % (key, value) for (key, value) in state['final_metrics'].items()])
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['final_metrics'].items()])
         print('\r' + epoch_str + stats_str, end='\n')
 
 
