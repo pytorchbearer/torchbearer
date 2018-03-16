@@ -133,8 +133,7 @@ class Model:
             # Load batch
             x, y_true = next(validation_iterator)
             x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
-            if self._use_cuda:
-                x, y_true = x.cuda(), y_true.cuda()
+            x, y_true = self._sample_device_function(x, y_true)
 
             # Forward pass
             y_pred = self._model(x)
