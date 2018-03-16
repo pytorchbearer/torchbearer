@@ -164,3 +164,4 @@ class Model:
     @staticmethod
     def _cpu_sample(x, y):
         return x, y
+
