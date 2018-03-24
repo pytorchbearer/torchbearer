@@ -119,8 +119,8 @@ class EpochLambda(metrics.BasicMetric):
         return self._final(self._y_true, self._y_pred)
 
     def validate(self, state):
-        self._y_true = torch.cat((self._y_true, state['y_true'].float()), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state['y_pred']), dim=0)
+        self._y_true = torch.cat((self._y_true, state['y_true']), dim=0)
+        self._y_pred = torch.cat((self._y_pred, state['y_pred'].float()), dim=0)
 
     def final_validate(self, state):
         return self._final(self._y_true, self._y_pred)
