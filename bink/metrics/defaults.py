@@ -6,7 +6,7 @@ def loss():
 
 
 def accuracy():
-    return metrics.MetricList([metrics.running_stats(metrics.categorical_primitive), metrics.stats(metrics.categorical_primitive)])
+    return metrics.MetricList([metrics.running_stats(metrics.categorical_accuracy_primitive), metrics.stats(metrics.categorical_accuracy_primitive)])
 
 
 acc = accuracy

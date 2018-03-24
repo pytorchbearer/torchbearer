@@ -2,13 +2,15 @@ from bink import metrics
 
 import torch
 
+class CategoricalAccuracy(metrics.BatchLambda):
+    def __init__(self):
+        def _categorical(y_true, y_pred):
+            _, y_pred = torch.max(y_pred, 1)
+            return (y_pred == y_true).float()
+        super().__init__('acc', _categorical)
 
-def _categorical(y_true, y_pred):
-    _, y_pred = torch.max(y_pred, 1)
-    return (y_pred == y_true).float()
 
-
-categorical_primitive = metrics.BatchLambda('acc', _categorical)
+categorical_accuracy_primitive = CategoricalAccuracy()
 
 
 class Loss(metrics.BasicMetric):
