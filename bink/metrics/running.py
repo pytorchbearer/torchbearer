@@ -35,7 +35,7 @@ class RunningMetric(metrics.BasicMetric):
         if len(self._cache) > self._batch_size:
             self._cache.popleft()
         if self._i % self._step_size == 0:
-            self._result = self._step(self._cache)
+            self._result = self._step(list(self._cache))
         self._i += 1
         return self._result
 
