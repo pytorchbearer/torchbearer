@@ -68,15 +68,13 @@ class Model:
         _callbacks.on_start(state)
 
         self._model.train()
-        for epoch in range(initial_epoch, epochs):
-            state['epoch'] = epoch
-            state['t'] = 0
+        for state['epoch'] in range(initial_epoch, epochs):
             _callbacks.on_start_epoch(state)
             self._metrics.reset(state)
 
             train_iterator = iter(state['generator'])
             state['train_iterator'] = train_iterator
-            for i in range(1, train_steps + 1):
+            for state['t'] in range(0, train_steps):
                 data = next(train_iterator)
 
                 # Extract batch
@@ -92,7 +90,6 @@ class Model:
                 y_pred = self._model(x)
                 state['y_pred'] = y_pred.data
                 state['y_true'] = y_true.data
-                state['t'] = state['t'] + 1
                 _callbacks.on_forward(state)
 
                 # Loss Calculation

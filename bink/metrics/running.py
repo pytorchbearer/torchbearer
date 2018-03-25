@@ -4,7 +4,7 @@ from collections import deque
 
 
 def running_mean(metric):
-    return Mean(metric)
+    return RunningMean(metric)
 
 
 def running_statistics(metric):
@@ -43,7 +43,7 @@ class RunningMetric(metrics.BasicMetric):
         self._i = 0
 
 
-class Mean(RunningMetric):
+class RunningMean(RunningMetric):
     def __init__(self, metric, batch_size=50, step_size=10):
         super().__init__(metric.name, batch_size=batch_size, step_size=step_size)
         self._metric = metric
