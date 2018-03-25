@@ -34,7 +34,6 @@ class Model:
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
                       validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
-        self.stop_training = False
         history = None
 
         if verbose == 1:
@@ -57,7 +56,8 @@ class Model:
             'validation_steps': validation_steps,
             't': 0,
             'generator': generator,
-            'use_cuda': self._use_cuda
+            'use_cuda': self._use_cuda,
+            'stop_training': False
         }
 
         if self._use_cuda:
@@ -69,6 +69,9 @@ class Model:
 
         self._model.train()
         for state['epoch'] in range(initial_epoch, epochs):
+            if state['stop_training']:
+                break
+
             _callbacks.on_start_epoch(state)
             self._metrics.reset(state)
 
