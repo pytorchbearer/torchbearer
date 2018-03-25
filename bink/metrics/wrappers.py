@@ -38,12 +38,12 @@ class Std(metrics.BasicMetric):
     def final_train(self, state):
         mean = self._sum / self._count
         mean = mean ** 2
-        return (self._sum_sq / self._count) - mean
+        return ((self._sum_sq / self._count) - mean) ** 0.5
 
     def final_validate(self, state):
         mean = self._sum / self._count
         mean = mean ** 2
-        return (self._sum_sq / self._count) - mean
+        return ((self._sum_sq / self._count) - mean) ** 0.5
 
     def reset(self, state):
         self._metric.reset(state)
@@ -111,7 +111,7 @@ class EpochLambda(metrics.BasicMetric):
     def train(self, state):
         self._y_true = torch.cat((self._y_true, state['y_true']), dim=0)
         self._y_pred = torch.cat((self._y_pred, state['y_pred'].float()), dim=0)
-        if (state['t'] - 1) % self._step_size == 0:
+        if state['t'] % self._step_size == 0:
             self._result = self._step(self._y_true, self._y_pred)
         return self._result
 
@@ -129,6 +129,6 @@ class EpochLambda(metrics.BasicMetric):
         self._y_true = torch.zeros(0).long()
         self._y_pred = torch.zeros(0, 0)
 
-        if state['use_cuda']:
+        if 'use_cuda' in state and state['use_cuda']:
             self._y_true = self._y_true.cuda()
             self._y_pred = self._y_pred.cuda()
