@@ -40,7 +40,7 @@ class DatasetCrossValidation:
         self.dataset = dataset
         self.num_folds = num_folds
         self.valid_len = int(len(dataset)*valid_split)
-        self.ids = range(len(dataset))
+        self.ids = list(range(len(dataset)))
         self.current_fold = 0
 
         if shuffle:
@@ -50,13 +50,14 @@ class DatasetCrossValidation:
         return self
 
     def __next__(self):
-        if self.current_fold > self.num_folds:
+        if self.current_fold >= self.num_folds:
             raise StopIteration
 
         val_start = self.current_fold*self.valid_len
         valid_ids = self.ids[val_start:val_start+self.valid_len]
 
         sets = DatasetValidation(self.dataset, valid_ids)
+        self.current_fold += 1
         return sets.get_train_dataset(), sets.get_valid_dataset()
 
 
