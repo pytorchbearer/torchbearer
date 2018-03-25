@@ -2,7 +2,7 @@ import unittest
 
 from unittest.mock import Mock, call
 
-from bink.metrics import Mean, BasicMetric, RunningMetric
+from bink.metrics import RunningMean, BasicMetric, RunningMetric
 
 import torch
 
@@ -23,11 +23,11 @@ class TestRunningMetric(unittest.TestCase):
         self._metric._step.assert_has_calls([call([3]), call([3, 3, 3, 3, 3])])
 
 
-class TestMean(unittest.TestCase):
+class TestRunningMean(unittest.TestCase):
     def setUp(self):
         self._metric = BasicMetric('test')
         self._metric.train = Mock(return_value=torch.FloatTensor([1.0, 1.5, 2.0]))
-        self._mean = Mean(self._metric)
+        self._mean = RunningMean(self._metric)
         self._cache = [1.0, 1.5, 2.0]
         self._target = 1.5
 
