@@ -44,4 +44,4 @@ model = nm.InceptionSmall()
 ####### Trainer #######
 
 model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
-model.fit_generator(trainloader, validation_generator=testloader, callbacks=[EarlyStopping(verbose=1)], epochs=10)
+model.fit_generator(trainloader, validation_generator=testloader, callbacks=[EarlyStopping(monitor='val_loss_std', verbose=1)], epochs=10)

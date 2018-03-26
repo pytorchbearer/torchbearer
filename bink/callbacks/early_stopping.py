@@ -1,9 +1,5 @@
 from bink.callbacks import Callback
 
-import warnings
-
-import numpy as np
-
 
 class EarlyStopping(Callback):
     """Stop training when a monitored quantity has stopped improving.
@@ -30,47 +26,34 @@ class EarlyStopping(Callback):
         super(EarlyStopping, self).__init__()
 
         self.monitor = monitor
+        self.min_delta = min_delta
         self.patience = patience
         self.verbose = verbose
-        self.min_delta = min_delta
+        self.mode = mode
+
         self.wait = 0
         self.stopped_epoch = 0
 
-        if mode not in ['auto', 'min', 'max']:
-            warnings.warn('EarlyStopping mode %s is unknown, '
-                          'fallback to auto mode.' % mode,
-                          RuntimeWarning)
-            mode = 'auto'
-
-        if mode == 'min':
-            self.monitor_op = np.less
-        elif mode == 'max':
-            self.monitor_op = np.greater
-        else:
+        if self.mode not in ['min', 'max']:
             if 'acc' in self.monitor:
-                self.monitor_op = np.greater
+                self.mode = 'max'
             else:
-                self.monitor_op = np.less
+                self.mode = 'min'
 
-        if self.monitor_op == np.greater:
-            self.min_delta *= 1
-        else:
+        if self.mode == 'min':
             self.min_delta *= -1
+            self.monitor_op = lambda x1, x2: x1 < x2
+        elif self.mode == 'max':
+            self.min_delta *= 1
+            self.monitor_op = lambda x1, x2: x1 > x2
 
     def on_start(self, state):
         self.wait = 0
         self.stopped_epoch = 0
-        self.best = np.Inf if self.monitor_op == np.less else -np.Inf
+        self.best = float('inf') if self.mode == 'min' else -float('inf')
 
     def on_end_epoch(self, state):
         current = state['final_metrics'][self.monitor]
-        if current is None:
-            warnings.warn(
-                'Early stopping conditioned on metric `%s` '
-                'which is not available. Available metrics are: %s' %
-                (self.monitor, ','.join(list(state['final_metrics'].keys()))), RuntimeWarning
-            )
-            return
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
             self.wait = 0
