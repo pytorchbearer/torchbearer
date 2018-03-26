@@ -1,3 +1,4 @@
+import torch
 from torch.utils.data import DataLoader, TensorDataset
 from utils import get_train_valid_sets
 from bink.callbacks.callbacks import CallbackList
@@ -83,7 +84,7 @@ class Model:
                 # Extract batch
                 x, y_true = data
                 x, y_true = Variable(x), Variable(y_true)
-                x, y_true = self._sample_device_function(x, y_true)
+                x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
                 _callbacks.on_sample(state)
 
                 # Zero grads
@@ -133,7 +134,7 @@ class Model:
             # Load batch
             x, y_true = next(validation_iterator)
             x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
-            x, y_true = self._sample_device_function(x, y_true)
+            x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
 
             # Forward pass
             y_pred = self._model(x)
@@ -144,6 +145,85 @@ class Model:
             loss = self._criterion(y_pred, y_true)
             state['loss'] = loss.data
             state['metrics'] = self._metrics.validate_dict(state)
+
+    # TODO: num workers? Steps?
+    def evaluate(self, x=None, y=None, batch_size=32, verbose=1):
+        trainset = DataLoader(TensorDataset(x, y), batch_size)
+
+        return self.evaluate_generator(trainset, verbose)
+
+    def evaluate_generator(self, generator, verbose=1, steps=None):
+        bar = CallbackList([])
+        if verbose == 1:
+            bar = Tqdm()
+
+        if steps is None:
+            steps = len(generator)
+
+        state = {'epoch': 0, 'max_epochs': 1, 'generator': generator, 'use_cuda': self._model.cuda}
+        self._metrics.reset(state)
+
+        self._model.eval()
+        bar.on_start_epoch(state)
+        loader = iter(state['generator'])
+        for state['t'] in range(steps):
+
+            # Load batch
+            x, y_true = next(loader)
+            x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
+            x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
+
+            # Forward pass
+            y_pred = self._model(x)
+            state['y_pred'] = y_pred.data
+            state['y_true'] = y_true.data
+
+            # Loss and metrics
+            loss = self._criterion(y_pred, y_true)
+            state['loss'] = loss.data
+            state['metrics'] = self._metrics.train_dict(state)
+            bar.on_update_parameters(state)
+
+        state['final_metrics'] = self._metrics.final_train_dict(state)
+        bar.on_end_epoch(state)
+
+        return state['final_metrics']
+
+    def predict(self, x=None, batch_size=None, verbose=0):
+        pred_set = DataLoader(TensorDataset(x, None), batch_size)
+
+        return self.predict_generator(pred_set, verbose)
+
+    def predict_generator(self, generator, verbose=0, steps=None):
+        bar = CallbackList([])
+        if verbose == 1:
+            bar = Tqdm()
+
+        if steps is None:
+            steps = len(generator)
+
+        state = {'epoch': 1, 'max_epochs': 1, 'generator': generator}
+
+        self._model.eval()
+        bar.on_start_epoch(state)
+
+        loader = iter(generator)
+        predictions_list = []
+        for state['t'] in range(steps):
+            # Load batch
+            x, _ = next(loader)
+            x = Variable(x, volatile=True)
+            x = self._sample_device_function(x)
+
+            # Forward pass
+            y_pred = self._model(x)
+            predictions_list.append(y_pred)
+            bar.on_update_parameters(state)
+
+        bar.on_end_epoch(state)
+        predictions = torch.cat(predictions_list, 0)
+
+        return predictions
 
     def cuda(self):
         self._model.cuda()
@@ -158,10 +238,10 @@ class Model:
         return self
 
     @staticmethod
-    def _cuda_sample(x, y):
-        return x.cuda(), y.cuda()
+    def _cuda_sample(x):
+        return x.cuda()
 
     @staticmethod
-    def _cpu_sample(x, y):
-        return x, y
+    def _cpu_sample(x):
+        return x.cpu()
 
