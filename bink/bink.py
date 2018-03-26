@@ -67,7 +67,8 @@ class Model:
             self._sample_device_function = self._cpu_sample
 
         _callbacks.on_start(state)
-        state['model'].train()
+
+        self.train()
         for state['epoch'] in range(initial_epoch, epochs):
             if state['stop_training']:
                 break
@@ -100,7 +101,7 @@ class Model:
                 loss = state['criterion'](y_pred, y_true)
                 state['loss'] = loss.data
                 _callbacks.on_forward_criterion(state)
-                state['metrics'] = state['metric_list'].train_dict(state)
+                state['metrics'] = state['metric_list'].evaluate_dict(state)
 
                 # Backwards pass
                 loss.backward()
@@ -110,15 +111,15 @@ class Model:
                 state['optimizer'].step()
                 _callbacks.on_update_parameters(state)
 
-            state['final_metrics'] = state['metric_list'].final_train_dict(state)
+            state['final_metrics'] = state['metric_list'].evaluate_final_dict(state)
 
             # Validate
             state['validation_generator'] = validation_generator
             if validation_generator is not None:
                 state['metric_list'].reset(state)
-                state['model'].eval()
+                self.eval()
                 self._validate(validation_generator, validation_steps, state)
-                state['final_metrics'].update(state['metric_list'].final_validate_dict(state))
+                state['final_metrics'].update(state['metric_list'].evaluate_final_dict(state))
 
             _callbacks.on_end_epoch(state)
 
@@ -127,7 +128,7 @@ class Model:
         return history
 
     def _validate(self, validation_generator, num_validation_steps, state):
-        state['model'].eval()
+        self.eval()
         validation_iterator = iter(validation_generator)
         for step in range(num_validation_steps):
 
@@ -144,7 +145,7 @@ class Model:
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = state['metric_list'].validate_dict(state)
+            state['metrics'] = state['metric_list'].evaluate_dict(state)
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
@@ -173,6 +174,7 @@ class Model:
         state['metric_list'].reset(state)
         state['model'].eval()
 
+        self.eval()
         bar.on_start_epoch(state)
         loader = iter(state['generator'])
         for state['t'] in range(steps):
@@ -190,11 +192,10 @@ class Model:
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = state['metric_list'].train_dict(state)
+            state['metrics'] = state['metric_list'].evaluate_dict(state)
             bar.on_update_parameters(state)
 
-        # Get final metrics
-        state['final_metrics'] = state['metric_list'].final_train_dict(state)
+        state['final_metrics'] = state['metric_list'].evaluate_final_dict(state)
         bar.on_end_epoch(state)
 
         return state['final_metrics']
@@ -204,7 +205,7 @@ class Model:
 
         return self.predict_generator(pred_set, verbose)
 
-    def predict_generator(self, generator, verbose=1, steps=None):
+    def predict_generator(self, generator, verbose=0, steps=None):
         bar = CallbackList([])
         if verbose == 1:
             bar = Tqdm()
@@ -223,7 +224,7 @@ class Model:
         }
         state.update(self.main_state)
 
-        state['model'].eval()
+        self.eval()
         bar.on_start_epoch(state)
 
         loader = iter(state['generator'])
@@ -244,6 +245,14 @@ class Model:
         predictions = torch.cat(predictions_list, 0)
 
         return predictions
+
+    def train(self):
+        self.main_state['model'].train()
+        self.main_state['metric_list'].train()
+
+    def eval(self):
+        self.main_state['model'].eval()
+        self.main_state['metric_list'].eval()
 
     def cuda(self):
         self.main_state['model'].cuda()

@@ -2,6 +2,7 @@ from bink import metrics
 
 import torch
 
+
 class CategoricalAccuracy(metrics.BatchLambda):
     def __init__(self):
         def _categorical(y_true, y_pred):
@@ -13,17 +14,11 @@ class CategoricalAccuracy(metrics.BatchLambda):
 categorical_accuracy_primitive = CategoricalAccuracy()
 
 
-class Loss(metrics.BasicMetric):
+class Loss(metrics.Metric):
     def __init__(self):
         super().__init__('loss')
 
-    def train(self, state):
-        return self._process(state)
-
-    def validate(self, state):
-        return self._process(state)
-
-    def _process(self, state):
+    def evaluate(self, state):
         return state['loss']
 
 
@@ -32,20 +27,19 @@ loss_primitive = Loss()
 
 class Epoch(metrics.Metric):
     def __init__(self):
-        super().__init__()
-        self._name = 'epoch'
+        super().__init__('epoch')
 
-    def final_train_dict(self, state):
-        return {self._name: self._process(state)}
+    def evaluate_final(self, state):
+        return self._process(state)
 
-    def final_validate_dict(self, state):
-        return {self._name: self._process(state)}
+    def evaluate(self, state):
+        return self._process(state)
 
-    def train_dict(self, state):
-        return {self._name: self._process(state)}
+    def evaluate_final_dict(self, state):
+        return {self.name: self.evaluate_final(state)}
 
-    def validate_dict(self, state):
-        return {self._name: self._process(state)}
+    def evaluate_dict(self, state):
+        return {self.name: self.evaluate(state)}
 
     def _process(self, state):
         return state['epoch']
