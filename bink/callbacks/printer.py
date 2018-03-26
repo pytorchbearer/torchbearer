@@ -2,12 +2,6 @@ from bink.callbacks.callbacks import Callback
 from tqdm import tqdm
 
 
-def _print_final_metrics(state):
-    epoch_str = '{:d}/{:d}: '.format(state['epoch'] + 1, state['max_epochs'])
-    stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['final_metrics'].items()])
-    print(epoch_str + stats_str)
-
-
 class ConsolePrinter(Callback):
     def on_update_parameters(self, state):
         epoch_str = '{:d}/{:d}: '.format(state['epoch'] + 1, state['max_epochs'])
@@ -17,7 +11,9 @@ class ConsolePrinter(Callback):
 
     def on_end_epoch(self, state):
         print()
-        _print_final_metrics(state)
+        epoch_str = '{:d}/{:d}: '.format(state['epoch'] + 1, state['max_epochs'])
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['final_metrics'].items()])
+        print(epoch_str + stats_str)
 
 
 class Tqdm(Callback):
@@ -33,5 +29,7 @@ class Tqdm(Callback):
         self._loader.set_postfix(state['metrics'])
 
     def on_end_epoch(self, state):
+        metrics = state['metrics'].copy()
+        metrics.update(state['final_metrics'])
+        self._loader.set_postfix(metrics)
         self._loader.close()
-        _print_final_metrics(state)

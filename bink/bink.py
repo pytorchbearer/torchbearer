@@ -68,11 +68,11 @@ class Model:
 
         _callbacks.on_start(state)
 
-        self.train()
         for state['epoch'] in range(initial_epoch, epochs):
             if state['stop_training']:
                 break
 
+            self.train()
             _callbacks.on_start_epoch(state)
             self._metrics.reset(state)
 
