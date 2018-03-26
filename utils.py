@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader, TensorDataset,  Dataset
 import torch
 from random import shuffle as shuffle_list
 
+
 def train_valid_splitter(x, y, split, shuffle=True):
     num_samples_x = x.shape[0]
     num_valid_samples = torch.floor(num_samples_x * split)
@@ -34,7 +35,7 @@ def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
     return trainset, valset
 
 
-class DatasetCrossValidation:
+class DatasetCrossValidationIter:
     def __init__(self, dataset, num_folds=1, valid_split=0.1, shuffle=False):
         super().__init__()
         self.dataset = dataset
@@ -56,12 +57,12 @@ class DatasetCrossValidation:
         val_start = self.current_fold*self.valid_len
         valid_ids = self.ids[val_start:val_start+self.valid_len]
 
-        sets = DatasetValidation(self.dataset, valid_ids)
+        sets = DatasetValidationSplitter(self.dataset, valid_ids)
         self.current_fold += 1
         return sets.get_train_dataset(), sets.get_valid_dataset()
 
 
-class DatasetValidation:
+class DatasetValidationSplitter:
     def __init__(self, dataset, valid_ids, shuffle=False):
         super().__init__()
         self.valid_ids = valid_ids
