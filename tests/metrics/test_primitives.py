@@ -4,20 +4,23 @@ from bink.metrics import Loss, Epoch, CategoricalAccuracy
 
 import torch
 
+
 class TestLoss(unittest.TestCase):
     def setUp(self):
         self._state = {
-            'loss':torch.FloatTensor([2.35])
+            'loss': torch.FloatTensor([2.35])
         }
         self._metric = Loss()
 
-    def test_train_dict(self):
-        result = self._metric.train_dict(self._state)
+    def test_train_evaluate_dict(self):
+        self._metric.train()
+        result = self._metric.evaluate_dict(self._state)
         self.assertTrue('train_loss' in result, msg='train_loss is not a key in: ' + str(result))
         self.assertAlmostEqual(2.35, result['train_loss'][0], 3, 0.002)
 
-    def test_validate_dict(self):
-        result = self._metric.validate_dict(self._state)
+    def test_validate_evaluate_dict(self):
+        self._metric.eval()
+        result = self._metric.evaluate_dict(self._state)
         self.assertTrue('val_loss' in result, msg='val_loss is not a key in: ' + str(result))
         self.assertAlmostEqual(2.35, result['val_loss'][0], 3, 0.002)
 
@@ -29,13 +32,15 @@ class TestEpoch(unittest.TestCase):
         }
         self._metric = Epoch()
 
-    def test_train_dict(self):
-        result = self._metric.train_dict(self._state)
+    def test_train_evaluate_dict(self):
+        self._metric.train()
+        result = self._metric.evaluate_dict(self._state)
         self.assertTrue('epoch' in result, msg='epoch is not a key in: ' + str(result))
         self.assertEqual(101, result['epoch'])
 
-    def test_validate_dict(self):
-        result = self._metric.validate_dict(self._state)
+    def test_validate_evaluate_dict(self):
+        self._metric.eval()
+        result = self._metric.evaluate_dict(self._state)
         self.assertTrue('epoch' in result, msg='epoch is not a key in: ' + str(result))
         self.assertEqual(101, result['epoch'])
 
@@ -55,23 +60,27 @@ class TestCategoricalAccuracy(unittest.TestCase):
         self._targets = [1, 1, 1, 0, 0]
         self._metric = CategoricalAccuracy()
 
-    def test_train_dict_key_exists(self):
-        result = self._metric.train_dict(self._state)
+    def test_train_evaluate_dict_key_exists(self):
+        self._metric.train()
+        result = self._metric.evaluate_dict(self._state)
         self.assertTrue('train_acc' in result, msg='train_acc is not a key in: ' + str(result))
 
-    def test_validate_dict_key_exists(self):
-        result = self._metric.validate_dict(self._state)
+    def test_validate_evaluate_dict_key_exists(self):
+        self._metric.eval()
+        result = self._metric.evaluate_dict(self._state)
         self.assertTrue('val_acc' in result, msg='val_acc is not a key in: ' + str(result))
 
-    def test_train_correct_output(self):
-        result = self._metric.train(self._state)
+    def test_train_evaluate_correct_output(self):
+        self._metric.train()
+        result = self._metric.evaluate(self._state)
         for i in range(0, len(self._targets)):
             self.assertEqual(result[i], self._targets[i],
                              msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
                                  + ' in: ' + str(result))
 
-    def test_validate_correct_output(self):
-        result = self._metric.validate(self._state)
+    def test_validate_evaluate_correct_output(self):
+        self._metric.eval()
+        result = self._metric.evaluate(self._state)
         for i in range(0, len(self._targets)):
             self.assertEqual(result[i], self._targets[i],
                              msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
