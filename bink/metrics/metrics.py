@@ -33,16 +33,22 @@ class MetricList(Metric):
         super().__init__('metric_list')
         import bink.metrics.defaults as defaults
 
+        self.metric_list = []
+
         for i in range(len(metric_list)):
             metric = metric_list[i]
-            if str(metric) == metric:
-                metric_list[i] = getattr(defaults, metric)()
 
-        self._metric_list = metric_list
+            if str(metric) == metric:
+                metric = getattr(defaults, metric)()
+
+            if type(metric) is MetricList:
+                self.metric_list = self.metric_list + metric.metric_list
+            else:
+                self.metric_list.append(metric)
 
     def _for_list(self, function):
         result = {}
-        for metric in self._metric_list:
+        for metric in self.metric_list:
             out = function(metric)
             if out is not None:
                 result.update(out)
