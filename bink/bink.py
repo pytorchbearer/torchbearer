@@ -68,7 +68,7 @@ class Model:
 
         _callbacks.on_start(state)
 
-        self._model.train()
+        self.train()
         for state['epoch'] in range(initial_epoch, epochs):
             if state['stop_training']:
                 break
@@ -100,7 +100,7 @@ class Model:
                 loss = self._criterion(y_pred, y_true)
                 state['loss'] = loss.data
                 _callbacks.on_forward_criterion(state)
-                state['metrics'] = self._metrics.train_dict(state)
+                state['metrics'] = self._metrics.evaluate_dict(state)
 
                 # Backwards pass
                 loss.backward()
@@ -110,15 +110,15 @@ class Model:
                 self._optimizer.step()
                 _callbacks.on_update_parameters(state)
 
-            state['final_metrics'] = self._metrics.final_train_dict(state)
+            state['final_metrics'] = self._metrics.evaluate_final_dict(state)
 
             # Validate
             state['validation_generator'] = validation_generator
             if validation_generator is not None:
                 self._metrics.reset(state)
-                self._model.eval()
+                self.eval()
                 self._validate(validation_generator, validation_steps, state)
-                state['final_metrics'].update(self._metrics.final_validate_dict(state))
+                state['final_metrics'].update(self._metrics.evaluate_final_dict(state))
 
             _callbacks.on_end_epoch(state)
 
@@ -127,7 +127,7 @@ class Model:
         return history
 
     def _validate(self, validation_generator, num_validation_steps, state):
-        self._model.eval()
+        self.eval()
         validation_iterator = iter(validation_generator)
         for step in range(num_validation_steps):
 
@@ -144,7 +144,7 @@ class Model:
             # Loss and metrics
             loss = self._criterion(y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = self._metrics.validate_dict(state)
+            state['metrics'] = self._metrics.evaluate_dict(state)
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
@@ -176,7 +176,7 @@ class Model:
 
         self._metrics.reset(state)
 
-        self._model.eval()
+        self.eval()
         bar.on_start_epoch(state)
         loader = iter(state['generator'])
         for state['t'] in range(steps):
@@ -194,10 +194,10 @@ class Model:
             # Loss and metrics
             loss = self._criterion(y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = self._metrics.train_dict(state)
+            state['metrics'] = self._metrics.evaluate_dict(state)
             bar.on_update_parameters(state)
 
-        state['final_metrics'] = self._metrics.final_train_dict(state)
+        state['final_metrics'] = self._metrics.evaluate_final_dict(state)
         bar.on_end_epoch(state)
 
         return state['final_metrics']
@@ -217,7 +217,7 @@ class Model:
 
         state = {'epoch': 1, 'max_epochs': 1, 'generator': generator}
 
-        self._model.eval()
+        self.eval()
         bar.on_start_epoch(state)
 
         loader = iter(generator)
@@ -237,6 +237,14 @@ class Model:
         predictions = torch.cat(predictions_list, 0)
 
         return predictions
+
+    def train(self):
+        self._model.train()
+        self._metrics.train()
+
+    def eval(self):
+        self._model.eval()
+        self._metrics.eval()
 
     def cuda(self):
         self._model.cuda()
