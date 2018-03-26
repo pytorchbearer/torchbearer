@@ -1,4 +1,4 @@
-from bink.callbacks.callbacks import Callback
+from bink.callbacks import Callback
 from tqdm import tqdm
 
 
