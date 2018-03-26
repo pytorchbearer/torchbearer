@@ -19,6 +19,7 @@ class ConsolePrinter(Callback):
         print()
         _print_final_metrics(state)
 
+
 class Tqdm(Callback):
     def __init__(self):
         self._loader = None
