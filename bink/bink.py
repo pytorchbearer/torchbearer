@@ -146,9 +146,9 @@ class Model:
             state['loss'] = loss.data
             state['metrics'] = self._metrics.validate_dict(state)
 
-    # TODO: num workers? Steps?
-    def evaluate(self, x=None, y=None, batch_size=32, verbose=1):
-        trainset = DataLoader(TensorDataset(x, y), batch_size)
+    # TODO: num workers?
+    def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
+        trainset = DataLoader(TensorDataset(x, y), batch_size, steps)
 
         return self.evaluate_generator(trainset, verbose)
 
@@ -160,7 +160,20 @@ class Model:
         if steps is None:
             steps = len(generator)
 
-        state = {'epoch': 0, 'max_epochs': 1, 'generator': generator, 'use_cuda': self._model.cuda}
+        state = {
+            'model': self._model,
+            'criterion': self._criterion,
+            'optimizer': self._optimizer,
+            'epoch': 0,
+            'max_epochs': 1,
+            'train_steps': steps,
+            'validation_steps': None,
+            't': 0,
+            'generator': generator,
+            'use_cuda': self._use_cuda,
+            'stop_training': False
+        }
+
         self._metrics.reset(state)
 
         self._model.eval()
@@ -189,8 +202,8 @@ class Model:
 
         return state['final_metrics']
 
-    def predict(self, x=None, batch_size=None, verbose=0):
-        pred_set = DataLoader(TensorDataset(x, None), batch_size)
+    def predict(self, x=None, batch_size=None, verbose=0, steps=None):
+        pred_set = DataLoader(TensorDataset(x, None), batch_size, steps)
 
         return self.predict_generator(pred_set, verbose)
 
