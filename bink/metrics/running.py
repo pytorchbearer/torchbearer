@@ -14,7 +14,7 @@ def running_statistics(metric):
 running_stats = running_statistics
 
 
-class RunningMetric(metrics.BasicMetric):
+class RunningMetric(metrics.AdvancedMetric):
     __metaclass__ = ABCMeta
 
     def __init__(self, name, batch_size=50, step_size=10):
@@ -25,13 +25,13 @@ class RunningMetric(metrics.BasicMetric):
         self._result = {}
 
     @abstractmethod
-    def _train(self, state): ...
+    def _process_train(self, state): ...
 
     @abstractmethod
     def _step(self, cache): ...
 
-    def train(self, state):
-        self._cache.append(self._train(state))
+    def process_train(self, state):
+        self._cache.append(self._process_train(state))
         if len(self._cache) > self._batch_size:
             self._cache.popleft()
         if self._i % self._step_size == 0:
@@ -48,8 +48,8 @@ class RunningMean(RunningMetric):
         super().__init__(metric.name, batch_size=batch_size, step_size=step_size)
         self._metric = metric
 
-    def _train(self, state):
-        return self._metric.train(state).mean()
+    def _process_train(self, state):
+        return self._metric.evaluate(state).mean()
 
     def _step(self, cache):
         return sum(cache) / float(len(cache))
