@@ -9,10 +9,11 @@ from torch.utils.data import DataLoader
 from Example import inception_network as nm
 from bink.bink import Model
 from bink.metrics import RocAucScore
+from bink.callbacks import EarlyStopping
 
 
 ####### Paths #######
-dataset_path = '/home/matt/datasets'
+dataset_path = '/home/ethan/datasets'
 model_load_path = ''  # Path to a saved model which is loaded if "newmodel" is true
 logfile = 'logs.log'
 folderName = 'test'
@@ -42,5 +43,5 @@ model = nm.InceptionSmall()
 
 ####### Trainer #######
 
-model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=[RocAucScore(), 'acc', 'loss']).cuda()
-model.fit_generator(trainloader, validation_generator=testloader, callbacks=[], epochs=10)
+model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
+model.fit_generator(trainloader, validation_generator=testloader, callbacks=[EarlyStopping(verbose=1)], epochs=10)
