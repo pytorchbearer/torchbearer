@@ -31,3 +31,15 @@ class Tqdm(Callback):
     def on_end_training(self, state):
         self._loader.set_postfix(state['metrics'])
         self._loader.close()
+
+    def on_start_validation(self, state):
+        bar_desc = '{:d}/{:d}'.format(state['epoch'] + 1, state['max_epochs'])
+        self._loader = tqdm(state['validation_generator'], desc=bar_desc)
+        state['validation_generator'] = self._loader
+
+    def on_step_validation(self, state):
+        self._loader.set_postfix(state['metrics'])
+
+    def on_end_validation(self, state):
+        self._loader.set_postfix(state['metrics'])
+        self._loader.close()

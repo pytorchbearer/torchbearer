@@ -53,7 +53,6 @@ class Model:
         state = {
             'max_epochs': epochs,
             'train_steps': train_steps,
-            'validation_steps': validation_steps,
             't': 0,
             'generator': generator,
             'stop_training': False
@@ -81,7 +80,7 @@ class Model:
             # Init iterator
             train_iterator = iter(state['generator'])
             state['train_iterator'] = train_iterator
-            for state['t'] in range(0, train_steps):
+            for state['t'] in range(0, state['train_steps']):
                 data = next(train_iterator)
 
                 # Extract batch
@@ -119,11 +118,12 @@ class Model:
             _callbacks.on_end_training(state)
 
             # Validate
-            state['validation_generator'] = validation_generator
             if validation_generator is not None:
+                state['validation_generator'] = validation_generator
+                state['validation_steps'] = validation_steps
                 state['metric_list'].reset(state)
                 self.eval()
-                self._validate(validation_generator, validation_steps, state, _callbacks)
+                self._validate(state, _callbacks)
 
                 state['metrics'].update(state['metric_list'].process_final(state))
                 final_metrics.update(state['metrics'])
@@ -136,13 +136,12 @@ class Model:
 
         return state
 
-    def _validate(self, validation_generator, num_validation_steps, state, _callbacks):
+    def _validate(self, state, _callbacks):
         self.eval()
 
         _callbacks.on_start_validation(state)
-        validation_iterator = iter(validation_generator)
-        for step in range(num_validation_steps):
-
+        validation_iterator = iter(state['validation_generator'])
+        for state['t'] in range(state['validation_steps']):
             # Load batch
             x, y_true = next(validation_iterator)
             x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
