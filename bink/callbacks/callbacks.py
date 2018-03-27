@@ -92,3 +92,12 @@ class CallbackList(Callback):
 
     def on_end(self, state):
         self._for_list(lambda callback: callback.on_end(state))
+
+    def on_start_validation(self, state):
+        self._for_list(lambda callback: callback.on_start_validation(state))
+
+    def on_end_validation(self, state):
+        self._for_list(lambda callback: callback.on_end_validation(state))
+
+    def on_step_validation(self, state):
+        self._for_list(lambda callback: callback.on_step_validation(state))
