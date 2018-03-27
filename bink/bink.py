@@ -118,7 +118,7 @@ class Model:
             if validation_generator is not None:
                 state['metric_list'].reset(state)
                 self.eval()
-                self._validate(validation_generator, validation_steps, state)
+                self._validate(validation_generator, validation_steps, state, _callbacks)
                 state['final_metrics'].update(state['metric_list'].evaluate_final_dict(state))
 
             _callbacks.on_end_training(state)
@@ -127,8 +127,10 @@ class Model:
 
         return state
 
-    def _validate(self, validation_generator, num_validation_steps, state):
+    def _validate(self, validation_generator, num_validation_steps, state, _callbacks):
         self.eval()
+
+        _callbacks.on_start_validation(state)
         validation_iterator = iter(validation_generator)
         for step in range(num_validation_steps):
 
@@ -146,6 +148,9 @@ class Model:
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
             state['metrics'] = state['metric_list'].evaluate_dict(state)
+            _callbacks.on_step_validation(state)
+
+        _callbacks.on_end_validation(state)
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
