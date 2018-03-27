@@ -4,6 +4,7 @@ from utils import ShuffleSplitCVIter, KFoldCVIter, LeavePOutCVIter
 import copy
 
 
+# TODO: Allow merging of separate validation dataset? 
 class CrossValidationRunner:
     def __init__(self, binkmodel, dataset, batch_size=32, num_folds=2, valid_split=0.1, splitter='shufflesplit'):
         """
@@ -64,7 +65,7 @@ class CrossValidationRunner:
         metric_strings = []
         for (key, value) in metric_mean.items():
             std = metric_std[key]
-            metric_strings.append('{0}:{1:.03g}(+/-{2:.03f})'.format(key, value, std))
+            metric_strings.append('{0}:{1:.03g}(+/-{2:.1E})'.format(key, value, std))
 
         valid_str = ", ".join(metric_strings)
         print('\nValidation Results:')
