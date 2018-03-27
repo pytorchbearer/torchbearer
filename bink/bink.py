@@ -15,7 +15,8 @@ class Model:
             'criterion': loss_criterion,
             'optimizer': optimizer,
             'use_cuda': False,
-            'metric_list': bink_metrics.MetricList(metrics)
+            'metric_list': bink_metrics.MetricList(metrics),
+            'self': self
         }
         self._sample_device_function = self._cpu_sample
 
