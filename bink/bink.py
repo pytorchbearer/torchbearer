@@ -73,7 +73,7 @@ class Model:
                 break
 
             self.train()
-            _callbacks.on_start_epoch(state)
+            _callbacks.on_start_training(state)
             state['metric_list'].reset(state)
 
             # Init iterator
@@ -109,7 +109,7 @@ class Model:
 
                 # Update parameters
                 state['optimizer'].step()
-                _callbacks.on_update_parameters(state)
+                _callbacks.on_step_training(state)
 
             final_metrics = state['metrics']
             state['metrics'] = state['metric_list'].process_final(state)
@@ -120,17 +120,19 @@ class Model:
             if validation_generator is not None:
                 state['metric_list'].reset(state)
                 self.eval()
-                self._validate(validation_generator, validation_steps, state)
-                state['final_metrics'].update(state['metric_list'].process_final(state))
+                self._validate(validation_generator, validation_steps, state, _callbacks)
+                state['final_metrics'].update(state['metric_list'].evaluate_final_dict(state))
 
-            _callbacks.on_end_epoch(state)
+            _callbacks.on_end_training(state)
 
         _callbacks.on_end(state)
 
         return state
 
-    def _validate(self, validation_generator, num_validation_steps, state):
+    def _validate(self, validation_generator, num_validation_steps, state, _callbacks):
         self.eval()
+
+        _callbacks.on_start_validation(state)
         validation_iterator = iter(validation_generator)
         for step in range(num_validation_steps):
 
@@ -147,7 +149,11 @@ class Model:
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = state['metric_list'].process(state)
+
+            state['metrics'] = state['metric_list'].evaluate_dict(state)
+            _callbacks.on_step_validation(state)
+
+        _callbacks.on_end_validation(state)
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
@@ -177,7 +183,7 @@ class Model:
         state['model'].eval()
 
         self.eval()
-        bar.on_start_epoch(state)
+        bar.on_start_training(state)
         loader = iter(state['generator'])
         for state['t'] in range(steps):
 
@@ -194,11 +200,12 @@ class Model:
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
+
             state['metrics'] = state['metric_list'].process(state)
-            bar.on_update_parameters(state)
+            bar.on_step_training(state)
 
         state['final_metrics'] = state['metric_list'].process_final(state)
-        bar.on_end_epoch(state)
+        bar.on_end_training(state)
 
         return state['final_metrics']
 
@@ -227,7 +234,7 @@ class Model:
         state.update(self.main_state)
 
         self.eval()
-        bar.on_start_epoch(state)
+        bar.on_start_training(state)
 
         loader = iter(state['generator'])
         predictions_list = []
@@ -240,10 +247,10 @@ class Model:
             # Forward pass
             y_pred = state['model'](x)
             predictions_list.append(y_pred)
-            bar.on_update_parameters(state)
+            bar.on_step_training(state)
 
         # Aggregate Predictions
-        bar.on_end_epoch(state)
+        bar.on_end_training(state)
         predictions = torch.cat(predictions_list, 0)
 
         return predictions
