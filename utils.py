@@ -1,6 +1,7 @@
 from torch.utils.data import DataLoader, TensorDataset,  Dataset
 import torch
 from random import shuffle as shuffle_list
+from sklearn.model_selection import ShuffleSplit, KFold, LeavePOut
 
 
 def train_valid_splitter(x, y, split, shuffle=True):
@@ -33,19 +34,17 @@ def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
         valset = TensorDataset(x_val, y_val)
 
     return trainset, valset
+   
 
-
-class DatasetCrossValidationIter:
-    def __init__(self, dataset, num_folds=1, valid_split=0.1, shuffle=False):
+class CrossValidationIterator:
+    def __init__(self, dataset, splitter, num_folds=1):
         super().__init__()
         self.dataset = dataset
         self.num_folds = num_folds
-        self.valid_len = int(len(dataset)*valid_split)
         self.ids = list(range(len(dataset)))
         self.current_fold = 0
-
-        if shuffle:
-            shuffle_list(self.ids)
+        self.splitter = splitter
+        self.splitter.get_n_splits(self.ids)
 
     def __iter__(self):
         return self
@@ -53,13 +52,28 @@ class DatasetCrossValidationIter:
     def __next__(self):
         if self.current_fold >= self.num_folds:
             raise StopIteration
-
-        val_start = self.current_fold*self.valid_len
-        valid_ids = self.ids[val_start:val_start+self.valid_len]
-
-        sets = DatasetValidationSplitter(self.dataset, valid_ids)
+        
+        train_ids, test_ids = next(self.splitter.split(self.ids))
+        trainset = SubsetDataset(self.dataset, train_ids)
+        valset = SubsetDataset(self.dataset, test_ids)
         self.current_fold += 1
-        return sets.get_train_dataset(), sets.get_valid_dataset()
+        
+        return trainset, valset
+
+
+class ShuffleSplitCVIter(CrossValidationIterator):
+    def __init__(self, dataset, num_folds, valid_split):
+        super().__init__(dataset, ShuffleSplit(num_folds, valid_split), num_folds)
+        
+
+class KFoldCVIter(CrossValidationIterator):
+    def __init__(self, dataset, num_folds):
+        super().__init__(dataset, KFold(num_folds, shuffle=True), num_folds)
+
+
+class LeavePOutCVIter(CrossValidationIterator):
+    def __init__(self, dataset, num_folds, p):
+        super().__init__(dataset, LeavePOut(p), num_folds)
 
 
 class DatasetValidationSplitter:

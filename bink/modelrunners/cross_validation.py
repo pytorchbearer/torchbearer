@@ -1,15 +1,35 @@
 import numpy as np
 import torch.utils.data as data
-from utils import DatasetCrossValidationIter
+from utils import ShuffleSplitCVIter, KFoldCVIter, LeavePOutCVIter
 import copy
 
 
 class CrossValidationRunner:
-    def __init__(self, binkmodel, dataset, batch_size=32, num_folds=2, valid_split=0.1, shuffle=False):
+    def __init__(self, binkmodel, dataset, batch_size=32, num_folds=2, valid_split=0.1, splitter='shufflesplit'):
+        '''
+        Creates a cross validation runner for bink models
+        
+        :param binkmodel: binkmodel object 
+        :param dataset: PyTorch dataset object
+        :param batch_size: Batch size for model
+        :param num_folds: Number of folds to run
+        :param valid_split: Amount of data to use in validation (for shufflesplit and leave_p_out)
+        :param splitter: Defines the type of sklearn model selection splitter to use. One of ['shufflesplit', 'kfold', 'leave_p_out']
+        '''
         super().__init__()
         self.binkmodel = binkmodel
         self.num_folds = num_folds
-        self.validation_dataset = DatasetCrossValidationIter(dataset, num_folds, valid_split, shuffle=shuffle)
+        
+        if splitter == 'shufflesplit':
+            self.validation_dataset = ShuffleSplitCVIter(dataset, num_folds, valid_split)
+        elif splitter == 'kfold':
+            self.validation_dataset = KFoldCVIter(dataset, num_folds)
+        elif splitter == 'leave_p_out':
+            n = int(len(dataset)*valid_split)
+            self.validation_dataset = LeavePOutCVIter(dataset, num_folds, n)
+        else: 
+            self.validation_dataset = ShuffleSplitCVIter(dataset, num_folds, valid_split)
+
         self.batch_size = batch_size
 
     def run(self, epochs=1, train_steps=None, verbose=1, callbacks=[]):
@@ -18,6 +38,7 @@ class CrossValidationRunner:
         metric_aggregate = None
 
         for i in range(self.num_folds):
+            print('Running Fold: {:d}/{:d}'.format(i+1, self.num_folds))
             model = copy.deepcopy(self.binkmodel)
             trainset, valset = next(self.validation_dataset)
 
