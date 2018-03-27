@@ -38,7 +38,6 @@ class Model:
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
                       validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
-        history = None
 
         if verbose == 1:
             callbacks = [Tqdm()] + callbacks
@@ -126,7 +125,7 @@ class Model:
 
         _callbacks.on_end(state)
 
-        return history
+        return state
 
     def _validate(self, validation_generator, num_validation_steps, state):
         self.eval()
