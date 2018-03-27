@@ -52,7 +52,7 @@ class EarlyStopping(Callback):
         self.stopped_epoch = 0
         self.best = float('inf') if self.mode == 'min' else -float('inf')
 
-    def on_end_epoch(self, state):
+    def on_end_training(self, state):
         current = state['final_metrics'][self.monitor]
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
