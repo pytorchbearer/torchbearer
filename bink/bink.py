@@ -73,7 +73,7 @@ class Model:
                 break
 
             self.train()
-            _callbacks.on_start_epoch(state)
+            _callbacks.on_start_training(state)
             state['metric_list'].reset(state)
 
             # Init iterator
@@ -109,7 +109,7 @@ class Model:
 
                 # Update parameters
                 state['optimizer'].step()
-                _callbacks.on_update_parameters(state)
+                _callbacks.on_step_training(state)
 
             state['final_metrics'] = state['metric_list'].evaluate_final_dict(state)
 
@@ -121,7 +121,7 @@ class Model:
                 self._validate(validation_generator, validation_steps, state)
                 state['final_metrics'].update(state['metric_list'].evaluate_final_dict(state))
 
-            _callbacks.on_end_epoch(state)
+            _callbacks.on_end_training(state)
 
         _callbacks.on_end(state)
 
@@ -175,7 +175,7 @@ class Model:
         state['model'].eval()
 
         self.eval()
-        bar.on_start_epoch(state)
+        bar.on_start_training(state)
         loader = iter(state['generator'])
         for state['t'] in range(steps):
 
@@ -193,10 +193,10 @@ class Model:
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
             state['metrics'] = state['metric_list'].evaluate_dict(state)
-            bar.on_update_parameters(state)
+            bar.on_step_training(state)
 
         state['final_metrics'] = state['metric_list'].evaluate_final_dict(state)
-        bar.on_end_epoch(state)
+        bar.on_end_training(state)
 
         return state['final_metrics']
 
@@ -225,7 +225,7 @@ class Model:
         state.update(self.main_state)
 
         self.eval()
-        bar.on_start_epoch(state)
+        bar.on_start_training(state)
 
         loader = iter(state['generator'])
         predictions_list = []
@@ -238,10 +238,10 @@ class Model:
             # Forward pass
             y_pred = state['model'](x)
             predictions_list.append(y_pred)
-            bar.on_update_parameters(state)
+            bar.on_step_training(state)
 
         # Aggregate Predictions
-        bar.on_end_epoch(state)
+        bar.on_end_training(state)
         predictions = torch.cat(predictions_list, 0)
 
         return predictions

@@ -15,13 +15,13 @@ class CSVLogger(Callback):
         self.csvfile = open(self.filename, filemode, newline='')
         self.write_header = write_header
 
-    def on_update_parameters(self, state):
-        super().on_update_parameters(state)
+    def on_step_training(self, state):
+        super().on_step_training(state)
         if self.batch_granularity:
             self._write_to_dict(state)
 
-    def on_end_epoch(self, state):
-        super().on_end_epoch(state)
+    def on_end_training(self, state):
+        super().on_end_training(state)
         self._write_to_dict(state)
 
     def on_end(self, state):
