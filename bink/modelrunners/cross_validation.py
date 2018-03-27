@@ -1,3 +1,4 @@
+import numpy as np
 import torch.utils.data as data
 from utils import DatasetCrossValidationIter
 import copy
@@ -15,6 +16,7 @@ class CrossValidationRunner:
 
         models = []
         metric_aggregate = None
+
         for i in range(self.num_folds):
             model = copy.deepcopy(self.binkmodel)
             trainset, valset = next(self.validation_dataset)
@@ -26,15 +28,25 @@ class CrossValidationRunner:
             
             if metric_aggregate is None:
                 metric_aggregate = state['final_metrics']
+                for metric in metric_aggregate:
+                    metric_aggregate[metric] = [metric_aggregate[metric]]
             else:
                 for metric in metric_aggregate:
-                    metric_aggregate[metric] += state['final_metrics'][metric]
+                    metric_aggregate[metric].append(state['final_metrics'][metric])
 
+        metric_mean = {}
+        metric_std = {}
         for metric in metric_aggregate:
-            metric_aggregate[metric] /= self.num_folds
+            metric_mean[metric] = np.mean(metric_aggregate[metric])
+            metric_std[metric] = np.std(metric_aggregate[metric])
 
-        metric_str = ', '.join(['{0}:{1:.03g}(+/-)'.format(key, value) for (key, value) in metric_aggregate.items()])
+        metric_strings = []
+        for (key, value) in metric_mean.items():
+            std = metric_std[key]
+            metric_strings.append('{0}:{1:.03g}(+/-{2:.03f})'.format(key, value, std))
+
+        valid_str = ", ".join(metric_strings)
         print('\nValidation Results:')
-        print(metric_str)
+        print(valid_str)
 
         return models
