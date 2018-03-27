@@ -72,6 +72,8 @@ class Model:
             if state['stop_training']:
                 break
 
+            _callbacks.on_start_epoch(state)
+
             self.train()
             _callbacks.on_start_training(state)
             state['metric_list'].reset(state)
@@ -111,9 +113,10 @@ class Model:
                 state['optimizer'].step()
                 _callbacks.on_step_training(state)
 
+            state['metrics'].update(state['metric_list'].process_final(state))
             final_metrics = state['metrics']
-            state['metrics'] = state['metric_list'].process_final(state)
-            final_metrics.update(state['metrics'])
+
+            _callbacks.on_end_training(state)
 
             # Validate
             state['validation_generator'] = validation_generator
@@ -121,10 +124,14 @@ class Model:
                 state['metric_list'].reset(state)
                 self.eval()
                 self._validate(validation_generator, validation_steps, state, _callbacks)
-                state['final_metrics'].update(state['metric_list'].evaluate_final_dict(state))
 
-            _callbacks.on_end_training(state)
+                state['metrics'].update(state['metric_list'].process_final(state))
+                final_metrics.update(state['metrics'])
 
+                _callbacks.on_end_validation(state)
+
+            state['metrics'] = final_metrics
+            _callbacks.on_end_epoch(state)
         _callbacks.on_end(state)
 
         return state
@@ -150,10 +157,8 @@ class Model:
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
 
-            state['metrics'] = state['metric_list'].evaluate_dict(state)
+            state['metrics'] = state['metric_list'].process(state)
             _callbacks.on_step_validation(state)
-
-        _callbacks.on_end_validation(state)
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
@@ -204,10 +209,10 @@ class Model:
             state['metrics'] = state['metric_list'].process(state)
             bar.on_step_training(state)
 
-        state['final_metrics'] = state['metric_list'].process_final(state)
+        state['metrics'].update(state['metric_list'].process_final(state))
         bar.on_end_training(state)
 
-        return state['final_metrics']
+        return state['metrics']
 
     def predict(self, x=None, batch_size=None, verbose=0, steps=None):
         pred_set = DataLoader(TensorDataset(x, None), batch_size, steps)
@@ -343,6 +348,3 @@ def _restore_bink_from_state(binkmodel, bink_state_obj):
         binkmodel.cuda()
 
     return binkmodel
-
-
-
