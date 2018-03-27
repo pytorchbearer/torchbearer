@@ -6,7 +6,7 @@ import copy
 
 class CrossValidationRunner:
     def __init__(self, binkmodel, dataset, batch_size=32, num_folds=2, valid_split=0.1, splitter='shufflesplit'):
-        '''
+        """
         Creates a cross validation runner for bink models
         
         :param binkmodel: binkmodel object 
@@ -15,7 +15,7 @@ class CrossValidationRunner:
         :param num_folds: Number of folds to run
         :param valid_split: Amount of data to use in validation (for shufflesplit and leave_p_out)
         :param splitter: Defines the type of sklearn model selection splitter to use. One of ['shufflesplit', 'kfold', 'leave_p_out']
-        '''
+        """
         super().__init__()
         self.binkmodel = binkmodel
         self.num_folds = num_folds
