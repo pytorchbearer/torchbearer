@@ -2,7 +2,7 @@ from bink.callbacks.callbacks import Callback
 import os
 
 
-class _Checkpointer:
+class _Checkpointer(Callback):
     def __init__(self, fileformat, save_weights_only):
         super().__init__()
         self.fileformat = fileformat
@@ -60,7 +60,7 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}', monitor='val_lo
     return check
 
 
-class MostRecent(Callback, _Checkpointer):
+class MostRecent(_Checkpointer):
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}', save_weights_only=False):
         super().__init__(filepath, save_weights_only)
         self.filepath = filepath
@@ -71,7 +71,7 @@ class MostRecent(Callback, _Checkpointer):
         self.save_checkpoint(model_state, overwrite_most_recent=True)
 
 
-class Best(Callback, _Checkpointer):
+class Best(_Checkpointer):
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}', monitor='val_loss', save_weights_only=False,
                  mode='auto', period=1, min_delta=0):
         super().__init__(filepath, save_weights_only)
@@ -110,7 +110,7 @@ class Best(Callback, _Checkpointer):
                 self.save_checkpoint(model_state, overwrite_most_recent=True)
 
 
-class Interval(Callback, _Checkpointer):
+class Interval(_Checkpointer):
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}', save_weights_only=False, period=1):
         super().__init__(filepath, save_weights_only)
         self.period = period
