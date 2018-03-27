@@ -69,9 +69,6 @@ class Model:
         _callbacks.on_start(state)
 
         for state['epoch'] in range(initial_epoch, epochs):
-            if state['stop_training']:
-                break
-
             _callbacks.on_start_epoch(state)
 
             self.train()
@@ -113,6 +110,9 @@ class Model:
                 state['optimizer'].step()
                 _callbacks.on_step_training(state)
 
+                if state['stop_training']:
+                    break
+
             state['metrics'].update(state['metric_list'].process_final(state))
             final_metrics = state['metrics']
 
@@ -132,6 +132,9 @@ class Model:
 
             state['metrics'] = final_metrics
             _callbacks.on_end_epoch(state)
+
+            if state['stop_training']:
+                break
         _callbacks.on_end(state)
 
         return state
@@ -159,6 +162,8 @@ class Model:
 
             state['metrics'] = state['metric_list'].process(state)
             _callbacks.on_step_validation(state)
+            if state['stop_training']:
+                break
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
