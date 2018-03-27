@@ -12,7 +12,7 @@ class _Checkpointer(Callback):
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
         state = {}
         state.update(model_state)
-        state.update(model_state['final_metrics'])
+        state.update(model_state['metrics'])
 
         filepath = self.fileformat.format(**state)
 
@@ -103,7 +103,7 @@ class Best(_Checkpointer):
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
 
-            current = model_state['final_metrics'][self.monitor]
+            current = model_state['metrics'][self.monitor]
 
             if self.monitor_op(current, self.best):
                 self.best = current

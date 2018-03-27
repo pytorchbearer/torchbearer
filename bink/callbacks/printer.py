@@ -29,7 +29,5 @@ class Tqdm(Callback):
         self._loader.set_postfix(state['metrics'])
 
     def on_end_training(self, state):
-        metrics = state['metrics'].copy()
-        metrics.update(state['final_metrics'])
-        self._loader.set_postfix(metrics)
+        self._loader.set_postfix(state['metrics'])
         self._loader.close()

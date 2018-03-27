@@ -13,21 +13,21 @@ class TestMetricList(unittest.TestCase):
         metric = MetricList(['loss'])
         self.assertTrue(metric.metric_list[0].name == 'running_loss', msg='running_loss not in: ' + str(metric.metric_list))
 
-    def test_evaluate_dict(self):
+    def test_process(self):
         my_mock = Metric('test')
-        my_mock.evaluate = Mock(return_value=-1)
+        my_mock.process = Mock(return_value=-1)
         metric = MetricList([my_mock])
-        result = metric.evaluate_dict({'state': -1})
-        self.assertEqual({'train_test': -1}, result)
-        my_mock.evaluate.assert_called_once_with({'state': -1})
+        result = metric.process({'state': -1})
+        self.assertEqual({'test': -1}, result)
+        my_mock.process.assert_called_once_with({'state': -1})
 
-    def test_evaluate_final_dict(self):
+    def test_process_final(self):
         my_mock = Metric('test')
-        my_mock.evaluate_final = Mock(return_value=-1)
+        my_mock.process_final = Mock(return_value=-1)
         metric = MetricList([my_mock])
-        result = metric.evaluate_final_dict({'state': -1})
-        self.assertEqual({'train_test': -1}, result)
-        my_mock.evaluate_final.assert_called_once_with({'state': -1})
+        result = metric.process_final({'state': -1})
+        self.assertEqual({'test': -1}, result)
+        my_mock.process_final.assert_called_once_with({'state': -1})
 
     def test_train(self):
         my_mock = Metric('test')

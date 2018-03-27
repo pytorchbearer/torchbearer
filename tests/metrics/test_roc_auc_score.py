@@ -15,7 +15,7 @@ class TestRocAucScore(unittest.TestCase):
         mock_sklearn_metrics.roc_auc_score = Mock()
         metric = RocAucScore(one_hot_classes=3, one_hot_offset=1)
         metric.reset({})
-        metric.evaluate({'t': 0,
+        metric.process({'t': 0,
                       'y_true': torch.LongTensor([1, 2, 3]),
                       'y_pred': torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
         mock_sklearn_metrics.roc_auc_score.assert_called_once()
@@ -32,7 +32,7 @@ class TestRocAucScore(unittest.TestCase):
         mock_sklearn_metrics.roc_auc_score = Mock()
         metric = RocAucScore(one_hot_labels=False)
         metric.reset({})
-        metric.evaluate({'t': 0,
+        metric.process({'t': 0,
                       'y_true': torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
                       'y_pred': torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
         mock_sklearn_metrics.roc_auc_score.assert_called_once()

@@ -14,7 +14,7 @@ class TorchScheduler(Callback):
 
     def on_end_training(self, state):
         if self._monitor is not None:
-            self._scheduler.step(state['final_metrics'][self._monitor])
+            self._scheduler.step(state['metrics'][self._monitor])
 
 
 class LambdaLR(TorchScheduler):

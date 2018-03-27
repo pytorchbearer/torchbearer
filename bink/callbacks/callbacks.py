@@ -2,6 +2,9 @@ class Callback(object):
     def on_start(self, state):
         pass
 
+    def on_start_epoch(self, state):
+        pass
+
     def on_start_training(self, state):
         pass
 
@@ -26,6 +29,9 @@ class Callback(object):
     def on_end_training(self, state):
         pass
 
+    def on_end_epoch(self, state):
+        pass
+
     def on_end(self, state):
         pass
 
@@ -37,6 +43,7 @@ class Callback(object):
 
     def on_step_validation(self, state):
         pass
+
 
 class CallbackList(Callback):
     def __init__(self, callback_list):
@@ -52,6 +59,9 @@ class CallbackList(Callback):
         
     def on_start(self, state):
         self._for_list(lambda callback: callback.on_start(state))
+
+    def on_start_epoch(self, state):
+        self._for_list(lambda callback: callback.on_start_epoch(state))
 
     def on_start_training(self, state):
         self._for_list(lambda callback: callback.on_start_training(state))
@@ -76,6 +86,9 @@ class CallbackList(Callback):
 
     def on_end_training(self, state):
         self._for_list(lambda callback: callback.on_end_training(state))
+
+    def on_end_epoch(self, state):
+        self._for_list(lambda callback: callback.on_end_epoch(state))
 
     def on_end(self, state):
         self._for_list(lambda callback: callback.on_end(state))

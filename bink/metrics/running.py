@@ -49,7 +49,7 @@ class RunningMean(RunningMetric):
         self._metric = metric
 
     def _process_train(self, state):
-        return self._metric.evaluate(state).mean()
+        return self._metric.process(state).mean()
 
     def _step(self, cache):
         return sum(cache) / float(len(cache))
