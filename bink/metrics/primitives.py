@@ -18,7 +18,7 @@ class Loss(metrics.Metric):
     def __init__(self):
         super().__init__('loss')
 
-    def evaluate(self, state):
+    def process(self, state):
         return state['loss']
 
 
@@ -29,17 +29,11 @@ class Epoch(metrics.Metric):
     def __init__(self):
         super().__init__('epoch')
 
-    def evaluate_final(self, state):
+    def process_final(self, state):
         return self._process(state)
 
-    def evaluate(self, state):
+    def process(self, state):
         return self._process(state)
-
-    def evaluate_final_dict(self, state):
-        return {self.name: self.evaluate_final(state)}
-
-    def evaluate_dict(self, state):
-        return {self.name: self.evaluate(state)}
 
     def _process(self, state):
         return state['epoch']

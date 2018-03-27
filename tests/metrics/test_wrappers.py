@@ -6,42 +6,41 @@ from bink.metrics import Std, Metric, Mean, BatchLambda, EpochLambda
 
 import torch
 
+
 class TestStd(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
-        self._metric.evaluate = Mock()
-        self._metric.evaluate.side_effect = [torch.FloatTensor([0.1, 0.2, 0.3]),
-                                          torch.FloatTensor([0.4, 0.5, 0.6]),
-                                          torch.FloatTensor([0.7, 0.8, 0.9])]
+        self._metric.process = Mock()
+        self._metric.process.side_effect = [torch.FloatTensor([0.1, 0.2, 0.3]),
+                                            torch.FloatTensor([0.4, 0.5, 0.6]),
+                                            torch.FloatTensor([0.7, 0.8, 0.9])]
 
         self._std = Std(self._metric)
         self._std.reset({})
         self._target = 0.25819888974716
 
-    def test_train_dict(self):
+    def test_train(self):
         self._std.train()
         for i in range(3):
-            self._std.evaluate_dict({})
-        result = self._std.evaluate_final_dict({})
-        self.assertTrue('train_test_std' in result, msg='train_test_std is not a key in: ' + str(result))
-        self.assertAlmostEqual(self._target, result['train_test_std'])
+            self._std.process({})
+        result = self._std.process_final({})
+        self.assertAlmostEqual(self._target, result)
 
-    def test_validate_dict(self):
+    def test_validate(self):
         self._std.eval()
         for i in range(3):
-            self._std.evaluate_dict({})
-        result = self._std.evaluate_final_dict({})
-        self.assertTrue('val_test_std' in result, msg='val_test_std is not a key in: ' + str(result))
-        self.assertAlmostEqual(self._target, result['val_test_std'])
+            self._std.process({})
+        result = self._std.process_final({})
+        self.assertAlmostEqual(self._target, result)
 
 
 class TestMean(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
-        self._metric.evaluate = Mock()
-        self._metric.evaluate.side_effect = [torch.FloatTensor([0.1, 0.2, 0.3]),
-                                          torch.FloatTensor([0.4, 0.5, 0.6]),
-                                          torch.FloatTensor([0.7, 0.8, 0.9])]
+        self._metric.process = Mock()
+        self._metric.process.side_effect = [torch.FloatTensor([0.1, 0.2, 0.3]),
+                                            torch.FloatTensor([0.4, 0.5, 0.6]),
+                                            torch.FloatTensor([0.7, 0.8, 0.9])]
 
         self._mean = Mean(self._metric)
         self._mean.reset({})
@@ -50,18 +49,16 @@ class TestMean(unittest.TestCase):
     def test_train_dict(self):
         self._mean.train()
         for i in range(3):
-            self._mean.evaluate_dict({})
-        result = self._mean.evaluate_final_dict({})
-        self.assertTrue('train_test' in result, msg='train_test is not a key in: ' + str(result))
-        self.assertAlmostEqual(self._target, result['train_test'])
+            self._mean.process({})
+        result = self._mean.process_final({})
+        self.assertAlmostEqual(self._target, result)
 
     def test_validate_dict(self):
         self._mean.eval()
         for i in range(3):
-            self._mean.evaluate_dict({})
-        result = self._mean.evaluate_final_dict({})
-        self.assertTrue('val_test' in result, msg='val_test is not a key in: ' + str(result))
-        self.assertAlmostEqual(self._target, result['val_test'])
+            self._mean.process({})
+        result = self._mean.process_final({})
+        self.assertAlmostEqual(self._target, result)
 
 
 class TestBatchLambda(unittest.TestCase):
@@ -76,7 +73,7 @@ class TestBatchLambda(unittest.TestCase):
         self._metric.train()
         calls = []
         for i in range(len(self._states)):
-            self._metric.evaluate(self._states[i])
+            self._metric.process(self._states[i])
             calls.append(call(self._states[i]['y_true'], self._states[i]['y_pred']))
         self._metric_function.assert_has_calls(calls)
 
@@ -84,7 +81,7 @@ class TestBatchLambda(unittest.TestCase):
         self._metric.eval()
         calls = []
         for i in range(len(self._states)):
-            self._metric.evaluate(self._states[i])
+            self._metric.process(self._states[i])
             calls.append(call(self._states[i]['y_true'], self._states[i]['y_pred']))
         self._metric_function.assert_has_calls(calls)
 
@@ -105,13 +102,13 @@ class TestEpochLambda(unittest.TestCase):
         calls = [[torch.LongTensor([0]), torch.FloatTensor([0.0])],
                  [torch.LongTensor([0, 1, 2, 3]), torch.FloatTensor([0.0, 0.1, 0.2, 0.3])]]
         for i in range(len(self._states)):
-            self._metric.evaluate(self._states[i])
+            self._metric.process(self._states[i])
         self.assertEqual(2, len(self._metric_function.call_args_list))
         for i in range(len(self._metric_function.call_args_list)):
             self.assertTrue(torch.eq(self._metric_function.call_args_list[i][0][0], calls[i][0]).all)
             self.assertTrue(torch.lt(torch.abs(torch.add(self._metric_function.call_args_list[i][0][1], -calls[i][1])), 1e-12).all)
         self._metric_function.reset_mock()
-        self._metric.evaluate_final({})
+        self._metric.process_final({})
 
         self._metric_function.assert_called_once()
         self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][0], torch.LongTensor([0, 1, 2, 3, 4])).all)
@@ -120,9 +117,9 @@ class TestEpochLambda(unittest.TestCase):
     def test_validate(self):
         self._metric.eval()
         for i in range(len(self._states)):
-            self._metric.evaluate(self._states[i])
+            self._metric.process(self._states[i])
         self._metric_function.assert_not_called()
-        self._metric.final_validate({})
+        self._metric.process_final_validate({})
 
         self._metric_function.assert_called_once()
         self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][0], torch.LongTensor([0, 1, 2, 3, 4])).all)

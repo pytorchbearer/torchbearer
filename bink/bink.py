@@ -101,7 +101,7 @@ class Model:
                 loss = state['criterion'](y_pred, y_true)
                 state['loss'] = loss.data
                 _callbacks.on_forward_criterion(state)
-                state['metrics'] = state['metric_list'].evaluate_dict(state)
+                state['metrics'] = state['metric_list'].process(state)
 
                 # Backwards pass
                 loss.backward()
@@ -111,7 +111,9 @@ class Model:
                 state['optimizer'].step()
                 _callbacks.on_update_parameters(state)
 
-            state['final_metrics'] = state['metric_list'].evaluate_final_dict(state)
+            final_metrics = state['metrics']
+            state['metrics'] = state['metric_list'].process_final(state)
+            final_metrics.update(state['metrics'])
 
             # Validate
             state['validation_generator'] = validation_generator
@@ -119,7 +121,7 @@ class Model:
                 state['metric_list'].reset(state)
                 self.eval()
                 self._validate(validation_generator, validation_steps, state)
-                state['final_metrics'].update(state['metric_list'].evaluate_final_dict(state))
+                state['final_metrics'].update(state['metric_list'].process_final(state))
 
             _callbacks.on_end_epoch(state)
 
@@ -145,7 +147,7 @@ class Model:
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = state['metric_list'].evaluate_dict(state)
+            state['metrics'] = state['metric_list'].process(state)
 
     # TODO: num workers?
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
@@ -192,10 +194,10 @@ class Model:
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
             state['loss'] = loss.data
-            state['metrics'] = state['metric_list'].evaluate_dict(state)
+            state['metrics'] = state['metric_list'].process(state)
             bar.on_update_parameters(state)
 
-        state['final_metrics'] = state['metric_list'].evaluate_final_dict(state)
+        state['final_metrics'] = state['metric_list'].process_final(state)
         bar.on_end_epoch(state)
 
         return state['final_metrics']
