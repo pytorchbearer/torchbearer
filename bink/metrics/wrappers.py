@@ -82,7 +82,7 @@ class BatchLambda(metrics.Metric):
         self._metric_function = metric_function
 
     def process(self, state):
-        return self._metric_function(state['y_true'], state['y_pred'])
+        return self._metric_function(state['y_true'].data, state['y_pred'].data)
 
 
 class EpochLambda(metrics.AdvancedMetric):

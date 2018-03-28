@@ -2,6 +2,8 @@ import unittest
 
 from unittest.mock import Mock, call
 
+from torch.autograd import Variable
+
 from bink.metrics import Std, Metric, Mean, BatchLambda, EpochLambda
 
 import torch
@@ -65,16 +67,16 @@ class TestBatchLambda(unittest.TestCase):
     def setUp(self):
         self._metric_function = Mock(return_value='test')
         self._metric = BatchLambda('test', self._metric_function)
-        self._states = [{'y_true': 1, 'y_pred': 2},
-                        {'y_true': 3, 'y_pred': 4},
-                        {'y_true': 5, 'y_pred': 6}]
+        self._states = [{'y_true': Variable(torch.FloatTensor([1])), 'y_pred': Variable(torch.FloatTensor([2]))},
+                        {'y_true': Variable(torch.FloatTensor([3])), 'y_pred': Variable(torch.FloatTensor([4]))},
+                        {'y_true': Variable(torch.FloatTensor([5])), 'y_pred': Variable(torch.FloatTensor([6]))}]
 
     def test_train(self):
         self._metric.train()
         calls = []
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
-            calls.append(call(self._states[i]['y_true'], self._states[i]['y_pred']))
+            calls.append(call(self._states[i]['y_true'].data, self._states[i]['y_pred'].data))
         self._metric_function.assert_has_calls(calls)
 
     def test_validate(self):
@@ -82,7 +84,7 @@ class TestBatchLambda(unittest.TestCase):
         calls = []
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
-            calls.append(call(self._states[i]['y_true'], self._states[i]['y_pred']))
+            calls.append(call(self._states[i]['y_true'].data, self._states[i]['y_pred'].data))
         self._metric_function.assert_has_calls(calls)
 
 

@@ -81,22 +81,20 @@ class Model:
                 data = next(train_iterator)
 
                 # Extract batch
-                x, y_true = data
-                x, y_true = Variable(x), Variable(y_true)
-                x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
+                state['x'], state['y_true'] = data
+                state['x'], state['y_true'] = Variable(state['x']), Variable(state['y_true'])
+                state['x'], state['y_true'] = self._sample_device_function(state['x']), self._sample_device_function(state['y_true'])
                 _callbacks.on_sample(state)
 
                 # Zero grads
                 state['optimizer'].zero_grad()
 
                 # Forward pass
-                y_pred = state['model'](x)
-                state['y_pred'] = y_pred.data
-                state['y_true'] = y_true.data
+                state['y_pred'] = state['model'](state['x'])
                 _callbacks.on_forward(state)
 
                 # Loss Calculation
-                loss = state['criterion'](y_pred, y_true)
+                loss = state['criterion'](state['y_pred'], state['y_true'])
                 state['loss'] = loss.data
                 _callbacks.on_forward_criterion(state)
                 state['metrics'] = state['metric_list'].process(state)
@@ -152,8 +150,8 @@ class Model:
 
             # Forward pass
             y_pred = state['model'](x)
-            state['y_pred'] = y_pred.data
-            state['y_true'] = y_true.data
+            state['y_pred'] = y_pred
+            state['y_true'] = y_true
 
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
@@ -203,8 +201,8 @@ class Model:
 
             # Forward pass
             y_pred = state['model'](x)
-            state['y_pred'] = y_pred.data
-            state['y_true'] = y_true.data
+            state['y_pred'] = y_pred
+            state['y_true'] = y_true
 
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
