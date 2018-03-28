@@ -1,5 +1,7 @@
 import unittest
 
+from torch.autograd import Variable
+
 from bink.metrics import Loss, Epoch, CategoricalAccuracy
 
 import torch
@@ -44,14 +46,14 @@ class TestEpoch(unittest.TestCase):
 class TestCategoricalAccuracy(unittest.TestCase):
     def setUp(self):
         self._state = {
-            'y_true':torch.LongTensor([0, 1, 2, 2, 1]),
-            'y_pred':torch.FloatTensor([
+            'y_true':Variable(torch.LongTensor([0, 1, 2, 2, 1])),
+            'y_pred':Variable(torch.FloatTensor([
                 [0.9, 0.1, 0.1], # Correct
                 [0.1, 0.9, 0.1], # Correct
                 [0.1, 0.1, 0.9], # Correct
                 [0.9, 0.1, 0.1], # Incorrect
                 [0.9, 0.1, 0.1], # Incorrect
-            ])
+            ]))
         }
         self._targets = [1, 1, 1, 0, 0]
         self._metric = CategoricalAccuracy()
