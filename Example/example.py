@@ -27,8 +27,8 @@ transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-trainset = torchvision.datasets.CIFAR10(dataset_path, train=True, transform=transform)
-testset =  torchvision.datasets.CIFAR10(dataset_path, train=False, transform=transform)
+trainset = torchvision.datasets.MNIST(dataset_path, train=True, transform=transform)
+testset =  torchvision.datasets.MNIST(dataset_path, train=False, transform=transform)
 
 trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 testloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
@@ -41,7 +41,7 @@ modelPath = os.getcwd() + '/' + modelName + '/' + folderName + '/'
 
 
 
-model = nm.InceptionSmall(channels=3)
+model = nm.InceptionSmall(channels=1)
 
 ####### Trainer #######
 
@@ -49,4 +49,4 @@ from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
 
 model = Model(model, torch.optim.SGD(model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
-model.fit_generator(trainloader, validation_generator=testloader, callbacks=[TensorBoardImageVis(num_images=250, comment=current_time), TensorBoard(comment=current_time, write_batch_metrics=True, write_graph=True)], epochs=100)
+model.fit_generator(trainloader, validation_generator=testloader, callbacks=[TensorBoardImageVis(avg_pool_size=2, num_images=250, comment=current_time), TensorBoard(comment=current_time, write_batch_metrics=True, write_graph=True)], epochs=100)
