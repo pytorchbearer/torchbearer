@@ -66,7 +66,7 @@ class MostRecent(_Checkpointer):
         self.filepath = filepath
         self.save_weights_only = save_weights_only
 
-    def on_end_training(self, model_state):
+    def on_end_epoch(self, model_state):
         super().on_end_training(model_state)
         self.save_checkpoint(model_state, overwrite_most_recent=True)
 
@@ -97,7 +97,7 @@ class Best(_Checkpointer):
     def on_start(self, state):
         self.best = float('inf') if self.mode == 'min' else -float('inf')
 
-    def on_end_training(self, model_state):
+    def on_end_epoch(self, model_state):
 
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.period:
@@ -116,7 +116,7 @@ class Interval(_Checkpointer):
         self.period = period
         self.epochs_since_last_save = 0
 
-    def on_end_training(self, model_state):
+    def on_end_epoch(self, model_state):
         super().on_end_training(model_state)
 
         self.epochs_since_last_save += 1
