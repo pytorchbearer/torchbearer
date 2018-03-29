@@ -22,7 +22,7 @@ class Model:
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
             validation_data=None, shuffle=True, class_weight=None, initial_epoch=0,
-            steps_per_epoch=None, validation_steps=None, workers=1):
+            steps_per_epoch=None, validation_steps=None, workers=1, pass_state=False):
         
         trainset, valset = get_train_valid_sets(x, y, validation_data, validation_split, shuffle=shuffle)
         trainloader = DataLoader(trainset, batch_size, shuffle=shuffle, num_workers=workers)
@@ -34,10 +34,10 @@ class Model:
 
         return self.fit_generator(trainloader, train_steps=steps_per_epoch, epochs=epochs, verbose=verbose,
                                   callbacks=callbacks, validation_generator=valloader, validation_steps=validation_steps,
-                                  class_weight=class_weight, initial_epoch=initial_epoch)
+                                  class_weight=class_weight, initial_epoch=initial_epoch, pass_state=pass_state)
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
-                      validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0):
+                      validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0, pass_state=False):
 
         if verbose == 1:
             callbacks = [Tqdm()] + callbacks
@@ -90,7 +90,10 @@ class Model:
                 state['optimizer'].zero_grad()
 
                 # Forward pass
-                state['y_pred'] = state['model'](state['x'])
+                if pass_state:
+                    state['y_pred'] = state['model'](state['x'], state=state)
+                else:
+                    state['y_pred'] = state['model'](state['x'])
                 _callbacks.on_forward(state)
 
                 # Loss Calculation
@@ -121,7 +124,7 @@ class Model:
                 state['validation_steps'] = validation_steps
                 state['metric_list'].reset(state)
                 self.eval()
-                self._validate(state, _callbacks)
+                self._validate(state, _callbacks, pass_state)
 
                 state['metrics'].update(state['metric_list'].process_final(state))
                 final_metrics.update(state['metrics'])
@@ -137,7 +140,7 @@ class Model:
 
         return state
 
-    def _validate(self, state, _callbacks):
+    def _validate(self, state, _callbacks, pass_state):
         self.eval()
 
         _callbacks.on_start_validation(state)
@@ -149,7 +152,10 @@ class Model:
             x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
 
             # Forward pass
-            y_pred = state['model'](x)
+            if pass_state:
+                y_pred = state['model'](x, state=state)
+            else:
+                y_pred = state['model'](x)
             state['x'] = x
             state['y_pred'] = y_pred
             state['y_true'] = y_true
