@@ -5,9 +5,9 @@ import torch.nn.functional as F
 class InceptionSmall(nn.Module):
     name = 'Inception'
 
-    def __init__(self):
+    def __init__(self, channels=1):
         super(InceptionSmall, self).__init__()
-        self.conv1 = ConvModule(1, 96, 3, 1)
+        self.conv1 = ConvModule(channels, 96, 3, 1)
         self.incep = InceptionModule(96, 32, 32)
         self.incep2 = InceptionModule(64, 32, 48)
         self.downsamp = DownSampleModule(80, 80)

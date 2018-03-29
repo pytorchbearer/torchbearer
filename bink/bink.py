@@ -150,6 +150,7 @@ class Model:
 
             # Forward pass
             y_pred = state['model'](x)
+            state['x'] = x
             state['y_pred'] = y_pred
             state['y_true'] = y_true
 
