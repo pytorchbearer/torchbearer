@@ -10,7 +10,7 @@ import torch
 class TestLoss(unittest.TestCase):
     def setUp(self):
         self._state = {
-            'loss': torch.FloatTensor([2.35])
+            'loss': Variable(torch.FloatTensor([2.35]), volatile=True, requires_grad=False)
         }
         self._metric = Loss()
 
