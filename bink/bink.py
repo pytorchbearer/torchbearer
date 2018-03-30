@@ -97,13 +97,13 @@ class Model:
                 _callbacks.on_forward(state)
 
                 # Loss Calculation
-                loss = state['criterion'](state['y_pred'], state['y_true'])
-                state['loss'] = loss
+                state['loss'] = state['criterion'](state['y_pred'], state['y_true'])
+
                 _callbacks.on_forward_criterion(state)
                 state['metrics'] = state['metric_list'].process(state)
 
                 # Backwards pass
-                loss.backward()
+                state['loss'].backward()
                 _callbacks.on_backward(state)
 
                 # Update parameters
