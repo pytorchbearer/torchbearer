@@ -19,7 +19,7 @@ class Loss(metrics.Metric):
         super().__init__('loss')
 
     def process(self, state):
-        return state['loss']
+        return state['loss'].data
 
 
 loss_primitive = Loss()
