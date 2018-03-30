@@ -3,9 +3,9 @@ from bink.callbacks import Callback
 import torch
 
 
-class WeightDecay(Callback):
+class GradientNormClipping(Callback):
     def __init__(self, max_norm, norm_type=2, params=None):
-        super(WeightDecay, self).__init__()
+        super(GradientNormClipping, self).__init__()
 
         self.max_norm = max_norm
         self.norm_type = norm_type
