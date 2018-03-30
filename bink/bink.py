@@ -98,7 +98,7 @@ class Model:
 
                 # Loss Calculation
                 loss = state['criterion'](state['y_pred'], state['y_true'])
-                state['loss'] = loss.data
+                state['loss'] = loss
                 _callbacks.on_forward_criterion(state)
                 state['metrics'] = state['metric_list'].process(state)
 
@@ -162,7 +162,7 @@ class Model:
 
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
-            state['loss'] = loss.data
+            state['loss'] = loss
 
             state['metrics'] = state['metric_list'].process(state)
             _callbacks.on_step_validation(state)
@@ -213,7 +213,7 @@ class Model:
 
             # Loss and metrics
             loss = state['criterion'](y_pred, y_true)
-            state['loss'] = loss.data
+            state['loss'] = loss
 
             state['metrics'] = state['metric_list'].process(state)
             bar.on_step_training(state)
