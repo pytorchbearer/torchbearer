@@ -20,7 +20,7 @@ class CSVLogger(Callback):
         if self.batch_granularity:
             self._write_to_dict(state)
 
-    def on_end_training(self, state):
+    def on_end_epoch(self, state):
         super().on_end_training(state)
         self._write_to_dict(state)
 
