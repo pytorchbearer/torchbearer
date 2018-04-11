@@ -1,8 +1,9 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
-from bink.callbacks.checkpointers import _Checkpointer, MostRecent, Interval, Best
+from unittest.mock import patch
+
 from bink import Model
-import numpy as np
+from bink.callbacks.checkpointers import _Checkpointer, MostRecent, Interval, Best
+import os
 
 
 class TestCheckpointer(TestCase):
@@ -39,13 +40,12 @@ class TestCheckpointer(TestCase):
 
         self.assertTrue(mock_save.call_args_list[1][0][-1] == True)
 
-
     @patch("bink.Model.save")
     def test_save_checkpoint_formatting(self, mock_save):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{epoch}'
@@ -61,7 +61,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {'test_metric':0.001},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{test_metric}'
@@ -77,7 +77,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {'test_metric':0.001},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{test_metric:.01f}'
@@ -93,7 +93,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {'test_metric':0.001},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{test_metric:d}'
@@ -105,9 +105,9 @@ class TestCheckpointer(TestCase):
 
         self.fail('No error was thrown when wrong format chosen for save file format')
 
-    @patch("bink.Model.save")
     @patch('os.rename')
-    def test_save_checkpoint_overwrite_recent(self, mock_save, mock_os_rename):
+    @patch("bink.Model.save")
+    def test_save_checkpoint_overwrite_recent(self, mock_save, _):
         state = {
             'self': Model(None, None, None, []),
             'epoch': 0,
@@ -117,14 +117,12 @@ class TestCheckpointer(TestCase):
         file_format = 'test_file_{epoch}'
         check = _Checkpointer(file_format, False)
         check.save_checkpoint(state, True)
+        self.assertTrue(check.most_recent == 'test_file_0')
 
         state['epoch'] = 1
-        check.save_checkpoint(state)
+        check.save_checkpoint(state, True)
+        self.assertTrue(check.most_recent == 'test_file_1')
 
-        self.assertTrue(mock_os_rename.call_args_list[0][0][0] == 'test_file_0.pt')
-        self.assertTrue(mock_os_rename.call_args_list[1][0][0] == 'test_file_1.pt')
-        self.assertTrue(mock_os_rename.call_args_list[0][0][1] == 'test_file_0.bink')
-        self.assertTrue(mock_os_rename.call_args_list[1][0][1] == 'test_file_1.bink')
 
 class TestMostRecent(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -137,6 +135,8 @@ class TestMostRecent(TestCase):
 
         self.assertTrue(mock_save_check.call_count == 2)
 
+
+# TODO: Negative and fractional interval test and decide how to handle
 class TestInterval(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_interval_is_1(self, mock_save_check):
@@ -162,15 +162,13 @@ class TestInterval(TestCase):
             elif i == 7:
                 self.assertTrue(mock_save_check.call_count == 2)
 
-
         self.assertTrue(mock_save_check.call_count == 3)
 
-    #TODO: Negative and fractional interval test and decide how to handle
 
 class TestBest(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_with_increasing(self, mock_save):
-        state = { 'metrics':{'val_loss':0.1} }
+        state = {'metrics': {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='min')
@@ -200,7 +198,7 @@ class TestBest(TestCase):
 
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_max_with_increasing(self, mock_save):
-        state = { 'metrics':{'val_loss':0.1} }
+        state = {'metrics': {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='max')
@@ -229,7 +227,7 @@ class TestBest(TestCase):
         self.assertTrue(mock_save.call_count == 1)
 
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
-    def test_min_delta(self, mock_save):
+    def test_min_delta_no_save(self, mock_save):
         state = {'metrics': {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
@@ -244,7 +242,7 @@ class TestBest(TestCase):
         self.assertTrue(mock_save.call_count == 1)
 
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
-    def test_min_delta(self, mock_save):
+    def test_min_delta_save(self, mock_save):
         state = {'metrics': {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
@@ -257,4 +255,3 @@ class TestBest(TestCase):
         state = {'metrics': {'val_loss': -0.001}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 2)
-
