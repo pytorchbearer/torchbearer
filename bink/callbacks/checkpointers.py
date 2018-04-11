@@ -89,10 +89,10 @@ class Best(_Checkpointer):
 
         if self.mode == 'min':
             self.min_delta *= -1
-            self.monitor_op = lambda x1, x2: x1 < x2
+            self.monitor_op = lambda x1, x2: (x1-self.min_delta) < x2
         elif self.mode == 'max':
             self.min_delta *= 1
-            self.monitor_op = lambda x1, x2: x1 > x2
+            self.monitor_op = lambda x1, x2: (x1-self.min_delta) > x2
 
     def on_start(self, state):
         self.best = float('inf') if self.mode == 'min' else -float('inf')
