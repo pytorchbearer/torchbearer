@@ -30,9 +30,9 @@ class CSVLogger(Callback):
 
     def _write_to_dict(self, state):
         fields = self._get_field_dict(state)
+        self.writer = csv.DictWriter(self.csvfile, fieldnames=fields.keys(), delimiter=self.separator)
 
         if self.write_header:
-            self.writer = csv.DictWriter(self.csvfile, fieldnames=fields.keys(), delimiter=self.separator)
             self.writer.writeheader()
             self.write_header = False
 
