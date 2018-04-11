@@ -45,7 +45,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{epoch}'
@@ -61,7 +61,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {'test_metric':0.001},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{test_metric}'
@@ -77,7 +77,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {'test_metric':0.001},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{test_metric:.01f}'
@@ -93,7 +93,7 @@ class TestCheckpointer(TestCase):
         state = {
             'self': Model(None, None, None, []),
             'metrics': {'test_metric':0.001},
-            'epoch':2
+            'epoch': 2
         }
 
         file_format = 'test_file_{test_metric:d}'
@@ -168,7 +168,7 @@ class TestInterval(TestCase):
 class TestBest(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_with_increasing(self, mock_save):
-        state = { 'metrics':{'val_loss':0.1} }
+        state = {'metrics': {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='min')
@@ -198,7 +198,7 @@ class TestBest(TestCase):
 
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_max_with_increasing(self, mock_save):
-        state = { 'metrics':{'val_loss':0.1} }
+        state = {'metrics': {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='max')
