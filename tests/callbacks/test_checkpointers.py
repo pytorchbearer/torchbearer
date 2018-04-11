@@ -5,7 +5,7 @@ from bink import Model
 import numpy as np
 
 
-class Test_Checkpointer(TestCase):
+class TestCheckpointer(TestCase):
     @patch("bink.Model.save")
     def test_save_checkpoint_save_filename(self, mock_save):
         state = {
@@ -126,7 +126,7 @@ class Test_Checkpointer(TestCase):
         self.assertTrue(mock_os_rename.call_args_list[0][0][1] == 'test_file_0.bink')
         self.assertTrue(mock_os_rename.call_args_list[1][0][1] == 'test_file_1.bink')
 
-class Test_MostRecent(TestCase):
+class TestMostRecent(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_save(self, mock_save_check):
         state = {}
@@ -137,7 +137,7 @@ class Test_MostRecent(TestCase):
 
         self.assertTrue(mock_save_check.call_count == 2)
 
-class Test_Interval(TestCase):
+class TestInterval(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_interval_is_1(self, mock_save_check):
         state = {}
@@ -167,7 +167,7 @@ class Test_Interval(TestCase):
 
     #TODO: Negative and fractional interval test and decide how to handle
 
-class Test_Best(TestCase):
+class TestBest(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_with_increasing(self, mock_save):
         state = { 'metrics':{'val_loss':0.1} }
