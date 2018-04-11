@@ -169,4 +169,92 @@ class Test_Interval(TestCase):
 
 class Test_Best(TestCase):
     @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
-    def test_min(self, mock_save):
+    def test_min_with_increasing(self, mock_save):
+        state = { 'metrics':{'val_loss':0.1} }
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, mode='min')
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+        state = {'metrics': {'val_loss': 0.2}}
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_min_with_decreasing(self, mock_save):
+        state = {'metrics': {'val_loss': 0.1}}
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, mode='min')
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+        state = {'metrics': {'val_loss': 0.001}}
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 2)
+
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_max_with_increasing(self, mock_save):
+        state = { 'metrics':{'val_loss':0.1} }
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, mode='max')
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+        state = {'metrics': {'val_loss': 0.2}}
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 2)
+
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_max_with_decreasing(self, mock_save):
+        state = {'metrics': {'val_loss': 0.1}}
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, mode='max')
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+        state = {'metrics': {'val_loss': 0.001}}
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_min_delta(self, mock_save):
+        state = {'metrics': {'val_loss': 0.1}}
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, mode='min', min_delta=0.1)
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+        state = {'metrics': {'val_loss': 0.001}}
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_min_delta(self, mock_save):
+        state = {'metrics': {'val_loss': 0.1}}
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, mode='min', min_delta=0.1)
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 1)
+
+        state = {'metrics': {'val_loss': -0.001}}
+        check.on_end_epoch(state)
+        self.assertTrue(mock_save.call_count == 2)
+
