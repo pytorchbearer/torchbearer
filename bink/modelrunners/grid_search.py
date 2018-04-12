@@ -2,7 +2,7 @@ from sklearn.model_selection import ParameterGrid
 from torch import nn
 
 from bink.callbacks import CallbackList
-from bink import Model
+from bink.bink import Model
 
 class GridSearchRunner:
     def __init__(self, trainloader, torch_model_type, optimizer, model_init_arg_dict, optimizer_param_dict,

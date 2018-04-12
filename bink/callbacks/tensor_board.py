@@ -40,10 +40,16 @@ class TensorBoard(Callback):
             self._handle_graph = lambda _: ...
 
         self._writer = None
+        self._batch_writer = None
 
     def on_start(self, state):
-        log_dir = os.path.join(self.log_dir, state['model'].__class__.__name__ + '_' + self.comment)
-        self._writer = SummaryWriter(log_dir=log_dir)
+        self.log_dir = os.path.join(self.log_dir, state['model'].__class__.__name__ + '_' + self.comment)
+        self._writer = SummaryWriter(log_dir=self.log_dir)
+
+    def on_start_epoch(self, state):
+        if self.write_batch_metrics:
+            log_dir = os.path.join(self.log_dir, 'epoch-' + str(state['epoch']))
+            self._batch_writer = SummaryWriter(log_dir=log_dir)
 
     def on_end(self, state):
         self._writer.close()
@@ -54,14 +60,16 @@ class TensorBoard(Callback):
     def on_step_training(self, state):
         if self.write_batch_metrics:
             for metric in state['metrics']:
-                self._writer.add_scalars('batch/' + metric, {'epoch ' + str(state['epoch']): state['metrics'][metric]}, state['t'])
+                self._batch_writer.add_scalar('batch/' + metric, state['metrics'][metric], state['t'])
 
     def on_step_validation(self, state):
         if self.write_batch_metrics:
             for metric in state['metrics']:
-                self._writer.add_scalars('batch/' + metric, {'epoch ' + str(state['epoch']): state['metrics'][metric]}, state['t'])
+                self._batch_writer.add_scalar('batch/' + metric, state['metrics'][metric], state['t'])
 
     def on_end_epoch(self, state):
+        self._batch_writer.close()
+
         for metric in state['metrics']:
             self._writer.add_scalar('epoch/' + metric, state['metrics'][metric], state['epoch'])
 
