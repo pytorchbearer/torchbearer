@@ -255,3 +255,25 @@ class TestBest(TestCase):
         state = {'metrics': {'val_loss': -0.001}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 2)
+        
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_auto_shoud_be_min(self, _):
+        state = {'metrics': {'val_loss': 0.1}}
+
+        file_path = 'test_file_{val_loss:.2f}'
+        check = Best(file_path, monitor='val_loss')
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(check.mode == 'min')
+
+    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_auto_shoud_be_max(self, _):
+        state = {'metrics': {'acc_loss': 0.1}}
+
+        file_path = 'test_file_{acc_loss:.2f}'
+        check = Best(file_path, monitor='acc_loss')
+        check.on_start(state)
+
+        check.on_end_epoch(state)
+        self.assertTrue(check.mode == 'max')
