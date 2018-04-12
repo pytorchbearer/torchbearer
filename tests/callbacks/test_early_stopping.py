@@ -1,11 +1,12 @@
 from unittest import TestCase
 from bink.callbacks import EarlyStopping
 
+
 class TestEarlyStopping(TestCase):
     
     def test_min_should_stop(self):
         state = {
-            'epoch':1,
+            'epoch': 1,
             'stop_training': False,
             'metrics': {'test_metric': 0.001}
         }
@@ -24,7 +25,7 @@ class TestEarlyStopping(TestCase):
 
     def test_min_should_continue(self):
         state = {
-            'epoch':1,
+            'epoch': 1,
             'stop_training': False,
             'metrics': {'test_metric': 0.001}
         }
@@ -118,7 +119,7 @@ class TestEarlyStopping(TestCase):
 
     def test_patience_should_stop(self):
         state = {
-            'epoch':1,
+            'epoch': 1,
             'stop_training': False,
             'metrics': {'test_metric': 0.001}
         }
