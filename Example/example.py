@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
 from Example import inception_network as nm
-from bink.bink import Model
+from bink import Model
 from bink.metrics import RocAucScore
 from bink.callbacks import EarlyStopping, TensorBoard, TensorBoardImageVis, L2WeightDecay, L1WeightDecay
 
@@ -26,8 +26,8 @@ transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-trainset = torchvision.datasets.MNIST(dataset_path, train=True, transform=transform)
-testset =  torchvision.datasets.MNIST(dataset_path, train=False, transform=transform)
+trainset = torchvision.datasets.CIFAR10(dataset_path, train=True, transform=transform)
+testset =  torchvision.datasets.CIFAR10(dataset_path, train=False, transform=transform)
 
 trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 testloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
@@ -40,7 +40,7 @@ modelPath = os.getcwd() + '/' + modelName + '/' + folderName + '/'
 
 
 
-my_model = nm.InceptionSmall(channels=1)
+my_model = nm.InceptionSmall(channels=3)
 
 ####### Trainer #######
 
