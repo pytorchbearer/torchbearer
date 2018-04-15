@@ -68,7 +68,8 @@ class TensorBoard(Callback):
                 self._batch_writer.add_scalar('batch/' + metric, state['metrics'][metric], state['t'])
 
     def on_end_epoch(self, state):
-        self._batch_writer.close()
+        if self.write_batch_metrics:
+            self._batch_writer.close()
 
         for metric in state['metrics']:
             self._writer.add_scalar('epoch/' + metric, state['metrics'][metric], state['epoch'])
