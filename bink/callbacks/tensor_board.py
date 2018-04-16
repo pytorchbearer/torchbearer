@@ -15,6 +15,7 @@ class TensorBoard(Callback):
     def __init__(self, log_dir='./logs',
                  write_graph=True,
                  write_batch_metrics=False,
+                 batch_step_size=10,
                  write_epoch_metrics=True,
                  comment='bink'):
         super(TensorBoard, self).__init__()
@@ -22,10 +23,9 @@ class TensorBoard(Callback):
         self.log_dir = log_dir
         self.write_graph = write_graph
         self.write_batch_metrics = write_batch_metrics
+        self.batch_step_size = batch_step_size
+        self.write_epoch_metrics = write_epoch_metrics
         self.comment = comment
-
-        if not write_epoch_metrics:
-            self.on_end_epoch = lambda _: ...
 
         if self.write_graph:
             def handle_graph(state):
@@ -58,12 +58,12 @@ class TensorBoard(Callback):
         self._handle_graph(state)
 
     def on_step_training(self, state):
-        if self.write_batch_metrics:
+        if self.write_batch_metrics and state['t'] % self.batch_step_size == 0:
             for metric in state['metrics']:
                 self._batch_writer.add_scalar('batch/' + metric, state['metrics'][metric], state['t'])
 
     def on_step_validation(self, state):
-        if self.write_batch_metrics:
+        if self.write_batch_metrics and state['t'] % self.batch_step_size == 0:
             for metric in state['metrics']:
                 self._batch_writer.add_scalar('batch/' + metric, state['metrics'][metric], state['t'])
 
@@ -71,8 +71,9 @@ class TensorBoard(Callback):
         if self.write_batch_metrics:
             self._batch_writer.close()
 
-        for metric in state['metrics']:
-            self._writer.add_scalar('epoch/' + metric, state['metrics'][metric], state['epoch'])
+        if self.write_epoch_metrics:
+            for metric in state['metrics']:
+                self._writer.add_scalar('epoch/' + metric, state['metrics'][metric], state['epoch'])
 
 
 class TensorBoardImageVis(Callback):
