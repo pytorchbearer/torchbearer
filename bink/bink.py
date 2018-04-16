@@ -121,8 +121,8 @@ class Model:
 
             # Validate
             if validation_generator is not None:
-                state['test_generator'] = validation_generator
-                state['test_steps'] = validation_steps
+                state['validation_generator'] = validation_generator
+                state['validation_steps'] = validation_steps
                 self.eval()
                 self._validate(state, _callbacks, pass_state)
 
@@ -141,10 +141,10 @@ class Model:
         state['metric_list'].reset(state)
 
         if num_steps is None:
-            num_steps = len(state['test_generator'])
+            num_steps = len(state['validation_generator'])
 
         _callbacks.on_start_validation(state)
-        test_iterator = iter(state['test_generator'])
+        test_iterator = iter(state['validation_generator'])
         for state['t'] in range(num_steps):
             # Load batch
             x, y_true = next(test_iterator)
@@ -173,14 +173,14 @@ class Model:
         _callbacks.on_end_validation(state)
 
     def _validate(self, state, _callbacks, pass_state):
-        self._test_loop(state, _callbacks, pass_state, state['test_steps'])
+        self._test_loop(state, _callbacks, pass_state, state['validation_steps'])
 
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
         trainset = DataLoader(TensorDataset(x, y), batch_size, steps)
         return self.evaluate_generator(trainset, verbose)
 
     def evaluate_generator(self, generator, verbose=1, steps=None, pass_state=False):
-        state = {'epoch': 0, 'max_epochs': 1, 'stop_training': False, 'test_generator': generator}
+        state = {'epoch': 0, 'max_epochs': 1, 'stop_training': False, 'validation_generator': generator}
         state.update(self.main_state)
 
         _callbacks = []
@@ -195,7 +195,7 @@ class Model:
         return self.predict_generator(pred_set, verbose)
 
     def predict_generator(self, generator, verbose=1, steps=None, pass_state=False):
-        state = {'epoch': 0, 'max_epochs': 1, 'stop_training': False, 'test_generator': generator}
+        state = {'epoch': 0, 'max_epochs': 1, 'stop_training': False, 'validation_generator': generator}
         state.update(self.main_state)
 
         _callbacks = [AggregatePredictions()]
