@@ -136,20 +136,18 @@ class Model:
 
         return state
 
-    def _test_loop(self, state, _callbacks, pass_state, num_steps=None):
+    def _test_loop(self, state, callbacks, pass_state, batch_loader, num_steps=None):
         self.eval()
         state['metric_list'].reset(state)
 
         if num_steps is None:
             num_steps = len(state['validation_generator'])
 
-        _callbacks.on_start_validation(state)
-        test_iterator = iter(state['validation_generator'])
+        callbacks.on_start_validation(state)
+        state['validation_iterator'] = iter(state['validation_generator'])
         for state['t'] in range(num_steps):
             # Load batch
-            state['x'], state['y_true'] = next(test_iterator)
-            state['x'], state['y_true'] = Variable(state['x'], volatile=True), Variable(state['y_true'], volatile=True)
-            state['x'], state['y_true'] = self._sample_device_function(state['x']), self._sample_device_function(state['y_true'])
+            batch_loader(state, self._sample_device_function)
 
             # Forward pass
             if pass_state:
@@ -158,19 +156,19 @@ class Model:
                 state['y_pred'] = state['model'](state['x'])
 
             # Loss and metrics
-            loss = state['criterion'](state['y_pred'], state['y_true'])
-            state['loss'] = loss
+            if 'y_true' in state:
+                state['loss'] = state['criterion'](state['y_pred'], state['y_true'])
+                state['metrics'] = state['metric_list'].process(state)
 
-            state['metrics'] = state['metric_list'].process(state)
-            _callbacks.on_step_validation(state)
+            callbacks.on_step_validation(state)
             if state['stop_training']:
                 break
 
         state['metrics'].update(state['metric_list'].process_final(state))
-        _callbacks.on_end_validation(state)
+        callbacks.on_end_validation(state)
 
     def _validate(self, state, _callbacks, pass_state):
-        self._test_loop(state, _callbacks, pass_state, state['validation_steps'])
+        self._test_loop(state, _callbacks, pass_state, self._load_batch_standard, state['validation_steps'])
 
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
         trainset = DataLoader(TensorDataset(x, y), batch_size, steps)
@@ -183,7 +181,7 @@ class Model:
         _callbacks = []
         if verbose == 1:
             _callbacks.append(Tqdm('e'))
-        self._test_loop(state, CallbackList(_callbacks), pass_state, steps)
+        self._test_loop(state, CallbackList(_callbacks), pass_state, self._load_batch_standard, steps)
 
         return state['metrics']
 
@@ -198,7 +196,7 @@ class Model:
         _callbacks = [AggregatePredictions()]
         if verbose == 1:
             _callbacks.append(Tqdm('p'))
-        self._test_loop(state, CallbackList(_callbacks), pass_state, steps)
+        self._test_loop(state, CallbackList(_callbacks), pass_state, self._load_batch_predict, steps)
 
         return state['final_predictions']
 
@@ -221,14 +219,6 @@ class Model:
         self._sample_device_function = self._cpu_sample
         self.main_state['use_cuda'] = False
         return self
-
-    @staticmethod
-    def _cuda_sample(x):
-        return x.cuda()
-
-    @staticmethod
-    def _cpu_sample(x):
-        return x.cpu()
 
     def save(self, model_file, state_file, save_state_dict=False, save_keys=['optimizer', 'criterion', 'use_cuda']):
         '''
@@ -276,6 +266,34 @@ class Model:
 
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
+
+    @staticmethod
+    def _cuda_sample(x):
+        return x.cuda()
+
+    @staticmethod
+    def _cpu_sample(x):
+        return x.cpu()
+
+    @staticmethod
+    def _load_batch_standard(state, sample_device_function):
+        state['x'], state['y_true'] = next(state['validation_iterator'])
+        state['x'], state['y_true'] = Variable(state['x'], volatile=True), Variable(state['y_true'], volatile=True)
+        state['x'], state['y_true'] = sample_device_function(state['x']), sample_device_function(
+            state['y_true'])
+
+    @staticmethod
+    def _load_batch_predict( state, sample_device_function):
+        data = next(state['validation_iterator'])
+        if isinstance(data, list) or isinstance(data, tuple):
+            state['x'], state['y_true'] = data
+            state['x'], state['y_true'] = Variable(state['x'], volatile=True), Variable(state['y_true'], volatile=True)
+            state['x'], state['y_true'] = sample_device_function(state['x']), sample_device_function(
+                state['y_true'])
+        else:
+            state['x'] = data
+            state['x'] = Variable(state['x'], volatile=True)
+            state['x'] = sample_device_function(state['x'])
 
 
 def _build_bink_state_object(state, save_keys):
