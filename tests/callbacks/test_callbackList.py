@@ -17,24 +17,3 @@ class TestCallbackList(TestCase):
         self.list.on_start({})
         self.assertTrue(self.callback_1.method_calls[0][0] == 'on_start')
         self.assertTrue(self.callback_2.method_calls[0][0] == 'on_start')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
