@@ -22,7 +22,7 @@ class Model:
         self._sample_device_function = self._cpu_sample
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
-            validation_data=None, shuffle=True, class_weight=None, initial_epoch=0,
+            validation_data=None, shuffle=True, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, workers=1, pass_state=False):
         
         trainset, valset = get_train_valid_sets(x, y, validation_data, validation_split, shuffle=shuffle)
@@ -35,10 +35,10 @@ class Model:
 
         return self.fit_generator(trainloader, train_steps=steps_per_epoch, epochs=epochs, verbose=verbose,
                                   callbacks=callbacks, validation_generator=valloader, validation_steps=validation_steps,
-                                  class_weight=class_weight, initial_epoch=initial_epoch, pass_state=pass_state)
+                                  initial_epoch=initial_epoch, pass_state=pass_state)
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
-                      validation_generator=None, validation_steps=None, class_weight=None, initial_epoch=0, pass_state=False):
+                      validation_generator=None, validation_steps=None, initial_epoch=0, pass_state=False):
 
         if verbose == 1:
             callbacks = [Tqdm()] + callbacks
@@ -121,17 +121,12 @@ class Model:
 
             # Validate
             if validation_generator is not None:
-                state['validation_generator'] = validation_generator
-                state['validation_steps'] = validation_steps
-                state['metric_list'].reset(state)
+                state['test_generator'] = validation_generator
+                state['test_steps'] = validation_steps
                 self.eval()
                 self._validate(state, _callbacks, pass_state)
 
-                state['metrics'].update(state['metric_list'].process_final(state))
-                final_metrics.update(state['metrics'])
-
-                _callbacks.on_end_validation(state)
-
+            final_metrics.update(state['metrics'])
             state['metrics'] = final_metrics
             _callbacks.on_end_epoch(state)
 
@@ -141,14 +136,15 @@ class Model:
 
         return state
 
-    def _test_loop(self, state, _callbacks, pass_state, generator, num_steps=None):
+    def _test_loop(self, state, _callbacks, pass_state, num_steps=None):
         self.eval()
+        state['metric_list'].reset(state)
 
         if num_steps is None:
-            num_steps = len(generator)
+            num_steps = len(state['test_generator'])
 
         _callbacks.on_start_validation(state)
-        test_iterator = iter(generator)
+        test_iterator = iter(state['test_generator'])
         for state['t'] in range(num_steps):
             # Load batch
             x, y_true = next(test_iterator)
@@ -173,39 +169,39 @@ class Model:
             if state['stop_training']:
                 break
 
+        state['metrics'].update(state['metric_list'].process_final(state))
         _callbacks.on_end_validation(state)
 
     def _validate(self, state, _callbacks, pass_state):
-        generator = state['validation_generator']
-        self._test_loop(state, _callbacks, pass_state, generator, state['validation_steps'])
+        self._test_loop(state, _callbacks, pass_state, state['test_steps'])
 
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
         trainset = DataLoader(TensorDataset(x, y), batch_size, steps)
         return self.evaluate_generator(trainset, verbose)
 
     def evaluate_generator(self, generator, verbose=1, steps=None, pass_state=False):
-        state = {}
+        state = {'epoch': 0, 'max_epochs': 1, 'stop_training': False, 'test_generator': generator}
         state.update(self.main_state)
 
         _callbacks = []
         if verbose == 1:
-            _callbacks.append(Tqdm())
-        self._test_loop(self.main_state, CallbackList(_callbacks), pass_state, generator, steps)
+            _callbacks.append(Tqdm('e'))
+        self._test_loop(state, CallbackList(_callbacks), pass_state, steps)
 
         return state['metrics']
 
-    def predict(self, x=None, batch_size=None, verbose=0, steps=None):
+    def predict(self, x=None, batch_size=None, verbose=1, steps=None):
         pred_set = DataLoader(TensorDataset(x, None), batch_size, steps)
         return self.predict_generator(pred_set, verbose)
 
-    def predict_generator(self, generator, verbose=0, steps=None, pass_state=False):
-        state = {}
+    def predict_generator(self, generator, verbose=1, steps=None, pass_state=False):
+        state = {'epoch': 0, 'max_epochs': 1, 'stop_training': False, 'test_generator': generator}
         state.update(self.main_state)
 
         _callbacks = [AggregatePredictions()]
         if verbose == 1:
-            _callbacks.append(Tqdm())
-        self._test_loop(state, CallbackList(_callbacks), pass_state, generator, steps)
+            _callbacks.append(Tqdm('p'))
+        self._test_loop(state, CallbackList(_callbacks), pass_state, steps)
 
         return state['final_predictions']
 

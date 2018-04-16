@@ -17,8 +17,9 @@ class ConsolePrinter(Callback):
 
 
 class Tqdm(Callback):
-    def __init__(self):
+    def __init__(self, validation_label_letter='v'):
         self._loader = None
+        self.validation_label = validation_label_letter
 
     def on_start_training(self, state):
         bar_desc = '{:d}/{:d}(t)'.format(state['epoch'] + 1, state['max_epochs'])
@@ -33,9 +34,9 @@ class Tqdm(Callback):
         self._loader.close()
 
     def on_start_validation(self, state):
-        bar_desc = '{:d}/{:d}(v)'.format(state['epoch'] + 1, state['max_epochs'])
-        self._loader = tqdm(state['validation_generator'], desc=bar_desc)
-        state['validation_generator'] = self._loader
+        bar_desc = '{:d}/{:d}({:s})'.format(state['epoch'] + 1, state['max_epochs'], self.validation_label)
+        self._loader = tqdm(state['test_generator'], desc=bar_desc)
+        state['test_generator'] = self._loader
 
     def on_step_validation(self, state):
         self._loader.set_postfix(state['metrics'])
