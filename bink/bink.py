@@ -139,6 +139,7 @@ class Model:
     def _test_loop(self, state, callbacks, pass_state, batch_loader, num_steps=None):
         self.eval()
         state['metric_list'].reset(state)
+        state['metrics'] = {}
 
         if num_steps is None:
             num_steps = len(state['validation_generator'])
@@ -164,7 +165,8 @@ class Model:
             if state['stop_training']:
                 break
 
-        state['metrics'].update(state['metric_list'].process_final(state))
+        if 'y_true' in state:
+            state['metrics'].update(state['metric_list'].process_final(state))
         callbacks.on_end_validation(state)
 
     def _validate(self, state, _callbacks, pass_state):
