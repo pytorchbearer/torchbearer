@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from bink.utils import get_train_valid_sets
 from bink.callbacks.callbacks import CallbackList
 from bink.callbacks.printer import Tqdm
+from bink.callbacks.aggregate_predictions import AggregatePredictions
 from torch.autograd import Variable
 from bink import metrics as bink_metrics
 
@@ -140,14 +141,17 @@ class Model:
 
         return state
 
-    def _validate(self, state, _callbacks, pass_state):
+    def _test_loop(self, state, _callbacks, pass_state, generator, num_steps=None):
         self.eval()
 
+        if num_steps is None:
+            num_steps = len(generator)
+
         _callbacks.on_start_validation(state)
-        validation_iterator = iter(state['validation_generator'])
-        for state['t'] in range(state['validation_steps']):
+        test_iterator = iter(generator)
+        for state['t'] in range(num_steps):
             # Load batch
-            x, y_true = next(validation_iterator)
+            x, y_true = next(test_iterator)
             x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
             x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
 
@@ -169,105 +173,41 @@ class Model:
             if state['stop_training']:
                 break
 
-    # TODO: num workers?
+        _callbacks.on_end_validation(state)
+
+    def _validate(self, state, _callbacks, pass_state):
+        generator = state['validation_generator']
+        self._test_loop(state, _callbacks, pass_state, generator, state['validation_steps'])
+
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None):
         trainset = DataLoader(TensorDataset(x, y), batch_size, steps)
-
         return self.evaluate_generator(trainset, verbose)
 
-    def evaluate_generator(self, generator, verbose=1, steps=None):
-        bar = CallbackList([])
-        if verbose == 1:
-            bar = Tqdm()
-
-        if steps is None:
-            steps = len(generator)
-
-        # Init state
-        state = {
-            'epoch': 0,
-            'max_epochs': 1,
-            'evaluation_steps': steps,
-            't': 0,
-            'generator': generator
-            }
+    def evaluate_generator(self, generator, verbose=1, steps=None, pass_state=False):
+        state = {}
         state.update(self.main_state)
 
-        state['metric_list'].reset(state)
-        state['model'].eval()
-
-        self.eval()
-        bar.on_start_training(state)
-        loader = iter(state['generator'])
-        for state['t'] in range(steps):
-
-            # Load batch
-            x, y_true = next(loader)
-            x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
-            x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
-
-            # Forward pass
-            y_pred = state['model'](x)
-            state['y_pred'] = y_pred
-            state['y_true'] = y_true
-
-            # Loss and metrics
-            loss = state['criterion'](y_pred, y_true)
-            state['loss'] = loss
-
-            state['metrics'] = state['metric_list'].process(state)
-            bar.on_step_training(state)
-
-        state['metrics'].update(state['metric_list'].process_final(state))
-        bar.on_end_training(state)
+        _callbacks = []
+        if verbose == 1:
+            _callbacks.append(Tqdm())
+        self._test_loop(self.main_state, CallbackList(_callbacks), pass_state, generator, steps)
 
         return state['metrics']
 
     def predict(self, x=None, batch_size=None, verbose=0, steps=None):
         pred_set = DataLoader(TensorDataset(x, None), batch_size, steps)
-
         return self.predict_generator(pred_set, verbose)
 
-    def predict_generator(self, generator, verbose=0, steps=None):
-        bar = CallbackList([])
-        if verbose == 1:
-            bar = Tqdm()
-
-        if steps is None:
-            steps = len(generator)
-
-        # Init state
-        state = {
-            'epoch': 0,
-            'max_epochs': 1,
-            'generator': generator,
-            'prediction_steps': steps,
-            'metrics': {},
-            'final_metrics': {}
-        }
+    def predict_generator(self, generator, verbose=0, steps=None, pass_state=False):
+        state = {}
         state.update(self.main_state)
 
-        self.eval()
-        bar.on_start_training(state)
+        _callbacks = [AggregatePredictions()]
+        if verbose == 1:
+            _callbacks.append(Tqdm())
+        self._test_loop(state, CallbackList(_callbacks), pass_state, generator, steps)
 
-        loader = iter(state['generator'])
-        predictions_list = []
-        for state['t'] in range(steps):
-            # Load batch
-            x, _ = next(loader)
-            x = Variable(x, volatile=True)
-            x = self._sample_device_function(x)
-
-            # Forward pass
-            y_pred = state['model'](x)
-            predictions_list.append(y_pred)
-            bar.on_step_training(state)
-
-        # Aggregate Predictions
-        bar.on_end_training(state)
-        predictions = torch.cat(predictions_list, 0)
-
-        return predictions
+        return state['final_predictions']
 
     def train(self):
         self.main_state['model'].train()
