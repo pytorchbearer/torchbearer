@@ -147,21 +147,18 @@ class Model:
         test_iterator = iter(state['validation_generator'])
         for state['t'] in range(num_steps):
             # Load batch
-            x, y_true = next(test_iterator)
-            x, y_true = Variable(x, volatile=True), Variable(y_true, volatile=True)
-            x, y_true = self._sample_device_function(x), self._sample_device_function(y_true)
+            state['x'], state['y_true'] = next(test_iterator)
+            state['x'], state['y_true'] = Variable(state['x'], volatile=True), Variable(state['y_true'], volatile=True)
+            state['x'], state['y_true'] = self._sample_device_function(state['x']), self._sample_device_function(state['y_true'])
 
             # Forward pass
             if pass_state:
-                y_pred = state['model'](x, state=state)
+                state['y_pred'] = state['model'](state['x'], state=state)
             else:
-                y_pred = state['model'](x)
-            state['x'] = x
-            state['y_pred'] = y_pred
-            state['y_true'] = y_true
+                state['y_pred'] = state['model'](state['x'])
 
             # Loss and metrics
-            loss = state['criterion'](y_pred, y_true)
+            loss = state['criterion'](state['y_pred'], state['y_true'])
             state['loss'] = loss
 
             state['metrics'] = state['metric_list'].process(state)
