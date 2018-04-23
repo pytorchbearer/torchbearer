@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from bink import Model
 from bink.callbacks.checkpointers import _Checkpointer, MostRecent, Interval, Best
@@ -7,10 +7,12 @@ import os
 
 
 class TestCheckpointer(TestCase):
-    @patch("bink.Model.save")
+    @patch("torch.save")
     def test_save_checkpoint_save_filename(self, mock_save):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'metrics': {}
         }
 
@@ -19,31 +21,32 @@ class TestCheckpointer(TestCase):
         check.save_checkpoint(state)
         mock_save.assert_called_once()
 
-        self.assertTrue(mock_save.call_args_list[0][0][0] == 'test_file.pt')
-        self.assertTrue(mock_save.call_args_list[0][0][1] == 'test_file.bink')
+        self.assertTrue(mock_save.call_args[0][1] == 'test_file.pt')
 
-    @patch("bink.Model.save")
-    def test_save_checkpoint_save_weights(self, mock_save):
+    @patch("torch.save")
+    def test_save_checkpoint_save_weights(self, _):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'metrics': {}
         }
 
         file_format = 'test_file'
-        check = _Checkpointer(file_format, False)
+        check = _Checkpointer(file_format, save_weights_only=False)
         check.save_checkpoint(state)
+        torchmodel.state_dict.assert_not_called()
 
-        self.assertTrue(mock_save.call_args_list[0][0][-1] == False)
-
-        check = _Checkpointer(file_format, True)
+        check = _Checkpointer(file_format, save_weights_only=True)
         check.save_checkpoint(state)
+        torchmodel.state_dict.assert_called_once()
 
-        self.assertTrue(mock_save.call_args_list[1][0][-1] == True)
-
-    @patch("bink.Model.save")
+    @patch("torch.save")
     def test_save_checkpoint_formatting(self, mock_save):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'metrics': {},
             'epoch': 2
         }
@@ -53,13 +56,14 @@ class TestCheckpointer(TestCase):
         check.save_checkpoint(state)
         mock_save.assert_called_once()
 
-        self.assertTrue(mock_save.call_args_list[0][0][0] == 'test_file_2.pt')
-        self.assertTrue(mock_save.call_args_list[0][0][1] == 'test_file_2.bink')
+        self.assertTrue(mock_save.call_args[0][1] == 'test_file_2.pt')
 
-    @patch("bink.Model.save")
+    @patch("torch.save")
     def test_save_checkpoint_formatting_metric(self, mock_save):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'metrics': {'test_metric':0.001},
             'epoch': 2
         }
@@ -69,13 +73,14 @@ class TestCheckpointer(TestCase):
         check.save_checkpoint(state)
         mock_save.assert_called_once()
 
-        self.assertTrue(mock_save.call_args_list[0][0][0] == 'test_file_0.001.pt')
-        self.assertTrue(mock_save.call_args_list[0][0][1] == 'test_file_0.001.bink')
+        self.assertTrue(mock_save.call_args[0][1] == 'test_file_0.001.pt')
 
-    @patch("bink.Model.save")
+    @patch("torch.save")
     def test_save_checkpoint_subformatting(self, mock_save):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'metrics': {'test_metric':0.001},
             'epoch': 2
         }
@@ -85,13 +90,14 @@ class TestCheckpointer(TestCase):
         check.save_checkpoint(state)
         mock_save.assert_called_once()
 
-        self.assertTrue(mock_save.call_args_list[0][0][0] == 'test_file_0.0.pt')
-        self.assertTrue(mock_save.call_args_list[0][0][1] == 'test_file_0.0.bink')
+        self.assertTrue(mock_save.call_args[0][1] == 'test_file_0.0.pt')
 
-    @patch("bink.Model.save")
-    def test_save_checkpoint_wrong_format(self, mock_save):
+    @patch("torch.save")
+    def test_save_checkpoint_wrong_format(self, _):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'metrics': {'test_metric':0.001},
             'epoch': 2
         }
@@ -106,10 +112,12 @@ class TestCheckpointer(TestCase):
         self.fail('No error was thrown when wrong format chosen for save file format')
 
     @patch('os.rename')
-    @patch("bink.Model.save")
-    def test_save_checkpoint_overwrite_recent(self, mock_save, _):
+    @patch("torch.save")
+    def test_save_checkpoint_overwrite_recent(self, _, __):
+        torchmodel = Mock()
+        optim = Mock()
         state = {
-            'self': Model(None, None, None, []),
+            'self': Model(torchmodel, optim, None, []),
             'epoch': 0,
             'metrics': {}
         }

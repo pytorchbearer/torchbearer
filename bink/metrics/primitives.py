@@ -5,11 +5,11 @@ import torch
 
 class CategoricalAccuracy(metrics.BatchLambda):
     def __init__(self):
-        def _categorical(y_true, y_pred):
-            _, y_pred = torch.max(y_pred, 1)
-            return (y_pred == y_true).float()
-        super().__init__('acc', _categorical)
+        super().__init__('acc', self._categorical)
 
+    def _categorical(self, y_true, y_pred):
+        _, y_pred = torch.max(y_pred, 1)
+        return (y_pred == y_true).float()
 
 categorical_accuracy_primitive = CategoricalAccuracy()
 
