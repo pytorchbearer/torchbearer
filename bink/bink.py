@@ -71,15 +71,14 @@ class Model:
         for state['epoch'] in range(initial_epoch, epochs):
             _callbacks.on_start_epoch(state)
 
+            state['train_iterator'] = iter(state['generator'])
             self.train()
+
             _callbacks.on_start_training(state)
             state['metric_list'].reset(state)
 
-            # Init iterator
-            train_iterator = iter(state['generator'])
-            state['train_iterator'] = train_iterator
             for state['t'] in range(0, state['train_steps']):
-                data = next(train_iterator)
+                data = next(state['train_iterator'])
 
                 # Extract batch
                 state['x'], state['y_true'] = data
@@ -144,8 +143,10 @@ class Model:
         if num_steps is None:
             num_steps = len(state['validation_generator'])
 
-        callbacks.on_start_validation(state)
         state['validation_iterator'] = iter(state['validation_generator'])
+
+        callbacks.on_start_validation(state)
+
         for state['t'] in range(num_steps):
             # Load batch
             batch_loader(state, self._sample_device_function)
