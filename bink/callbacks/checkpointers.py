@@ -1,3 +1,5 @@
+import torch
+
 from bink.callbacks.callbacks import Callback
 import os
 
@@ -18,9 +20,13 @@ class _Checkpointer(Callback):
 
         if self.most_recent is not None and overwrite_most_recent:
             os.rename(self.most_recent+'.pt', filepath+'.pt')
-            os.rename(self.most_recent + '.bink', filepath + '.bink')
+            # os.rename(self.most_recent + '.bink', filepath + '.bink')
 
-        state['self'].save(filepath + '.pt', filepath + '.bink', self.save_weights_only)
+        if self.save_weights_only:
+            torch.save(model_state['self'].state_dict(), filepath + '.pt')
+        else:
+            torch.save(model_state, filepath + '.pt')
+
         self.most_recent = filepath
 
 

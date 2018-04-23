@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
-from bink.utils import get_train_valid_sets
+from bink.cv_utils import get_train_valid_sets
 from bink.callbacks.callbacks import CallbackList
 from bink.callbacks.printer import Tqdm
 from bink.callbacks.aggregate_predictions import AggregatePredictions
@@ -223,52 +223,25 @@ class Model:
         self.main_state['use_cuda'] = False
         return self
 
-    def save(self, model_file, state_file, save_state_dict=False, save_keys=['optimizer', 'criterion', 'use_cuda']):
-        '''
-        Saves a binkmodel to a torch model file and a bink state file
+    def load_state_dict(self, state_dict):
+        self.main_state['model'].load_state_dict(state_dict['model'])
+        self.main_state['optimizer'].load_state_dict(state_dict['optimizer'])
 
-        :param binkmodel: bink Model to be saved
-        :param model_file: File string which torch model will be saved under
-        :param state_file: File string which bink state will be sved under
-        :param save_state_dict: Whether to save torch model as state_dict
-        :param save_keys: Keys of binkmodel state objects to be saved
-        '''
-        try:
+    def state_dict(self):
+        state_dict = {
+            'model': self.main_state['model'].state_dict(),
+            'optimizer': self.main_state['optimizer'].state_dict()
+        }
+        return state_dict
 
-            if save_state_dict:
-                torch.save(self.main_state['model'].state_dict(), model_file)
-            else:
-                torch.save(self.main_state['model'], model_file)
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['main_state']['self'] = None
+        return state
 
-            bink_state = _build_bink_state_object(self.main_state, save_keys)
-            torch.save(bink_state, state_file)
-
-        except IOError as e:
-            print("I/O error({0}): {1}".format(e.errno, e.strerror))
-
-    def load(self, model_file, state_file, torchmodel=None):
-        '''
-        Loads a bink model saved by Model.save()
-
-        :param model_file: File string to saved torch model
-        :param state_file: File string to saved bink state
-        :return:
-        '''
-        try:
-
-            if torchmodel is None:
-                torchmodel = torch.load(model_file)
-            else:
-                state_dict = torch.load(model_file)
-                torchmodel.load_state_dict(state_dict)
-
-            bink_state_obj = torch.load(state_file)
-            bink_state_obj['model'] = torchmodel
-
-            return _restore_bink_from_state(self, bink_state_obj)
-
-        except IOError as e:
-            print("I/O error({0}): {1}".format(e.errno, e.strerror))
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.main_state['self'] = self
 
     @staticmethod
     def _cuda_sample(x):
@@ -299,15 +272,3 @@ class Model:
             state['x'] = sample_device_function(state['x'])
 
 
-def _build_bink_state_object(state, save_keys):
-    bink_state = {key: state[key] for key in save_keys}
-    return bink_state
-
-
-def _restore_bink_from_state(binkmodel, bink_state_obj):
-    binkmodel.main_state.update(bink_state_obj)
-
-    if 'use_cuda' in bink_state_obj and bink_state_obj['use_cuda']:
-        binkmodel.cuda()
-
-    return binkmodel
