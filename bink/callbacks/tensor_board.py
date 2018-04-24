@@ -1,5 +1,7 @@
 import copy
 
+import torchvision.utils as utils
+
 from tensorboardX import SummaryWriter
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -76,7 +78,80 @@ class TensorBoard(Callback):
                 self._writer.add_scalar('epoch/' + metric, state['metrics'][metric], state['epoch'])
 
 
-class TensorBoardImageVis(Callback):
+class TensorBoardImages(Callback):
+    def __init__(self, log_dir='./logs',
+                 comment='bink',
+                 name='Image',
+                 key='y_pred',
+                 write_each_epoch=True,
+                 num_images=16,
+                 nrow=8,
+                 padding=2,
+                 normalize=False,
+                 range=None,
+                 scale_each=False,
+                 pad_value=0):
+        self.log_dir = log_dir
+        self.comment = comment
+        self.name = name
+        self.key = key
+        self.write_each_epoch = write_each_epoch
+        self.num_images = num_images
+        self.nrow = nrow
+        self.padding = padding
+        self.normalize = normalize
+        self.range = range
+        self.scale_each = scale_each
+        self.pad_value = pad_value
+
+        self._writer = None
+        self.done = False
+
+    def on_start(self, state):
+        log_dir = os.path.join(self.log_dir, state['model'].__class__.__name__ + '_' + self.comment)
+        self._writer = SummaryWriter(log_dir=log_dir)
+
+    def on_step_validation(self, state):
+        if not self.done:
+            data = state[self.key].data.clone()
+
+            if len(data.size()) == 3:
+                data = data.unsqueeze(1)
+
+            if state['t'] == 0:
+                remaining = self.num_images if self.num_images < data.size(0) else data.size(0)
+
+                self._data = data[:remaining].cpu()
+            else:
+                remaining = self.num_images - self._data.size(0)
+
+                if remaining > data.size(0):
+                    remaining = data.size(0)
+
+                self._data = torch.cat((self._data, data[:remaining].cpu()), dim=0)
+
+            if self._data.size(0) >= self.num_images:
+                image = utils.make_grid(
+                    self._data,
+                    nrow=self.nrow,
+                    padding=self.padding,
+                    normalize=self.normalize,
+                    range=self.range,
+                    scale_each=self.scale_each,
+                    pad_value=self.pad_value
+                )
+                self._writer.add_image(self.name, image, state['epoch'])
+                self.done = True
+
+    def on_end_epoch(self, state):
+        if self.write_each_epoch:
+            self.done = False
+
+    def on_end(self, state):
+        self._writer.close()
+
+
+class TensorBoardProjector(Callback):
     def __init__(self, log_dir='./logs',
                  comment='bink',
                  num_images=100,
