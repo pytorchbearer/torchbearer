@@ -234,15 +234,6 @@ class Model:
         }
         return state_dict
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state['main_state']['self'] = None
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.main_state['self'] = self
-
     @staticmethod
     def _cuda_sample(x):
         return x.cuda()

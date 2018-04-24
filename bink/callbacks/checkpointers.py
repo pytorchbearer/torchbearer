@@ -5,10 +5,9 @@ import os
 
 
 class _Checkpointer(Callback):
-    def __init__(self, fileformat, save_weights_only):
+    def __init__(self, fileformat):
         super().__init__()
         self.fileformat = fileformat
-        self.save_weights_only = save_weights_only
         self.most_recent = None
 
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
@@ -19,19 +18,15 @@ class _Checkpointer(Callback):
         filepath = self.fileformat.format(**state)
 
         if self.most_recent is not None and overwrite_most_recent:
-            os.rename(self.most_recent+'.pt', filepath+'.pt')
-            # os.rename(self.most_recent + '.bink', filepath + '.bink')
+            os.remove(self.most_recent)
 
-        if self.save_weights_only:
-            torch.save(model_state['self'].state_dict(), filepath + '.pt')
-        else:
-            torch.save(model_state, filepath + '.pt')
+        torch.save(model_state['self'].state_dict(), filepath )
 
         self.most_recent = filepath
 
 
-def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}', monitor='val_loss', save_best_only=False, save_weights_only=False,
-                 mode='auto', period=1, min_delta=0):
+def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
+        monitor='val_loss', save_best_only=False, mode='auto', period=1, min_delta=0):
     """Save the model after every epoch.
     `filepath` can contain named formatting options,
     which will be filled any values from state.
@@ -53,24 +48,20 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}', monitor='val_lo
             this should be `max`, for `val_loss` this should
             be `min`, etc. In `auto` mode, the direction is
             automatically inferred from the name of the monitored quantity.
-        save_weights_only: if True, then only the model's weights will be
-            saved (`model.save_weights(filepath)`), else the full model
-            is saved (`model.save(filepath)`).
         period: Interval (number of epochs) between checkpoints.
     """
     if save_best_only:
-        check = Best(filepath, monitor, save_weights_only, mode, period, min_delta)
+        check = Best(filepath, monitor, mode, period, min_delta)
     else:
-        check = Interval(filepath, save_weights_only, period)
+        check = Interval(filepath, period)
 
     return check
 
 
 class MostRecent(_Checkpointer):
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}', save_weights_only=False):
-        super().__init__(filepath, save_weights_only)
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt'):
+        super().__init__(filepath)
         self.filepath = filepath
-        self.save_weights_only = save_weights_only
 
     def on_end_epoch(self, model_state):
         super().on_end_training(model_state)
@@ -78,9 +69,9 @@ class MostRecent(_Checkpointer):
 
 
 class Best(_Checkpointer):
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}', monitor='val_loss', save_weights_only=False,
-                 mode='auto', period=1, min_delta=0):
-        super().__init__(filepath, save_weights_only)
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
+            monitor='val_loss', mode='auto', period=1, min_delta=0):
+        super().__init__(filepath)
         self.min_delta = min_delta
         self.mode = mode
         self.monitor = monitor
@@ -117,8 +108,8 @@ class Best(_Checkpointer):
 
 
 class Interval(_Checkpointer):
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}', save_weights_only=False, period=1):
-        super().__init__(filepath, save_weights_only)
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1):
+        super().__init__(filepath)
         self.period = period
         self.epochs_since_last_save = 0
 
