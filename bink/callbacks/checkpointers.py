@@ -22,6 +22,7 @@ class _Checkpointer(Callback):
 
         torch.save(model_state['self'].state_dict(), filepath )
 
+
         self.most_recent = filepath
 
 
