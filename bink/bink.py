@@ -7,6 +7,7 @@ from bink.callbacks.aggregate_predictions import AggregatePredictions
 from torch.autograd import Variable
 from bink import metrics as bink_metrics
 
+import tracemalloc
 
 class Model:
     def __init__(self, model, optimizer, loss_criterion, metrics=[]):
@@ -15,11 +16,10 @@ class Model:
             'model': model,
             'criterion': loss_criterion,
             'optimizer': optimizer,
-            'use_cuda': False,
+            'device': 'cpu',
             'metric_list': bink_metrics.MetricList(metrics),
             'self': self
         }
-        self._sample_device_function = self._cpu_sample
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
             validation_data=None, shuffle=True, initial_epoch=0,
@@ -39,7 +39,7 @@ class Model:
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
                       validation_generator=None, validation_steps=None, initial_epoch=0, pass_state=False):
-
+        # tracemalloc.start()
         if verbose == 1:
             callbacks = [Tqdm()] + callbacks
         _callbacks = CallbackList(callbacks)
@@ -60,12 +60,6 @@ class Model:
         }
         state.update(self.main_state)
 
-        # Set cuda
-        if state['use_cuda']:
-            self._sample_device_function = self._cuda_sample
-        else:
-            self._sample_device_function = self._cpu_sample
-
         _callbacks.on_start(state)
 
         for state['epoch'] in range(initial_epoch, epochs):
@@ -82,8 +76,7 @@ class Model:
 
                 # Extract batch
                 state['x'], state['y_true'] = data
-                state['x'], state['y_true'] = Variable(state['x']), Variable(state['y_true'])
-                state['x'], state['y_true'] = self._sample_device_function(state['x']), self._sample_device_function(state['y_true'])
+                state['x'], state['y_true'] = state['x'].to(state['device']), state['y_true'].to(state['device'])
                 _callbacks.on_sample(state)
 
                 # Zero grads
@@ -113,6 +106,13 @@ class Model:
                 if state['stop_training']:
                     break
 
+                # snap = tracemalloc.take_snapshot()
+                # top = snap.statistics('lineno')
+                # print("[ Top 10 ]")
+                # for stat in top[:10]:
+                #     print(stat)
+                #     print('')
+
             state['metrics'].update(state['metric_list'].process_final(state))
             final_metrics = state['metrics']
 
@@ -136,7 +136,8 @@ class Model:
         return state
 
     def _test_loop(self, state, callbacks, pass_state, batch_loader, num_steps=None):
-        self.eval()
+        torch.set_grad_enabled(False)
+
         state['metric_list'].reset(state)
         state['metrics'] = {}
 
@@ -149,7 +150,7 @@ class Model:
 
         for state['t'] in range(num_steps):
             # Load batch
-            batch_loader(state, self._sample_device_function)
+            batch_loader(state)
 
             # Forward pass
             if pass_state:
@@ -169,6 +170,8 @@ class Model:
         if 'y_true' in state:
             state['metrics'].update(state['metric_list'].process_final(state))
         callbacks.on_end_validation(state)
+
+        torch.set_grad_enabled(True)
 
     def _validate(self, state, _callbacks, pass_state):
         self._test_loop(state, _callbacks, pass_state, self._load_batch_standard, state['validation_steps'])
@@ -213,14 +216,12 @@ class Model:
 
     def cuda(self):
         self.main_state['model'].cuda()
-        self._sample_device_function = self._cuda_sample
-        self.main_state['use_cuda'] = True
+        self.main_state['device'] = 'cuda'
         return self
 
     def cpu(self):
         self.main_state['model'].cpu()
-        self._sample_device_function = self._cpu_sample
-        self.main_state['use_cuda'] = False
+        self.main_state['device'] = 'cpu'
         return self
 
     def load_state_dict(self, state_dict):
@@ -235,31 +236,18 @@ class Model:
         return state_dict
 
     @staticmethod
-    def _cuda_sample(x):
-        return x.cuda()
-
-    @staticmethod
-    def _cpu_sample(x):
-        return x.cpu()
-
-    @staticmethod
-    def _load_batch_standard(state, sample_device_function):
+    def _load_batch_standard(state):
         state['x'], state['y_true'] = next(state['validation_iterator'])
-        state['x'], state['y_true'] = Variable(state['x'], volatile=True), Variable(state['y_true'], volatile=True)
-        state['x'], state['y_true'] = sample_device_function(state['x']), sample_device_function(
-            state['y_true'])
+        state['x'], state['y_true'] = state['x'].to(state['device']), state['y_true'].to(state['device'])
 
     @staticmethod
-    def _load_batch_predict( state, sample_device_function):
+    def _load_batch_predict( state):
         data = next(state['validation_iterator'])
         if isinstance(data, list) or isinstance(data, tuple):
             state['x'], state['y_true'] = data
-            state['x'], state['y_true'] = Variable(state['x'], volatile=True), Variable(state['y_true'], volatile=True)
-            state['x'], state['y_true'] = sample_device_function(state['x']), sample_device_function(
-                state['y_true'])
+            state['x'], state['y_true'] = state['x'].to(state['device']), state['y_true'].to(state['device'])
         else:
             state['x'] = data
-            state['x'] = Variable(state['x'], volatile=True)
-            state['x'] = sample_device_function(state['x'])
+            state['x'] = state['x'].to(state['device'])
 
 

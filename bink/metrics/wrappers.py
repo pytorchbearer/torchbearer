@@ -44,12 +44,16 @@ class Std(Wrapper):
         result = self._metric.process(state)
         self._sum += result.sum()
         self._sum_sq += result.pow(2).sum()
-        self._count += result.size(0)
+
+        if result.size() == torch.Size([]):
+            self._count += 1
+        else:
+            self._count += result.size(0)
 
     def process_final(self, state):
         mean = self._sum / self._count
         mean = mean ** 2
-        return ((self._sum_sq / self._count) - mean) ** 0.5
+        return (((self._sum_sq / self._count) - mean) ** 0.5).item()
 
     def reset(self, state):
         super().reset(state)
@@ -65,10 +69,14 @@ class Mean(Wrapper):
     def process(self, state):
         result = self._metric.process(state)
         self._sum += result.sum()
-        self._count += result.size(0)
+
+        if result.size() == torch.Size([]):
+            self._count += 1
+        else:
+            self._count += result.size(0)
 
     def process_final(self, state):
-        return self._sum / self._count
+        return (self._sum / self._count).item()
 
     def reset(self, state):
         super().reset(state)
@@ -118,6 +126,5 @@ class EpochLambda(metrics.AdvancedMetric):
         self._y_true = torch.zeros(0).long()
         self._y_pred = torch.zeros(0, 0)
 
-        if 'use_cuda' in state and state['use_cuda']:
-            self._y_true = self._y_true.cuda()
-            self._y_pred = self._y_pred.cuda()
+        self._y_true = self._y_true.to(state['device'])
+        self._y_pred = self._y_pred.to(state['device'])

@@ -93,11 +93,11 @@ class TestEpochLambda(unittest.TestCase):
         self._metric_function = Mock(return_value='test')
         self._metric = EpochLambda('test', self._metric_function, step_size=3)
         self._metric.reset({})
-        self._states = [{'t': 0, 'y_true': torch.LongTensor([0]), 'y_pred': torch.FloatTensor([0.0])},
-                        {'t': 1, 'y_true': torch.LongTensor([1]), 'y_pred': torch.FloatTensor([0.1])},
-                        {'t': 2, 'y_true': torch.LongTensor([2]), 'y_pred': torch.FloatTensor([0.2])},
-                        {'t': 3, 'y_true': torch.LongTensor([3]), 'y_pred': torch.FloatTensor([0.3])},
-                        {'t': 4, 'y_true': torch.LongTensor([4]), 'y_pred': torch.FloatTensor([0.4])}]
+        self._states = [{'t': 0, 'y_true': torch.LongTensor([0]), 'y_pred': torch.FloatTensor([0.0]), 'device': 'cpu'},
+                        {'t': 1, 'y_true': torch.LongTensor([1]), 'y_pred': torch.FloatTensor([0.1]), 'device': 'cpu'},
+                        {'t': 2, 'y_true': torch.LongTensor([2]), 'y_pred': torch.FloatTensor([0.2]), 'device': 'cpu'},
+                        {'t': 3, 'y_true': torch.LongTensor([3]), 'y_pred': torch.FloatTensor([0.3]), 'device': 'cpu'},
+                        {'t': 4, 'y_true': torch.LongTensor([4]), 'y_pred': torch.FloatTensor([0.4]), 'device': 'cpu'}]
 
     def test_train(self):
         self._metric.train()
