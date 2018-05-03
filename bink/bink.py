@@ -214,9 +214,9 @@ class Model:
         self.main_state['model'].eval()
         self.main_state['metric_list'].eval()
 
-    def cuda(self):
-        self.main_state['model'].cuda()
-        self.main_state['device'] = 'cuda'
+    def to(self, device_string='cuda'):
+        self.main_state['model'].to(device_string)
+        self.main_state['device'] = device_string
         return self
 
     def cpu(self):
