@@ -14,7 +14,7 @@ class TestRocAucScore(unittest.TestCase):
     def test_one_hot(self, mock_sklearn_metrics):
         mock_sklearn_metrics.roc_auc_score = Mock()
         metric = RocAucScore(one_hot_classes=3, one_hot_offset=1)
-        metric.reset({})
+        metric.reset({'device': 'cpu'})
         metric.process({'t': 0, 'device': 'cpu',
                       'y_true': torch.LongTensor([1, 2, 3]),
                       'y_pred': torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
@@ -31,7 +31,7 @@ class TestRocAucScore(unittest.TestCase):
     def test_non_one_hot(self, mock_sklearn_metrics):
         mock_sklearn_metrics.roc_auc_score = Mock()
         metric = RocAucScore(one_hot_labels=False)
-        metric.reset({})
+        metric.reset({'device': 'cpu'})
         metric.process({'t': 0, 'device': 'cpu',
                       'y_true': torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
                       'y_pred': torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})

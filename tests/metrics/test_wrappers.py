@@ -76,7 +76,7 @@ class TestBatchLambda(unittest.TestCase):
         calls = []
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
-            calls.append(call(self._states[i]['y_true'].data, self._states[i]['y_pred'].data))
+            calls.append(call(self._states[i]['y_pred'].data, self._states[i]['y_true'].data))
         self._metric_function.assert_has_calls(calls)
 
     def test_validate(self):
@@ -84,7 +84,7 @@ class TestBatchLambda(unittest.TestCase):
         calls = []
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
-            calls.append(call(self._states[i]['y_true'].data, self._states[i]['y_pred'].data))
+            calls.append(call(self._states[i]['y_pred'].data, self._states[i]['y_true'].data))
         self._metric_function.assert_has_calls(calls)
 
 
@@ -92,7 +92,7 @@ class TestEpochLambda(unittest.TestCase):
     def setUp(self):
         self._metric_function = Mock(return_value='test')
         self._metric = EpochLambda('test', self._metric_function, step_size=3)
-        self._metric.reset({})
+        self._metric.reset({'device': 'cpu'})
         self._states = [{'t': 0, 'y_true': torch.LongTensor([0]), 'y_pred': torch.FloatTensor([0.0]), 'device': 'cpu'},
                         {'t': 1, 'y_true': torch.LongTensor([1]), 'y_pred': torch.FloatTensor([0.1]), 'device': 'cpu'},
                         {'t': 2, 'y_true': torch.LongTensor([2]), 'y_pred': torch.FloatTensor([0.2]), 'device': 'cpu'},

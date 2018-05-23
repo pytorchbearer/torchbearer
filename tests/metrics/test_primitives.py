@@ -9,9 +9,10 @@ import torch
 
 class TestLoss(unittest.TestCase):
     def setUp(self):
-        self._state = {
-            'loss': Variable(torch.FloatTensor([2.35]), volatile=True, requires_grad=False)
-        }
+        with torch.no_grad():
+            self._state = {
+                'loss': torch.FloatTensor([2.35])
+            }
         self._metric = Loss()
 
     def test_train_process(self):
