@@ -42,8 +42,8 @@ class Std(Wrapper):
 
     def process(self, state):
         result = self._metric.process(state)
-        self._sum += result.sum()
-        self._sum_sq += result.pow(2).sum()
+        self._sum += result.sum().item()
+        self._sum_sq += result.pow(2).sum().item()
 
         if result.size() == torch.Size([]):
             self._count += 1
@@ -68,7 +68,7 @@ class Mean(Wrapper):
 
     def process(self, state):
         result = self._metric.process(state)
-        self._sum += result.sum()
+        self._sum += result.sum().item()
 
         if result.size() == torch.Size([]):
             self._count += 1
@@ -90,7 +90,7 @@ class BatchLambda(metrics.Metric):
         self._metric_function = metric_function
 
     def process(self, state):
-        return self._metric_function(state['y_true'].data, state['y_pred'].data)
+        return self._metric_function(state['y_pred'], state['y_true'])
 
 
 class EpochLambda(metrics.AdvancedMetric):

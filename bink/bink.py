@@ -217,6 +217,12 @@ class Model:
     def to(self, device_string='cuda'):
         self.main_state['model'].to(device_string)
         self.main_state['device'] = device_string
+
+        for state in self.main_state['optimizer'].state.values():
+            for k, v in state.items():
+                if torch.is_tensor(v):
+                    state[k] = v.to(device_string)
+
         return self
 
     def cpu(self):
