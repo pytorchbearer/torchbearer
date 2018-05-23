@@ -4,10 +4,8 @@ from bink.cv_utils import get_train_valid_sets
 from bink.callbacks.callbacks import CallbackList
 from bink.callbacks.printer import Tqdm
 from bink.callbacks.aggregate_predictions import AggregatePredictions
-from torch.autograd import Variable
 from bink import metrics as bink_metrics
 
-import tracemalloc
 
 class Model:
     def __init__(self, model, optimizer, loss_criterion, metrics=[]):
@@ -39,7 +37,6 @@ class Model:
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
                       validation_generator=None, validation_steps=None, initial_epoch=0, pass_state=False):
-        # tracemalloc.start()
         if verbose == 1:
             callbacks = [Tqdm()] + callbacks
         _callbacks = CallbackList(callbacks)
@@ -106,13 +103,6 @@ class Model:
                 if state['stop_training']:
                     break
 
-                # snap = tracemalloc.take_snapshot()
-                # top = snap.statistics('lineno')
-                # print("[ Top 10 ]")
-                # for stat in top[:10]:
-                #     print(stat)
-                #     print('')
-
             state['metrics'].update(state['metric_list'].process_final(state))
             final_metrics = state['metrics']
 
@@ -136,42 +126,39 @@ class Model:
         return state
 
     def _test_loop(self, state, callbacks, pass_state, batch_loader, num_steps=None):
-        torch.set_grad_enabled(False)
+        with torch.no_grad():
+            state['metric_list'].reset(state)
+            state['metrics'] = {}
 
-        state['metric_list'].reset(state)
-        state['metrics'] = {}
+            if num_steps is None:
+                num_steps = len(state['validation_generator'])
 
-        if num_steps is None:
-            num_steps = len(state['validation_generator'])
+            state['validation_iterator'] = iter(state['validation_generator'])
 
-        state['validation_iterator'] = iter(state['validation_generator'])
+            callbacks.on_start_validation(state)
 
-        callbacks.on_start_validation(state)
+            for state['t'] in range(num_steps):
+                # Load batch
+                batch_loader(state)
 
-        for state['t'] in range(num_steps):
-            # Load batch
-            batch_loader(state)
+                # Forward pass
+                if pass_state:
+                    state['y_pred'] = state['model'](state['x'], state=state)
+                else:
+                    state['y_pred'] = state['model'](state['x'])
 
-            # Forward pass
-            if pass_state:
-                state['y_pred'] = state['model'](state['x'], state=state)
-            else:
-                state['y_pred'] = state['model'](state['x'])
+                # Loss and metrics
+                if 'y_true' in state:
+                    state['loss'] = state['criterion'](state['y_pred'], state['y_true'])
+                    state['metrics'] = state['metric_list'].process(state)
 
-            # Loss and metrics
+                callbacks.on_step_validation(state)
+                if state['stop_training']:
+                    break
+
             if 'y_true' in state:
-                state['loss'] = state['criterion'](state['y_pred'], state['y_true'])
-                state['metrics'] = state['metric_list'].process(state)
-
-            callbacks.on_step_validation(state)
-            if state['stop_training']:
-                break
-
-        if 'y_true' in state:
-            state['metrics'].update(state['metric_list'].process_final(state))
-        callbacks.on_end_validation(state)
-
-        torch.set_grad_enabled(True)
+                state['metrics'].update(state['metric_list'].process_final(state))
+            callbacks.on_end_validation(state)
 
     def _validate(self, state, _callbacks, pass_state):
         self._test_loop(state, _callbacks, pass_state, self._load_batch_standard, state['validation_steps'])
