@@ -53,7 +53,7 @@ class Std(Wrapper):
     def process_final(self, state):
         mean = self._sum / self._count
         mean = mean ** 2
-        return (((self._sum_sq / self._count) - mean) ** 0.5).item()
+        return ((self._sum_sq / self._count) - mean) ** 0.5
 
     def reset(self, state):
         super().reset(state)
@@ -76,7 +76,7 @@ class Mean(Wrapper):
             self._count += result.size(0)
 
     def process_final(self, state):
-        return (self._sum / self._count).item()
+        return self._sum / self._count
 
     def reset(self, state):
         super().reset(state)
