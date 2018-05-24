@@ -32,9 +32,7 @@ class TensorBoard(Callback):
         if self.write_graph:
             def handle_graph(state):
                 dummy = Variable(torch.rand(state['x'].size()), volatile=True)
-                model = copy.deepcopy(state['model'])
-                if state['use_cuda']:
-                    model = model.cpu()
+                model = copy.deepcopy(state['model']).to('cpu')
                 self._writer.add_graph(model, (dummy, ))
                 self._handle_graph = lambda _: ...
             self._handle_graph = handle_graph
@@ -121,14 +119,14 @@ class TensorBoardImages(Callback):
             if state['t'] == 0:
                 remaining = self.num_images if self.num_images < data.size(0) else data.size(0)
 
-                self._data = data[:remaining].cpu()
+                self._data = data[:remaining].to('cpu')
             else:
                 remaining = self.num_images - self._data.size(0)
 
                 if remaining > data.size(0):
                     remaining = data.size(0)
 
-                self._data = torch.cat((self._data, data[:remaining].cpu()), dim=0)
+                self._data = torch.cat((self._data, data[:remaining].to('cpu')), dim=0)
 
             if self._data.size(0) >= self.num_images:
                 image = utils.make_grid(
@@ -207,28 +205,28 @@ class TensorBoardProjector(Callback):
             if state['t'] == 0:
                 remaining = self.num_images if self.num_images < label.size(0) else label.size(0)
 
-                self._images = x[:remaining].cpu()
-                self._labels = label[:remaining].cpu()
+                self._images = x[:remaining].to('cpu')
+                self._labels = label[:remaining].to('cpu')
 
                 if data is not None:
-                    self._data = data[:remaining].cpu()
+                    self._data = data[:remaining].to('cpu')
 
                 if feature is not None:
-                    self._features = feature[:remaining].cpu()
+                    self._features = feature[:remaining].to('cpu')
             else:
                 remaining = self.num_images - self._labels.size(0)
 
                 if remaining > label.size(0):
                     remaining = label.size(0)
 
-                self._images = torch.cat((self._images, x[:remaining].cpu()), dim=0)
-                self._labels = torch.cat((self._labels, label[:remaining].cpu()), dim=0)
+                self._images = torch.cat((self._images, x[:remaining].to('cpu')), dim=0)
+                self._labels = torch.cat((self._labels, label[:remaining].to('cpu')), dim=0)
 
                 if data is not None:
-                    self._data = torch.cat((self._data, data[:remaining].cpu()), dim=0)
+                    self._data = torch.cat((self._data, data[:remaining].to('cpu')), dim=0)
 
                 if feature is not None:
-                    self._features = torch.cat((self._features, feature[:remaining].cpu()), dim=0)
+                    self._features = torch.cat((self._features, feature[:remaining].to('cpu')), dim=0)
 
             if self._labels.size(0) >= self.num_images:
                 if state['epoch'] == 0 and self.write_data:

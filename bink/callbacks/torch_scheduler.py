@@ -12,7 +12,7 @@ class TorchScheduler(Callback):
         if self._monitor is None:
             self._scheduler.step()
 
-    def on_end_training(self, state):
+    def on_end_epoch(self, state):
         if self._monitor is not None:
             self._scheduler.step(state['metrics'][self._monitor])
 
