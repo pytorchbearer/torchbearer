@@ -69,11 +69,8 @@ class Model:
             state['metric_list'].reset(state)
 
             for state['t'] in range(0, state['train_steps']):
-                data = next(state['train_iterator'])
-
                 # Extract batch
-                state['x'], state['y_true'] = data
-                state['x'], state['y_true'] = state['x'].to(state['device']), state['y_true'].to(state['device'])
+                self._load_batch_standard('train', state)
                 _callbacks.on_sample(state)
 
                 # Zero grads
@@ -139,7 +136,7 @@ class Model:
 
             for state['t'] in range(num_steps):
                 # Load batch
-                batch_loader(state)
+                batch_loader('validation', state)
 
                 # Forward pass
                 if pass_state:
@@ -229,18 +226,28 @@ class Model:
         return state_dict
 
     @staticmethod
-    def _load_batch_standard(state):
-        state['x'], state['y_true'] = next(state['validation_iterator'])
-        state['x'], state['y_true'] = state['x'].to(state['device']), state['y_true'].to(state['device'])
+    def _tuple_to(tensor_tuple, device):
+        if isinstance(tensor_tuple, list) or isinstance(tensor_tuple, tuple):
+            tensor_tuple = list(tensor_tuple)
+            for i in range(len(tensor_tuple)):
+                tensor_tuple[i] = tensor_tuple[i].to(device)
+            tensor_tuple = tuple(tensor_tuple)
+        else:
+            tensor_tuple = tensor_tuple.to(device)
+
+        return tensor_tuple
 
     @staticmethod
-    def _load_batch_predict( state):
-        data = next(state['validation_iterator'])
+    def _load_batch_standard(iterator, state):
+        state['x'], state['y_true'] = next(state[iterator + '_iterator'])
+        state['x'] = state['x'].to(state['device'])
+        state['y_true'] = Model._tuple_to(state['y_true'], state['device'])
+
+    @staticmethod
+    def _load_batch_predict(iterator, state):
+        data = next(state[iterator + '_iterator'])
         if isinstance(data, list) or isinstance(data, tuple):
-            state['x'], state['y_true'] = data
-            state['x'], state['y_true'] = state['x'].to(state['device']), state['y_true'].to(state['device'])
-        else:
-            state['x'] = data
             state['x'] = state['x'].to(state['device'])
-
-
+            state['y_true'] = Model._tuple_to(state['y_true'], state['device'])
+        else:
+            state['x'] = data.to(state['device'])
