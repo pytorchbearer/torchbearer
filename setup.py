@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='bink',
-    version='0.1.0',
+    version='0.1.1',
     packages=['bink', 'bink.metrics', 'bink.runners', 'bink.callbacks', 'tests', 'tests.metrics', 'tests.callbacks'],
     url='https://github.com/MattPainter01/PyTorch-bink',
     download_url='https://github.com/MattPainter01/PyTorch-bink/archive/v0.1.0.tar.gz',
