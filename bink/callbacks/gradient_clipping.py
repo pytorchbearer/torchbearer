@@ -16,4 +16,4 @@ class GradientNormClipping(Callback):
             self.params = state['model'].parameters()
 
     def on_backward(self, state):
-        torch.nn.utils.clip_grad_norm(self.params, self.max_norm, norm_type=self.norm_type)
+        torch.nn.utils.clip_grad_norm_(self.params, self.max_norm, norm_type=self.norm_type)
