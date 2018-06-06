@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Changed the learning rate scheduler callbacks to no longer require an optimizer and to have the proper arguments
 ### Deprecated
 ### Removed
 ### Fixed
