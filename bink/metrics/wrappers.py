@@ -116,7 +116,7 @@ class EpochLambda(metrics.AdvancedMetric):
 
     def process_validate(self, state):
         self._y_true = torch.cat((self._y_true, state['y_true']), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state['y_pred'].float()), dim=0)
+        self._y_pred = torch.cat((self._y_pred, state['y_pred'].to(self._y_pred.dtype)), dim=0)
 
     def process_final_validate(self, state):
         return self._final(self._y_true, self._y_pred)
@@ -127,4 +127,4 @@ class EpochLambda(metrics.AdvancedMetric):
         self._y_pred = torch.zeros(0, 0)
 
         self._y_true = self._y_true.to(state['device'])
-        self._y_pred = self._y_pred.to(state['device'])
+        self._y_pred = self._y_pred.to(state['device'], state['dtype'])

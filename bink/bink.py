@@ -15,6 +15,7 @@ class Model:
             'criterion': loss_criterion,
             'optimizer': optimizer,
             'device': 'cpu',
+            'dtype': torch.float32,
             'metric_list': bink_metrics.MetricList(metrics),
             'self': self
         }
@@ -198,21 +199,32 @@ class Model:
         self.main_state['model'].eval()
         self.main_state['metric_list'].eval()
 
-    def to(self, device_string='cuda'):
-        self.main_state['model'].to(device_string)
-        self.main_state['device'] = device_string
+    def to(self, *args, **kwargs):
+        self.main_state['model'].to(*args, **kwargs)
 
         for state in self.main_state['optimizer'].state.values():
             for k, v in state.items():
                 if torch.is_tensor(v):
-                    state[k] = v.to(device_string)
+                    state[k] = v.to(*args, **kwargs)
+
+        for key, val in kwargs.items():
+            if key == 'dtype':
+                self.main_state['dtype'] = kwargs['dtype']
+            elif 'device' in kwargs:
+                self.main_state['device'] = kwargs['device']
+        for arg in args:
+            if isinstance(arg, torch.dtype):
+                self.main_state['dtype'] = arg
+            else:
+                self.main_state['device'] = arg
 
         return self
+
+    def cuda(self, device=torch.cuda.current_device()):
+        return self.to('cuda:' + str(device))
 
     def cpu(self):
-        self.main_state['model'].cpu()
-        self.main_state['device'] = 'cpu'
-        return self
+        return self.to('cpu')
 
     def load_state_dict(self, state_dict):
         self.main_state['model'].load_state_dict(state_dict['model'])
@@ -226,28 +238,30 @@ class Model:
         return state_dict
 
     @staticmethod
-    def _tuple_to(tensor_tuple, device):
-        if isinstance(tensor_tuple, list) or isinstance(tensor_tuple, tuple):
-            tensor_tuple = list(tensor_tuple)
-            for i in range(len(tensor_tuple)):
-                tensor_tuple[i] = tensor_tuple[i].to(device)
-            tensor_tuple = tuple(tensor_tuple)
-        else:
-            tensor_tuple = tensor_tuple.to(device)
+    def _deep_to(batch, device, dtype):
+        is_tuple = isinstance(batch, tuple)
 
-        return tensor_tuple
+        if isinstance(batch, list) or isinstance(batch, tuple):
+            batch = list(batch)
+            for i in range(len(batch)):
+                batch[i] = Model._deep_to(batch[i], device, dtype)
+            batch = tuple(batch) if is_tuple else batch
+        else:
+            if batch.dtype.is_floating_point:
+                batch = batch.to(device, dtype)
+            else:
+                batch = batch.to(device)
+
+        return batch
 
     @staticmethod
     def _load_batch_standard(iterator, state):
-        state['x'], state['y_true'] = next(state[iterator + '_iterator'])
-        state['x'] = state['x'].to(state['device'])
-        state['y_true'] = Model._tuple_to(state['y_true'], state['device'])
+        state['x'], state['y_true'] = Model._deep_to(next(state[iterator + '_iterator']), state['device'], state['dtype'])
 
     @staticmethod
     def _load_batch_predict(iterator, state):
-        data = next(state[iterator + '_iterator'])
+        data = Model._deep_to(next(state[iterator + '_iterator']), state['device'], state['dtype'])
         if isinstance(data, list) or isinstance(data, tuple):
-            state['x'] = state['x'].to(state['device'])
-            state['y_true'] = Model._tuple_to(state['y_true'], state['device'])
+            state['x'], state['y_true'] = data
         else:
-            state['x'] = data.to(state['device'])
+            state['x'] = data
