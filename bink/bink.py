@@ -207,21 +207,16 @@ class Model:
                 if torch.is_tensor(v):
                     state[k] = v.to(*args, **kwargs)
 
-        device = None
-        dtype = None
         for key, val in kwargs.items():
             if key == 'dtype':
-                dtype = kwargs['dtype']
+                self.main_state['dtype'] = kwargs['dtype']
             elif 'device' in kwargs:
-                device = kwargs['device']
+                self.main_state['device'] = kwargs['device']
         for arg in args:
             if isinstance(arg, torch.dtype):
-                dtype = arg
+                self.main_state['dtype'] = arg
             else:
-                device = arg
-
-        self.main_state['device'] = device
-        self.main_state['dtype'] = dtype
+                self.main_state['device'] = arg
 
         return self
 
