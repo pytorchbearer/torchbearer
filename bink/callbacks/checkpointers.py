@@ -5,9 +5,13 @@ import os
 
 
 class _Checkpointer(Callback):
-    def __init__(self, fileformat):
+    def __init__(self, fileformat, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
         super().__init__()
         self.fileformat = fileformat
+
+        self.pickle_module = pickle_module
+        self.pickle_protocol = pickle_protocol
+
         self.most_recent = None
 
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
@@ -17,11 +21,10 @@ class _Checkpointer(Callback):
 
         filepath = self.fileformat.format(**state)
 
+        torch.save(model_state['self'].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
+
         if self.most_recent is not None and overwrite_most_recent:
             os.remove(self.most_recent)
-
-        torch.save(model_state['self'].state_dict(), filepath )
-
 
         self.most_recent = filepath
 
@@ -60,8 +63,8 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
 
 
 class MostRecent(_Checkpointer):
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt'):
-        super().__init__(filepath)
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+        super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.filepath = filepath
 
     def on_end_epoch(self, model_state):
@@ -71,8 +74,8 @@ class MostRecent(_Checkpointer):
 
 class Best(_Checkpointer):
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
-            monitor='val_loss', mode='auto', period=1, min_delta=0):
-        super().__init__(filepath)
+            monitor='val_loss', mode='auto', period=1, min_delta=0, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+        super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.min_delta = min_delta
         self.mode = mode
         self.monitor = monitor
@@ -109,8 +112,8 @@ class Best(_Checkpointer):
 
 
 class Interval(_Checkpointer):
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1):
-        super().__init__(filepath)
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+        super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.period = period
         self.epochs_since_last_save = 0
 
