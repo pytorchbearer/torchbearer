@@ -11,6 +11,7 @@ class CategoricalAccuracy(metrics.BatchLambda):
         _, y_pred = torch.max(y_pred, 1)
         return (y_pred == y_true).float()
 
+
 categorical_accuracy_primitive = CategoricalAccuracy()
 
 
