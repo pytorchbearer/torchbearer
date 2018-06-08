@@ -226,28 +226,27 @@ class Model:
         return state_dict
 
     @staticmethod
-    def _tuple_to(tensor_tuple, device):
-        if isinstance(tensor_tuple, list) or isinstance(tensor_tuple, tuple):
-            tensor_tuple = list(tensor_tuple)
-            for i in range(len(tensor_tuple)):
-                tensor_tuple[i] = tensor_tuple[i].to(device)
-            tensor_tuple = tuple(tensor_tuple)
-        else:
-            tensor_tuple = tensor_tuple.to(device)
+    def _deep_to(batch, device):
+        is_tuple = isinstance(batch, tuple)
 
-        return tensor_tuple
+        if isinstance(batch, list) or isinstance(batch, tuple):
+            batch = list(batch)
+            for i in range(len(batch)):
+                batch[i] = Model._deep_to(batch[i], device)
+            batch = tuple(batch) if is_tuple else batch
+        else:
+            batch = batch.to(device)
+
+        return batch
 
     @staticmethod
     def _load_batch_standard(iterator, state):
-        state['x'], state['y_true'] = next(state[iterator + '_iterator'])
-        state['x'] = state['x'].to(state['device'])
-        state['y_true'] = Model._tuple_to(state['y_true'], state['device'])
+        state['x'], state['y_true'] = Model._deep_to(next(state[iterator + '_iterator']), state['device'])
 
     @staticmethod
     def _load_batch_predict(iterator, state):
-        data = next(state[iterator + '_iterator'])
+        data = Model._deep_to(next(state[iterator + '_iterator']), state['device'])
         if isinstance(data, list) or isinstance(data, tuple):
-            state['x'] = state['x'].to(state['device'])
-            state['y_true'] = Model._tuple_to(state['y_true'], state['device'])
+            state['x'], state['y_true'] = data
         else:
-            state['x'] = data.to(state['device'])
+            state['x'] = data
