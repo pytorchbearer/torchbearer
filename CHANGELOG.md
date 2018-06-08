@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added support for tuple outputs from generators, bink expects output to be length 2. Specifically, x, y = next() is possible, where x and y can be tuples of arbitrary size or depth
 - Added support for torch dtypes in bink Model.to(...)
+- Added pickle_module and pickle_protocol to checkpointers for consistency with torch.save
 ### Changed
 - Changed the learning rate scheduler callbacks to no longer require an optimizer and to have the proper arguments
 ### Deprecated
