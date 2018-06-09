@@ -92,7 +92,7 @@ class TestEpochLambda(unittest.TestCase):
     def setUp(self):
         self._metric_function = Mock(return_value='test')
         self._metric = EpochLambda('test', self._metric_function, step_size=3)
-        self._metric.reset({'device': 'cpu'})
+        self._metric.reset({'device': 'cpu', 'dtype': torch.float32})
         self._states = [{'t': 0, 'y_true': torch.LongTensor([0]), 'y_pred': torch.FloatTensor([0.0]), 'device': 'cpu'},
                         {'t': 1, 'y_true': torch.LongTensor([1]), 'y_pred': torch.FloatTensor([0.1]), 'device': 'cpu'},
                         {'t': 2, 'y_true': torch.LongTensor([2]), 'y_pred': torch.FloatTensor([0.2]), 'device': 'cpu'},
@@ -101,8 +101,8 @@ class TestEpochLambda(unittest.TestCase):
 
     def test_train(self):
         self._metric.train()
-        calls = [[torch.LongTensor([0]), torch.FloatTensor([0.0])],
-                 [torch.LongTensor([0, 1, 2, 3]), torch.FloatTensor([0.0, 0.1, 0.2, 0.3])]]
+        calls = [[torch.FloatTensor([0.0]), torch.LongTensor([0])],
+                 [torch.FloatTensor([0.0, 0.1, 0.2, 0.3]), torch.LongTensor([0, 1, 2, 3])]]
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
         self.assertEqual(2, len(self._metric_function.call_args_list))
@@ -113,8 +113,8 @@ class TestEpochLambda(unittest.TestCase):
         self._metric.process_final({})
 
         self._metric_function.assert_called_once()
-        self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][0], torch.LongTensor([0, 1, 2, 3, 4])).all)
-        self.assertTrue(torch.lt(torch.abs(torch.add(self._metric_function.call_args_list[0][0][1], -torch.FloatTensor([0.0, 0.1, 0.2, 0.3, 0.4]))), 1e-12).all)
+        self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][1], torch.LongTensor([0, 1, 2, 3, 4])).all)
+        self.assertTrue(torch.lt(torch.abs(torch.add(self._metric_function.call_args_list[0][0][0], -torch.FloatTensor([0.0, 0.1, 0.2, 0.3, 0.4]))), 1e-12).all)
 
     def test_validate(self):
         self._metric.eval()
@@ -124,5 +124,5 @@ class TestEpochLambda(unittest.TestCase):
         self._metric.process_final_validate({})
 
         self._metric_function.assert_called_once()
-        self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][0], torch.LongTensor([0, 1, 2, 3, 4])).all)
-        self.assertTrue(torch.lt(torch.abs(torch.add(self._metric_function.call_args_list[0][0][1], -torch.FloatTensor([0.0, 0.1, 0.2, 0.3, 0.4]))), 1e-12).all)
+        self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][1], torch.LongTensor([0, 1, 2, 3, 4])).all)
+        self.assertTrue(torch.lt(torch.abs(torch.add(self._metric_function.call_args_list[0][0][0], -torch.FloatTensor([0.0, 0.1, 0.2, 0.3, 0.4]))), 1e-12).all)
