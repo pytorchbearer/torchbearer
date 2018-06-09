@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Changed the order of the arguments to the lambda function in the EpochLambda metric for consistency with pytorch and other metrics
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed tests which were failing as of version 0.1.2
 
 ## [0.1.2] - 2018-06-08
 ### Added
