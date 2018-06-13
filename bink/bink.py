@@ -68,6 +68,7 @@ class Model:
 
             _callbacks.on_start_training(state)
             state['metric_list'].reset(state)
+            state['metrics'] = {}
 
             for state['t'] in range(0, state['train_steps']):
                 # Extract batch
