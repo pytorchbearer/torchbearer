@@ -6,12 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added a flag (step_on_batch) to the LR Scheduler callbacks which allows for step() to be called on each iteration instead of each epoch
+- Added on_sample_validation and on_forward_validation calls for validation callbacks
+- Checkpointers now create directory to savepath if it doesn't exist 
 ### Changed
 - Changed the order of the arguments to the lambda function in the EpochLambda metric for consistency with pytorch and other metrics
 ### Deprecated
 ### Removed
 ### Fixed
 - Fixed tests which were failing as of version 0.1.2
+- Fixed validation_steps not being added to state
 
 ## [0.1.2] - 2018-06-08
 ### Added
