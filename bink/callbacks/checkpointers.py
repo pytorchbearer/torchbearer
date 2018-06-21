@@ -14,6 +14,9 @@ class _Checkpointer(Callback):
 
         self.most_recent = None
 
+        if not os.path.exists(os.path.dirname(fileformat)):
+            os.makedirs(os.path.dirname(fileformat))
+
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
         state = {}
         state.update(model_state)

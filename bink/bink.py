@@ -132,6 +132,7 @@ class Model:
             if num_steps is None:
                 num_steps = len(state['validation_generator'])
 
+            state['validation_steps'] = num_steps
             state['validation_iterator'] = iter(state['validation_generator'])
 
             callbacks.on_start_validation(state)
