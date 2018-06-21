@@ -139,12 +139,14 @@ class Model:
             for state['t'] in range(num_steps):
                 # Load batch
                 batch_loader('validation', state)
+                callbacks.on_sample_validation(state)
 
                 # Forward pass
                 if pass_state:
                     state['y_pred'] = state['model'](state['x'], state=state)
                 else:
                     state['y_pred'] = state['model'](state['x'])
+                callbacks.on_forward_validation(state)
 
                 # Loss and metrics
                 if 'y_true' in state:
