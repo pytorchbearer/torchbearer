@@ -38,6 +38,12 @@ class Callback(object):
     def on_start_validation(self, state):
         pass
 
+    def on_sample_validation(self, state):
+        pass
+
+    def on_forward_validation(self, state):
+        pass
+
     def on_end_validation(self, state):
         pass
 
@@ -95,6 +101,12 @@ class CallbackList(Callback):
 
     def on_start_validation(self, state):
         self._for_list(lambda callback: callback.on_start_validation(state))
+
+    def on_sample_validation(self, state):
+        self._for_list(lambda callback: callback.on_sample_validation(state))
+
+    def on_forward_validation(self, state):
+        self._for_list(lambda callback: callback.on_forward_validation(state))
 
     def on_end_validation(self, state):
         self._for_list(lambda callback: callback.on_end_validation(state))
