@@ -8,6 +8,12 @@ class TerminateOnNaN(Callback):
     """
 
     def __init__(self, monitor='running_loss'):
+        """Create a TerminateOnNaN callback which montiors the given metric and halts training if its value is nan or
+        inf.
+
+        :param monitor: The metric name to monitor
+        :type monitor: str
+        """
         super(TerminateOnNaN, self).__init__()
         self._monitor = monitor
 

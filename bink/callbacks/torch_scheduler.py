@@ -90,8 +90,9 @@ class CosineAnnealingLR(TorchScheduler):
 
 class ReduceLROnPlateau(TorchScheduler):
     """
-    Args:
-        monitor (string): The quantity to monitor. (Default value = 'val_loss')
+    :param monitor: The quantity to monitor. (Default value = 'val_loss')
+    :type monitor: str
+
     See:
         `PyTorch ReduceLROnPlateau <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.ReduceLROnPlateau>`_
     """
