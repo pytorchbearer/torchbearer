@@ -9,7 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added on_sample_validation and on_forward_validation calls for validation callbacks
 ### Changed
 - Changed the order of the arguments to the lambda function in the EpochLambda metric for consistency with pytorch and other metrics
-- Checkpointers now create directory to savepath if it doesn't exist 
+- Checkpointers now create directory to savepath if it doesn't exist
+- Changed the 'on_forward_criterion' callback method to 'on_criterion'
 ### Deprecated
 ### Removed
 ### Fixed

@@ -88,7 +88,7 @@ class Model:
                 # Loss Calculation
                 state['loss'] = state['criterion'](state['y_pred'], state['y_true'])
 
-                _callbacks.on_forward_criterion(state)
+                _callbacks.on_criterion(state)
                 state['metrics'] = state['metric_list'].process(state)
 
                 # Backwards pass
