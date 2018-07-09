@@ -9,7 +9,9 @@ class TestGradientNormClipping(TestCase):
     @patch('torch.nn.utils.clip_grad_norm_')
     def test_not_given_params(self, mock_clip):
         model = nn.Sequential(nn.Conv2d(3, 3, 3))
-        model.parameters = Mock(return_value=-1)
+        param = Mock(return_value=-1)
+        param.requires_grad = Mock(return_value=True)
+        model.parameters = Mock(return_value=[param])
         state = {'model': model}
 
         clipper = GradientNormClipping(5)
@@ -17,7 +19,7 @@ class TestGradientNormClipping(TestCase):
         clipper.on_start(state)
         clipper.on_backward(state)
 
-        self.assertTrue(mock_clip.mock_calls[0][1][0] == -1)
+        self.assertTrue(next(mock_clip.mock_calls[0][1][0])() == -1)
 
     @patch('torch.nn.utils.clip_grad_norm_')
     def test_given_params(self, mock_clip):

@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added a flag (step_on_batch) to the LR Scheduler callbacks which allows for step() to be called on each iteration instead of each epoch
 - Added on_sample_validation and on_forward_validation calls for validation callbacks
+- Added GradientClipping callback which simply clips the absolute gradient of the model parameters
 ### Changed
 - Changed the order of the arguments to the lambda function in the EpochLambda metric for consistency with pytorch and other metrics
 - Checkpointers now create directory to savepath if it doesn't exist 
