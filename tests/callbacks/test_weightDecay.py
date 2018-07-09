@@ -17,7 +17,7 @@ class TestWeightDecay(TestCase):
 
         decay = WeightDecay(1, 1.0)
         decay.on_start(state)
-        decay.on_forward_criterion(state)
+        decay.on_criterion(state)
 
         self.assertTrue(state['loss'].item() == 3)
 
@@ -31,7 +31,7 @@ class TestWeightDecay(TestCase):
 
         decay = WeightDecay(1, 1.0)
         decay.on_start(state)
-        decay.on_forward_criterion(state)
+        decay.on_criterion(state)
 
         self.assertTrue(state['loss'].item() == 4)
 
@@ -45,7 +45,7 @@ class TestWeightDecay(TestCase):
 
         decay = WeightDecay(0.5, 1.0)
         decay.on_start(state)
-        decay.on_forward_criterion(state)
+        decay.on_criterion(state)
 
         self.assertTrue(state['loss'].item() == 2)
 
@@ -59,7 +59,7 @@ class TestWeightDecay(TestCase):
 
         decay = WeightDecay(2, 2)
         decay.on_start(state)
-        decay.on_forward_criterion(state)
+        decay.on_criterion(state)
 
         self.assertTrue(state['loss'].item() == 5)
 

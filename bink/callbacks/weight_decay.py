@@ -15,7 +15,7 @@ class WeightDecay(Callback):
         if self.params is None:
             self.params = state['model'].parameters()
 
-    def on_forward_criterion(self, state):
+    def on_criterion(self, state):
         for param in self.params:
             state['loss'] += self.rate * torch.pow(param, self.p).sum()
 
