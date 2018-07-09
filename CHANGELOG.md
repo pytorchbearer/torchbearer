@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed tests which were failing as of version 0.1.2
 - Fixed validation_steps not being added to state
+- Fixed checkpointer bug when path contained only filename and no directory path
 
 ## [0.1.2] - 2018-06-08
 ### Added
