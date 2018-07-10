@@ -20,10 +20,10 @@ class GradientNormClipping(Callback):
 
 
 class GradientClipping(Callback):
-    def __init__(self, max_abs, params=None):
+    def __init__(self, clip_value, params=None):
         super(GradientClipping, self).__init__()
 
-        self.max_abs = max_abs
+        self.clip_value = clip_value
         self.params = params
 
     def on_start(self, state):
@@ -31,5 +31,4 @@ class GradientClipping(Callback):
             self.params = filter(lambda p: p.requires_grad, state['model'].parameters())
 
     def on_backward(self, state):
-        for p in self.params:
-            p.grad.data.clamp_(-self.max_abs, self.max_abs)
+        torch.nn.utils.clip_grad_value_(self.params, self.clip_value)
