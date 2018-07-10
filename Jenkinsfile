@@ -4,7 +4,8 @@ pipeline {
     stage('Test') {
       steps {
         echo 'Running Tests'
-        sh 'nosetests tests'
+        sh '''source /opt/anaconda3/bin/activate
+nosetests tests'''
       }
     }
   }
