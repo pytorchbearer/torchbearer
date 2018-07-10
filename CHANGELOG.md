@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed tests which were failing as of version 0.1.2
 - Fixed validation_steps not being added to state
 - Fixed checkpointer bug when path contained only filename and no directory path
+- Fixed console printer bug not printing validation statistics
+- Fixed console printer bug calling final_metrics before they existed in state
 
 ## [0.1.2] - 2018-06-08
 ### Added
