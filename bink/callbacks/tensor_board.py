@@ -50,7 +50,7 @@ class TensorBoard(Callback):
 
         if self.write_graph:
             def handle_graph(state):
-                dummy = Variable(torch.rand(state['x'].size()), volatile=True)
+                dummy = torch.rand(state['x'].size(), requires_grad=False)
                 model = copy.deepcopy(state['model']).to('cpu')
                 self._writer.add_graph(model, (dummy, ))
                 self._handle_graph = lambda _: ...
