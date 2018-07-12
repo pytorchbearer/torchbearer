@@ -176,6 +176,10 @@ class TensorBoardImages(Callback):
 
 
 class TensorBoardProjector(Callback):
+    """The TensorBoardProjector callback is used to write images from the validation pass to Tensorboard using the
+    TensorboardX library.
+    """
+
     def __init__(self, log_dir='./logs',
                  comment='bink',
                  num_images=100,
@@ -184,6 +188,28 @@ class TensorBoardProjector(Callback):
                  write_data=True,
                  write_features=True,
                  features_key='y_pred'):
+        """Construct a TensorBoardProjector callback which writes images to the given directory and, if required,
+        associated features.
+
+        :param log_dir: The tensorboard log path for output
+        :type log_dir: str
+        :param comment: Descriptive comment to append to path
+        :type comment: str
+        :param num_images: The number of images to write
+        :type num_images: int
+        :param avg_pool_size: Size of the average pool to perform on the image. This is recommended to reduce the
+        overall image sizes and improve latency
+        :type avg_pool_size: int
+        :param avg_data_channels: If True, the image data will be averaged in the channel dimension
+        :type avg_data_channels: bool
+        :param write_data: If True, the raw data will be written as an embedding
+        :type write_data: bool
+        :param write_features: If True, the image features will be written as an embedding
+        :type write_features: bool
+        :param features_key: The key in state to use for the embedding. Typically model output but can be used to show
+        features from any layer of the model.
+        :type features_key: str
+        """
         self.log_dir = log_dir
         self.comment = comment
         self.num_images = num_images
