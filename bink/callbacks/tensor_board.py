@@ -14,12 +14,31 @@ import torch
 
 
 class TensorBoard(Callback):
+    """The TensorBoard callback is used to write metric graphs to tensorboard. Requires the TensorboardX library for
+    python.
+    """
+
     def __init__(self, log_dir='./logs',
                  write_graph=True,
                  write_batch_metrics=False,
                  batch_step_size=10,
                  write_epoch_metrics=True,
                  comment='bink'):
+        """TensorBoard callback which writes metrics to the given log directory.
+
+        :param log_dir: The tensorboard log path for output
+        :type log_dir: str
+        :param write_graph: If True, the model graph will be written using the TensorboardX library
+        :type write_graph: bool
+        :param write_batch_metrics: If True, batch metrics will be written
+        :type write_batch_metrics: bool
+        :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
+        :type batch_step_size: int
+        :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
+        :type write_epoch_metrics: True
+        :param comment: Descriptive comment to append to path
+        :type comment: str
+        """
         super(TensorBoard, self).__init__()
 
         self.log_dir = log_dir
@@ -77,6 +96,10 @@ class TensorBoard(Callback):
 
 
 class TensorBoardImages(Callback):
+    """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
+    TensorboardX library and torchvision.utils.make_grid
+    """
+
     def __init__(self, log_dir='./logs',
                  comment='bink',
                  name='Image',
@@ -89,6 +112,28 @@ class TensorBoardImages(Callback):
                  range=None,
                  scale_each=False,
                  pad_value=0):
+        """Create TensorBoardImages callback which writes images from the given key to the given path. Full name of
+        image sub directory will be model name + _ + comment.
+
+        :param log_dir: The tensorboard log path for output
+        :type log_dir: str
+        :param comment: Descriptive comment to append to path
+        :type comment: str
+        :param name: The name of the image
+        :type name: str
+        :param key: The key in state containing image data (tensor of size [c, w, h] or [b, c, w, h])
+        :type key: str
+        :param write_each_epoch: If True, write data on every epoch, else write only for the first epoch.
+        :type write_each_epoch: bool
+        :param num_images: The number of images to write
+        :type num_images: int
+        :param nrow: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param padding: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param normalize: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param range: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param scale_each: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param pad_value: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        """
         self.log_dir = log_dir
         self.comment = comment
         self.name = name
@@ -150,6 +195,10 @@ class TensorBoardImages(Callback):
 
 
 class TensorBoardProjector(Callback):
+    """The TensorBoardProjector callback is used to write images from the validation pass to Tensorboard using the
+    TensorboardX library.
+    """
+
     def __init__(self, log_dir='./logs',
                  comment='bink',
                  num_images=100,
@@ -158,6 +207,28 @@ class TensorBoardProjector(Callback):
                  write_data=True,
                  write_features=True,
                  features_key='y_pred'):
+        """Construct a TensorBoardProjector callback which writes images to the given directory and, if required,
+        associated features.
+
+        :param log_dir: The tensorboard log path for output
+        :type log_dir: str
+        :param comment: Descriptive comment to append to path
+        :type comment: str
+        :param num_images: The number of images to write
+        :type num_images: int
+        :param avg_pool_size: Size of the average pool to perform on the image. This is recommended to reduce the
+        overall image sizes and improve latency
+        :type avg_pool_size: int
+        :param avg_data_channels: If True, the image data will be averaged in the channel dimension
+        :type avg_data_channels: bool
+        :param write_data: If True, the raw data will be written as an embedding
+        :type write_data: bool
+        :param write_features: If True, the image features will be written as an embedding
+        :type write_features: bool
+        :param features_key: The key in state to use for the embedding. Typically model output but can be used to show
+        features from any layer of the model.
+        :type features_key: str
+        """
         self.log_dir = log_dir
         self.comment = comment
         self.num_images = num_images
