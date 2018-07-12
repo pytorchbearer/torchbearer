@@ -1,3 +1,5 @@
+import bink
+
 import torch
 
 from bink.callbacks.callbacks import Callback
@@ -20,11 +22,11 @@ class _Checkpointer(Callback):
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
         state = {}
         state.update(model_state)
-        state.update(model_state['metrics'])
+        state.update(model_state[bink.METRICS])
 
         filepath = self.fileformat.format(**state)
 
-        torch.save(model_state['self'].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
+        torch.save(model_state[bink.SELF].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
 
         if self.most_recent is not None and overwrite_most_recent:
             os.remove(self.most_recent)
@@ -142,7 +144,7 @@ class Best(_Checkpointer):
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
 
-            current = model_state['metrics'][self.monitor]
+            current = model_state[bink.METRICS][self.monitor]
 
             if self.monitor_op(current, self.best):
                 self.best = current
