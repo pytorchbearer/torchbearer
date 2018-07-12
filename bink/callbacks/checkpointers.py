@@ -26,7 +26,7 @@ class _Checkpointer(Callback):
 
         filepath = self.fileformat.format(**state)
 
-        torch.save(model_state['self'].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
+        torch.save(model_state[bink.SELF].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
 
         if self.most_recent is not None and overwrite_most_recent:
             os.remove(self.most_recent)
