@@ -5,11 +5,10 @@ from bink.callbacks.callbacks import CallbackList
 from bink.callbacks.printer import Tqdm
 from bink.callbacks.aggregate_predictions import AggregatePredictions
 from bink import metrics as bink_metrics
-from types import *
+
 
 class Model:
-    '''
-
+    ''' Binkmodel to wrap base torch model and provide training environment around it
     '''
     def __init__(self, model, optimizer, loss_criterion, metrics=[]):
         ''' Create binkmodel which wraps a base torchmodel and provides a training environment surrounding it
