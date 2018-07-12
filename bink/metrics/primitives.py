@@ -1,3 +1,4 @@
+import bink
 from bink import metrics
 
 import torch
@@ -24,7 +25,7 @@ class Loss(metrics.Metric):
         super().__init__('loss')
 
     def process(self, state):
-        return state['loss']
+        return state[bink.LOSS]
 
 
 loss_primitive = Loss()
@@ -43,7 +44,7 @@ class Epoch(metrics.Metric):
         return self._process(state)
 
     def _process(self, state):
-        return state['epoch']
+        return state[bink.EPOCH]
 
 
 epoch_primitive = Epoch()

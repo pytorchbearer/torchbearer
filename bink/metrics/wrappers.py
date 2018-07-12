@@ -1,3 +1,4 @@
+import bink
 from bink import metrics
 
 import torch
@@ -195,7 +196,7 @@ class BatchLambda(metrics.Metric):
         :return: The value of the metric function('y_pred', 'y_true').
 
         """
-        return self._metric_function(state['y_pred'], state['y_true'])
+        return self._metric_function(state[bink.Y_PRED], state[bink.Y_TRUE])
 
 
 class EpochLambda(metrics.AdvancedMetric):
@@ -234,9 +235,9 @@ class EpochLambda(metrics.AdvancedMetric):
         :return: The current running result.
 
         """
-        self._y_true = torch.cat((self._y_true, state['y_true']), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state['y_pred'].float()), dim=0)
-        if state['t'] % self._step_size == 0:
+        self._y_true = torch.cat((self._y_true, state[bink.Y_TRUE]), dim=0)
+        self._y_pred = torch.cat((self._y_pred, state[bink.Y_PRED].float()), dim=0)
+        if state[bink.BATCH] % self._step_size == 0:
             self._result = self._step(self._y_pred, self._y_true)
         return self._result
 
@@ -257,8 +258,8 @@ class EpochLambda(metrics.AdvancedMetric):
         :type state: dict
 
         """
-        self._y_true = torch.cat((self._y_true, state['y_true']), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state['y_pred'].to(self._y_pred.dtype)), dim=0)
+        self._y_true = torch.cat((self._y_true, state[bink.Y_TRUE]), dim=0)
+        self._y_pred = torch.cat((self._y_pred, state[bink.Y_PRED].to(self._y_pred.dtype)), dim=0)
 
     def process_final_validate(self, state):
         """Evaluate the function with the aggregated outputs.
@@ -281,5 +282,5 @@ class EpochLambda(metrics.AdvancedMetric):
         self._y_true = torch.zeros(0).long()
         self._y_pred = torch.zeros(0, 0)
 
-        self._y_true = self._y_true.to(state['device'])
-        self._y_pred = self._y_pred.to(state['device'], state['dtype'])
+        self._y_true = self._y_true.to(state[bink.DEVICE])
+        self._y_pred = self._y_pred.to(state[bink.DEVICE], state[bink.DATA_TYPE])

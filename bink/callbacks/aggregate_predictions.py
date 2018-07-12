@@ -1,3 +1,4 @@
+import bink
 from bink.callbacks import Callback
 import torch
 
@@ -9,7 +10,7 @@ class AggregatePredictions(Callback):
 
     def on_step_validation(self, state):
         super().on_step_validation(state)
-        self.predictions_list.append(state['y_pred'])
+        self.predictions_list.append(state[bink.Y_PRED])
 
     def on_end_validation(self, state):
-        state['final_predictions'] = torch.cat(self.predictions_list, 0)
+        state[bink.FINAL_PREDICTIONS] = torch.cat(self.predictions_list, 0)

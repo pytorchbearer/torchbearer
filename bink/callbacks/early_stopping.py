@@ -1,3 +1,5 @@
+import bink
+
 from bink.callbacks import Callback
 
 
@@ -53,15 +55,15 @@ class EarlyStopping(Callback):
         self.best = float('inf') if self.mode == 'min' else -float('inf')
 
     def on_end_epoch(self, state):
-        current = state['metrics'][self.monitor]
+        current = state[bink.METRICS][self.monitor]
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
             self.wait = 0
         else:
             self.wait += 1
             if self.wait >= self.patience:
-                self.stopped_epoch = state['epoch']
-                state['stop_training'] = True
+                self.stopped_epoch = state[bink.EPOCH]
+                state[bink.STOP_TRAINING] = True
 
     def on_end(self, state):
         if self.stopped_epoch > 0 and self.verbose > 0:

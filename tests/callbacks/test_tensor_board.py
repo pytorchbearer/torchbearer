@@ -3,6 +3,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
+import bink
 from bink.callbacks import TensorBoard
 import torch
 import torch.nn as nn
@@ -11,7 +12,7 @@ import torch.nn as nn
 class TestTensorBoard(TestCase):
     @patch('bink.callbacks.tensor_board.SummaryWriter')
     def test_log_dir(self, mock_board):
-        state = {'model': nn.Sequential(nn.Conv2d(3, 3, 3))}
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
         tboard = TensorBoard(write_epoch_metrics=False)
         tboard.on_start(state)
@@ -20,7 +21,7 @@ class TestTensorBoard(TestCase):
 
     @patch('bink.callbacks.tensor_board.SummaryWriter')
     def test_batch_log_dir(self, mock_board):
-        state = {'model': nn.Sequential(nn.Conv2d(3, 3, 3)), 'epoch': 0}
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)), bink.EPOCH: 0}
 
         tboard = TensorBoard(write_batch_metrics=True, write_graph=False, write_epoch_metrics=False)
         tboard.on_start(state)
@@ -35,23 +36,23 @@ class TestTensorBoard(TestCase):
         mock_board.return_value.add_graph = Mock()
         mock_rand.return_value = 1
 
-        state = {'model': nn.Sequential(nn.Conv2d(3, 3, 3)), 'x': torch.zeros(1, 1, 9, 9)}
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)), bink.X: torch.zeros(1, 1, 9, 9)}
 
         tboard = TensorBoard(write_epoch_metrics=False)
         tboard.on_start(state)
         tboard.on_sample(state)
 
-        mock_rand.assert_called_once_with(state['x'].size(), requires_grad=False)
+        mock_rand.assert_called_once_with(state[bink.X].size(), requires_grad=False)
         mock_board.return_value.add_graph.assert_called_once()
-        self.assertEqual(str(state['model']), str(mock_board.return_value.add_graph.call_args_list[0][0][0]))
-        self.assertNotEqual(state['model'], mock_board.return_value.add_graph.call_args_list[0][0][0])
+        self.assertEqual(str(state[bink.MODEL]), str(mock_board.return_value.add_graph.call_args_list[0][0][0]))
+        self.assertNotEqual(state[bink.MODEL], mock_board.return_value.add_graph.call_args_list[0][0][0])
 
     @patch('bink.callbacks.tensor_board.SummaryWriter')
     def test_writer_closed_on_end(self, mock_board):
         mock_board.return_value = Mock()
         mock_board.return_value.close = Mock()
 
-        state = {'model': nn.Sequential(nn.Conv2d(3, 3, 3))}
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
         tboard = TensorBoard(write_epoch_metrics=False)
         tboard.on_start(state)
@@ -63,7 +64,7 @@ class TestTensorBoard(TestCase):
         mock_board.return_value = Mock()
         mock_board.return_value.close = Mock()
 
-        state = {'epoch': 0}
+        state = {bink.EPOCH: 0}
 
         tboard = TensorBoard(write_batch_metrics=True, write_epoch_metrics=False)
         tboard.on_start_epoch(state)
@@ -75,7 +76,7 @@ class TestTensorBoard(TestCase):
         mock_board.return_value = Mock()
         mock_board.return_value.add_scalar = Mock()
 
-        state = {'epoch': 0, 'metrics': {'test': 1}, 't': 0}
+        state = {bink.EPOCH: 0, bink.METRICS: {'test': 1}, bink.BATCH: 0}
 
         tboard = TensorBoard(write_batch_metrics=True, write_epoch_metrics=False)
         tboard.on_start_epoch(state)
@@ -90,7 +91,7 @@ class TestTensorBoard(TestCase):
         mock_board.return_value = Mock()
         mock_board.return_value.add_scalar = Mock()
 
-        state = {'model': nn.Sequential(nn.Conv2d(3, 3, 3)), 'epoch': 0, 'metrics': {'test': 1}}
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)), bink.EPOCH: 0, bink.METRICS: {'test': 1}}
 
         tboard = TensorBoard(write_batch_metrics=False, write_epoch_metrics=True)
         tboard.on_start(state)

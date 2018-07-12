@@ -1,3 +1,5 @@
+import bink
+
 from bink.callbacks import Callback
 from tqdm import tqdm
 
@@ -10,25 +12,25 @@ class ConsolePrinter(Callback):
         self.validation_label = validation_label_letter
 
     def on_step_training(self, state):
-        epoch_str = '{:d}/{:d}(t): '.format(state['epoch'] + 1, state['max_epochs'])
-        batch_str = '{:d}/{:d} '.format(state['t'], state['train_steps'])
-        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['metrics'].items()])
+        epoch_str = '{:d}/{:d}(t): '.format(state[bink.EPOCH] + 1, state[bink.MAX_EPOCHS])
+        batch_str = '{:d}/{:d} '.format(state[bink.BATCH], state[bink.TRAIN_STEPS])
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[bink.METRICS].items()])
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
     def on_end_training(self, state):
-        epoch_str = '{:d}/{:d}(t): '.format(state['epoch'] + 1, state['max_epochs'])
-        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['metrics'].items()])
+        epoch_str = '{:d}/{:d}(t): '.format(state[bink.EPOCH] + 1, state[bink.MAX_EPOCHS])
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[bink.METRICS].items()])
         print('\r' + epoch_str + stats_str)
 
     def on_step_validation(self, state):
-        epoch_str = '{:d}/{:d}({:s}): '.format(state['epoch'] + 1, state['max_epochs'], self.validation_label)
-        batch_str = '{:d}/{:d} '.format(state['t'], state['validation_steps'])
-        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['metrics'].items()])
+        epoch_str = '{:d}/{:d}({:s}): '.format(state[bink.EPOCH] + 1, state[bink.MAX_EPOCHS], self.validation_label)
+        batch_str = '{:d}/{:d} '.format(state[bink.BATCH], state[bink.VALIDATION_STEPS])
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[bink.METRICS].items()])
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
     def on_end_validation(self, state):
-        epoch_str = '{:d}/{:d}({:s}): '.format(state['epoch'] + 1, state['max_epochs'], self.validation_label)
-        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state['metrics'].items()])
+        epoch_str = '{:d}/{:d}({:s}): '.format(state[bink.EPOCH] + 1, state[bink.MAX_EPOCHS], self.validation_label)
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[bink.METRICS].items()])
         print('\r' + epoch_str + stats_str)
 
 
@@ -51,8 +53,8 @@ class Tqdm(Callback):
         :param state: The Model state
         :type state: dict
         """
-        bar_desc = '{:d}/{:d}(t)'.format(state['epoch'] + 1, state['max_epochs'])
-        self._loader = tqdm(total=state['train_steps'], desc=bar_desc)
+        bar_desc = '{:d}/{:d}(t)'.format(state[bink.EPOCH] + 1, state[bink.MAX_EPOCHS])
+        self._loader = tqdm(total=state[bink.TRAIN_STEPS], desc=bar_desc)
 
     def on_step_training(self, state):
         """Update the bar with the metrics from this step.
@@ -61,7 +63,7 @@ class Tqdm(Callback):
         :type state: dict
         """
         self._loader.update(1)
-        self._loader.set_postfix(state['metrics'])
+        self._loader.set_postfix(state[bink.METRICS])
 
     def on_end_training(self, state):
         """Update the bar with the terminal training metrics and then close.
@@ -69,7 +71,7 @@ class Tqdm(Callback):
         :param state: The Model state
         :type state: dict
         """
-        self._loader.set_postfix(state['metrics'])
+        self._loader.set_postfix(state[bink.METRICS])
         self._loader.close()
 
     def on_start_validation(self, state):
@@ -78,8 +80,8 @@ class Tqdm(Callback):
         :param state: The Model state
         :type state: dict
         """
-        bar_desc = '{:d}/{:d}({:s})'.format(state['epoch'] + 1, state['max_epochs'], self.validation_label)
-        self._loader = tqdm(total=state['validation_steps'], desc=bar_desc)
+        bar_desc = '{:d}/{:d}({:s})'.format(state[bink.EPOCH] + 1, state[bink.MAX_EPOCHS], self.validation_label)
+        self._loader = tqdm(total=state[bink.VALIDATION_STEPS], desc=bar_desc)
 
     def on_step_validation(self, state):
         """Update the bar with the metrics from this step.
@@ -88,7 +90,7 @@ class Tqdm(Callback):
         :type state: dict
         """
         self._loader.update(1)
-        self._loader.set_postfix(state['metrics'])
+        self._loader.set_postfix(state[bink.METRICS])
 
     def on_end_validation(self, state):
         """Update the bar with the terminal validation metrics and then close.
@@ -96,5 +98,5 @@ class Tqdm(Callback):
         :param state: The Model state
         :type state: dict
         """
-        self._loader.set_postfix(state['metrics'])
+        self._loader.set_postfix(state[bink.METRICS])
         self._loader.close()
