@@ -77,6 +77,10 @@ class TensorBoard(Callback):
 
 
 class TensorBoardImages(Callback):
+    """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
+    TensorboardX library and torchvision.utils.make_grid
+    """
+
     def __init__(self, log_dir='./logs',
                  comment='bink',
                  name='Image',
@@ -89,6 +93,28 @@ class TensorBoardImages(Callback):
                  range=None,
                  scale_each=False,
                  pad_value=0):
+        """Create TensorBoardImages callback which writes images from the given key to the given path. Full name of
+        image sub directory will be model name + _ + comment.
+
+        :param log_dir: The tensorboard log path for output
+        :type log_dir: str
+        :param comment: Descriptive comment to append to path
+        :type comment: str
+        :param name: The name of the image
+        :type name: str
+        :param key: The key in state containing image data (tensor of size [c, w, h] or [b, c, w, h])
+        :type key: str
+        :param write_each_epoch: If True, write data on every epoch, else write only for the first epoch.
+        :type write_each_epoch: bool
+        :param num_images: The number of images to write
+        :type num_images: int
+        :param nrow: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param padding: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param normalize: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param range: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param scale_each: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param pad_value: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        """
         self.log_dir = log_dir
         self.comment = comment
         self.name = name
