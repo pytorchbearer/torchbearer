@@ -14,12 +14,31 @@ import torch
 
 
 class TensorBoard(Callback):
+    """The TensorBoard callback is used to write metric graphs to tensorboard. Requires the TensorboardX library for
+    python.
+    """
+
     def __init__(self, log_dir='./logs',
                  write_graph=True,
                  write_batch_metrics=False,
                  batch_step_size=10,
                  write_epoch_metrics=True,
                  comment='bink'):
+        """TensorBoard callback which writes metrics to the given log directory.
+
+        :param log_dir: The tensorboard log path for output
+        :type log_dir: str
+        :param write_graph: If True, the model graph will be written using the TensorboardX library
+        :type write_graph: bool
+        :param write_batch_metrics: If True, batch metrics will be written
+        :type write_batch_metrics: bool
+        :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
+        :type batch_step_size: int
+        :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
+        :type write_epoch_metrics: True
+        :param comment: Descriptive comment to append to path
+        :type comment: str
+        """
         super(TensorBoard, self).__init__()
 
         self.log_dir = log_dir
