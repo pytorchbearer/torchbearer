@@ -1,5 +1,7 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+
+import bink
 from bink.cv_utils import get_train_valid_sets
 from bink.callbacks.callbacks import CallbackList
 from bink.callbacks.printer import Tqdm
@@ -24,13 +26,13 @@ class Model:
         '''
         super().__init__()
         self.main_state = {
-            'model': model,
-            'criterion': loss_criterion,
-            'optimizer': optimizer,
-            'device': 'cpu',
-            'dtype': torch.float32,
-            'metric_list': bink_metrics.MetricList(metrics),
-            'self': self
+            bink.MODEL: model,
+            bink.CRITERION: loss_criterion,
+            bink.OPTIMIZER: optimizer,
+            bink.DEVICE: 'cpu',
+            bink.DATA_TYPE: torch.float32,
+            bink.METRIC_LIST: bink_metrics.MetricList(metrics),
+            bink.SELF: self
         }
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
