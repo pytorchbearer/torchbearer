@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Changed the order of the arguments to the lambda function in the EpochLambda metric for consistency with pytorch and other metrics
 - Checkpointers now create directory to savepath if it doesn't exist
 - Changed the 'on_forward_criterion' callback method to 'on_criterion'
+- Changed epoch number in printer callbacks to be consistent with the rest of bink
 ### Deprecated
 ### Removed
 ### Fixed
