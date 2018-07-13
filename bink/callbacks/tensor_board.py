@@ -150,6 +150,7 @@ class TensorBoardImages(Callback):
         self.pad_value = pad_value
 
         self._writer = None
+        self._data = None
         self.done = False
 
     def on_start(self, state):
@@ -158,12 +159,12 @@ class TensorBoardImages(Callback):
 
     def on_step_validation(self, state):
         if not self.done:
-            data = state[self.key].data.clone()
+            data = state[self.key].clone()
 
             if len(data.size()) == 3:
                 data = data.unsqueeze(1)
 
-            if state[bink.BATCH] == 0:
+            if self._data is None:
                 remaining = self.num_images if self.num_images < data.size(0) else data.size(0)
 
                 self._data = data[:remaining].to('cpu')
@@ -187,6 +188,7 @@ class TensorBoardImages(Callback):
                 )
                 self._writer.add_image(self.name, image, state[bink.EPOCH])
                 self.done = True
+                self._data = None
 
     def on_end_epoch(self, state):
         if self.write_each_epoch:
