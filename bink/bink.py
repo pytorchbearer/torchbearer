@@ -416,7 +416,7 @@ class Model:
         :type state_dict: dict
         :param kwargs: `See torch.nn.Module.load_state_dict https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.load_state_dict`
         '''
-        self.main_state[bink.MODEL].load_state_dict(state_dict[bink.MODEL])
+        self.main_state[bink.MODEL].load_state_dict(state_dict[bink.MODEL], **kwargs)
         self.main_state[bink.OPTIMIZER].load_state_dict(state_dict[bink.OPTIMIZER])
 
     def state_dict(self, **kwargs):
@@ -427,7 +427,7 @@ class Model:
         :rtype: dict
         '''
         state_dict = {
-            bink.MODEL: self.main_state[bink.MODEL].state_dict(),
+            bink.MODEL: self.main_state[bink.MODEL].state_dict(**kwargs),
             bink.OPTIMIZER: self.main_state[bink.OPTIMIZER].state_dict()
         }
         return state_dict
