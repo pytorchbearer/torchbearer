@@ -1,10 +1,10 @@
 import os
 
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, ANY
 
 import bink
-from bink.callbacks import TensorBoard
+from bink.callbacks import TensorBoard, TensorBoardImages
 import torch
 import torch.nn as nn
 
@@ -97,3 +97,126 @@ class TestTensorBoard(TestCase):
         tboard.on_start(state)
         tboard.on_end_epoch(state)
         mock_board.return_value.add_scalar.assert_called_once_with('epoch/test', 1, 0)
+
+
+class TestTensorBoardImages(TestCase):
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_log_dir(self, mock_board):
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages(log_dir='./test', comment='sconce')
+        tboard.on_start(state)
+
+        mock_board.assert_called_once_with(log_dir=os.path.join('./test', 'Sequential_sconce'))
+
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_writer_closed_on_end(self, mock_board):
+        mock_board.return_value = Mock()
+        mock_board.return_value.close = Mock()
+
+        state = {bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages()
+        tboard.on_start(state)
+        tboard.on_end({})
+        mock_board.return_value.close.assert_called_once()
+
+    @patch('bink.callbacks.tensor_board.utils.make_grid')
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_simple_case(self, mock_board, mock_grid):
+        mock_board.return_value = Mock()
+        mock_board.return_value.add_image = Mock()
+
+        mock_grid.return_value = 10
+
+        state = {'x': torch.ones(18, 3, 10, 10), bink.EPOCH: 1, bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=False, num_images=18, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+
+        tboard.on_start(state)
+        tboard.on_step_validation(state)
+
+        mock_grid.assert_called_once_with(ANY, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        mock_board.return_value.add_image.assert_called_once_with('test', 10, 1)
+        self.assertTrue(mock_grid.call_args[0][0].size() == state['x'].size())
+
+    @patch('bink.callbacks.tensor_board.utils.make_grid')
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_multi_batch(self, mock_board, mock_grid):
+        mock_board.return_value = Mock()
+        mock_board.return_value.add_image = Mock()
+
+        mock_grid.return_value = 10
+
+        state = {'x': torch.ones(18, 3, 10, 10), bink.EPOCH: 1, bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=False, num_images=36, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+
+        tboard.on_start(state)
+        tboard.on_step_validation(state)
+        tboard.on_step_validation(state)
+
+        mock_grid.assert_called_once_with(ANY, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        mock_board.return_value.add_image.assert_called_once_with('test', 10, 1)
+        self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(36, 3, 10, 10).size())
+
+    @patch('bink.callbacks.tensor_board.utils.make_grid')
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_multi_epoch(self, mock_board, mock_grid):
+        mock_board.return_value = Mock()
+        mock_board.return_value.add_image = Mock()
+
+        mock_grid.return_value = 10
+
+        state = {'x': torch.ones(18, 3, 10, 10), bink.EPOCH: 1, bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=36, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+
+        tboard.on_start(state)
+        tboard.on_step_validation(state)
+        tboard.on_end_epoch(state)
+        tboard.on_step_validation(state)
+
+        mock_grid.assert_called_once_with(ANY, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        mock_board.return_value.add_image.assert_called_once_with('test', 10, 1)
+        self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(36, 3, 10, 10).size())
+
+    @patch('bink.callbacks.tensor_board.utils.make_grid')
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_single_channel(self, mock_board, mock_grid):
+        mock_board.return_value = Mock()
+        mock_board.return_value.add_image = Mock()
+
+        mock_grid.return_value = 10
+
+        state = {'x': torch.ones(18, 10, 10), bink.EPOCH: 1, bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=18, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+
+        tboard.on_start(state)
+        tboard.on_step_validation(state)
+
+        mock_grid.assert_called_once_with(ANY, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        mock_board.return_value.add_image.assert_called_once_with('test', 10, 1)
+        self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(18, 1, 10, 10).size())
+
+    @patch('bink.callbacks.tensor_board.utils.make_grid')
+    @patch('bink.callbacks.tensor_board.SummaryWriter')
+    def test_odd_batches(self, mock_board, mock_grid):
+        mock_board.return_value = Mock()
+        mock_board.return_value.add_image = Mock()
+
+        mock_grid.return_value = 10
+
+        state = {'x': torch.ones(18, 3, 10, 10), bink.EPOCH: 1, bink.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
+
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=40, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+
+        tboard.on_start(state)
+        tboard.on_step_validation(state)
+        tboard.on_step_validation(state)
+        tboard.on_step_validation(state)
+
+        mock_grid.assert_called_once_with(ANY, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        mock_board.return_value.add_image.assert_called_once_with('test', 10, 1)
+        self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(40, 3, 10, 10).size())
