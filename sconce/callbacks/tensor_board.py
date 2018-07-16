@@ -3,7 +3,7 @@ import copy
 import torchvision.utils as utils
 
 from tensorboardX import SummaryWriter
-from torch.autograd import Variable
+
 import torch.nn.functional as F
 
 import sconce
@@ -257,7 +257,7 @@ class TensorBoardProjector(Callback):
             if len(x.size()) == 3:
                 x = x.unsqueeze(1)
 
-            x = F.avg_pool2d(Variable(x, volatile=True), self.avg_pool_size).data
+            x = F.avg_pool2d(x, self.avg_pool_size).data
 
             data = None
 
