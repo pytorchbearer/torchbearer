@@ -1,6 +1,6 @@
 import numpy as np
 import torch.utils.data as data
-from bink.utils import ShuffleSplitCVIter, KFoldCVIter, LeavePOutCVIter
+from bink.cv_utils import ShuffleSplitCVIter, KFoldCVIter, LeavePOutCVIter
 import copy
 
 
