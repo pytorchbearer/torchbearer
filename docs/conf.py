@@ -28,7 +28,7 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['torch', 'numpy', 'sklearn', 'tqdm', 'tensorboardX']
+MOCK_MODULES = ['torch', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX']
 
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
