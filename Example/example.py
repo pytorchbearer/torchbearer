@@ -9,10 +9,10 @@ from torch.utils.data import DataLoader
 from Example import inception_network as nm
 from bink import Model
 from bink.metrics import RocAucScore
-from bink.callbacks import EarlyStopping, TensorBoard, TensorBoardImageVis, L2WeightDecay, L1WeightDecay
+from bink.callbacks import EarlyStopping, TensorBoard, L2WeightDecay, L1WeightDecay
 
 ####### Paths #######
-dataset_path = '/home/ethan/datasets'
+dataset_path = '/home/matt/datasets/cifar'
 model_load_path = ''  # Path to a saved model which is loaded if "newmodel" is true
 logfile = 'logs.log'
 folderName = 'test'
@@ -48,4 +48,4 @@ from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
 
 model = Model(my_model, torch.optim.SGD(my_model.parameters(), 0.001), nn.CrossEntropyLoss(), metrics=['acc', 'loss']).cuda()
-model.fit_generator(trainloader, validation_generator=testloader, callbacks=[L1WeightDecay(), L2WeightDecay(), TensorBoardImageVis(avg_pool_size=2, num_images=250, comment=current_time), TensorBoard(comment=current_time, write_batch_metrics=True, write_graph=True)], epochs=100)
+model.fit_generator(trainloader, validation_generator=testloader, callbacks=[L1WeightDecay(), L2WeightDecay()], epochs=100)
