@@ -385,8 +385,8 @@ class Model:
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
 
-        :param args: See `torch.nn.Module.to https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to`
-        :param kwargs: See `torch.nn.Module.to https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to`
+        :param args: See: `torch.nn.Module.to <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to>`_
+        :param kwargs: See: `torch.nn.Module.to <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to>`_
         :return: Self sconcemodel
         :rtype: Model
         """
@@ -424,14 +424,14 @@ class Model:
 
         :param state_dict: A dict containing parameters and persistent buffers.
         :type state_dict: dict
-        :param kwargs: `See torch.nn.Module.load_state_dict https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.load_state_dict`
+        :param kwargs: See: `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.load_state_dict>`_
         """
         self.main_state[sconce.MODEL].load_state_dict(state_dict[sconce.MODEL], **kwargs)
         self.main_state[sconce.OPTIMIZER].load_state_dict(state_dict[sconce.OPTIMIZER])
 
     def state_dict(self, **kwargs):
         """
-        :param kwargs: See `torch.nn.Module.state_dict https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.state_dict`
+        :param kwargs: See: `torch.nn.Module.state_dict <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.state_dict>`_
 
         :return: A dict containing parameters and persistent buffers.
         :rtype: dict

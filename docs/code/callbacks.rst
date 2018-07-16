@@ -1,4 +1,4 @@
-Callback API
+sconce.callbacks
 ====================================
 
 ..  automodule:: sconce.callbacks

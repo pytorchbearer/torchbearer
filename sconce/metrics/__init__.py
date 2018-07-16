@@ -3,9 +3,8 @@
         :members:
         :undoc-members:
 
-..  automodule:: sconce.metrics.defaults
-        :members:
-        :undoc-members:
+Metric Wrappers
+------------------------------------
 
 ..  automodule:: sconce.metrics.wrappers
         :members:
@@ -15,11 +14,21 @@
         :members:
         :undoc-members:
 
-..  automodule:: sconce.metrics.roc_auc_score
+Default Metrics
+------------------------------------
+
+..  automodule:: sconce.metrics.defaults
         :members:
         :undoc-members:
 
+Valued Metrics
+------------------------------------
+
 ..  automodule:: sconce.metrics.primitives
+        :members:
+        :undoc-members:
+
+..  automodule:: sconce.metrics.roc_auc_score
         :members:
         :undoc-members:
 """

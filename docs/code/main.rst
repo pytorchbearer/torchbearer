@@ -1,4 +1,4 @@
-Sconce
+sconce
 ====================================
 
 ..  automodule:: sconce
