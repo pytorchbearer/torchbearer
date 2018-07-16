@@ -1,4 +1,4 @@
-from bink import metrics
+from sconce import metrics
 
 import sklearn.metrics
 import numpy as np

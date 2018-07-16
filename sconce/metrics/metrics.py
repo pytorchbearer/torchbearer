@@ -70,7 +70,7 @@ class MetricList(Metric):
 
         """
         super().__init__('metric_list')
-        import bink.metrics.defaults as defaults
+        import sconce.metrics.defaults as defaults
 
         self.prefix = ''
         self.metric_list = []

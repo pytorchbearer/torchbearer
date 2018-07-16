@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-import bink
-from bink import Model
-from bink.callbacks.checkpointers import _Checkpointer, MostRecent, Interval, Best
+import sconce
+from sconce import Model
+from sconce.callbacks.checkpointers import _Checkpointer, MostRecent, Interval, Best
 import os
 
 
@@ -13,8 +13,8 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            bink.SELF: Model(torchmodel, optim, None, []),
-            bink.METRICS: {}
+            sconce.SELF: Model(torchmodel, optim, None, []),
+            sconce.METRICS: {}
         }
 
         file_format = 'test_file.pt'
@@ -29,9 +29,9 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            bink.SELF: Model(torchmodel, optim, None, []),
-            bink.METRICS: {},
-            bink.EPOCH: 2
+            sconce.SELF: Model(torchmodel, optim, None, []),
+            sconce.METRICS: {},
+            sconce.EPOCH: 2
         }
 
         file_format = 'test_file_{epoch}.pt'
@@ -46,9 +46,9 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            bink.SELF: Model(torchmodel, optim, None, []),
-            bink.METRICS: {'test_metric': 0.001},
-            bink.EPOCH: 2
+            sconce.SELF: Model(torchmodel, optim, None, []),
+            sconce.METRICS: {'test_metric': 0.001},
+            sconce.EPOCH: 2
         }
 
         file_format = 'test_file_{test_metric}.pt'
@@ -63,9 +63,9 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            bink.SELF: Model(torchmodel, optim, None, []),
-            bink.METRICS: {'test_metric': 0.001},
-            bink.EPOCH: 2
+            sconce.SELF: Model(torchmodel, optim, None, []),
+            sconce.METRICS: {'test_metric': 0.001},
+            sconce.EPOCH: 2
         }
 
         file_format = 'test_file_{test_metric:.01f}.pt'
@@ -80,9 +80,9 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            bink.SELF: Model(torchmodel, optim, None, []),
-            bink.METRICS: {'test_metric': 0.001},
-            bink.EPOCH: 2
+            sconce.SELF: Model(torchmodel, optim, None, []),
+            sconce.METRICS: {'test_metric': 0.001},
+            sconce.EPOCH: 2
         }
 
         file_format = 'test_file_{test_metric:d}.pt'
@@ -100,9 +100,9 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            bink.SELF: Model(torchmodel, optim, None, []),
-            bink.EPOCH: 0,
-            bink.METRICS: {}
+            sconce.SELF: Model(torchmodel, optim, None, []),
+            sconce.EPOCH: 0,
+            sconce.METRICS: {}
         }
 
         file_format = 'test_file_{epoch}.pt'
@@ -110,13 +110,13 @@ class TestCheckpointer(TestCase):
         check.save_checkpoint(state, True)
         self.assertTrue(check.most_recent == 'test_file_0.pt')
 
-        state[bink.EPOCH] = 1
+        state[sconce.EPOCH] = 1
         check.save_checkpoint(state, True)
         self.assertTrue(check.most_recent == 'test_file_1.pt')
 
 
 class TestMostRecent(TestCase):
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_save(self, mock_save_check):
         state = {}
         check = MostRecent('test_file.pt')
@@ -129,7 +129,7 @@ class TestMostRecent(TestCase):
 
 # TODO: Negative and fractional interval test and decide how to handle
 class TestInterval(TestCase):
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_interval_is_1(self, mock_save_check):
         state = {}
         check = Interval('test_file', period=1)
@@ -139,7 +139,7 @@ class TestInterval(TestCase):
 
         self.assertTrue(mock_save_check.call_count == 2)
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_interval_is_more_than_1(self, mock_save_check):
         state = {}
         check = Interval('test_file', period=4)
@@ -157,9 +157,9 @@ class TestInterval(TestCase):
 
 
 class TestBest(TestCase):
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_with_increasing(self, mock_save):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='min')
@@ -168,13 +168,13 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-        state = {bink.METRICS: {'val_loss': 0.2}}
+        state = {sconce.METRICS: {'val_loss': 0.2}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_with_decreasing(self, mock_save):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='min')
@@ -183,13 +183,13 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-        state = {bink.METRICS: {'val_loss': 0.001}}
+        state = {sconce.METRICS: {'val_loss': 0.001}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 2)
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_max_with_increasing(self, mock_save):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='max')
@@ -198,13 +198,13 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-        state = {bink.METRICS: {'val_loss': 0.2}}
+        state = {sconce.METRICS: {'val_loss': 0.2}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 2)
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_max_with_decreasing(self, mock_save):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='max')
@@ -213,13 +213,13 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-        state = {bink.METRICS: {'val_loss': 0.001}}
+        state = {sconce.METRICS: {'val_loss': 0.001}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_delta_no_save(self, mock_save):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='min', min_delta=0.1)
@@ -228,13 +228,13 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-        state = {bink.METRICS: {'val_loss': 0.001}}
+        state = {sconce.METRICS: {'val_loss': 0.001}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_min_delta_save(self, mock_save):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, mode='min', min_delta=0.1)
@@ -243,13 +243,13 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 1)
 
-        state = {bink.METRICS: {'val_loss': -0.001}}
+        state = {sconce.METRICS: {'val_loss': -0.001}}
         check.on_end_epoch(state)
         self.assertTrue(mock_save.call_count == 2)
         
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_auto_shoud_be_min(self, _):
-        state = {bink.METRICS: {'val_loss': 0.1}}
+        state = {sconce.METRICS: {'val_loss': 0.1}}
 
         file_path = 'test_file_{val_loss:.2f}'
         check = Best(file_path, monitor='val_loss')
@@ -258,9 +258,9 @@ class TestBest(TestCase):
         check.on_end_epoch(state)
         self.assertTrue(check.mode == 'min')
 
-    @patch('bink.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    @patch('sconce.callbacks.checkpointers._Checkpointer.save_checkpoint')
     def test_auto_shoud_be_max(self, _):
-        state = {bink.METRICS: {'acc_loss': 0.1}}
+        state = {sconce.METRICS: {'acc_loss': 0.1}}
 
         file_path = 'test_file_{acc_loss:.2f}'
         check = Best(file_path, monitor='acc_loss')
