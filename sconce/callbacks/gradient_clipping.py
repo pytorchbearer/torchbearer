@@ -6,7 +6,7 @@ import torch
 
 
 class GradientNormClipping(Callback):
-    """GradientNormClipping callback, uses torch.nn.utils.clip_grad_norm_
+    """GradientNormClipping callback, uses 'torch.nn.utils.clip_grad_norm\_'
     """
 
     def __init__(self, max_norm, norm_type=2, params=None):
@@ -42,7 +42,7 @@ class GradientNormClipping(Callback):
 
 
 class GradientClipping(Callback):
-    """GradientClipping callback, uses torch.nn.utils.clip_grad_value_
+    """GradientClipping callback, uses 'torch.nn.utils.clip_grad_value\_'
     """
 
     def __init__(self, clip_value, params=None):
