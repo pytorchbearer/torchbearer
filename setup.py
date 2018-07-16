@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(
-    name='bink',
+    name='sconce',
     version='0.1.2',
-    packages=['bink', 'bink.metrics', 'bink.runners', 'bink.callbacks', 'tests', 'tests.metrics', 'tests.callbacks'],
-    url='https://github.com/MattPainter01/PyTorch-bink',
-    download_url='https://github.com/MattPainter01/PyTorch-bink/archive/v0.1.2.tar.gz',
+    packages=['sconce', 'sconce.metrics', 'sconce.runners', 'sconce.callbacks', 'tests', 'tests.metrics', 'tests.callbacks'],
+    url='https://github.com/MattPainter01/PyTorch-sconce',
+    download_url='https://github.com/MattPainter01/PyTorch-sconce/archive/v0.1.2.tar.gz',
     license='GPL-3.0',
     author='Matt Painter',
     author_email='mp2u16@ecs.soton.ac.uk',

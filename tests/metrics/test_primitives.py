@@ -2,8 +2,8 @@ import unittest
 
 from torch.autograd import Variable
 
-import bink
-from bink.metrics import Loss, Epoch, CategoricalAccuracy
+import sconce
+from sconce.metrics import Loss, Epoch, CategoricalAccuracy
 
 import torch
 
@@ -12,7 +12,7 @@ class TestLoss(unittest.TestCase):
     def setUp(self):
         with torch.no_grad():
             self._state = {
-                bink.LOSS: torch.FloatTensor([2.35])
+                sconce.LOSS: torch.FloatTensor([2.35])
             }
         self._metric = Loss()
 
@@ -30,7 +30,7 @@ class TestLoss(unittest.TestCase):
 class TestEpoch(unittest.TestCase):
     def setUp(self):
         self._state = {
-            bink.EPOCH: 101
+            sconce.EPOCH: 101
         }
         self._metric = Epoch()
 
@@ -48,8 +48,8 @@ class TestEpoch(unittest.TestCase):
 class TestCategoricalAccuracy(unittest.TestCase):
     def setUp(self):
         self._state = {
-            bink.Y_TRUE: Variable(torch.LongTensor([0, 1, 2, 2, 1])),
-            bink.Y_PRED: Variable(torch.FloatTensor([
+            sconce.Y_TRUE: Variable(torch.LongTensor([0, 1, 2, 2, 1])),
+            sconce.Y_PRED: Variable(torch.FloatTensor([
                 [0.9, 0.1, 0.1], # Correct
                 [0.1, 0.9, 0.1], # Correct
                 [0.1, 0.1, 0.9], # Correct

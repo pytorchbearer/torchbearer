@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-import bink
-from bink.callbacks import GradientNormClipping, GradientClipping
+import sconce
+from sconce.callbacks import GradientNormClipping, GradientClipping
 import torch.nn as nn
 
 
@@ -13,7 +13,7 @@ class TestGradientNormClipping(TestCase):
         param = Mock(return_value=-1)
         param.requires_grad = Mock(return_value=True)
         model.parameters = Mock(return_value=[param])
-        state = {bink.MODEL: model}
+        state = {sconce.MODEL: model}
 
         clipper = GradientNormClipping(5)
 
@@ -26,7 +26,7 @@ class TestGradientNormClipping(TestCase):
     def test_given_params(self, mock_clip):
         model = nn.Sequential(nn.Conv2d(3, 3, 3))
         model.parameters = Mock(return_value=-1)
-        state = {bink.MODEL: model}
+        state = {sconce.MODEL: model}
 
         clipper = GradientNormClipping(5, params=model.parameters())
 
@@ -39,7 +39,7 @@ class TestGradientNormClipping(TestCase):
     def test_passed_norm(self, mock_clip):
         model = nn.Sequential(nn.Conv2d(3, 3, 3))
         model.parameters = Mock(return_value=-1)
-        state = {bink.MODEL: model}
+        state = {sconce.MODEL: model}
 
         clipper = GradientNormClipping(5, 2, params=model.parameters())
 
@@ -53,7 +53,7 @@ class TestGradientNormClipping(TestCase):
     def test_default_norm_type(self, mock_clip):
         model = nn.Sequential(nn.Conv2d(3, 3, 3))
         model.parameters = Mock(return_value=-1)
-        state = {bink.MODEL: model}
+        state = {sconce.MODEL: model}
 
         clipper = GradientNormClipping(5, params=model.parameters())
 
@@ -71,7 +71,7 @@ class TestGradientClipping(TestCase):
         param = Mock(return_value=-1)
         param.requires_grad = Mock(return_value=True)
         model.parameters = Mock(return_value=[param])
-        state = {bink.MODEL: model}
+        state = {sconce.MODEL: model}
 
         clipper = GradientClipping(5)
 
@@ -84,7 +84,7 @@ class TestGradientClipping(TestCase):
     def test_given_params(self, mock_clip):
         model = nn.Sequential(nn.Conv2d(3, 3, 3))
         model.parameters = Mock(return_value=-1)
-        state = {bink.MODEL: model}
+        state = {sconce.MODEL: model}
 
         clipper = GradientClipping(5, params=model.parameters())
 

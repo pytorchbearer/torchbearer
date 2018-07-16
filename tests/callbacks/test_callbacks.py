@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from bink.callbacks import CallbackList
+from sconce.callbacks import CallbackList
 
 
 class TestCallbackList(TestCase):

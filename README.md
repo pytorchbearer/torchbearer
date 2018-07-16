@@ -1,2 +1,2 @@
-# PyTorch-bink
-bink: A model training library for PyTorch
+# PyTorch-sconce
+sconce: A model training library for PyTorch
