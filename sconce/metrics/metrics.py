@@ -64,7 +64,7 @@ class MetricList(Metric):
     def __init__(self, metric_list):
         """Create a new metric which wraps and internally calls each metric in the given list in turn.
 
-        :param metric_list:The list of metrics to be wrapped. If the list contains a :class:`MetricList`, this will be
+        :param metric_list:The list of metrics to be wrapped. If the list contains a :class:`MetricList`, this will be\
         unwrapped. Any strings in the list will be retrieved from :mod:`defaults`.
         :type metric_list:list
 
@@ -122,7 +122,7 @@ class MetricList(Metric):
         self._for_list(lambda metric: metric.train())
 
     def eval(self):
-        """Put each metric in eval mode and prepend 'val_' to future outputs.
+        """Put each metric in eval mode and prepend 'val\_' to future outputs.
         """
         self.prefix = 'val_'
         self._for_list(lambda metric: metric.eval())
