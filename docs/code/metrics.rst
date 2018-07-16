@@ -1,4 +1,4 @@
-Metric API
+sconce.metrics
 ====================================
 
 ..  automodule:: sconce.metrics

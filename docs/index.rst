@@ -7,12 +7,18 @@ Welcome to PySconce's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :glob:
+   :maxdepth: 1
+   :caption: Examples
 
-   code/main
-   code/callbacks
-   code/metrics
+   examples/*
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Package Reference
+
+   code/*
 
 
 Indices and tables
