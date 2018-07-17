@@ -782,9 +782,10 @@ class TestSconce(TestCase):
         self.assertTrue(main_state[sconce.DATA_TYPE] == dtype)
         self.assertTrue(main_state[sconce.DEVICE] == dev)
 
+    @patch('torch.cuda.current_device')
+    def test_cuda_no_device(self, device_mock):
+        device_mock.return_value = 111
 
-    def test_cuda_no_device(self):
-        default_device = torch.cuda.current_device()
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         torchmodel.load_state_dict = Mock()
 
@@ -795,7 +796,7 @@ class TestSconce(TestCase):
         sconcemodel.to = Mock()
         sconcemodel.cuda()
 
-        self.assertTrue(sconcemodel.to.call_args[0][0] == 'cuda:' + str(default_device))
+        self.assertTrue(sconcemodel.to.call_args[0][0] == 'cuda:' + str(111))
 
     def test_cuda_with_device(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
