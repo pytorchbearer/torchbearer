@@ -1,6 +1,6 @@
-import sconce
+import bink
 
-from sconce.callbacks import Callback
+from bink.callbacks import Callback
 from tqdm import tqdm
 
 
@@ -12,24 +12,24 @@ class ConsolePrinter(Callback):
         self.validation_label = validation_label_letter
 
     def _step(self, state, letter, steps):
-        epoch_str = '{:d}/{:d}({:s}): '.format(state[sconce.EPOCH], state[sconce.MAX_EPOCHS], letter)
-        batch_str = '{:d}/{:d} '.format(state[sconce.BATCH], steps)
-        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[sconce.METRICS].items()])
+        epoch_str = '{:d}/{:d}({:s}): '.format(state[bink.EPOCH], state[bink.MAX_EPOCHS], letter)
+        batch_str = '{:d}/{:d} '.format(state[bink.BATCH], steps)
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[bink.METRICS].items()])
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
     def _end(self, state, letter):
-        epoch_str = '{:d}/{:d}({:s}): '.format(state[sconce.EPOCH], state[sconce.MAX_EPOCHS], letter)
-        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[sconce.METRICS].items()])
+        epoch_str = '{:d}/{:d}({:s}): '.format(state[bink.EPOCH], state[bink.MAX_EPOCHS], letter)
+        stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[bink.METRICS].items()])
         print('\r' + epoch_str + stats_str)
 
     def on_step_training(self, state):
-        self._step(state, 't', state[sconce.TRAIN_STEPS])
+        self._step(state, 't', state[bink.TRAIN_STEPS])
 
     def on_end_training(self, state):
         self._end(state, 't')
 
     def on_step_validation(self, state):
-        self._step(state, self.validation_label, state[sconce.VALIDATION_STEPS])
+        self._step(state, self.validation_label, state[bink.VALIDATION_STEPS])
 
     def on_end_validation(self, state):
         self._end(state, self.validation_label)
@@ -49,15 +49,15 @@ class Tqdm(Callback):
         self.validation_label = validation_label_letter
 
     def _on_start(self, state, letter, steps):
-        bar_desc = '{:d}/{:d}({:s})'.format(state[sconce.EPOCH], state[sconce.MAX_EPOCHS], letter)
+        bar_desc = '{:d}/{:d}({:s})'.format(state[bink.EPOCH], state[bink.MAX_EPOCHS], letter)
         self._loader = tqdm(total=steps, desc=bar_desc)
 
     def _update(self, state):
         self._loader.update(1)
-        self._loader.set_postfix(state[sconce.METRICS])
+        self._loader.set_postfix(state[bink.METRICS])
 
     def _close(self, state):
-        self._loader.set_postfix(state[sconce.METRICS])
+        self._loader.set_postfix(state[bink.METRICS])
         self._loader.close()
 
     def on_start_training(self, state):
@@ -66,7 +66,7 @@ class Tqdm(Callback):
         :param state: The Model state
         :type state: dict
         """
-        self._on_start(state, 't', state[sconce.TRAIN_STEPS])
+        self._on_start(state, 't', state[bink.TRAIN_STEPS])
 
     def on_step_training(self, state):
         """Update the bar with the metrics from this step.
@@ -90,7 +90,7 @@ class Tqdm(Callback):
         :param state: The Model state
         :type state: dict
         """
-        self._on_start(state, self.validation_label, state[sconce.VALIDATION_STEPS])
+        self._on_start(state, self.validation_label, state[bink.VALIDATION_STEPS])
 
     def on_step_validation(self, state):
         """Update the bar with the metrics from this step.

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from sconce.metrics import MetricList, Metric
+from bink.metrics import MetricList, Metric
 
 
 class TestMetricList(unittest.TestCase):

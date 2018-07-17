@@ -2,7 +2,7 @@ import unittest
 
 from unittest.mock import Mock, call
 
-from sconce.metrics import RunningMean, Metric, RunningMetric
+from bink.metrics import RunningMean, Metric, RunningMetric
 
 import torch
 

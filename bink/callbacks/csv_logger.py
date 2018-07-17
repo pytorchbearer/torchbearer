@@ -1,6 +1,6 @@
-import sconce
+import bink
 
-from sconce.callbacks import Callback
+from bink.callbacks import Callback
 import csv
 
 
@@ -58,11 +58,11 @@ class CSVLogger(Callback):
         self.csvfile.flush()
 
     def _get_field_dict(self, state):
-        fields = {'epoch': state[sconce.EPOCH]}
+        fields = {'epoch': state[bink.EPOCH]}
 
         if self.batch_granularity:
-            fields.update({'batch': state[sconce.BATCH]})
+            fields.update({'batch': state[bink.BATCH]})
 
-        fields.update(state[sconce.METRICS])
+        fields.update(state[bink.METRICS])
 
         return fields

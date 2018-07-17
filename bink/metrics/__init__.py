@@ -1,34 +1,34 @@
 """
-..  automodule:: sconce.metrics.metrics
+..  automodule:: bink.metrics.metrics
         :members:
         :undoc-members:
 
 Metric Wrappers
 ------------------------------------
 
-..  automodule:: sconce.metrics.wrappers
+..  automodule:: bink.metrics.wrappers
         :members:
         :undoc-members:
 
-..  automodule:: sconce.metrics.running
+..  automodule:: bink.metrics.running
         :members:
         :undoc-members:
 
 Default Metrics
 ------------------------------------
 
-..  automodule:: sconce.metrics.defaults
+..  automodule:: bink.metrics.defaults
         :members:
         :undoc-members:
 
 Valued Metrics
 ------------------------------------
 
-..  automodule:: sconce.metrics.primitives
+..  automodule:: bink.metrics.primitives
         :members:
         :undoc-members:
 
-..  automodule:: sconce.metrics.roc_auc_score
+..  automodule:: bink.metrics.roc_auc_score
         :members:
         :undoc-members:
 """

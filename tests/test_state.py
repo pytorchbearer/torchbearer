@@ -1,15 +1,15 @@
 import unittest
 
-import sconce
+import bink
 
 
 class TestStateKey(unittest.TestCase):
     def test_key_added(self):
-        key = sconce.state_key('key')
+        key = bink.state_key('key')
 
-        self.assertTrue(key in sconce.STATE_KEYS)
+        self.assertTrue(key in bink.STATE_KEYS)
 
     def test_duplicate(self):
-        key = sconce.state_key(sconce.MODEL)
+        key = bink.state_key(bink.MODEL)
 
-        self.assertTrue(sconce.MODEL != key)
+        self.assertTrue(bink.MODEL != key)

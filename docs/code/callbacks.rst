@@ -1,6 +1,6 @@
-sconce.callbacks
+bink.callbacks
 ====================================
 
-..  automodule:: sconce.callbacks
+..  automodule:: bink.callbacks
 	:members:
 	:undoc-members:
