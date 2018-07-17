@@ -10,6 +10,6 @@ setup(
     author='Matt Painter',
     author_email='mp2u16@ecs.soton.ac.uk',
     description='A model training library for pytorch',
-    install_requires=['numpy', 'torch>=0.4', 'scipy', 'scikit-learn', 'tqdm', 'tensorboardX>=1.2'],
+    install_requires=['numpy', 'torch>=0.4', 'torchvision', 'scipy', 'scikit-learn', 'tqdm', 'tensorboardX>=1.2'],
     python_requires='>=3',
 )
