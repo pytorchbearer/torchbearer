@@ -1,6 +1,6 @@
-sconce
+bink
 ====================================
 
-..  automodule:: sconce
+..  automodule:: bink
 	:members:
 	:undoc-members:

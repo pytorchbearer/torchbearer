@@ -1,6 +1,6 @@
-import sconce
+import bink
 
-from sconce.callbacks import Callback
+from bink.callbacks import Callback
 
 import torch
 
@@ -33,7 +33,7 @@ class WeightDecay(Callback):
         :type state: dict
         """
         if self.params is None:
-            self.params = state[sconce.MODEL].parameters()
+            self.params = state[bink.MODEL].parameters()
 
     def on_criterion(self, state):
         """Calculate the decay term and add to state['loss'].

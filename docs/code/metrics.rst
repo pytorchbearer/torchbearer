@@ -1,6 +1,6 @@
-sconce.metrics
+bink.metrics
 ====================================
 
-..  automodule:: sconce.metrics
+..  automodule:: bink.metrics
 	:members:
 	:undoc-members:

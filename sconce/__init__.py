@@ -1,13 +1,13 @@
 """
-..  automodule:: sconce.sconce
+..  automodule:: bink.bink
         :members:
         :undoc-members:
 
-..  automodule:: sconce.state
+..  automodule:: bink.state
         :members:
         :undoc-members:
 
-..  automodule:: sconce.cv_utils
+..  automodule:: bink.cv_utils
         :members:
         :undoc-members:
 """
@@ -15,5 +15,5 @@
 from .state import *
 from . import metrics
 from . import callbacks
-from .sconce import *
+from .bink import *
 from . import cv_utils

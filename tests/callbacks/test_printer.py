@@ -1,14 +1,14 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-import sconce
-from sconce.callbacks import Tqdm, ConsolePrinter
+import bink
+from bink.callbacks import Tqdm, ConsolePrinter
 
 
 class TestConsolePrinter(TestCase):
     @patch('builtins.print')
     def test_console_printer(self, mock_print):
-        state = {sconce.BATCH: 5, sconce.EPOCH: 1, sconce.MAX_EPOCHS: 10, sconce.TRAIN_STEPS: 100, sconce.VALIDATION_STEPS: 101, sconce.METRICS: {'test': 0.9945}}
+        state = {bink.BATCH: 5, bink.EPOCH: 1, bink.MAX_EPOCHS: 10, bink.TRAIN_STEPS: 100, bink.VALIDATION_STEPS: 101, bink.METRICS: {'test': 0.9945}}
         printer = ConsolePrinter(validation_label_letter='e')
 
         printer.on_step_training(state)
@@ -29,14 +29,14 @@ class TestConsolePrinter(TestCase):
 
 
 class TestTqdm(TestCase):
-    @patch("sconce.callbacks.printer.tqdm")
+    @patch("bink.callbacks.printer.tqdm")
     def test_tqdm(self, mock_tqdm):
         mock_tqdm.return_value = Mock()
         mock_tqdm.return_value.set_postfix = Mock()
         mock_tqdm.return_value.close = Mock()
         mock_tqdm.return_value.update = Mock()
 
-        state = {sconce.EPOCH: 1, sconce.MAX_EPOCHS: 10, sconce.TRAIN_STEPS: 100, sconce.VALIDATION_STEPS: 101, sconce.METRICS: 'test'}
+        state = {bink.EPOCH: 1, bink.MAX_EPOCHS: 10, bink.TRAIN_STEPS: 100, bink.VALIDATION_STEPS: 101, bink.METRICS: 'test'}
         tqdm = Tqdm(validation_label_letter='e')
 
         tqdm.on_start_training(state)

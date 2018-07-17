@@ -3,13 +3,13 @@ from unittest.mock import MagicMock, Mock, patch
 import torch
 from torch.utils.data import DataLoader
 
-from sconce import Model
-import sconce
-from sconce.callbacks import Callback
-from sconce.metrics import MetricList, Metric
+from bink import Model
+import bink
+from bink.callbacks import Callback
+from bink.metrics import MetricList, Metric
 
 
-class TestSconce(TestCase):
+class TestBink(TestCase):
 
     def test_main_loop_metrics(self):
         metric = Metric('test')
@@ -25,7 +25,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -34,13 +34,13 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        sconcestate[sconce.METRIC_LIST].metric_list[0].reset.assert_called_once()
-        self.assertTrue(sconcestate[sconce.METRIC_LIST].metric_list[0].process.call_count == len(data))
-        sconcestate[sconce.METRIC_LIST].metric_list[0].process_final.assert_called_once()
-        self.assertTrue(sconcestate[sconce.METRICS]['test'] == 0)
+        binkstate[bink.METRIC_LIST].metric_list[0].reset.assert_called_once()
+        self.assertTrue(binkstate[bink.METRIC_LIST].metric_list[0].process.call_count == len(data))
+        binkstate[bink.METRIC_LIST].metric_list[0].process_final.assert_called_once()
+        self.assertTrue(binkstate[bink.METRICS]['test'] == 0)
 
     def test_main_loop_train_steps_positive(self):
         metric = Metric('test')
@@ -53,7 +53,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -62,10 +62,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == train_steps)
+        self.assertTrue(binkstate[bink.MODEL].call_count == train_steps)
 
     @patch("warnings.warn")
     def test_main_loop_train_steps_fractional(self, _):
@@ -79,7 +79,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -88,10 +88,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == int(train_steps))
+        self.assertTrue(binkstate[bink.MODEL].call_count == int(train_steps))
 
     def test_main_loop_epochs_positive(self):
         metric = Metric('test')
@@ -104,7 +104,7 @@ class TestSconce(TestCase):
         epochs = 2
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -113,10 +113,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == len(data)*epochs)
+        self.assertTrue(binkstate[bink.MODEL].call_count == len(data)*epochs)
 
     def test_main_loop_epochs_zero(self):
         metric = Metric('test')
@@ -129,7 +129,7 @@ class TestSconce(TestCase):
         epochs = 0
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -138,10 +138,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == len(data)*epochs)
+        self.assertTrue(binkstate[bink.MODEL].call_count == len(data)*epochs)
 
     def test_main_loop_epochs_negative(self):
         metric = Metric('test')
@@ -154,7 +154,7 @@ class TestSconce(TestCase):
         epochs = -2
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -163,10 +163,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 0)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 0)
 
     @patch("warnings.warn")
     def test_main_loop_epochs_fractional(self, _):
@@ -180,7 +180,7 @@ class TestSconce(TestCase):
         epochs = 2.5
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -189,10 +189,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == int(epochs)*len(data))
+        self.assertTrue(binkstate[bink.MODEL].call_count == int(epochs)*len(data))
 
     def test_main_loop_train_steps_too_big(self):
         metric = Metric('test')
@@ -205,7 +205,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -214,10 +214,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == len(data))
+        self.assertTrue(binkstate[bink.MODEL].call_count == len(data))
 
     def test_main_loop_train_steps_negative(self):
         metric = Metric('test')
@@ -230,7 +230,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -239,10 +239,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 0)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 0)
 
     def test_main_loop_pass_state(self):
         metric = Metric('test')
@@ -255,7 +255,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -264,10 +264,10 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
 
-        self.assertTrue(len(sconcestate[sconce.MODEL].call_args) == 2)
+        self.assertTrue(len(binkstate[bink.MODEL].call_args) == 2)
 
     def test_main_loop_optimizer(self):
         metric = Metric('test')
@@ -280,7 +280,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -289,8 +289,8 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
         self.assertTrue(optimizer.zero_grad.call_count == epochs*len(data))
         self.assertTrue(optimizer.step.call_count == epochs*len(data))
 
@@ -305,7 +305,7 @@ class TestSconce(TestCase):
         epochs = 1
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -314,12 +314,12 @@ class TestSconce(TestCase):
         loss = torch.tensor([2], requires_grad=True)
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
-        self.assertTrue(sconcestate[sconce.CRITERION].call_count == epochs*len(data))
-        self.assertTrue(sconcestate[sconce.LOSS] == 2)
+        state = binkmodel.main_state.copy()
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
+        self.assertTrue(binkstate[bink.CRITERION].call_count == epochs*len(data))
+        self.assertTrue(binkstate[bink.LOSS] == 2)
 
     def test_main_loop_backward(self):
         metric = Metric('test')
@@ -339,15 +339,15 @@ class TestSconce(TestCase):
         loss = Mock()
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
-        self.assertTrue(sconcestate[sconce.LOSS].backward.call_count == epochs*len(data))
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
+        self.assertTrue(binkstate[bink.LOSS].backward.call_count == epochs*len(data))
 
     def test_main_loop_stop_training(self):
         class stop_training_test_callback(Callback):
             def on_sample(self, state):
                 super().on_sample(state)
-                state[sconce.STOP_TRAINING] = True
+                state[bink.STOP_TRAINING] = True
 
         metric = Metric('test')
 
@@ -366,9 +366,9 @@ class TestSconce(TestCase):
         loss = Mock()
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 1)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 1)
 
     def test_main_loop_callback_calls(self):
         metric = Metric('test')
@@ -388,8 +388,8 @@ class TestSconce(TestCase):
         loss = Mock()
         criterion = Mock(return_value=loss)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
-        sconcestate = sconcemodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkstate = binkmodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=True)
         callback.on_start.assert_called_once()
         callback.on_start_epoch.asser_called_once()
         callback.on_start_training.assert_called_once()
@@ -414,7 +414,7 @@ class TestSconce(TestCase):
         validation_steps = len(data)
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -422,19 +422,19 @@ class TestSconce(TestCase):
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                 sconce.CallbackList: callback_List, sconce.MODEL: torchmodel, sconce.VALIDATION_STEPS: validation_steps,
-                 sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                 bink.CallbackList: callback_List, bink.MODEL: torchmodel, bink.VALIDATION_STEPS: validation_steps,
+                 bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
-        sconcestate[sconce.METRIC_LIST].metric_list[0].reset.assert_called_once()
-        self.assertTrue(sconcestate[sconce.METRIC_LIST].metric_list[0].process.call_count == len(data))
-        sconcestate[sconce.METRIC_LIST].metric_list[0].process_final.assert_called_once()
-        self.assertTrue(sconcestate[sconce.METRICS]['test'] == 0)
+        binkstate[bink.METRIC_LIST].metric_list[0].reset.assert_called_once()
+        self.assertTrue(binkstate[bink.METRIC_LIST].metric_list[0].process.call_count == len(data))
+        binkstate[bink.METRIC_LIST].metric_list[0].process_final.assert_called_once()
+        self.assertTrue(binkstate[bink.METRICS]['test'] == 0)
 
     def test_test_loop_forward(self):
         metric = Metric('test')
@@ -445,24 +445,24 @@ class TestSconce(TestCase):
         validation_steps = len(data)
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                 sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                 sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                 bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                 bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 3)
-        self.assertTrue(sconcestate[sconce.Y_PRED] == 1)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 3)
+        self.assertTrue(binkstate[bink.Y_PRED] == 1)
 
     def test_test_loop_criterion(self):
         metric = Metric('test')
@@ -473,24 +473,24 @@ class TestSconce(TestCase):
         validation_steps = len(data)
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                 sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                 sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                 bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                 bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
-        self.assertTrue(sconcestate[sconce.CRITERION].call_count == 3)
-        self.assertTrue(sconcestate[sconce.LOSS] == 2)
+        self.assertTrue(binkstate[bink.CRITERION].call_count == 3)
+        self.assertTrue(binkstate[bink.LOSS] == 2)
 
     def test_test_loop_pass_state(self):
         metric = Metric('test')
@@ -502,24 +502,24 @@ class TestSconce(TestCase):
         validation_steps = len(data)
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, True, Model._load_batch_standard, num_steps=None)
+        binkstate = binkmodel._test_loop(state, callback_List, True, Model._load_batch_standard, num_steps=None)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 3)
-        self.assertTrue(len(sconcestate[sconce.MODEL].call_args) == 2)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 3)
+        self.assertTrue(len(binkstate[bink.MODEL].call_args) == 2)
 
     def test_test_loop_num_steps_positive(self):
         metric = Metric('test')
@@ -531,23 +531,23 @@ class TestSconce(TestCase):
         validation_steps = 2
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 2)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 2)
 
     @patch("warnings.warn")
     def test_test_loop_num_steps_fractional(self, _):
@@ -560,23 +560,23 @@ class TestSconce(TestCase):
         validation_steps = 2.5
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 2)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 2)
 
     def test_test_loop_num_steps_too_big(self):
         metric = Metric('test')
@@ -588,23 +588,23 @@ class TestSconce(TestCase):
         validation_steps = 8
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == len(data))
+        self.assertTrue(binkstate[bink.MODEL].call_count == len(data))
 
     def test_test_loop_num_steps_zero(self):
         metric = Metric('test')
@@ -616,23 +616,23 @@ class TestSconce(TestCase):
         validation_steps = 0
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 0)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 0)
 
     def test_test_loop_num_steps_negative(self):
         metric = Metric('test')
@@ -644,23 +644,23 @@ class TestSconce(TestCase):
         validation_steps = -2
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: False, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: False, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 0)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 0)
 
     def test_test_loop_stop_training(self):
         metric = Metric('test')
@@ -672,23 +672,23 @@ class TestSconce(TestCase):
         validation_steps = len(data)
 
         callback = MagicMock()
-        callback_List = sconce.CallbackList([callback])
+        callback_List = bink.CallbackList([callback])
 
         torchmodel = Mock(return_value=1)
         optimizer = MagicMock()
 
         criterion = Mock(return_value=2)
 
-        sconcemodel = Model(torchmodel, optimizer, criterion, [metric])
+        binkmodel = Model(torchmodel, optimizer, criterion, [metric])
 
-        state = sconcemodel.main_state.copy()
-        state.update({sconce.METRIC_LIST: metric_list, sconce.VALIDATION_GENERATOR: validation_generator,
-                      sconce.CallbackList: callback_List, sconce.VALIDATION_STEPS: validation_steps,
-                      sconce.CRITERION: criterion, sconce.STOP_TRAINING: True, sconce.METRICS: {}})
+        state = binkmodel.main_state.copy()
+        state.update({bink.METRIC_LIST: metric_list, bink.VALIDATION_GENERATOR: validation_generator,
+                      bink.CallbackList: callback_List, bink.VALIDATION_STEPS: validation_steps,
+                      bink.CRITERION: criterion, bink.STOP_TRAINING: True, bink.METRICS: {}})
 
-        sconcestate = sconcemodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        binkstate = binkmodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
-        self.assertTrue(sconcestate[sconce.MODEL].call_count == 1)
+        self.assertTrue(binkstate[bink.MODEL].call_count == 1)
 
     def test_to_both_args(self):
         dev = 'cuda:1'
@@ -701,8 +701,8 @@ class TestSconce(TestCase):
         state_tensor.to = Mock()
         optimizer.state = {'test': {'test': state_tensor}}
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to(dev, dtype)
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to(dev, dtype)
 
         self.assertTrue(torchmodel.to.call_args[0][0] == dev)
         self.assertTrue(torchmodel.to.call_args[0][1] == dtype)
@@ -719,8 +719,8 @@ class TestSconce(TestCase):
         state_tensor.to = Mock()
         optimizer.state = {'test': {'test': state_tensor}}
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to(dev)
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to(dev)
 
         self.assertTrue(torchmodel.to.call_args[0][0] == dev)
         self.assertTrue(state_tensor.to.call_args[0][0] == dev)
@@ -735,8 +735,8 @@ class TestSconce(TestCase):
         state_tensor.to = Mock()
         optimizer.state = {'test': {'test': state_tensor}}
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to(dtype)
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to(dtype)
 
         self.assertTrue(torchmodel.to.call_args[0][0] == dtype)
         self.assertTrue(state_tensor.to.call_args[0][0] == dtype)
@@ -752,8 +752,8 @@ class TestSconce(TestCase):
         state_tensor.to = Mock()
         optimizer.state = {'test': {'test': state_tensor}}
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to(device=dev, dtype=dtype)
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to(device=dev, dtype=dtype)
 
         self.assertTrue(torchmodel.to.call_args[1]['device'] == dev)
         self.assertTrue(torchmodel.to.call_args[1]['dtype'] == dtype)
@@ -764,12 +764,12 @@ class TestSconce(TestCase):
         main_state = {}
         dtype = torch.float16
         dev = 'cuda:1'
-        kwargs = {sconce.DEVICE: dev, sconce.DATA_TYPE: dtype}
+        kwargs = {bink.DEVICE: dev, bink.DATA_TYPE: dtype}
 
         main_state = Model._update_device_and_dtype_from_args(main_state, **kwargs)
 
-        self.assertTrue(main_state[sconce.DATA_TYPE] == dtype)
-        self.assertTrue(main_state[sconce.DEVICE] == dev)
+        self.assertTrue(main_state[bink.DATA_TYPE] == dtype)
+        self.assertTrue(main_state[bink.DEVICE] == dev)
 
     def test_update_device_and_dtype_from_args_only_arg(self):
         main_state = {}
@@ -779,8 +779,8 @@ class TestSconce(TestCase):
 
         main_state = Model._update_device_and_dtype_from_args(main_state, *args)
 
-        self.assertTrue(main_state[sconce.DATA_TYPE] == dtype)
-        self.assertTrue(main_state[sconce.DEVICE] == dev)
+        self.assertTrue(main_state[bink.DATA_TYPE] == dtype)
+        self.assertTrue(main_state[bink.DEVICE] == dev)
 
     @patch('torch.cuda.current_device')
     def test_cuda_no_device(self, device_mock):
@@ -792,11 +792,11 @@ class TestSconce(TestCase):
         optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
         optimizer.load_state_dict = Mock()
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to = Mock()
-        sconcemodel.cuda()
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to = Mock()
+        binkmodel.cuda()
 
-        self.assertTrue(sconcemodel.to.call_args[0][0] == 'cuda:' + str(111))
+        self.assertTrue(binkmodel.to.call_args[0][0] == 'cuda:' + str(111))
 
     def test_cuda_with_device(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
@@ -805,11 +805,11 @@ class TestSconce(TestCase):
         optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
         optimizer.load_state_dict = Mock()
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to = Mock()
-        sconcemodel.cuda(device='2')
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to = Mock()
+        binkmodel.cuda(device='2')
 
-        self.assertTrue(sconcemodel.to.call_args[0][0] == 'cuda:2')
+        self.assertTrue(binkmodel.to.call_args[0][0] == 'cuda:2')
 
     def test_cpu(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
@@ -818,11 +818,11 @@ class TestSconce(TestCase):
         optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
         optimizer.load_state_dict = Mock()
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.to = Mock()
-        sconcemodel.cpu()
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.to = Mock()
+        binkmodel.cpu()
 
-        self.assertTrue(sconcemodel.to.call_args[0][0] == 'cpu')
+        self.assertTrue(binkmodel.to.call_args[0][0] == 'cpu')
 
     def test_load_state_dict(self):
         key_words = {'strict': True}
@@ -835,10 +835,10 @@ class TestSconce(TestCase):
         optimizer.load_state_dict = Mock()
         optimizer_state = optimizer.state_dict()
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconce_state = sconcemodel.state_dict()
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        bink_state = binkmodel.state_dict()
 
-        sconcemodel.load_state_dict(sconce_state, **key_words)
+        binkmodel.load_state_dict(bink_state, **key_words)
 
         self.assertTrue(torchmodel.load_state_dict.call_args[0][0] == torch_state)
         self.assertTrue(optimizer.load_state_dict.call_args[0][0] == optimizer_state)
@@ -851,19 +851,19 @@ class TestSconce(TestCase):
         optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
         optimizer_state = optimizer.state_dict()
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconce_state = sconcemodel.state_dict()
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        bink_state = binkmodel.state_dict()
 
-        self.assertTrue(sconce_state[sconce.MODEL] == torchmodel_state)
-        self.assertTrue(sconce_state[sconce.OPTIMIZER] == optimizer_state)
+        self.assertTrue(bink_state[bink.MODEL] == torchmodel_state)
+        self.assertTrue(bink_state[bink.OPTIMIZER] == optimizer_state)
 
     def test_state_dict_kwargs(self):
         keywords = {'destination': None, 'prefix': '', 'keep_vars': False}
         torchmodel = MagicMock()
         optimizer = MagicMock()
 
-        sconcemodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
-        sconcemodel.state_dict(**keywords)
+        binkmodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        binkmodel.state_dict(**keywords)
 
         self.assertTrue(torchmodel.state_dict.call_args[1] == keywords)
         self.assertTrue(optimizer.state_dict.call_args[1] == {})

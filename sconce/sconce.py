@@ -5,19 +5,19 @@ from _warnings import warn
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-import sconce
-from sconce.cv_utils import get_train_valid_sets
-from sconce.callbacks.callbacks import CallbackList
-from sconce.callbacks.printer import Tqdm
-from sconce.callbacks.aggregate_predictions import AggregatePredictions
-from sconce import metrics as sconce_metrics
+import bink
+from bink.cv_utils import get_train_valid_sets
+from bink.callbacks.callbacks import CallbackList
+from bink.callbacks.printer import Tqdm
+from bink.callbacks.aggregate_predictions import AggregatePredictions
+from bink import metrics as bink_metrics
 
 
 class Model:
-    """ Sconcemodel to wrap base torch model and provide training environment around it
+    """ Binkmodel to wrap base torch model and provide training environment around it
     """
     def __init__(self, model, optimizer, loss_criterion, metrics=[]):
-        """ Create sconcemodel which wraps a base torchmodel and provides a training environment surrounding it
+        """ Create binkmodel which wraps a base torchmodel and provides a training environment surrounding it
 
         :param model: The base pytorch model
         :type model: torch.nn.Module
@@ -30,13 +30,13 @@ class Model:
         """
         super().__init__()
         self.main_state = {
-            sconce.MODEL: model,
-            sconce.CRITERION: loss_criterion,
-            sconce.OPTIMIZER: optimizer,
-            sconce.DEVICE: 'cpu',
-            sconce.DATA_TYPE: torch.float32,
-            sconce.METRIC_LIST: sconce_metrics.MetricList(metrics),
-            sconce.SELF: self
+            bink.MODEL: model,
+            bink.CRITERION: loss_criterion,
+            bink.OPTIMIZER: optimizer,
+            bink.DEVICE: 'cpu',
+            bink.DATA_TYPE: torch.float32,
+            bink.METRIC_LIST: bink_metrics.MetricList(metrics),
+            bink.SELF: self
         }
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
@@ -54,7 +54,7 @@ class Model:
         :type epochs: int
         :param verbose: If 1 use tqdm progress frontend, else display no training progress
         :type verbose: int
-        :param callbacks: The list of sconce callbacks to be called during training and validation
+        :param callbacks: The list of bink callbacks to be called during training and validation
         :type callbacks: list
         :param validation_split: Fraction of the training dataset to be set aside for validation testing
         :type validation_split: float
@@ -100,7 +100,7 @@ class Model:
         :type epochs: int
         :param verbose: If 1 use tqdm progress frontend, else display no training progress
         :type verbose: int
-        :param callbacks: The list of sconce callbacks to be called during training and validation
+        :param callbacks: The list of bink callbacks to be called during training and validation
         :type callbacks: list
         :param validation_generator: The validation data generator (usually a pytorch DataLoader)
         :type validation_generator: DataLoader
@@ -136,75 +136,75 @@ class Model:
 
         # Init state
         state = {
-            sconce.MAX_EPOCHS: epochs,
-            sconce.TRAIN_STEPS: train_steps,
-            sconce.BATCH: 0,
-            sconce.GENERATOR: generator,
-            sconce.STOP_TRAINING: False
+            bink.MAX_EPOCHS: epochs,
+            bink.TRAIN_STEPS: train_steps,
+            bink.BATCH: 0,
+            bink.GENERATOR: generator,
+            bink.STOP_TRAINING: False
         }
         state.update(self.main_state)
 
         _callbacks.on_start(state)
 
-        for state[sconce.EPOCH] in range(initial_epoch, epochs):
+        for state[bink.EPOCH] in range(initial_epoch, epochs):
             _callbacks.on_start_epoch(state)
 
-            state[sconce.TRAIN_ITERATOR] = iter(state[sconce.GENERATOR])
+            state[bink.TRAIN_ITERATOR] = iter(state[bink.GENERATOR])
             self.train()
 
             _callbacks.on_start_training(state)
-            state[sconce.METRIC_LIST].reset(state)
-            state[sconce.METRICS] = {}
+            state[bink.METRIC_LIST].reset(state)
+            state[bink.METRICS] = {}
 
-            for state[sconce.BATCH] in range(0, state[sconce.TRAIN_STEPS]):
+            for state[bink.BATCH] in range(0, state[bink.TRAIN_STEPS]):
                 # Extract batch
                 self._load_batch_standard('train', state)
                 _callbacks.on_sample(state)
 
                 # Zero grads
-                state[sconce.OPTIMIZER].zero_grad()
+                state[bink.OPTIMIZER].zero_grad()
 
                 # Forward pass
                 if pass_state:
-                    state[sconce.Y_PRED] = state[sconce.MODEL](state[sconce.X], state=state)
+                    state[bink.Y_PRED] = state[bink.MODEL](state[bink.X], state=state)
                 else:
-                    state[sconce.Y_PRED] = state[sconce.MODEL](state[sconce.X])
+                    state[bink.Y_PRED] = state[bink.MODEL](state[bink.X])
                 _callbacks.on_forward(state)
 
                 # Loss Calculation
-                state[sconce.LOSS] = state[sconce.CRITERION](state[sconce.Y_PRED], state[sconce.Y_TRUE])
+                state[bink.LOSS] = state[bink.CRITERION](state[bink.Y_PRED], state[bink.Y_TRUE])
 
                 _callbacks.on_criterion(state)
-                state[sconce.METRICS] = state[sconce.METRIC_LIST].process(state)
+                state[bink.METRICS] = state[bink.METRIC_LIST].process(state)
 
                 # Backwards pass
-                state[sconce.LOSS].backward()
+                state[bink.LOSS].backward()
                 _callbacks.on_backward(state)
 
                 # Update parameters
-                state[sconce.OPTIMIZER].step()
+                state[bink.OPTIMIZER].step()
                 _callbacks.on_step_training(state)
 
-                if state[sconce.STOP_TRAINING]:
+                if state[bink.STOP_TRAINING]:
                     break
 
-            state[sconce.METRICS].update(state[sconce.METRIC_LIST].process_final(state))
-            final_metrics = state[sconce.METRICS]
+            state[bink.METRICS].update(state[bink.METRIC_LIST].process_final(state))
+            final_metrics = state[bink.METRICS]
 
             _callbacks.on_end_training(state)
 
             # Validate
             if validation_generator is not None:
-                state[sconce.VALIDATION_GENERATOR] = validation_generator
-                state[sconce.VALIDATION_STEPS] = validation_steps
+                state[bink.VALIDATION_GENERATOR] = validation_generator
+                state[bink.VALIDATION_STEPS] = validation_steps
                 self.eval()
                 self._validate(state, _callbacks, pass_state)
 
-            final_metrics.update(state[sconce.METRICS])
-            state[sconce.METRICS] = final_metrics
+            final_metrics.update(state[bink.METRICS])
+            state[bink.METRICS] = final_metrics
             _callbacks.on_end_epoch(state)
 
-            if state[sconce.STOP_TRAINING]:
+            if state[bink.STOP_TRAINING]:
                 break
         _callbacks.on_end(state)
 
@@ -215,7 +215,7 @@ class Model:
 
         :param state: The current state context dictionary
         :type state: dict[str,any]
-        :param callbacks: The list of sconce callbacks to be called during training and validation
+        :param callbacks: The list of bink callbacks to be called during training and validation
         :type callbacks: CallbackList
         :param pass_state: If True the state dictionary is passed to the torch model forward method, if False only the input data is passed
         :type pass_state: bool
@@ -226,44 +226,44 @@ class Model:
         :rtype: dict[str,any]
         """
         with torch.no_grad():
-            state[sconce.METRIC_LIST].reset(state)
-            state[sconce.METRICS] = {}
+            state[bink.METRIC_LIST].reset(state)
+            state[bink.METRICS] = {}
 
 
-            if num_steps is None or num_steps > len(state[sconce.VALIDATION_GENERATOR]):
-                num_steps = len(state[sconce.VALIDATION_GENERATOR])
+            if num_steps is None or num_steps > len(state[bink.VALIDATION_GENERATOR]):
+                num_steps = len(state[bink.VALIDATION_GENERATOR])
             if not isinstance(num_steps, int):
                 num_steps = int(num_steps)
                 warnings.warn('Num test steps is not an int, converting to int.', Warning)
 
-            state[sconce.VALIDATION_STEPS] = num_steps
-            state[sconce.VALIDATION_ITERATOR] = iter(state[sconce.VALIDATION_GENERATOR])
+            state[bink.VALIDATION_STEPS] = num_steps
+            state[bink.VALIDATION_ITERATOR] = iter(state[bink.VALIDATION_GENERATOR])
 
             callbacks.on_start_validation(state)
 
-            for state[sconce.BATCH] in range(state[sconce.VALIDATION_STEPS]):
+            for state[bink.BATCH] in range(state[bink.VALIDATION_STEPS]):
                 # Load batch
                 batch_loader('validation', state)
                 callbacks.on_sample_validation(state)
 
                 # Forward pass
                 if pass_state:
-                    state[sconce.Y_PRED] = state[sconce.MODEL](state[sconce.X], state=state)
+                    state[bink.Y_PRED] = state[bink.MODEL](state[bink.X], state=state)
                 else:
-                    state[sconce.Y_PRED] = state[sconce.MODEL](state[sconce.X])
+                    state[bink.Y_PRED] = state[bink.MODEL](state[bink.X])
                 callbacks.on_forward_validation(state)
 
                 # Loss and metrics
-                if sconce.Y_TRUE in state:
-                    state[sconce.LOSS] = state[sconce.CRITERION](state[sconce.Y_PRED], state[sconce.Y_TRUE])
-                    state[sconce.METRICS] = state[sconce.METRIC_LIST].process(state)
+                if bink.Y_TRUE in state:
+                    state[bink.LOSS] = state[bink.CRITERION](state[bink.Y_PRED], state[bink.Y_TRUE])
+                    state[bink.METRICS] = state[bink.METRIC_LIST].process(state)
 
                 callbacks.on_step_validation(state)
-                if state[sconce.STOP_TRAINING]:
+                if state[bink.STOP_TRAINING]:
                     break
 
-            if sconce.Y_TRUE in state:
-                state[sconce.METRICS].update(state[sconce.METRIC_LIST].process_final(state))
+            if bink.Y_TRUE in state:
+                state[bink.METRICS].update(state[bink.METRIC_LIST].process_final(state))
             callbacks.on_end_validation(state)
 
         return state
@@ -272,14 +272,14 @@ class Model:
         """ Perform a validation loop
 
         :param state: The current context state dictionary
-        :param _callbacks: The list of sconce callbacks to be called during validation loop
+        :param _callbacks: The list of bink callbacks to be called during validation loop
         :type callbacks: CallbackList
         :param pass_state: If True the state dictionary is passed to the torch model forward method, if False only the input data is passed
         :type pass_state: bool
         :return: None
         :rtype: None
         """
-        self._test_loop(state, _callbacks, pass_state, self._load_batch_standard, state[sconce.VALIDATION_STEPS])
+        self._test_loop(state, _callbacks, pass_state, self._load_batch_standard, state[bink.VALIDATION_STEPS])
 
     def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None, pass_state=False):
         """ Perform an evaluation loop on given data and label tensors to evaluate metrics
@@ -317,7 +317,7 @@ class Model:
         :rtype: dict[str,any]
         """
 
-        state = {sconce.EPOCH: 0, sconce.MAX_EPOCHS: 1, sconce.STOP_TRAINING: False, sconce.VALIDATION_GENERATOR: generator}
+        state = {bink.EPOCH: 0, bink.MAX_EPOCHS: 1, bink.STOP_TRAINING: False, bink.VALIDATION_GENERATOR: generator}
         state.update(self.main_state)
 
         _callbacks = []
@@ -325,7 +325,7 @@ class Model:
             _callbacks.append(Tqdm('e'))
         self._test_loop(state, CallbackList(_callbacks), pass_state, self._load_batch_standard, steps)
 
-        return state[sconce.METRICS]
+        return state[bink.METRICS]
 
     def predict(self, x=None, batch_size=None, verbose=1, steps=None, pass_state=False):
         """ Perform a prediction loop on given data tensor to predict labels
@@ -360,7 +360,7 @@ class Model:
         :return: Tensor of final predicted labels
         :rtype: torch.Tensor
         """
-        state = {sconce.EPOCH: 0, sconce.MAX_EPOCHS: 1, sconce.STOP_TRAINING: False, sconce.VALIDATION_GENERATOR: generator}
+        state = {bink.EPOCH: 0, bink.MAX_EPOCHS: 1, bink.STOP_TRAINING: False, bink.VALIDATION_GENERATOR: generator}
         state.update(self.main_state)
 
         _callbacks = [AggregatePredictions()]
@@ -368,31 +368,31 @@ class Model:
             _callbacks.append(Tqdm('p'))
         self._test_loop(state, CallbackList(_callbacks), pass_state, self._load_batch_predict, steps)
 
-        return state[sconce.FINAL_PREDICTIONS]
+        return state[bink.FINAL_PREDICTIONS]
 
     def train(self):
         """ Set model and metrics to training mode
         """
-        self.main_state[sconce.MODEL].train()
-        self.main_state[sconce.METRIC_LIST].train()
+        self.main_state[bink.MODEL].train()
+        self.main_state[bink.METRIC_LIST].train()
 
     def eval(self):
         """ Set model and metrics to evaluation mode
         """
-        self.main_state[sconce.MODEL].eval()
-        self.main_state[sconce.METRIC_LIST].eval()
+        self.main_state[bink.MODEL].eval()
+        self.main_state[bink.METRIC_LIST].eval()
 
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
 
         :param args: See: `torch.nn.Module.to <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to>`_
         :param kwargs: See: `torch.nn.Module.to <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to>`_
-        :return: Self sconcemodel
+        :return: Self binkmodel
         :rtype: Model
         """
-        self.main_state[sconce.MODEL].to(*args, **kwargs)
+        self.main_state[bink.MODEL].to(*args, **kwargs)
 
-        for state in self.main_state[sconce.OPTIMIZER].state.values():
+        for state in self.main_state[bink.OPTIMIZER].state.values():
             for k, v in state.items():
                 if torch.is_tensor(v):
                     state[k] = v.to(*args, **kwargs)
@@ -406,7 +406,7 @@ class Model:
 
         :param device: if specified, all parameters will be copied to that device
         :type device: int, optional
-        :return: Self sconcemodel
+        :return: Self binkmodel
         :rtype: Model
         """
         if device is None:
@@ -416,7 +416,7 @@ class Model:
     def cpu(self):
         """ Moves all model parameters and buffers to the CPU.
 
-        :return: Self sconcemodel
+        :return: Self binkmodel
         :rtype: Model
         """
         return self.to('cpu')
@@ -428,8 +428,8 @@ class Model:
         :type state_dict: dict
         :param kwargs: See: `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.load_state_dict>`_
         """
-        self.main_state[sconce.MODEL].load_state_dict(state_dict[sconce.MODEL], **kwargs)
-        self.main_state[sconce.OPTIMIZER].load_state_dict(state_dict[sconce.OPTIMIZER])
+        self.main_state[bink.MODEL].load_state_dict(state_dict[bink.MODEL], **kwargs)
+        self.main_state[bink.OPTIMIZER].load_state_dict(state_dict[bink.OPTIMIZER])
 
     def state_dict(self, **kwargs):
         """
@@ -439,8 +439,8 @@ class Model:
         :rtype: dict
         """
         state_dict = {
-            sconce.MODEL: self.main_state[sconce.MODEL].state_dict(**kwargs),
-            sconce.OPTIMIZER: self.main_state[sconce.OPTIMIZER].state_dict()
+            bink.MODEL: self.main_state[bink.MODEL].state_dict(**kwargs),
+            bink.OPTIMIZER: self.main_state[bink.OPTIMIZER].state_dict()
         }
         return state_dict
 
@@ -481,7 +481,7 @@ class Model:
         :param state: The current state dict of the :class:`Model`.
         :type state: dict[str,any]
         """
-        state[sconce.X], state[sconce.Y_TRUE] = Model._deep_to(next(state[iterator + '_iterator']), state[sconce.DEVICE], state[sconce.DATA_TYPE])
+        state[bink.X], state[bink.Y_TRUE] = Model._deep_to(next(state[iterator + '_iterator']), state[bink.DEVICE], state[bink.DATA_TYPE])
 
     @staticmethod
     def _load_batch_predict(iterator, state):
@@ -492,11 +492,11 @@ class Model:
         :param state: The current state dict of the :class:`Model`.
         :type state: dict[str,any]
         """
-        data = Model._deep_to(next(state[iterator + '_iterator']), state[sconce.DEVICE], state[sconce.DATA_TYPE])
+        data = Model._deep_to(next(state[iterator + '_iterator']), state[bink.DEVICE], state[bink.DATA_TYPE])
         if isinstance(data, list) or isinstance(data, tuple):
-            state[sconce.X], state[sconce.Y_TRUE] = data
+            state[bink.X], state[bink.Y_TRUE] = data
         else:
-            state[sconce.X] = data
+            state[bink.X] = data
 
     @staticmethod
     def _update_device_and_dtype_from_args(main_state, *args, **kwargs):
@@ -510,15 +510,15 @@ class Model:
         :rtype: dict[str,any]
         """
         for key, val in kwargs.items():
-            if key == sconce.DATA_TYPE:
-                main_state[sconce.DATA_TYPE] = kwargs[sconce.DATA_TYPE]
-            elif sconce.DEVICE in kwargs:
-                main_state[sconce.DEVICE] = kwargs[sconce.DEVICE]
+            if key == bink.DATA_TYPE:
+                main_state[bink.DATA_TYPE] = kwargs[bink.DATA_TYPE]
+            elif bink.DEVICE in kwargs:
+                main_state[bink.DEVICE] = kwargs[bink.DEVICE]
 
         for arg in args:
             if isinstance(arg, torch.dtype):
-                main_state[sconce.DATA_TYPE] = arg
+                main_state[bink.DATA_TYPE] = arg
             else:
-                main_state[sconce.DEVICE] = arg
+                main_state[bink.DEVICE] = arg
 
         return main_state

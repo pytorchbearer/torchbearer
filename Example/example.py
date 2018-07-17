@@ -7,9 +7,9 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
 from Example import inception_network as nm
-from sconce import Model
-from sconce.metrics import RocAucScore
-from sconce.callbacks import EarlyStopping, TensorBoard, L2WeightDecay, L1WeightDecay
+from bink import Model
+from bink.metrics import RocAucScore
+from bink.callbacks import EarlyStopping, TensorBoard, L2WeightDecay, L1WeightDecay
 
 ####### Paths #######
 dataset_path = '/home/matt/datasets/cifar'

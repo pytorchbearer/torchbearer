@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch, mock_open
 
-import sconce
-from sconce.callbacks import CSVLogger
+import bink
+from bink.callbacks import CSVLogger
 
 
 class TestCSVLogger(TestCase):
@@ -10,9 +10,9 @@ class TestCSVLogger(TestCase):
     @patch("builtins.open", new_callable=mock_open)
     def test_write_header(self, mock_open):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
 
         logger = CSVLogger('test_file.log')
@@ -26,9 +26,9 @@ class TestCSVLogger(TestCase):
     @patch("builtins.open", new_callable=mock_open)
     def test_write_no_header(self, mock_open):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
 
         logger = CSVLogger('test_file.log', write_header=False)
@@ -42,9 +42,9 @@ class TestCSVLogger(TestCase):
     @patch("builtins.open", new_callable=mock_open)
     def test_csv_closed(self, mock_open):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
 
         logger = CSVLogger('test_file.log', write_header=False)
@@ -58,9 +58,9 @@ class TestCSVLogger(TestCase):
     @patch("builtins.open", new_callable=mock_open)
     def test_append(self, mock_open):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
 
         logger = CSVLogger('test_file.log', append=True)
@@ -74,9 +74,9 @@ class TestCSVLogger(TestCase):
     @patch("builtins.open", new_callable=mock_open)
     def test_get_field_dict(self, mock_open):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
         correct_fields_dict = {
             'epoch': 0,
@@ -91,13 +91,13 @@ class TestCSVLogger(TestCase):
 
         self.assertDictEqual(logger_fields_dict, correct_fields_dict)
 
-    @patch('sconce.callbacks.CSVLogger._write_to_dict')
+    @patch('bink.callbacks.CSVLogger._write_to_dict')
     @patch("builtins.open", new_callable=mock_open)
     def test_write_on_epoch(self, mock_open, mock_write):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
 
         logger = CSVLogger('test_file.log')
@@ -108,13 +108,13 @@ class TestCSVLogger(TestCase):
 
         mock_write.assert_called_once()
 
-    @patch('sconce.callbacks.CSVLogger._write_to_dict')
+    @patch('bink.callbacks.CSVLogger._write_to_dict')
     @patch("builtins.open", new_callable=mock_open)
     def test_batch_granularity(self, mock_open, mock_write):
         state = {
-            sconce.EPOCH: 0,
-            sconce.BATCH: 1,
-            sconce.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
+            bink.EPOCH: 0,
+            bink.BATCH: 1,
+            bink.METRICS: {'test_metric_1': 0.1, 'test_metric_2': 5}
         }
 
         logger = CSVLogger('test_file.log', batch_granularity=True)

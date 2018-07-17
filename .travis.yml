@@ -7,6 +7,6 @@ install:
   - python setup.py develop
 # command to run tests
 script:
-  - nosetests tests -v --with-coverage --cover-package=sconce
+  - nosetests tests -v --with-coverage --cover-package=bink
 after_success:
   - bash <(curl -s https://codecov.io/bash)
