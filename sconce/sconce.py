@@ -401,7 +401,7 @@ class Model:
 
         return self
 
-    def cuda(self, device=torch.cuda.current_device()):
+    def cuda(self, device=None):
         """ Moves all model parameters and buffers to the GPU.
 
         :param device: if specified, all parameters will be copied to that device
@@ -409,6 +409,8 @@ class Model:
         :return: Self sconcemodel
         :rtype: Model
         """
+        if device is None:
+            device = torch.cuda.current_device()
         return self.to('cuda:' + str(device))
 
     def cpu(self):
