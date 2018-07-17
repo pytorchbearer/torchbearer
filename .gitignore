@@ -102,5 +102,5 @@ ENV/
 
 .idea
 
-# Ignore example.py
-Example/
+# Ignore examples/data
+examples/data
