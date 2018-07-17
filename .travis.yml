@@ -9,4 +9,4 @@ install:
 script:
   - nosetests tests -v --with-coverage --cover-package=sconce
 after_success:
-  - bash < (curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
