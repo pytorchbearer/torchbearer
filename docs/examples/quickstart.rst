@@ -8,7 +8,7 @@ Defining the Model
 
 Let's get using torchbearer. Here's some data from Cifar10 and a simple 3 layer strided CNN:
 
-.. literalinclude:: ../../examples/quickstart.py
+.. literalinclude:: /_static/examples/quickstart.py
    :language: python
    :lines: 7-45
 
@@ -18,7 +18,7 @@ Instead, with torchbearer, we can define our optimiser and some metrics (just 'a
 Training on Cifar10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. literalinclude:: ../../examples/quickstart.py
+.. literalinclude:: /_static/examples/quickstart.py
    :lines: 47-53
 
 Running the above produces the following output:
@@ -53,5 +53,5 @@ Source Code
 
 The source code for the example is given below:
 
- :download:`Download Python source code: quickstart.py </_static/codes/quickstart.py>`
+ :download:`Download Python source code: quickstart.py </_static/examples/quickstart.py>`
 
