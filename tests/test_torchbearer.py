@@ -690,6 +690,28 @@ class TestTorchbearer(TestCase):
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 1)
 
+    def test_train(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
+        optimizer = MagicMock()
+        metric_list = MagicMock()
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state = {torchbearer.MODEL: torchmodel, torchbearer.METRIC_LIST: metric_list}
+        torchbearermodel.train()
+        self.assertTrue(torchbearermodel.main_state[torchbearer.MODEL].training == True)
+        torchbearermodel.main_state[torchbearer.METRIC_LIST].train.assert_called_once()
+
+    def test_eval(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
+        optimizer = MagicMock()
+        metric_list = MagicMock()
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state = {torchbearer.MODEL: torchmodel, torchbearer.METRIC_LIST: metric_list}
+        torchbearermodel.eval()
+        self.assertTrue(torchbearermodel.main_state[torchbearer.MODEL].training == False)
+        torchbearermodel.main_state[torchbearer.METRIC_LIST].eval.assert_called_once()
+
     def test_to_both_args(self):
         dev = 'cuda:1'
         dtype = torch.float16
@@ -923,3 +945,4 @@ class TestTorchbearer(TestCase):
         Model._load_batch_predict('training', state)
         self.assertTrue(state['x'].item() == items[0][0].item())
         self.assertTrue(state['y_true'].item() == items[0][1].item())
+
