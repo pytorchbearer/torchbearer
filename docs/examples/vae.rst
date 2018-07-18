@@ -108,7 +108,7 @@ The visualised results after ten epochs then look like this:
    :scale: 200 %
    :alt: VAE reconstructions after 10 epochs of mnist
 
-Source
+Source Code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The source code for the example are given below:
