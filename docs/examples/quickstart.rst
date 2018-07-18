@@ -1,19 +1,19 @@
 Quickstart Guide
 ====================================
 
-This guide will give a quick intro to training PyTorch models with PyBink. We'll start by loading in some data and defining a model, then we'll train it for a few epochs and see how well it does.
+This guide will give a quick intro to training PyTorch models with torchbearer. We'll start by loading in some data and defining a model, then we'll train it for a few epochs and see how well it does.
 
 Defining the Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's get using bink. Here's some data from Cifar10 and a simple 3 layer strided CNN:
+Let's get using torchbearer. Here's some data from Cifar10 and a simple 3 layer strided CNN:
 
 .. literalinclude:: ../../examples/quickstart.py
    :language: python
    :lines: 7-45
 
 Typically we would need a training loop and a series of calls to backward, step etc.
-Instead, with bink, we can define our optimiser and some metrics (just 'acc' and 'loss' for now) and let it do the work.
+Instead, with torchbearer, we can define our optimiser and some metrics (just 'acc' and 'loss' for now) and let it do the work.
 
 Training on Cifar10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

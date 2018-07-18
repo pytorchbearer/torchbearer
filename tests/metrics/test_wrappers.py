@@ -4,8 +4,8 @@ from unittest.mock import Mock, call
 
 from torch.autograd import Variable
 
-import bink
-from bink.metrics import Std, Metric, Mean, BatchLambda, EpochLambda
+import torchbearer
+from torchbearer.metrics import Std, Metric, Mean, BatchLambda, EpochLambda
 
 import torch
 
@@ -68,16 +68,16 @@ class TestBatchLambda(unittest.TestCase):
     def setUp(self):
         self._metric_function = Mock(return_value='test')
         self._metric = BatchLambda('test', self._metric_function)
-        self._states = [{bink.Y_TRUE: Variable(torch.FloatTensor([1])), bink.Y_PRED: Variable(torch.FloatTensor([2]))},
-                        {bink.Y_TRUE: Variable(torch.FloatTensor([3])), bink.Y_PRED: Variable(torch.FloatTensor([4]))},
-                        {bink.Y_TRUE: Variable(torch.FloatTensor([5])), bink.Y_PRED: Variable(torch.FloatTensor([6]))}]
+        self._states = [{torchbearer.Y_TRUE: Variable(torch.FloatTensor([1])), torchbearer.Y_PRED: Variable(torch.FloatTensor([2]))},
+                        {torchbearer.Y_TRUE: Variable(torch.FloatTensor([3])), torchbearer.Y_PRED: Variable(torch.FloatTensor([4]))},
+                        {torchbearer.Y_TRUE: Variable(torch.FloatTensor([5])), torchbearer.Y_PRED: Variable(torch.FloatTensor([6]))}]
 
     def test_train(self):
         self._metric.train()
         calls = []
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
-            calls.append(call(self._states[i][bink.Y_PRED].data, self._states[i][bink.Y_TRUE].data))
+            calls.append(call(self._states[i][torchbearer.Y_PRED].data, self._states[i][torchbearer.Y_TRUE].data))
         self._metric_function.assert_has_calls(calls)
 
     def test_validate(self):
@@ -85,7 +85,7 @@ class TestBatchLambda(unittest.TestCase):
         calls = []
         for i in range(len(self._states)):
             self._metric.process(self._states[i])
-            calls.append(call(self._states[i][bink.Y_PRED].data, self._states[i][bink.Y_TRUE].data))
+            calls.append(call(self._states[i][torchbearer.Y_PRED].data, self._states[i][torchbearer.Y_TRUE].data))
         self._metric_function.assert_has_calls(calls)
 
 
@@ -93,12 +93,12 @@ class TestEpochLambda(unittest.TestCase):
     def setUp(self):
         self._metric_function = Mock(return_value='test')
         self._metric = EpochLambda('test', self._metric_function, step_size=3)
-        self._metric.reset({bink.DEVICE: 'cpu', bink.DATA_TYPE: torch.float32})
-        self._states = [{bink.BATCH: 0, bink.Y_TRUE: torch.LongTensor([0]), bink.Y_PRED: torch.FloatTensor([0.0]), bink.DEVICE: 'cpu'},
-                        {bink.BATCH: 1, bink.Y_TRUE: torch.LongTensor([1]), bink.Y_PRED: torch.FloatTensor([0.1]), bink.DEVICE: 'cpu'},
-                        {bink.BATCH: 2, bink.Y_TRUE: torch.LongTensor([2]), bink.Y_PRED: torch.FloatTensor([0.2]), bink.DEVICE: 'cpu'},
-                        {bink.BATCH: 3, bink.Y_TRUE: torch.LongTensor([3]), bink.Y_PRED: torch.FloatTensor([0.3]), bink.DEVICE: 'cpu'},
-                        {bink.BATCH: 4, bink.Y_TRUE: torch.LongTensor([4]), bink.Y_PRED: torch.FloatTensor([0.4]), bink.DEVICE: 'cpu'}]
+        self._metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
+        self._states = [{torchbearer.BATCH: 0, torchbearer.Y_TRUE: torch.LongTensor([0]), torchbearer.Y_PRED: torch.FloatTensor([0.0]), torchbearer.DEVICE: 'cpu'},
+                        {torchbearer.BATCH: 1, torchbearer.Y_TRUE: torch.LongTensor([1]), torchbearer.Y_PRED: torch.FloatTensor([0.1]), torchbearer.DEVICE: 'cpu'},
+                        {torchbearer.BATCH: 2, torchbearer.Y_TRUE: torch.LongTensor([2]), torchbearer.Y_PRED: torch.FloatTensor([0.2]), torchbearer.DEVICE: 'cpu'},
+                        {torchbearer.BATCH: 3, torchbearer.Y_TRUE: torch.LongTensor([3]), torchbearer.Y_PRED: torch.FloatTensor([0.3]), torchbearer.DEVICE: 'cpu'},
+                        {torchbearer.BATCH: 4, torchbearer.Y_TRUE: torch.LongTensor([4]), torchbearer.Y_PRED: torch.FloatTensor([0.4]), torchbearer.DEVICE: 'cpu'}]
 
     def test_train(self):
         self._metric.train()

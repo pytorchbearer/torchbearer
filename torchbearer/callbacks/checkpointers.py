@@ -1,8 +1,8 @@
-import bink
+import torchbearer
 
 import torch
 
-from bink.callbacks.callbacks import Callback
+from torchbearer.callbacks.callbacks import Callback
 import os
 
 
@@ -22,11 +22,11 @@ class _Checkpointer(Callback):
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
         state = {}
         state.update(model_state)
-        state.update(model_state[bink.METRICS])
+        state.update(model_state[torchbearer.METRICS])
 
         filepath = self.fileformat.format(**state)
 
-        torch.save(model_state[bink.SELF].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
+        torch.save(model_state[torchbearer.SELF].state_dict(), filepath, pickle_module=self.pickle_module, pickle_protocol=self.pickle_protocol)
 
         if self.most_recent is not None and overwrite_most_recent:
             os.remove(self.most_recent)
@@ -42,7 +42,7 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
     For example: if `filepath` is `weights.{epoch:02d}-{val_loss:.2f}`,
     then the model checkpoints will be saved with the epoch number and
     the validation loss in the filename. The torch model will be saved to filename.pt
-    and the binkmodel state will be saved to filename.bink.
+    and the torchbearermodel state will be saved to filename.torchbearer.
 
     :param filepath: Path to save the model file
     :type filepath: str
@@ -144,7 +144,7 @@ class Best(_Checkpointer):
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
 
-            current = model_state[bink.METRICS][self.monitor]
+            current = model_state[torchbearer.METRICS][self.monitor]
 
             if self.monitor_op(current, self.best):
                 self.best = current

@@ -1,4 +1,4 @@
-from bink import metrics
+from torchbearer import metrics
 from abc import ABCMeta, abstractmethod
 from collections import deque
 

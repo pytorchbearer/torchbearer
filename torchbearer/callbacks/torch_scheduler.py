@@ -1,6 +1,6 @@
-import bink
+import torchbearer
 
-from bink.callbacks import Callback
+from torchbearer.callbacks import Callback
 
 import torch
 
@@ -13,7 +13,7 @@ class TorchScheduler(Callback):
         self._step_on_batch = step_on_batch
 
     def on_start(self, state):
-        self._scheduler = self._scheduler_builder(state[bink.OPTIMIZER])
+        self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER])
 
     def on_sample(self, state):
         if self._step_on_batch and self._monitor is None:
@@ -21,15 +21,15 @@ class TorchScheduler(Callback):
 
     def on_step_training(self, state):
         if self._step_on_batch and self._monitor is not None:
-            self._scheduler.step(state[bink.METRICS][self._monitor])
+            self._scheduler.step(state[torchbearer.METRICS][self._monitor])
 
     def on_start_training(self, state):
         if not self._step_on_batch and self._monitor is None:
-            self._scheduler.step(epoch=state[bink.EPOCH])
+            self._scheduler.step(epoch=state[torchbearer.EPOCH])
 
     def on_end_epoch(self, state):
         if not self._step_on_batch and self._monitor is not None:
-            self._scheduler.step(state[bink.METRICS][self._monitor], epoch=state[bink.EPOCH])
+            self._scheduler.step(state[torchbearer.METRICS][self._monitor], epoch=state[torchbearer.EPOCH])
 
 
 class LambdaLR(TorchScheduler):

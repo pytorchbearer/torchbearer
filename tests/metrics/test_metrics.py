@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from bink.metrics import MetricList, Metric
+from torchbearer.metrics import MetricList, Metric
 
 
 class TestMetricList(unittest.TestCase):

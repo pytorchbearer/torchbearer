@@ -1,15 +1,15 @@
 import unittest
 
-import bink
+import torchbearer
 
 
 class TestStateKey(unittest.TestCase):
     def test_key_added(self):
-        key = bink.state_key('key')
+        key = torchbearer.state_key('key')
 
-        self.assertTrue(key in bink.STATE_KEYS)
+        self.assertTrue(key in torchbearer.STATE_KEYS)
 
     def test_duplicate(self):
-        key = bink.state_key(bink.MODEL)
+        key = torchbearer.state_key(torchbearer.MODEL)
 
-        self.assertTrue(bink.MODEL != key)
+        self.assertTrue(torchbearer.MODEL != key)

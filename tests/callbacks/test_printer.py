@@ -1,14 +1,14 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-import bink
-from bink.callbacks import Tqdm, ConsolePrinter
+import torchbearer
+from torchbearer.callbacks import Tqdm, ConsolePrinter
 
 
 class TestConsolePrinter(TestCase):
     @patch('builtins.print')
     def test_console_printer(self, mock_print):
-        state = {bink.BATCH: 5, bink.EPOCH: 1, bink.MAX_EPOCHS: 10, bink.TRAIN_STEPS: 100, bink.VALIDATION_STEPS: 101, bink.METRICS: {'test': 0.9945}}
+        state = {torchbearer.BATCH: 5, torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100, torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: {'test': 0.9945}}
         printer = ConsolePrinter(validation_label_letter='e')
 
         printer.on_step_training(state)
@@ -29,14 +29,14 @@ class TestConsolePrinter(TestCase):
 
 
 class TestTqdm(TestCase):
-    @patch("bink.callbacks.printer.tqdm")
+    @patch("torchbearer.callbacks.printer.tqdm")
     def test_tqdm(self, mock_tqdm):
         mock_tqdm.return_value = Mock()
         mock_tqdm.return_value.set_postfix = Mock()
         mock_tqdm.return_value.close = Mock()
         mock_tqdm.return_value.update = Mock()
 
-        state = {bink.EPOCH: 1, bink.MAX_EPOCHS: 10, bink.TRAIN_STEPS: 100, bink.VALIDATION_STEPS: 101, bink.METRICS: 'test'}
+        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100, torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: 'test'}
         tqdm = Tqdm(validation_label_letter='e')
 
         tqdm.on_start_training(state)

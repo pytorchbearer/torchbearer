@@ -1,14 +1,14 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-import bink
-from bink.callbacks import TorchScheduler, LambdaLR, StepLR, MultiStepLR, ExponentialLR, CosineAnnealingLR,\
+import torchbearer
+from torchbearer.callbacks import TorchScheduler, LambdaLR, StepLR, MultiStepLR, ExponentialLR, CosineAnnealingLR,\
     ReduceLROnPlateau
 
 
 class TestTorchScheduler(TestCase):
     def test_torch_scheduler_on_batch_with_monitor(self):
-        state = {bink.EPOCH: 1, bink.METRICS: {'test': 101}, bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer'}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -35,7 +35,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_epoch_with_monitor(self):
-        state = {bink.EPOCH: 1, bink.METRICS: {'test': 101}, bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer'}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -62,7 +62,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_batch_no_monitor(self):
-        state = {bink.EPOCH: 1, bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer'}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -89,7 +89,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_epoch_no_monitor(self):
-        state = {bink.EPOCH: 1, bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer'}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -119,7 +119,7 @@ class TestTorchScheduler(TestCase):
 class TestLambdaLR(TestCase):
     @patch('torch.optim.lr_scheduler.LambdaLR')
     def test_lambda_lr(self, lr_mock):
-        state = {bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = LambdaLR(0.1, last_epoch=-4, step_on_batch='batch')
         scheduler.on_start(state)
@@ -131,7 +131,7 @@ class TestLambdaLR(TestCase):
 class TestStepLR(TestCase):
     @patch('torch.optim.lr_scheduler.StepLR')
     def test_lambda_lr(self, lr_mock):
-        state = {bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = StepLR(10, gamma=0.4, last_epoch=-4, step_on_batch='batch')
         scheduler.on_start(state)
@@ -143,7 +143,7 @@ class TestStepLR(TestCase):
 class TestMultiStepLR(TestCase):
     @patch('torch.optim.lr_scheduler.MultiStepLR')
     def test_lambda_lr(self, lr_mock):
-        state = {bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = MultiStepLR(10, gamma=0.4, last_epoch=-4, step_on_batch='batch')
         scheduler.on_start(state)
@@ -155,7 +155,7 @@ class TestMultiStepLR(TestCase):
 class TestExponentialLR(TestCase):
     @patch('torch.optim.lr_scheduler.ExponentialLR')
     def test_lambda_lr(self, lr_mock):
-        state = {bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = ExponentialLR(0.4, last_epoch=-4, step_on_batch='batch')
         scheduler.on_start(state)
@@ -167,7 +167,7 @@ class TestExponentialLR(TestCase):
 class TestCosineAnnealingLR(TestCase):
     @patch('torch.optim.lr_scheduler.CosineAnnealingLR')
     def test_lambda_lr(self, lr_mock):
-        state = {bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = CosineAnnealingLR(4, eta_min=10, last_epoch=-4, step_on_batch='batch')
         scheduler.on_start(state)
@@ -179,7 +179,7 @@ class TestCosineAnnealingLR(TestCase):
 class TestReduceLROnPlateau(TestCase):
     @patch('torch.optim.lr_scheduler.ReduceLROnPlateau')
     def test_lambda_lr(self, lr_mock):
-        state = {bink.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = ReduceLROnPlateau(monitor='test', mode='max', factor=0.2, patience=100, verbose=True, threshold=10,
                                       threshold_mode='thresh', cooldown=5, min_lr=0.1, eps=1e-4, step_on_batch='batch')

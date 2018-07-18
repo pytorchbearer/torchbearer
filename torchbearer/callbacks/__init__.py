@@ -1,62 +1,62 @@
 """
-..  automodule:: bink.callbacks.callbacks
+..  automodule:: torchbearer.callbacks.callbacks
         :members:
         :undoc-members:
 
 Model Checkpointers
 ------------------------------------
 
-..  automodule:: bink.callbacks.checkpointers
+..  automodule:: torchbearer.callbacks.checkpointers
         :members:
         :undoc-members:
 
 Logging
 ------------------------------------
 
-..  automodule:: bink.callbacks.csv_logger
+..  automodule:: torchbearer.callbacks.csv_logger
         :members:
         :undoc-members:
 
-..  automodule:: bink.callbacks.printer
+..  automodule:: torchbearer.callbacks.printer
         :members:
         :undoc-members:
 
 Tensorboard
 ------------------------------------
 
-..  automodule:: bink.callbacks.tensor_board
+..  automodule:: torchbearer.callbacks.tensor_board
         :members:
         :undoc-members:
 
 Early Stopping
 ------------------------------------
 
-..  automodule:: bink.callbacks.early_stopping
+..  automodule:: torchbearer.callbacks.early_stopping
         :members:
         :undoc-members:
 
-..  automodule:: bink.callbacks.terminate_on_nan
+..  automodule:: torchbearer.callbacks.terminate_on_nan
         :members:
         :undoc-members:
 
 Gradient Clipping
 ------------------------------------
 
-..  automodule:: bink.callbacks.gradient_clipping
+..  automodule:: torchbearer.callbacks.gradient_clipping
         :members:
         :undoc-members:
 
 Learning Rate Schedulers
 ------------------------------------
 
-..  automodule:: bink.callbacks.torch_scheduler
+..  automodule:: torchbearer.callbacks.torch_scheduler
         :members:
         :undoc-members:
 
 Weight Decay
 ------------------------------------
 
-..  automodule:: bink.callbacks.weight_decay
+..  automodule:: torchbearer.callbacks.weight_decay
         :members:
         :undoc-members:
 """

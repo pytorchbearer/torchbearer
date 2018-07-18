@@ -1,6 +1,6 @@
-import bink
+import torchbearer
 
-from bink.callbacks import Callback
+from torchbearer.callbacks import Callback
 
 import torch
 
@@ -29,7 +29,7 @@ class GradientNormClipping(Callback):
         :type state: dict
         """
         if self.params is None:
-            self.params = filter(lambda p: p.requires_grad, state[bink.MODEL].parameters())
+            self.params = filter(lambda p: p.requires_grad, state[torchbearer.MODEL].parameters())
 
     def on_backward(self, state):
         """Between the backward pass (which computes the gradients) and the step call (which updates the parameters),
@@ -64,7 +64,7 @@ class GradientClipping(Callback):
         :type state: dict
         """
         if self.params is None:
-            self.params = filter(lambda p: p.requires_grad, state[bink.MODEL].parameters())
+            self.params = filter(lambda p: p.requires_grad, state[torchbearer.MODEL].parameters())
 
     def on_backward(self, state):
         """Between the backward pass (which computes the gradients) and the step call (which updates the parameters),

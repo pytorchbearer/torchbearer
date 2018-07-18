@@ -1,4 +1,4 @@
-from bink import metrics
+from torchbearer import metrics
 
 import sklearn.metrics
 import numpy as np
