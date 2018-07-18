@@ -98,7 +98,7 @@ class TensorBoard(Callback):
 
 
 class TensorBoardImages(Callback):
-    """The TensorBoardImages callback will write a selection of img from the validation pass to tensorboard using the
+    """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
     TensorboardX library and torchvision.utils.make_grid
     """
 
@@ -114,7 +114,7 @@ class TensorBoardImages(Callback):
                  range=None,
                  scale_each=False,
                  pad_value=0):
-        """Create TensorBoardImages callback which writes img from the given key to the given path. Full name of
+        """Create TensorBoardImages callback which writes images from the given key to the given path. Full name of
         image sub directory will be model name + _ + comment.
 
         :param log_dir: The tensorboard log path for output
@@ -127,7 +127,7 @@ class TensorBoardImages(Callback):
         :type key: str
         :param write_each_epoch: If True, write data on every epoch, else write only for the first epoch.
         :type write_each_epoch: bool
-        :param num_images: The number of img to write
+        :param num_images: The number of images to write
         :type num_images: int
         :param nrow: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
         :param padding: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
@@ -199,7 +199,7 @@ class TensorBoardImages(Callback):
 
 
 class TensorBoardProjector(Callback):
-    """The TensorBoardProjector callback is used to write img from the validation pass to Tensorboard using the
+    """The TensorBoardProjector callback is used to write images from the validation pass to Tensorboard using the
     TensorboardX library.
     """
 
@@ -218,7 +218,7 @@ class TensorBoardProjector(Callback):
         :type log_dir: str
         :param comment: Descriptive comment to append to path
         :type comment: str
-        :param num_images: The number of img to write
+        :param num_images: The number of images to write
         :type num_images: int
         :param avg_pool_size: Size of the average pool to perform on the image. This is recommended to reduce the
         overall image sizes and improve latency
