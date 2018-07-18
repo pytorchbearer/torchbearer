@@ -1,24 +1,24 @@
 Quickstart Guide
 ====================================
 
-This guide will give a quick intro to training PyTorch models with PyBink. We'll start by loading in some data and defining a model, then we'll train it for a few epochs and see how well it does.
+This guide will give a quick intro to training PyTorch models with torchbearer. We'll start by loading in some data and defining a model, then we'll train it for a few epochs and see how well it does.
 
 Defining the Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's get using bink. Here's some data from Cifar10 and a simple 3 layer strided CNN:
+Let's get using torchbearer. Here's some data from Cifar10 and a simple 3 layer strided CNN:
 
-.. literalinclude:: ../../examples/quickstart.py
+.. literalinclude:: /_static/examples/quickstart.py
    :language: python
    :lines: 7-45
 
 Typically we would need a training loop and a series of calls to backward, step etc.
-Instead, with bink, we can define our optimiser and some metrics (just 'acc' and 'loss' for now) and let it do the work.
+Instead, with torchbearer, we can define our optimiser and some metrics (just 'acc' and 'loss' for now) and let it do the work.
 
 Training on Cifar10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. literalinclude:: ../../examples/quickstart.py
+.. literalinclude:: /_static/examples/quickstart.py
    :lines: 47-53
 
 Running the above produces the following output:
@@ -47,3 +47,11 @@ Running the above produces the following output:
     8/10(v): 100%|██████████| 79/79 [00:00<00:00, 221.55it/s, val_acc=0.679, val_acc_std=0.467, val_loss=0.923, val_loss_std=0.113]
     9/10(t): 100%|██████████| 391/391 [00:01<00:00, 213.23it/s, running_acc=0.756, running_loss=0.701, acc=0.759, acc_std=0.428, loss=0.695, loss_std=0.0915]
     9/10(v): 100%|██████████| 79/79 [00:00<00:00, 245.33it/s, val_acc=0.676, val_acc_std=0.468, val_loss=0.951, val_loss_std=0.111]
+
+Source Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The source code for the example is given below:
+
+ :download:`Download Python source code: quickstart.py </_static/examples/quickstart.py>`
+

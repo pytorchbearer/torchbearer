@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# PyBink documentation build configuration file, created by
+# torchbearer documentation build configuration file, created by
 # sphinx-quickstart on Mon Jul 16 14:35:09 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -59,7 +59,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PyBink'
+project = 'torchbearer'
 copyright = '2018, Ethan Harris and Matthew Painter'
 author = 'Ethan Harris and Matthew Painter'
 
@@ -128,7 +128,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PyBinkdoc'
+htmlhelp_basename = 'torchbearerdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -155,7 +155,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'PyBink.tex', 'PyBink Documentation',
+    (master_doc, 'torchbearer.tex', 'torchbearer Documentation',
      'Ethan Harris and Matthew Painter', 'manual'),
 ]
 
@@ -165,7 +165,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pybink', 'PyBink Documentation',
+    (master_doc, 'pytorchbearer', 'torchbearer Documentation',
      [author], 1)
 ]
 
@@ -176,8 +176,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'PyBink', 'PyBink Documentation',
-     author, 'PyBink', 'One line description of project.',
+    (master_doc, 'torchbearer', 'torchbearer Documentation',
+     author, 'torchbearer', 'One line description of project.',
      'Miscellaneous'),
 ]
 

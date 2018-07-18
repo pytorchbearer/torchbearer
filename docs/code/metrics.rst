@@ -1,6 +1,6 @@
-bink.metrics
+torchbearer.metrics
 ====================================
 
-..  automodule:: bink.metrics
+..  automodule:: torchbearer.metrics
 	:members:
 	:undoc-members:

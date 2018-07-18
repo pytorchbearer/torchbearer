@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(
-    name='bink',
+    name='torchbearer',
     version='0.1.3',
-    packages=['bink', 'bink.metrics', 'bink.callbacks', 'tests', 'tests.metrics', 'tests.callbacks'],
-    url='https://github.com/ecs-vlc/PyBink',
-    download_url='https://github.com/ecs-vlc/PyBink/archive/v0.1.3.tar.gz',
+    packages=['torchbearer', 'torchbearer.metrics', 'torchbearer.callbacks', 'tests', 'tests.metrics', 'tests.callbacks'],
+    url='https://github.com/ecs-vlc/torchbearer',
+    download_url='https://github.com/ecs-vlc/torchbearer/archive/0.1.3.tar.gz',
     license='GPL-3.0',
     author='Matt Painter',
     author_email='mp2u16@ecs.soton.ac.uk',

@@ -1,6 +1,6 @@
-import bink
+import torchbearer
 
-from bink.callbacks import Callback
+from torchbearer.callbacks import Callback
 
 
 class EarlyStopping(Callback):
@@ -55,15 +55,15 @@ class EarlyStopping(Callback):
         self.best = float('inf') if self.mode == 'min' else -float('inf')
 
     def on_end_epoch(self, state):
-        current = state[bink.METRICS][self.monitor]
+        current = state[torchbearer.METRICS][self.monitor]
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
             self.wait = 0
         else:
             self.wait += 1
             if self.wait >= self.patience:
-                self.stopped_epoch = state[bink.EPOCH]
-                state[bink.STOP_TRAINING] = True
+                self.stopped_epoch = state[torchbearer.EPOCH]
+                state[torchbearer.STOP_TRAINING] = True
 
     def on_end(self, state):
         if self.stopped_epoch > 0 and self.verbose > 0:

@@ -2,8 +2,8 @@ import unittest
 
 from unittest.mock import Mock, patch
 
-import bink
-from bink.metrics import RocAucScore
+import torchbearer
+from torchbearer.metrics import RocAucScore
 
 import torch
 
@@ -15,10 +15,10 @@ class TestRocAucScore(unittest.TestCase):
     def test_one_hot(self, mock_sklearn_metrics):
         mock_sklearn_metrics.roc_auc_score = Mock()
         metric = RocAucScore(one_hot_classes=3, one_hot_offset=1)
-        metric.reset({bink.DEVICE: 'cpu', bink.DATA_TYPE: torch.float32})
-        metric.process({bink.BATCH: 0, bink.DEVICE: 'cpu', bink.DATA_TYPE: torch.float32,
-                        bink.Y_TRUE: torch.LongTensor([1, 2, 3]),
-                        bink.Y_PRED: torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
+        metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
+        metric.process({torchbearer.BATCH: 0, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32,
+                        torchbearer.Y_TRUE: torch.LongTensor([1, 2, 3]),
+                        torchbearer.Y_PRED: torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
         mock_sklearn_metrics.roc_auc_score.assert_called_once()
         self.assertTrue(np.array_equal(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]),
                                        mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][0]))
@@ -32,10 +32,10 @@ class TestRocAucScore(unittest.TestCase):
     def test_non_one_hot(self, mock_sklearn_metrics):
         mock_sklearn_metrics.roc_auc_score = Mock()
         metric = RocAucScore(one_hot_labels=False)
-        metric.reset({bink.DEVICE: 'cpu', bink.DATA_TYPE: torch.float32})
-        metric.process({bink.BATCH: 0, bink.DEVICE: 'cpu', bink.DATA_TYPE: torch.float32,
-                        bink.Y_TRUE: torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
-                        bink.Y_PRED: torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
+        metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
+        metric.process({torchbearer.BATCH: 0, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32,
+                        torchbearer.Y_TRUE: torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
+                        torchbearer.Y_PRED: torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
         mock_sklearn_metrics.roc_auc_score.assert_called_once()
         self.assertTrue(np.array_equal(np.array([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
                                        mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][0]))

@@ -6,9 +6,9 @@ from tensorboardX import SummaryWriter
 
 import torch.nn.functional as F
 
-import bink
+import torchbearer
 
-from bink.callbacks import Callback
+from torchbearer.callbacks import Callback
 
 import os
 
@@ -25,7 +25,7 @@ class TensorBoard(Callback):
                  write_batch_metrics=False,
                  batch_step_size=10,
                  write_epoch_metrics=True,
-                 comment='bink'):
+                 comment='torchbearer'):
         """TensorBoard callback which writes metrics to the given log directory.
 
         :param log_dir: The tensorboard log path for output
@@ -52,8 +52,8 @@ class TensorBoard(Callback):
 
         if self.write_graph:
             def handle_graph(state):
-                dummy = torch.rand(state[bink.X].size(), requires_grad=False)
-                model = copy.deepcopy(state[bink.MODEL]).to('cpu')
+                dummy = torch.rand(state[torchbearer.X].size(), requires_grad=False)
+                model = copy.deepcopy(state[torchbearer.MODEL]).to('cpu')
                 self._writer.add_graph(model, (dummy, ))
                 self._handle_graph = lambda _: ...
             self._handle_graph = handle_graph
@@ -64,12 +64,12 @@ class TensorBoard(Callback):
         self._batch_writer = None
 
     def on_start(self, state):
-        self.log_dir = os.path.join(self.log_dir, state[bink.MODEL].__class__.__name__ + '_' + self.comment)
+        self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
         self._writer = SummaryWriter(log_dir=self.log_dir)
 
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
-            log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[bink.EPOCH]))
+            log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
             self._batch_writer = SummaryWriter(log_dir=log_dir)
 
     def on_end(self, state):
@@ -79,22 +79,22 @@ class TensorBoard(Callback):
         self._handle_graph(state)
 
     def on_step_training(self, state):
-        if self.write_batch_metrics and state[bink.BATCH] % self.batch_step_size == 0:
-            for metric in state[bink.METRICS]:
-                self._batch_writer.add_scalar('batch/' + metric, state[bink.METRICS][metric], state[bink.BATCH])
+        if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
+            for metric in state[torchbearer.METRICS]:
+                self._batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
 
     def on_step_validation(self, state):
-        if self.write_batch_metrics and state[bink.BATCH] % self.batch_step_size == 0:
-            for metric in state[bink.METRICS]:
-                self._batch_writer.add_scalar('batch/' + metric, state[bink.METRICS][metric], state[bink.BATCH])
+        if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
+            for metric in state[torchbearer.METRICS]:
+                self._batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
 
     def on_end_epoch(self, state):
         if self.write_batch_metrics:
             self._batch_writer.close()
 
         if self.write_epoch_metrics:
-            for metric in state[bink.METRICS]:
-                self._writer.add_scalar('epoch/' + metric, state[bink.METRICS][metric], state[bink.EPOCH])
+            for metric in state[torchbearer.METRICS]:
+                self._writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
 
 class TensorBoardImages(Callback):
@@ -103,9 +103,9 @@ class TensorBoardImages(Callback):
     """
 
     def __init__(self, log_dir='./logs',
-                 comment='bink',
+                 comment='torchbearer',
                  name='Image',
-                 key=bink.Y_PRED,
+                 key=torchbearer.Y_PRED,
                  write_each_epoch=True,
                  num_images=16,
                  nrow=8,
@@ -154,7 +154,7 @@ class TensorBoardImages(Callback):
         self.done = False
 
     def on_start(self, state):
-        log_dir = os.path.join(self.log_dir, state[bink.MODEL].__class__.__name__ + '_' + self.comment)
+        log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
         self._writer = SummaryWriter(log_dir=log_dir)
 
     def on_step_validation(self, state):
@@ -186,7 +186,7 @@ class TensorBoardImages(Callback):
                     scale_each=self.scale_each,
                     pad_value=self.pad_value
                 )
-                self._writer.add_image(self.name, image, state[bink.EPOCH])
+                self._writer.add_image(self.name, image, state[torchbearer.EPOCH])
                 self.done = True
                 self._data = None
 
@@ -204,14 +204,15 @@ class TensorBoardProjector(Callback):
     """
 
     def __init__(self, log_dir='./logs',
-                 comment='bink',
+                 comment='torchbearer',
                  num_images=100,
                  avg_pool_size=1,
                  avg_data_channels=True,
                  write_data=True,
                  write_features=True,
-                 features_key=bink.Y_PRED):
-        """Construct a TensorBoardProjector callback which writes images to the given directory and, if required, associated features):
+                 features_key=torchbearer.Y_PRED):
+        """Construct a TensorBoardProjector callback which writes images to the given directory and, if required,
+        associated features.
 
         :param log_dir: The tensorboard log path for output
         :type log_dir: str
@@ -246,12 +247,12 @@ class TensorBoardProjector(Callback):
         self.done = False
 
     def on_start(self, state):
-        log_dir = os.path.join(self.log_dir, state[bink.MODEL].__class__.__name__ + '_' + self.comment)
+        log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
         self._writer = SummaryWriter(log_dir=log_dir)
 
     def on_step_validation(self, state):
         if not self.done:
-            x = state[bink.X].data.clone()
+            x = state[torchbearer.X].data.clone()
 
             if len(x.size()) == 3:
                 x = x.unsqueeze(1)
@@ -260,7 +261,7 @@ class TensorBoardProjector(Callback):
 
             data = None
 
-            if state[bink.EPOCH] == 0 and self.write_data:
+            if state[torchbearer.EPOCH] == 0 and self.write_data:
                 if self.avg_data_channels:
                     data = torch.mean(x, 1)
                 else:
@@ -274,9 +275,9 @@ class TensorBoardProjector(Callback):
                 feature = state[self.features_key].data.clone()
                 feature = feature.view(feature.size(0), -1)
 
-            label = state[bink.Y_TRUE].data.clone()
+            label = state[torchbearer.Y_TRUE].data.clone()
 
-            if state[bink.BATCH] == 0:
+            if state[torchbearer.BATCH] == 0:
                 remaining = self.num_images if self.num_images < label.size(0) else label.size(0)
 
                 self._images = x[:remaining].to('cpu')
@@ -303,10 +304,10 @@ class TensorBoardProjector(Callback):
                     self._features = torch.cat((self._features, feature[:remaining].to('cpu')), dim=0)
 
             if self._labels.size(0) >= self.num_images:
-                if state[bink.EPOCH] == 0 and self.write_data:
+                if state[torchbearer.EPOCH] == 0 and self.write_data:
                     self._writer.add_embedding(self._data, metadata=self._labels, label_img=self._images, tag='data', global_step=-1)
                 if self.write_features:
-                    self._writer.add_embedding(self._features, metadata=self._labels, label_img=self._images, tag='features', global_step=state[bink.EPOCH])
+                    self._writer.add_embedding(self._features, metadata=self._labels, label_img=self._images, tag='features', global_step=state[torchbearer.EPOCH])
                 self.done = True
 
     def on_end_epoch(self, state):
