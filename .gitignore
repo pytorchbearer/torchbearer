@@ -103,4 +103,5 @@ ENV/
 .idea
 
 # Ignore examples/data
+/docs/_static/examples/results
 /docs/_static/examples/data
