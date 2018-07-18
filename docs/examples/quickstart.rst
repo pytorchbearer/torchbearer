@@ -47,3 +47,13 @@ Running the above produces the following output:
     8/10(v): 100%|██████████| 79/79 [00:00<00:00, 221.55it/s, val_acc=0.679, val_acc_std=0.467, val_loss=0.923, val_loss_std=0.113]
     9/10(t): 100%|██████████| 391/391 [00:01<00:00, 213.23it/s, running_acc=0.756, running_loss=0.701, acc=0.759, acc_std=0.428, loss=0.695, loss_std=0.0915]
     9/10(v): 100%|██████████| 79/79 [00:00<00:00, 245.33it/s, val_acc=0.676, val_acc_std=0.468, val_loss=0.951, val_loss_std=0.111]
+
+Source Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The source code for the example are given below:
+
+Standard:
+
+ :download:`Download Python source code: tensor_tutorial.py </_static/codes/quickstart.py>`
+
