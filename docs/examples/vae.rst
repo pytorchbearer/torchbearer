@@ -1,7 +1,7 @@
 Training a Variational Auto-Encoder
 ====================================
 
-This guide will give a quick guide on training a variational auto-encoder (VAE) in sconce. We will use the VAE example from the pytorch examples here_:
+This guide will give a quick guide on training a variational auto-encoder (VAE) in bink. We will use the VAE example from the pytorch examples here_:
 
 .. _here: https://github.com/pytorch/examples/tree/master/vae
 
@@ -44,7 +44,7 @@ Now we have the model, we will need a loss function to optimize. VAEs typically 
    :language: python
    :lines: 82-87
 
-This requires the packing of the reconstruction, mean and log-variance into the model output and unpacking it for the loss function to use
+This requires the packing of the reconstruction, mean and log-variance into the model output and unpacking it for the loss function to use.
 
 .. literalinclude:: ../../examples/vae_standard.py
    :language: python
@@ -54,11 +54,11 @@ This requires the packing of the reconstruction, mean and log-variance into the 
    :language: python
    :lines: 76-79
 
-However, in sconce, there is a persistent state dictionary which can be used to conveniently hold intermediate tensors such as the mean and log-variance.
+However, in bink, there is a persistent state dictionary which can be used to conveniently hold intermediate tensors such as the mean and log-variance.
 
 By default the model forward pass does not have access to the state dictionary, but setting the `pass_state` flag to true in the fit_generator_ call gives the model access to state on forward.
 
-.. _fit_generator: https://pysconce.readthedocs.io/en/latest/code/main.html#sconce.sconce.Model.fit_generator
+.. _fit_generator: https://pybink.readthedocs.io/en/latest/code/main.html#bink.bink.Model.fit_generator
 
 .. literalinclude:: ../../examples/vae.py
    :language: python
@@ -86,7 +86,7 @@ Since loss functions cannot access state, we can utilise a simple callback to co
 Visualising Results
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For auto-encoding problems it is often useful to visualise the reconstructions. We can do this in sconce by using another simple callback. We stack the first 8 images from the first validation batch and pass them to torchvisions_ save_image_ function which saves out visualisations.
+For auto-encoding problems it is often useful to visualise the reconstructions. We can do this in bink by using another simple callback. We stack the first 8 images from the first validation batch and pass them to torchvisions_ save_image_ function which saves out visualisations.
 
 .. _torchvisions: https://github.com/pytorch/vision
 .. _save_image: https://pytorch.org/docs/stable/torchvision/utils.html?highlight=save#torchvision.utils.save_image
@@ -97,7 +97,7 @@ For auto-encoding problems it is often useful to visualise the reconstructions. 
 Training the Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We train the model by creating a torchmodel and a sconcemodel and calling fit_generator.
+We train the model by creating a torchmodel and a binkmodel and calling fit_generator.
 
 .. literalinclude:: ../../examples/vae.py
    :lines: 115-120
@@ -107,3 +107,16 @@ The visualised results after ten epochs then look like this:
 .. figure:: /_static/img/reconstruction_9.png
    :scale: 200 %
    :alt: VAE reconstructions after 10 epochs of mnist
+
+Source
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The source code for the example are given below:
+
+Standard:
+
+ :download:`Download Python source code: tensor_tutorial.py </_static/codes/vae_standard.py>`
+
+Using state:
+
+ :download:`Download Python source code: tensor_tutorial.py </_static/codes/vae.py>`

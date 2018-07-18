@@ -104,3 +104,4 @@ ENV/
 
 # Ignore examples/data
 examples/data
+examples/results
