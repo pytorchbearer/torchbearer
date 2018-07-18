@@ -690,6 +690,138 @@ class TestTorchbearer(TestCase):
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 1)
 
+    def test_evaluate_generator_args(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = None
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.METRICS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][1].callback_list == [])
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
+    def test_evaluate_generator_verbose(self):
+        from torchbearer.callbacks import Tqdm
+
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = None
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.METRICS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.evaluate_generator(generator, 1, steps, pass_state)
+        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[0], Tqdm)
+
+    def test_evaluate_generator_pass_state(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = True
+        steps = None
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.METRICS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+
+    def test_evaluate_generator_steps(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = 100
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.METRICS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
+    def test_predict_generator_args(self):
+        from torchbearer.callbacks import AggregatePredictions
+
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = None
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.predict_generator(generator, 0, steps, pass_state)
+        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[0], AggregatePredictions)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
+    def test_predict_generator_verbose(self):
+        from torchbearer.callbacks import Tqdm
+
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = None
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.predict_generator(generator, 1, steps, pass_state)
+        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[1], Tqdm)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
+    def test_predict_generator_steps(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = 100
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.predict_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
+    def test_predict_generator_pass_state(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = MagicMock()
+
+        pass_state = False
+        steps = 100
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.predict_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+
     def test_train(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         optimizer = MagicMock()
