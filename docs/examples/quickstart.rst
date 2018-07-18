@@ -51,7 +51,7 @@ Running the above produces the following output:
 Source Code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The source code for the example are given below:
+The source code for the example is given below:
 
  :download:`Download Python source code: tensor_tutorial.py </_static/codes/quickstart.py>`
 
