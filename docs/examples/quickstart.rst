@@ -53,5 +53,5 @@ Source Code
 
 The source code for the example is given below:
 
- :download:`Download Python source code: tensor_tutorial.py </_static/codes/quickstart.py>`
+ :download:`Download Python source code: quickstart.py </_static/codes/quickstart.py>`
 
