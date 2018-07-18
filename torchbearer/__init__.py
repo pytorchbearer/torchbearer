@@ -1,13 +1,13 @@
 """
-..  automodule:: bink.bink
+..  automodule:: torchbearer.torchbearer
         :members:
         :undoc-members:
 
-..  automodule:: bink.state
+..  automodule:: torchbearer.state
         :members:
         :undoc-members:
 
-..  automodule:: bink.cv_utils
+..  automodule:: torchbearer.cv_utils
         :members:
         :undoc-members:
 """
@@ -15,5 +15,5 @@
 from .state import *
 from . import metrics
 from . import callbacks
-from .bink import *
+from .torchbearer import *
 from . import cv_utils

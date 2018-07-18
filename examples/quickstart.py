@@ -47,7 +47,7 @@ model = SimpleModel()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = nn.CrossEntropyLoss()
 
-from bink import Model
+from torchbearer import Model
 
-bink_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-bink_model.fit_generator(traingen, epochs=10, validation_generator=testgen)
+torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
+torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen)

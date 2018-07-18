@@ -1,6 +1,6 @@
-bink
+torchbearer
 ====================================
 
-..  automodule:: bink
+..  automodule:: torchbearer
 	:members:
 	:undoc-members:

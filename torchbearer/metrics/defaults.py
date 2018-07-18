@@ -1,4 +1,4 @@
-from bink import metrics
+from torchbearer import metrics
 
 
 def loss():

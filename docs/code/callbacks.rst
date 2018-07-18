@@ -1,6 +1,6 @@
-bink.callbacks
+torchbearer.callbacks
 ====================================
 
-..  automodule:: bink.callbacks
+..  automodule:: torchbearer.callbacks
 	:members:
 	:undoc-members:

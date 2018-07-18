@@ -1,34 +1,34 @@
 """
-..  automodule:: bink.metrics.metrics
+..  automodule:: torchbearer.metrics.metrics
         :members:
         :undoc-members:
 
 Metric Wrappers
 ------------------------------------
 
-..  automodule:: bink.metrics.wrappers
+..  automodule:: torchbearer.metrics.wrappers
         :members:
         :undoc-members:
 
-..  automodule:: bink.metrics.running
+..  automodule:: torchbearer.metrics.running
         :members:
         :undoc-members:
 
 Default Metrics
 ------------------------------------
 
-..  automodule:: bink.metrics.defaults
+..  automodule:: torchbearer.metrics.defaults
         :members:
         :undoc-members:
 
 Valued Metrics
 ------------------------------------
 
-..  automodule:: bink.metrics.primitives
+..  automodule:: torchbearer.metrics.primitives
         :members:
         :undoc-members:
 
-..  automodule:: bink.metrics.roc_auc_score
+..  automodule:: torchbearer.metrics.roc_auc_score
         :members:
         :undoc-members:
 """
