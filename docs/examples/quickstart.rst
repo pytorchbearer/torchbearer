@@ -53,7 +53,5 @@ Source Code
 
 The source code for the example are given below:
 
-Standard:
-
  :download:`Download Python source code: tensor_tutorial.py </_static/codes/quickstart.py>`
 
