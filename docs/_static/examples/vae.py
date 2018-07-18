@@ -7,8 +7,8 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from torchvision.utils import save_image
 
-import bink
-from bink.callbacks import Callback
+import torchbearer
+from torchbearer.callbacks import Callback
 
 
 class AutoEncoderMNIST(Dataset):
@@ -88,7 +88,7 @@ class AddKLDLoss(Callback):
     def on_criterion(self, state):
         super().on_criterion(state)
         KLD = self.KLD_Loss(state['mu'], state['logvar'])
-        state[bink.LOSS] = state[bink.LOSS] + KLD
+        state[torchbearer.LOSS] = state[torchbearer.LOSS] + KLD
 
     def KLD_Loss(self, mu, logvar):
         KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
@@ -103,13 +103,13 @@ class SaveReconstruction(Callback):
 
     def on_step_validation(self, state):
         super().on_step_validation(state)
-        if state[bink.BATCH] == 0:
-            data = state[bink.X]
-            recon_batch = state[bink.Y_PRED]
+        if state[torchbearer.BATCH] == 0:
+            data = state[torchbearer.X]
+            recon_batch = state[torchbearer.Y_PRED]
             comparison = torch.cat([data[:self.num_images],
                                     recon_batch.view(128, 1, 28, 28)[:self.num_images]])
             save_image(comparison.cpu(),
-                       str(self.folder) + 'reconstruction_' + str(state[bink.EPOCH]) + '.png', nrow=self.num_images)
+                       str(self.folder) + 'reconstruction_' + str(state[torchbearer.EPOCH]) + '.png', nrow=self.num_images)
 
 
 model = VAE()
@@ -117,7 +117,7 @@ model = VAE()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = bce_loss
 
-from bink import Model
+from torchbearer import Model
 
-bink_model = Model(model, optimizer, loss, metrics=['loss']).to('cuda')
-bink_model.fit_generator(traingen, epochs=10, validation_generator=testgen, callbacks=[AddKLDLoss(), SaveReconstruction()], pass_state=True)
+torchbearer_model = Model(model, optimizer, loss, metrics=['loss']).to('cuda')
+torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen, callbacks=[AddKLDLoss(), SaveReconstruction()], pass_state=True)
