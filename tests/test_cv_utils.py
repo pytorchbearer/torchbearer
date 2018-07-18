@@ -40,6 +40,25 @@ class TestCVUtils(unittest.TestCase):
         self.assertTrue(x_val.size()[0] == 40)
         self.assertTrue(y_val.size()[0] == 40)
 
+    def test_train_valid_splitter_sizes_2d(self):
+        x = range(1, 101)
+        y = range(1, 101)
+
+        x = torch.Tensor(x)
+        y = torch.Tensor(y)
+
+        x = torch.stack([x, x], -1)
+        y = torch.stack([y, y], -1)
+
+        valid_split = 0.1
+        shuffle = False
+
+        x, y, x_val, y_val = train_valid_splitter(x, y, valid_split, shuffle)
+        self.assertTrue(list(x.size()) == [90, 2])
+        self.assertTrue(list(y.size()) == [90, 2])
+        self.assertTrue(list(x_val.size()) == [10, 2])
+        self.assertTrue(list(y_val.size()) == [10, 2])
+
     def test_train_valid_splitter_order(self):
         x = range(1, 101)
         y = range(1, 101)
