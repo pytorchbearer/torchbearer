@@ -35,7 +35,12 @@ def to_dict(clazz):
             self.inner = clazz(*args, **kwargs)
 
         def build(self):
-            return ToDict(self.inner.build())
+            if isinstance(self.inner, MetricFactory):
+                inner = self.inner.build()
+            else:
+                inner = self.inner
+
+            return ToDict(inner)
 
     return DictFactory
 
@@ -43,10 +48,14 @@ def to_dict(clazz):
 def mean(clazz):
     class MeanFactory(MetricFactory):
         def __init__(self, *args, **kwargs):
-            self.inner_factory = clazz(*args, **kwargs)
+            self.inner = clazz(*args, **kwargs)
 
         def build(self):
-            inner = self.inner_factory.build()
+            if isinstance(self.inner, MetricFactory):
+                inner = self.inner.build()
+            else:
+                inner = self.inner
+
             if not isinstance(inner, MetricTree):
                 inner = MetricTree(inner)
             inner.add_child(ToDict(Mean(inner.name)))
@@ -58,10 +67,14 @@ def mean(clazz):
 def std(clazz):
     class StdFactory(MetricFactory):
         def __init__(self, *args, **kwargs):
-            self.inner_factory = clazz(*args, **kwargs)
+            self.inner = clazz(*args, **kwargs)
 
         def build(self):
-            inner = self.inner_factory.build()
+            if isinstance(self.inner, MetricFactory):
+                inner = self.inner.build()
+            else:
+                inner = self.inner
+
             if not isinstance(inner, MetricTree):
                 inner = MetricTree(inner)
             inner.add_child(ToDict(Std(inner.name + '_std')))
@@ -73,10 +86,14 @@ def std(clazz):
 def running_mean(clazz=None, batch_size=50, step_size=10):
     class RunningMeanFactory(MetricFactory):
         def __init__(self, *args, **kwargs):
-            self.inner_factory = clazz(*args, **kwargs)
+            self.inner = clazz(*args, **kwargs)
 
         def build(self):
-            inner = self.inner_factory.build()
+            if isinstance(self.inner, MetricFactory):
+                inner = self.inner.build()
+            else:
+                inner = self.inner
+
             if not isinstance(inner, MetricTree):
                 inner = MetricTree(inner)
             inner.add_child(ToDict(RunningMean('running_' + inner.name, batch_size=batch_size, step_size=step_size)))
@@ -84,6 +101,6 @@ def running_mean(clazz=None, batch_size=50, step_size=10):
 
     if clazz is None:
         def decorator(clazz):
-            return running_mean(clazz)
+            return running_mean(clazz, batch_size=batch_size, step_size=step_size)
         return decorator
     return RunningMeanFactory
