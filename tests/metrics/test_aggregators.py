@@ -5,33 +5,79 @@ from unittest.mock import Mock, call
 from torch.autograd import Variable
 
 import torchbearer
-from torchbearer.metrics import Std, Metric, Mean, BatchLambda, EpochLambda
+from torchbearer.metrics import Std, Metric, Mean, BatchLambda, EpochLambda, ToDict
 
 import torch
+
+
+class TestToDict(unittest.TestCase):
+    def setUp(self):
+        self._metric = Metric('test')
+        self._metric.train = Mock()
+        self._metric.eval = Mock()
+        self._metric.reset = Mock()
+        self._metric.process = Mock(return_value='process')
+        self._metric.process_final = Mock(return_value='process_final')
+
+        self._to_dict = ToDict(self._metric)
+
+    def test_train_process(self):
+        self._to_dict.train()
+        self._metric.train.assert_called_once()
+
+        self.assertTrue(self._to_dict.process('input') == {'test': 'process'})
+        self._metric.process.assert_called_once_with('input')
+
+    def test_train_process_final(self):
+        self._to_dict.train()
+        self._metric.train.assert_called_once()
+
+        self.assertTrue(self._to_dict.process_final('input') == {'test': 'process_final'})
+        self._metric.process_final.assert_called_once_with('input')
+
+    def test_eval_process(self):
+        self._to_dict.eval()
+        self._metric.eval.assert_called_once()
+
+        self.assertTrue(self._to_dict.process('input') == {'val_test': 'process'})
+        self._metric.process.assert_called_once_with('input')
+
+    def test_eval_process_final(self):
+        self._to_dict.eval()
+        self._metric.eval.assert_called_once()
+
+        self.assertTrue(self._to_dict.process_final('input') == {'val_test': 'process_final'})
+        self._metric.process_final.assert_called_once_with('input')
+
+    def test_reset(self):
+        self._to_dict.reset('test')
+        self._metric.reset.assert_called_once_with('test')
 
 
 class TestStd(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
         self._metric.process = Mock()
-        self._metric.process.side_effect = [torch.FloatTensor([0.1, 0.2, 0.3]),
+        self._metric.process.side_effect = [torch.zeros(torch.Size([])),
+                                            torch.FloatTensor([0.1, 0.2, 0.3]),
                                             torch.FloatTensor([0.4, 0.5, 0.6]),
-                                            torch.FloatTensor([0.7, 0.8, 0.9])]
+                                            torch.FloatTensor([0.7, 0.8, 0.9]),
+                                            torch.ones(torch.Size([]))]
 
         self._std = Std('test')
         self._std.reset({})
-        self._target = 0.25819888974716
+        self._target = 0.31622776601684
 
     def test_train(self):
         self._std.train()
-        for i in range(3):
+        for i in range(5):
             self._std.process(self._metric.process())
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
 
     def test_validate(self):
         self._std.eval()
-        for i in range(3):
+        for i in range(5):
             self._std.process(self._metric.process())
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
@@ -41,9 +87,11 @@ class TestMean(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
         self._metric.process = Mock()
-        self._metric.process.side_effect = [torch.FloatTensor([0.1, 0.2, 0.3]),
+        self._metric.process.side_effect = [torch.zeros(torch.Size([])),
+                                            torch.FloatTensor([0.1, 0.2, 0.3]),
                                             torch.FloatTensor([0.4, 0.5, 0.6]),
-                                            torch.FloatTensor([0.7, 0.8, 0.9])]
+                                            torch.FloatTensor([0.7, 0.8, 0.9]),
+                                            torch.ones(torch.Size([]))]
 
         self._mean = Mean('test')
         self._mean.reset({})
@@ -51,14 +99,14 @@ class TestMean(unittest.TestCase):
 
     def test_train_dict(self):
         self._mean.train()
-        for i in range(3):
+        for i in range(5):
             self._mean.process(self._metric.process())
         result = self._mean.process_final({})
         self.assertAlmostEqual(self._target, result)
 
     def test_validate_dict(self):
         self._mean.eval()
-        for i in range(3):
+        for i in range(5):
             self._mean.process(self._metric.process())
         result = self._mean.process_final({})
         self.assertAlmostEqual(self._target, result)
@@ -127,3 +175,13 @@ class TestEpochLambda(unittest.TestCase):
         self._metric_function.assert_called_once()
         self.assertTrue(torch.eq(self._metric_function.call_args_list[0][0][1], torch.LongTensor([0, 1, 2, 3, 4])).all)
         self.assertTrue(torch.lt(torch.abs(torch.add(self._metric_function.call_args_list[0][0][0], -torch.FloatTensor([0.0, 0.1, 0.2, 0.3, 0.4]))), 1e-12).all)
+
+    def test_not_running(self):
+        metric = EpochLambda('test', self._metric_function, running=False, step_size=6)
+        metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
+        metric.train()
+
+        for i in range(12):
+            metric.process(self._states[0])
+
+        self._metric_function.assert_not_called()

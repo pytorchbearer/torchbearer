@@ -25,6 +25,11 @@ class TestRunningMetric(unittest.TestCase):
             self._metric.process({})
         self._metric._step.assert_has_calls([call([3]), call([3, 3, 3, 3, 3])])
 
+    def test_empty_methods(self):
+        metric = RunningMetric('test')
+        self.assertTrue(metric._step(['test']) is None)
+        self.assertTrue(metric._process_train(['test']) is None)
+
 
 class TestRunningMean(unittest.TestCase):
     def setUp(self):

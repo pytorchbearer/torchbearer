@@ -3,31 +3,6 @@ from abc import ABCMeta, abstractmethod
 from collections import deque
 
 
-# def running_mean(metric):
-#     """Utility function to wrap the given metric in a :class:`RunningMean` and return the result.
-#
-#     :param metric: The metric to wrap.
-#     :type metric: Metric
-#     :return: RunningMean -- A running mean for the given metric.
-#
-#     """
-#     return RunningMean(metric)
-#
-#
-# def running_statistics(metric):
-#     """Utility function to wrap the given metric in a set of running statistics and return the result.
-#
-#     :param metric: The metric to wrap.
-#     :type metric: Metric
-#     :return: MetricList -- A list of running statistics.
-#
-#     """
-#     return metrics.MetricList([running_mean(metric)])
-#
-#
-# running_stats = running_statistics
-
-
 class RunningMetric(metrics.AdvancedMetric):
     """A metric which aggregates batches of results and presents a method to periodically process these into a value.
 

@@ -75,7 +75,7 @@ class MetricFactory(object):
 
     @abc.abstractmethod
     def build(self):
-        """Build and return a usbable :class:`Metric` instance.
+        """Build and return a usable :class:`Metric` instance.
 
         :return: The constructed :class:`Metric`
         """
@@ -103,35 +103,30 @@ class MetricTree(Metric):
         """
         self.children.append(child)
 
+    def _for_tree(self, function, *args):
+        result = {}
+        node_value = function(self.root, *args)
+
+        for subtree in self.children:
+            out = function(subtree, node_value)
+            if out is not None:
+                result.update(out)
+
+        return result
+
     def process(self, *args):
         """Process this node and then pass the output to each child.
 
         :return: A dict containing all results from the children
         """
-        result = {}
-        node_value = self.root.process(*args)
-
-        for subtree in self.children:
-            out = subtree.process(node_value)
-            if out is not None:
-                result.update(out)
-
-        return result
+        return self._for_tree(lambda metric, *in_args: metric.process(*in_args), *args)
 
     def process_final(self, *args):
         """Process this node and then pass the output to each child.
 
         :return: A dict containing all results from the children
         """
-        result = {}
-        node_value = self.root.process_final(*args)
-
-        for subtree in self.children:
-            out = subtree.process_final(node_value)
-            if out is not None:
-                result.update(out)
-
-        return result
+        return self._for_tree(lambda metric, *in_args: metric.process_final(*in_args), *args)
 
     def eval(self):
         self.root.eval()

@@ -34,14 +34,12 @@ class TestEpoch(unittest.TestCase):
         }
         self._metric = Epoch()
 
-    def test_train_process(self):
-        self._metric.train()
+    def test_process(self):
         result = self._metric.process(self._state)
         self.assertEqual(101, result)
 
-    def test_validate_process(self):
-        self._metric.eval()
-        result = self._metric.process(self._state)
+    def test_process_final(self):
+        result = self._metric.process_final(self._state)
         self.assertEqual(101, result)
 
 
