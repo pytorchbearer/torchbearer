@@ -1,16 +1,14 @@
-import math
 import warnings
-from _warnings import warn
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 import torchbearer
-from torchbearer.cv_utils import get_train_valid_sets
+from torchbearer import metrics as torchbearer_metrics
+from torchbearer.callbacks.aggregate_predictions import AggregatePredictions
 from torchbearer.callbacks.callbacks import CallbackList
 from torchbearer.callbacks.printer import Tqdm
-from torchbearer.callbacks.aggregate_predictions import AggregatePredictions
-from torchbearer import metrics as torchbearer_metrics
+from torchbearer.cv_utils import get_train_valid_sets
 
 
 class Model:
