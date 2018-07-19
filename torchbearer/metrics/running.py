@@ -3,29 +3,29 @@ from abc import ABCMeta, abstractmethod
 from collections import deque
 
 
-def running_mean(metric):
-    """Utility function to wrap the given metric in a :class:`RunningMean` and return the result.
-
-    :param metric: The metric to wrap.
-    :type metric: Metric
-    :return: RunningMean -- A running mean for the given metric.
-
-    """
-    return RunningMean(metric)
-
-
-def running_statistics(metric):
-    """Utility function to wrap the given metric in a set of running statistics and return the result.
-
-    :param metric: The metric to wrap.
-    :type metric: Metric
-    :return: MetricList -- A list of running statistics.
-
-    """
-    return metrics.MetricList([running_mean(metric)])
-
-
-running_stats = running_statistics
+# def running_mean(metric):
+#     """Utility function to wrap the given metric in a :class:`RunningMean` and return the result.
+#
+#     :param metric: The metric to wrap.
+#     :type metric: Metric
+#     :return: RunningMean -- A running mean for the given metric.
+#
+#     """
+#     return RunningMean(metric)
+#
+#
+# def running_statistics(metric):
+#     """Utility function to wrap the given metric in a set of running statistics and return the result.
+#
+#     :param metric: The metric to wrap.
+#     :type metric: Metric
+#     :return: MetricList -- A list of running statistics.
+#
+#     """
+#     return metrics.MetricList([running_mean(metric)])
+#
+#
+# running_stats = running_statistics
 
 
 class RunningMetric(metrics.AdvancedMetric):
@@ -49,14 +49,14 @@ class RunningMetric(metrics.AdvancedMetric):
         :type step_size: int
 
         """
-        super().__init__('running_' + name)
+        super().__init__(name)
         self._batch_size = batch_size
         self._step_size = step_size
         self._cache = deque()
         self._result = {}
 
     @abstractmethod
-    def _process_train(self, state):
+    def _process_train(self, *args):
         """Process the metric for a single train step.
 
         :param state: The current model state.
@@ -77,7 +77,7 @@ class RunningMetric(metrics.AdvancedMetric):
         """
         ...
 
-    def process_train(self, state):
+    def process_train(self, *args):
         """Add the current metric value to the cache and call '_step' is needed.
 
         :param state: The current model state.
@@ -85,7 +85,7 @@ class RunningMetric(metrics.AdvancedMetric):
         :return: The current metric value.
 
         """
-        self._cache.append(self._process_train(state))
+        self._cache.append(self._process_train(*args))
         if len(self._cache) > self._batch_size:
             self._cache.popleft()
         if self._i % self._step_size == 0:
@@ -107,7 +107,7 @@ class RunningMean(RunningMetric):
     """A running metric wrapper which outputs the mean of a sequence of observations.
     """
 
-    def __init__(self, metric, batch_size=50, step_size=10):
+    def __init__(self, name, batch_size=50, step_size=10):
         """Wrap the given metric in initialise the parent :class:`RunningMetric`.
 
         :param metric: The metric to wrap.
@@ -117,11 +117,10 @@ class RunningMean(RunningMetric):
         :param step_size: The number of iterations between aggregations.
         :type step_size: int
         """
-        super().__init__(metric.name, batch_size=batch_size, step_size=step_size)
-        self._metric = metric
+        super().__init__(name, batch_size=batch_size, step_size=step_size)
 
-    def _process_train(self, state):
-        return self._metric.process(state).mean().item()
+    def _process_train(self, data):
+        return data.mean().item()
 
     def _step(self, cache):
         return sum(cache) / float(len(cache))

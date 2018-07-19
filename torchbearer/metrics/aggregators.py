@@ -4,101 +4,68 @@ from torchbearer import metrics
 import torch
 
 
-def std(metric):
-    """Utility function to wrap the given metric in an :class:`Std`.
+class ToDict(metrics.AdvancedMetric):
+    def __init__(self, metric):
+        super(ToDict, self).__init__(metric.name)
 
-    :param metric: The metric to wrap.
-    :return: Std -- A standard deviation metric which wraps the input.
-    """
-    return Std(metric)
+        self.metric = metric
 
+    def process_train(self, *args):
+        val = self.metric.process(*args)
+        if val is not None:
+            return {self.metric.name: val}
 
-def mean(metric):
-    """Utility function to wrap the given metric in an :class:`Mean`.
+    def process_validate(self, *args):
+        val = self.metric.process(*args)
+        if val is not None:
+            return {'val_' + self.metric.name: val}
 
-    :param metric: The metric to wrap.
-    :return: Mean -- A mean metric which wraps the input.
-    """
-    return Mean(metric)
+    def process_final_train(self, *args):
+        val = self.metric.process_final(*args)
+        if val is not None:
+            return {self.metric.name: val}
 
-
-def statistics(metric):
-    """Utility function to wrap the given metric in a set of default statistics.
-
-    :param metric: The metric to wrap.
-    :return: MetricList -- A metric list containing a mean and std.
-    """
-    return metrics.MetricList([mean(metric), std(metric)])
-
-
-stats = statistics
-
-
-class Wrapper(metrics.Metric):
-    """Basic metric wrapper class which masks the processing methods.
-    """
-
-    def __init__(self, metric, postfix):
-        """Wrap the given metric and append the given string to the metric name.
-
-        :param metric: The metric to wrap.
-        :type metric: Metric
-        :param postfix: String to add to the metric name.
-        :type postfix: str
-
-        """
-        super().__init__(metric.name + postfix)
-        self._metric = metric
+    def process_final_validate(self, *args):
+        val = self.metric.process_final(*args)
+        if val is not None:
+            return {'val_' + self.metric.name: val}
 
     def eval(self):
-        """Call eval on the underlying metric.
-        """
         super().eval()
-        self._metric.eval()
+        self.metric.eval()
 
     def train(self):
-        """Call train on the underlying metric.
-        """
         super().train()
-        self._metric.train()
+        self.metric.train()
 
     def reset(self, state):
-        """Call reset on the underlying metric.
-        """
         super().reset(state)
-        self._metric.reset(state)
+        self.metric.reset(state)
 
 
-class Std(Wrapper):
+class Std(metrics.Metric):
     """Metric wrapper which calculates the standard deviation of process outputs between calls to reset.
     """
 
-    def __init__(self, metric):
-        """Wrap the given metric.
+    def __init__(self, name):
+        super(Std, self).__init__(name)
 
-        :param metric: The metric to wrap.
-        :type metric: Metric
-
-        """
-        super().__init__(metric, '_std')
-
-    def process(self, state):
+    def process(self, data):
         """Process the wrapped metric and compute values required for the std.
 
         :param state: The model state.
         :type state: dict
 
         """
-        result = self._metric.process(state)
-        self._sum += result.sum().item()
-        self._sum_sq += result.pow(2).sum().item()
+        self._sum += data.sum().item()
+        self._sum_sq += data.pow(2).sum().item()
 
-        if result.size() == torch.Size([]):
+        if data.size() == torch.Size([]):
             self._count += 1
         else:
-            self._count += result.size(0)
+            self._count += data.size(0)
 
-    def process_final(self, state):
+    def process_final(self, data):
         """Compute and return the final standard deviation.
 
         :param state: The model state.
@@ -123,35 +90,28 @@ class Std(Wrapper):
         self._count = 0
 
 
-class Mean(Wrapper):
+class Mean(metrics.Metric):
     """Metric wrapper which calculates the mean value of a series of observations between reset calls.
     """
 
-    def __init__(self, metric):
-        """Wrap the given metric.
+    def __init__(self, name):
+        super(Mean, self).__init__(name)
 
-        :param metric: The metric to wrap.
-        :type metric: Metric
-
-        """
-        super().__init__(metric, '')
-
-    def process(self, state):
+    def process(self, data):
         """Compute the metric value and add it to the rolling sum.
 
         :param state: The model state.
         :type state: dict
 
         """
-        result = self._metric.process(state)
-        self._sum += result.sum().item()
+        self._sum += data.sum().item()
 
-        if result.size() == torch.Size([]):
+        if data.size() == torch.Size([]):
             self._count += 1
         else:
-            self._count += result.size(0)
+            self._count += data.size(0)
 
-    def process_final(self, state):
+    def process_final(self, data):
         """Compute and return the mean of all metric values since the last call to reset.
 
         :param state: The model state.
@@ -185,7 +145,7 @@ class BatchLambda(metrics.Metric):
         :param metric_function: A metric function('y_pred', 'y_true') to wrap.
 
         """
-        super().__init__(name)
+        super(BatchLambda, self).__init__(name)
         self._metric_function = metric_function
 
     def process(self, state):
@@ -217,7 +177,7 @@ class EpochLambda(metrics.AdvancedMetric):
         :type step_size: int
 
         """
-        super().__init__(name)
+        super(EpochLambda, self).__init__(name)
         self._step = metric_function
         self._final = metric_function
         self._step_size = step_size

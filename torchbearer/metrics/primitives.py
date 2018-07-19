@@ -7,20 +7,28 @@ import torch
 class CategoricalAccuracy(metrics.BatchLambda):
     """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets.
     """
+
     def __init__(self):
-        super().__init__('acc', self._categorical)
+        def metric_function(y_pred, y_true):
+            _, y_pred = torch.max(y_pred, 1)
+            return (y_pred == y_true).float()
+        super(CategoricalAccuracy, self).__init__('acc', metric_function)
 
-    def _categorical(self, y_pred, y_true):
-        _, y_pred = torch.max(y_pred, 1)
-        return (y_pred == y_true).float()
 
-
-categorical_accuracy_primitive = CategoricalAccuracy()
+@metrics.default_for_key('acc')
+@metrics.default_for_key('accuracy')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
+class CategoricalAccuracyFactory(metrics.MetricFactory):
+    def build(self):
+        return CategoricalAccuracy()
 
 
 class Loss(metrics.Metric):
     """Simply returns the 'loss' value from the model state.
     """
+
     def __init__(self):
         super().__init__('loss')
 
@@ -28,12 +36,19 @@ class Loss(metrics.Metric):
         return state[torchbearer.LOSS]
 
 
-loss_primitive = Loss()
+@metrics.default_for_key('loss')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
+class LossFactory(metrics.MetricFactory):
+    def build(self):
+        return Loss()
 
 
 class Epoch(metrics.Metric):
     """Returns the 'epoch' from the model state.
     """
+
     def __init__(self):
         super().__init__('epoch')
 
@@ -47,4 +62,10 @@ class Epoch(metrics.Metric):
         return state[torchbearer.EPOCH]
 
 
-epoch_primitive = Epoch()
+@metrics.default_for_key('epoch')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
+class EpochFactory(metrics.MetricFactory):
+    def build(self):
+        return Epoch()

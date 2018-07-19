@@ -7,15 +7,15 @@ from torchbearer.metrics import MetricList, Metric
 class TestMetricList(unittest.TestCase):
     def test_default_acc(self):
         metric = MetricList(['acc'])
-        self.assertTrue(metric.metric_list[0].name == 'running_acc', msg='running_acc not in: ' + str(metric.metric_list))
+        self.assertTrue(metric.metric_list[0].name == 'acc', msg='acc not in: ' + str(metric.metric_list))
 
     def test_default_loss(self):
         metric = MetricList(['loss'])
-        self.assertTrue(metric.metric_list[0].name == 'running_loss', msg='running_loss not in: ' + str(metric.metric_list))
+        self.assertTrue(metric.metric_list[0].name == 'loss', msg='loss not in: ' + str(metric.metric_list))
 
     def test_process(self):
         my_mock = Metric('test')
-        my_mock.process = Mock(return_value=-1)
+        my_mock.process = Mock(return_value={'test': -1})
         metric = MetricList([my_mock])
         result = metric.process({'state': -1})
         self.assertEqual({'test': -1}, result)
@@ -23,7 +23,7 @@ class TestMetricList(unittest.TestCase):
 
     def test_process_final(self):
         my_mock = Metric('test')
-        my_mock.process_final = Mock(return_value=-1)
+        my_mock.process_final = Mock(return_value={'test': -1})
         metric = MetricList([my_mock])
         result = metric.process_final({'state': -1})
         self.assertEqual({'test': -1}, result)

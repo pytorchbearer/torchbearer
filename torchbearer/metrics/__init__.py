@@ -1,9 +1,19 @@
 """
+Base Classes
+------------------------------------
+
 ..  automodule:: torchbearer.metrics.metrics
         :members:
         :undoc-members:
 
-Metric Wrappers
+Decorators - The Decorator API
+------------------------------------
+
+..  automodule:: torchbearer.metrics.decorators
+        :members:
+        :undoc-members:
+
+Metric Aggregators
 ------------------------------------
 
 ..  automodule:: torchbearer.metrics.wrappers
@@ -14,14 +24,7 @@ Metric Wrappers
         :members:
         :undoc-members:
 
-Default Metrics
-------------------------------------
-
-..  automodule:: torchbearer.metrics.defaults
-        :members:
-        :undoc-members:
-
-Valued Metrics
+Base Metrics
 ------------------------------------
 
 ..  automodule:: torchbearer.metrics.primitives
@@ -34,8 +37,8 @@ Valued Metrics
 """
 
 from .metrics import *
-from .defaults import *
-from .wrappers import *
+from .aggregators import *
 from .running import *
+from .decorators import *
 from .roc_auc_score import *
 from .primitives import *
