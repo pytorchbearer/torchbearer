@@ -13,8 +13,8 @@ class TestTorchbearer(TestCase):
 
     def test_main_loop_metrics(self):
         metric = Metric('test')
-        metric.process = Mock(return_value=0)
-        metric.process_final = Mock(return_value=0)
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
         metric.reset = Mock(return_value=None)
         metric_list = MetricList([metric])
 
@@ -404,8 +404,8 @@ class TestTorchbearer(TestCase):
 
     def test_test_loop_metrics(self):
         metric = Metric('test')
-        metric.process = Mock(return_value=0)
-        metric.process_final = Mock(return_value=0)
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
         metric.reset = Mock(return_value=None)
         metric_list = MetricList([metric])
 

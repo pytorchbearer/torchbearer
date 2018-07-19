@@ -4,6 +4,8 @@ import sklearn.metrics
 import numpy as np
 
 
+@metrics.default_for_key('roc_auc')
+@metrics.default_for_key('roc_auc_score')
 class RocAucScore(metrics.EpochLambda):
     """Area Under ROC curve metric.
 

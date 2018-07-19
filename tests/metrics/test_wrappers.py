@@ -18,21 +18,21 @@ class TestStd(unittest.TestCase):
                                             torch.FloatTensor([0.4, 0.5, 0.6]),
                                             torch.FloatTensor([0.7, 0.8, 0.9])]
 
-        self._std = Std(self._metric)
+        self._std = Std('test')
         self._std.reset({})
         self._target = 0.25819888974716
 
     def test_train(self):
         self._std.train()
         for i in range(3):
-            self._std.process({})
+            self._std.process(self._metric.process())
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
 
     def test_validate(self):
         self._std.eval()
         for i in range(3):
-            self._std.process({})
+            self._std.process(self._metric.process())
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
 
@@ -45,21 +45,21 @@ class TestMean(unittest.TestCase):
                                             torch.FloatTensor([0.4, 0.5, 0.6]),
                                             torch.FloatTensor([0.7, 0.8, 0.9])]
 
-        self._mean = Mean(self._metric)
+        self._mean = Mean('test')
         self._mean.reset({})
         self._target = 0.5
 
     def test_train_dict(self):
         self._mean.train()
         for i in range(3):
-            self._mean.process({})
+            self._mean.process(self._metric.process())
         result = self._mean.process_final({})
         self.assertAlmostEqual(self._target, result)
 
     def test_validate_dict(self):
         self._mean.eval()
         for i in range(3):
-            self._mean.process({})
+            self._mean.process(self._metric.process())
         result = self._mean.process_final({})
         self.assertAlmostEqual(self._target, result)
 

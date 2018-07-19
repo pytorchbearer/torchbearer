@@ -29,14 +29,12 @@ class TestRunningMetric(unittest.TestCase):
 class TestRunningMean(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
-        self._metric.process = Mock(return_value=torch.FloatTensor([1.0, 1.5, 2.0]))
-        self._mean = RunningMean(self._metric)
+        self._mean = RunningMean('test')
         self._cache = [1.0, 1.5, 2.0]
         self._target = 1.5
 
     def test_train(self):
-        result = self._mean._process_train({'test': -1})
-        self._metric.process.assert_called_with({'test': -1})
+        result = self._mean._process_train(torch.FloatTensor([1.0, 1.5, 2.0]))
         self.assertAlmostEqual(self._target, result, 3, 0.002)
 
     def test_step(self):

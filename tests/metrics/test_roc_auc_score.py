@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import torchbearer
-from torchbearer.metrics import RocAucScore
+from torchbearer.metrics import RocAucScore, MetricList
 
 import torch
 
@@ -44,3 +44,10 @@ class TestRocAucScore(unittest.TestCase):
                                                                                    mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][1])
         except AssertionError:
             self.fail('y_pred not correctly passed to sklearn')
+
+    def test_default_roc(self):
+        mlist = MetricList(['roc_auc'])
+        self.assertTrue(mlist.metric_list[0].name == 'roc_auc_score')
+
+        mlist = MetricList(['roc_auc_score'])
+        self.assertTrue(mlist.metric_list[0].name == 'roc_auc_score')
