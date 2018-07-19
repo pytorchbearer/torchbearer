@@ -13,7 +13,7 @@ Decorators - The Decorator API
         :members:
         :undoc-members:
 
-Metric Wrappers
+Metric Aggregators
 ------------------------------------
 
 ..  automodule:: torchbearer.metrics.wrappers
@@ -37,7 +37,7 @@ Base Metrics
 """
 
 from .metrics import *
-from .wrappers import *
+from .aggregators import *
 from .running import *
 from .decorators import *
 from .roc_auc_score import *
