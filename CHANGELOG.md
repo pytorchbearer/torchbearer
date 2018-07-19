@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- Added a decorator API for metrics which allows decorators to be used for metric construction
+- Added a default_for_key decorator which can be used to associate a string with a given metric in metric lists
+### Changed
+- Changed the API for running metrics and aggregators to no longer wrap a metric but instead receive input
+### Deprecated
+### Removed
+### Fixed
+
 ## [0.1.3] - 2018-07-17
 ### Added
 - Added a flag (step_on_batch) to the LR Scheduler callbacks which allows for step() to be called on each iteration instead of each epoch
