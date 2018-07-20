@@ -3,11 +3,15 @@ from unittest.mock import patch, Mock
 
 import torchbearer
 from torchbearer import Model
-from torchbearer.callbacks.checkpointers import _Checkpointer, MostRecent, Interval, Best
-import os
+from torchbearer.callbacks.checkpointers import _Checkpointer, ModelCheckpoint, MostRecent, Interval, Best
 
 
 class TestCheckpointer(TestCase):
+    @patch('os.makedirs')
+    def test_make_dirs(self, mock_dirs):
+        _Checkpointer('thisdirectoryshouldntexist/norshouldthis/model.pt')
+        mock_dirs.assert_called_once_with('thisdirectoryshouldntexist/norshouldthis')
+
     @patch("torch.save")
     def test_save_checkpoint_save_filename(self, mock_save):
         torchmodel = Mock()
@@ -113,6 +117,14 @@ class TestCheckpointer(TestCase):
         state[torchbearer.EPOCH] = 1
         check.save_checkpoint(state, True)
         self.assertTrue(check.most_recent == 'test_file_1.pt')
+
+
+class TestModelCheckpoint(TestCase):
+    def test_best_only(self):
+        self.assertTrue(isinstance(ModelCheckpoint(save_best_only=True), Best))
+
+    def test_not_best_only(self):
+        self.assertTrue(isinstance(ModelCheckpoint(save_best_only=False), Interval))
 
 
 class TestMostRecent(TestCase):
