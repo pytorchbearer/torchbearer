@@ -16,7 +16,7 @@ We first define all constants for the example.
    :language: python
    :lines: 19-29
 
-We then define a number of state keys for convenience. This is optional, however automatically avoids key conflicts.
+We then define a number of state keys for convenience. This is optional, however, it automatically avoids key conflicts.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
