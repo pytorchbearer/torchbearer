@@ -1,10 +1,10 @@
 """
 The base metric classes exist to enable complex data flow requirements between metrics. All metrics are either instances
 of :class:`Metric` or :class:`MetricFactory`. These can then be collected in a :class:`MetricList` or a
-:class:`MetricTree`. The :class:`MetricList` simply aggregates calls from a list of metrics, whereas the `MetricTree`
-will pass data from its root metric to each child and collect the outputs. This enables complex running metrics and
-statistics, without needing to compute the underlying values more than once. Typically, constructions of this kind
-should be handled using the decorator API.
+:class:`MetricTree`. The :class:`MetricList` simply aggregates calls from a list of metrics, whereas the
+:class:`MetricTree` will pass data from its root metric to each child and collect the outputs. This enables complex
+running metrics and statistics, without needing to compute the underlying values more than once. Typically,
+constructions of this kind should be handled using the :mod:`decorator API <.decorators>`.
 """
 
 import abc
@@ -62,7 +62,7 @@ class Metric(object):
     def reset(self, state):
         """Reset the metric, called before the start of an epoch.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
 
         """
         ...
@@ -151,9 +151,9 @@ class MetricList(Metric):
     """The :class:`MetricList` class is a wrapper for a list of metrics which acts as a single metric and produces a
     dictionary of outputs.
 
-    :param metric_list:The list of metrics to be wrapped. If the list contains a :class:`MetricList`, this will be\
+    :param metric_list: The list of metrics to be wrapped. If the list contains a :class:`MetricList`, this will be\
     unwrapped. Any strings in the list will be retrieved from metrics.DEFAULT_METRICS.
-    :type metric_list:list
+    :type metric_list: list
     """
 
     def __init__(self, metric_list):
@@ -186,7 +186,7 @@ class MetricList(Metric):
     def process(self, state):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :return: dict[str,any] -- A dictionary which maps metric names to values.
 
         """
@@ -195,7 +195,7 @@ class MetricList(Metric):
     def process_final(self, state):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :return: dict[str,any] -- A dictionary which maps metric names to values.
 
         """
@@ -214,7 +214,7 @@ class MetricList(Metric):
     def reset(self, state):
         """Reset each metric with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
 
         """
         self._for_list(lambda metric: metric.reset(state))
@@ -237,7 +237,7 @@ class AdvancedMetric(Metric):
     def process_train(self, *args):
         """Process the given state and return the metric value for a training iteration.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :return: The metric value for a training iteration.
 
         """
@@ -246,7 +246,7 @@ class AdvancedMetric(Metric):
     def process_validate(self, *args):
         """Process the given state and return the metric value for a validation iteration.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :return: The metric value for a validation iteration.
 
         """
@@ -255,7 +255,7 @@ class AdvancedMetric(Metric):
     def process_final_train(self, *args):
         """Process the given state and return the final metric value for a training iteration.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :return: The final metric value for a training iteration.
 
         """
@@ -264,7 +264,7 @@ class AdvancedMetric(Metric):
     def process_final_validate(self, *args):
         """Process the given state and return the final metric value for a validation iteration.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict
         :return: The final metric value for a validation iteration.
 
@@ -274,7 +274,7 @@ class AdvancedMetric(Metric):
     def process(self, *args):
         """Depending on the current mode, return the result of either 'process_train' or 'process_validate'.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict
         :return: The metric value.
 
@@ -284,7 +284,7 @@ class AdvancedMetric(Metric):
     def process_final(self, *args):
         """Depending on the current mode, return the result of either 'process_final_train' or 'process_final_validate'.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict
         :return: The final metric value.
 
