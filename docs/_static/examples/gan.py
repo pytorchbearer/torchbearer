@@ -10,7 +10,8 @@ from torchvision import datasets
 from torchvision.utils import save_image
 
 import torchbearer as tb
-from torchbearer.callbacks import Callback
+import torchbearer.callbacks as callbacks
+from torchbearer import state_key
 
 os.makedirs('images', exist_ok=True)
 
@@ -22,6 +23,18 @@ nworkers = 8
 latent_dim = 100
 sample_interval = 400
 img_shape = (1, 28, 28)
+adversarial_loss = torch.nn.BCELoss()
+device = 'cuda'
+valid = torch.ones(batch_size, 1, device=device)
+fake = torch.zeros(batch_size, 1, device=device)
+
+# Register state keys (optional)
+GEN_IMGS = state_key('gen_imgs')
+DISC_GEN = state_key('disc_gen')
+DISC_GEN_DET = state_key('disc_gen_det')
+DISC_REAL = state_key('disc_real')
+G_LOSS = state_key('g_loss')
+D_LOSS = state_key('d_loss')
 
 
 class Generator(nn.Module):
@@ -79,39 +92,31 @@ class GAN(nn.Module):
     def forward(self, real_imgs, state):
         # Generator Forward
         z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
-        state['gen_imgs'] = self.generator(z)
-        state['disc_gen'] = self.discriminator(state['gen_imgs'])
+        state[GEN_IMGS] = self.generator(z)
+        state[DISC_GEN] = self.discriminator(state[GEN_IMGS])
         # We don't want to discriminator gradients on the generator forward pass
         self.discriminator.zero_grad()
 
         # Discriminator Forward
-        state['disc_gen_det'] = self.discriminator(state['gen_imgs'].detach())
-        state['disc_real'] = self.discriminator(real_imgs)
+        state[DISC_GEN_DET] = self.discriminator(state[GEN_IMGS].detach())
+        state[DISC_REAL] = self.discriminator(real_imgs)
 
 
-class LossCallback(Callback):
-    def on_start(self, state):
-        super().on_start(state)
-        self.adversarial_loss = torch.nn.BCELoss()
-        state['valid'] = torch.ones(batch_size, 1, device=state[tb.DEVICE])
-        state['fake'] = torch.zeros(batch_size, 1, device=state[tb.DEVICE])
-
-    def on_criterion(self, state):
-        super().on_criterion(state)
-        fake_loss = self.adversarial_loss(state['disc_gen_det'], state['fake'])
-        real_loss = self.adversarial_loss(state['disc_real'], state['valid'])
-        state['g_loss'] = self.adversarial_loss(state['disc_gen'], state['valid'])
-        state['d_loss'] = (real_loss + fake_loss) / 2
-        # This is the loss that backward is called on.
-        state[tb.LOSS] = state['g_loss'] + state['d_loss']
+@callbacks.on_criterion
+def loss_callback(state):
+    fake_loss = adversarial_loss(state[DISC_GEN_DET], fake)
+    real_loss = adversarial_loss(state[DISC_REAL], valid)
+    state[G_LOSS] = adversarial_loss(state[DISC_GEN], valid)
+    state[D_LOSS] = (real_loss + fake_loss) / 2
+    # This is the loss that backward is called on.
+    state[tb.LOSS] = state[G_LOSS] + state[D_LOSS]
 
 
-class SaverCallback(Callback):
-    def on_step_training(self, state):
-        super().on_step_training(state)
-        batches_done = state[tb.EPOCH] * len(state[tb.GENERATOR]) + state[tb.BATCH]
-        if batches_done % sample_interval == 0:
-            save_image(state['gen_imgs'].data[:25], 'images/%d.png' % batches_done, nrow=5, normalize=True)
+@callbacks.on_step_training
+def saver_callback(state):
+    batches_done = state[tb.EPOCH] * len(state[tb.GENERATOR]) + state[tb.BATCH]
+    if batches_done % sample_interval == 0:
+        save_image(state[GEN_IMGS].data[:25], 'images/%d.png' % batches_done, nrow=5, normalize=True)
 
 
 # Configure data loader
@@ -135,20 +140,20 @@ optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5, 0.999))
 @tb.metrics.mean
 class g_loss(tb.metrics.Metric):
     def __init__(self):
-        super().__init__('g_loss')
+        super().__init__(G_LOSS)
 
     def process(self, state):
-        return state['g_loss']
+        return state[G_LOSS]
 
 
 @tb.metrics.running_mean
 @tb.metrics.mean
 class d_loss(tb.metrics.Metric):
     def __init__(self):
-        super().__init__('d_loss')
+        super().__init__(D_LOSS)
 
     def process(self, state):
-        return state['d_loss']
+        return state[D_LOSS]
 
 
 def zero_loss(y_pred, y_true):
@@ -156,5 +161,5 @@ def zero_loss(y_pred, y_true):
 
 
 torchbearermodel = tb.Model(model, optim, zero_loss, ['loss', g_loss(), d_loss()])
-torchbearermodel.to('cuda')
-torchbearermodel.fit_generator(dataloader, epochs=200, pass_state=True, callbacks=[LossCallback(), SaverCallback()])
+torchbearermodel.to(device)
+torchbearermodel.fit_generator(dataloader, epochs=200, pass_state=True, callbacks=[loss_callback, saver_callback])

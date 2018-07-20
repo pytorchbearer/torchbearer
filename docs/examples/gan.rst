@@ -14,13 +14,19 @@ We first define all constants for the example.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 18-24
+   :lines: 19-29
+
+We then define a number of state keys for convenience. This is optional, however, it automatically avoids key conflicts.
+
+.. literalinclude:: /_static/examples/gan.py
+   :language: python
+   :lines: 32-37
 
 We then define the dataset and dataloader - for this example, MNIST.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 119-126
+   :lines: 124-131
 
 Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -29,7 +35,7 @@ We use the generator and discriminator from PyTorch_GAN_ and combine them into a
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 73-89
+   :lines: 86-102
 
 Note that we have to be careful to remove the gradient information from the discriminator after doing the generator forward pass.
 
@@ -40,14 +46,13 @@ Since our loss is complicated in this example, we shall forgo the basic loss cri
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 154-155
+   :lines: 159-160
 
-Instead use a callback to provide the loss.
-We also utilise this callback to add constants to state.
+Instead use a callback to provide the loss. Since this callback is very simple we can use callback decorators on a function (which takes state) to tell torchbearer when it should be called.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 92-106
+   :lines: 105-112
 
 Note that we have summed the separate discriminator and generator losses since their graphs are separated, this is allowable.
 
@@ -59,7 +64,7 @@ We can then create metrics from these by decorating simple state fetcher metrics
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 134-141
+   :lines: 139-146
 
 Training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -68,16 +73,16 @@ We can then train the torchbearer model on the GPU in the standard way.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 158-160
+   :lines: 163-165
 
 Visualising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save on training step.
+We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save on training step - again using decorators.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 109-114
+   :lines: 115-119
 
 After 172400 iterations we see the following.
 
