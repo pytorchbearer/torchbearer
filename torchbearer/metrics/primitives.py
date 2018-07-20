@@ -73,6 +73,7 @@ class Epoch(metrics.Metric):
 
 
 @metrics.default_for_key('epoch')
+@metrics.to_dict
 class EpochFactory(metrics.MetricFactory):
     def build(self):
         return Epoch()
