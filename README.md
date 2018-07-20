@@ -13,7 +13,7 @@ torchbearer: A model training library for researchers using PyTorch
 
 ## About
 
-Torchbearer is a PyTorch model training library designed by researchers, for researchers. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you. Our design decisions are geared towards flexibility and customisability will trying to maintain the simplest possible API.
+Torchbearer is a PyTorch model training library designed by researchers, for researchers. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you. Our design decisions are geared towards flexibility and customisability whilst trying to maintain the simplest possible API.
 
 <a name="installation"/>
 
@@ -27,7 +27,7 @@ The easiest way to install torchbearer is with pip:
 
 ## Documentation
 
-Our documentation containing the API reference, examples and some notes can be found at [torchbearer.readthedocs.io](torchbearer.readthedocs.io)
+Our documentation containing the API reference, examples and some notes can be found at [https://torchbearer.readthedocs.io](torchbearer.readthedocs.io)
 
 <a name="others"/>
 
