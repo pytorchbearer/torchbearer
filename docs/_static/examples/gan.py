@@ -1,6 +1,3 @@
-import torchbearer as tb
-
-import argparse
 import os
 
 import numpy as np
@@ -12,6 +9,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.utils import save_image
 
+import torchbearer as tb
 from torchbearer.callbacks import Callback
 
 os.makedirs('images', exist_ok=True)
@@ -83,7 +81,7 @@ class GAN(nn.Module):
         z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
         state['gen_imgs'] = self.generator(z)
         state['disc_gen'] = self.discriminator(state['gen_imgs'])
-        # We don't want to keep gradients for the discriminator on generator pass
+        # We don't want to discriminator gradients on the generator forward pass
         self.discriminator.zero_grad()
 
         # Discriminator Forward
@@ -104,7 +102,7 @@ class LossCallback(Callback):
         real_loss = self.adversarial_loss(state['disc_real'], state['valid'])
         state['g_loss'] = self.adversarial_loss(state['disc_gen'], state['valid'])
         state['d_loss'] = (real_loss + fake_loss) / 2
-        # This is the loss backward is called on.
+        # This is the loss that backward is called on.
         state[tb.LOSS] = state['g_loss'] + state['d_loss']
 
 
@@ -128,13 +126,11 @@ dataset = datasets.MNIST('./data/mnist', train=True, download=True, transform=tr
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
+# Model and optimizer
 model = GAN()
-
-# Optimizer
-optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5,0.999))
+optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5, 0.999))
 
 
-@tb.metrics.default_for_key('g_loss')
 @tb.metrics.running_mean
 @tb.metrics.mean
 class g_loss(tb.metrics.Metric):
@@ -145,7 +141,6 @@ class g_loss(tb.metrics.Metric):
         return state['g_loss']
 
 
-@tb.metrics.default_for_key('d_loss')
 @tb.metrics.running_mean
 @tb.metrics.mean
 class d_loss(tb.metrics.Metric):
@@ -158,6 +153,7 @@ class d_loss(tb.metrics.Metric):
 
 def zero_loss(y_pred, y_true):
     return torch.zeros(y_true.shape[0], 1)
+
 
 torchbearermodel = tb.Model(model, optim, zero_loss, ['loss', g_loss(), d_loss()])
 torchbearermodel.to('cuda')
