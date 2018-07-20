@@ -13,12 +13,15 @@ Decorators - The Decorator API
         :members:
         :undoc-members:
 
-Metric Wrappers / Aggregators
+Metric Wrappers
 ------------------------------------
 
 ..  automodule:: torchbearer.metrics.wrappers
         :members:
         :undoc-members:
+
+Metric Aggregators
+------------------------------------
 
 ..  automodule:: torchbearer.metrics.aggregators
         :members:
@@ -29,11 +32,9 @@ Base Metrics
 
 ..  automodule:: torchbearer.metrics.primitives
         :members:
-        :undoc-members:
 
 ..  automodule:: torchbearer.metrics.roc_auc_score
         :members:
-        :undoc-members:
 """
 
 from .metrics import *

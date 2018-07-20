@@ -1,3 +1,8 @@
+"""
+Metric wrappers are classes which wrap instances of :class:`.Metric` or, in the case of :class:`EpochLambda` and
+:class:`BatchLambda`, functions. Typically, these should **not** be used directly (although this is entirely possible), but
+via the :mod:`decorator API<.decorators>`.
+"""
 import torchbearer
 from torchbearer import metrics
 
@@ -5,6 +10,29 @@ import torch
 
 
 class ToDict(metrics.AdvancedMetric):
+    """The :class:`ToDict` class is an :class:`.AdvancedMetric` which will put output from the inner :class:`.Metric` in
+    a dict (mapping metric name to value) before returning. When in `eval` mode, 'val\_' will be prepended to the metric
+    name.
+
+    Example: ::
+
+        >>> from torchbearer import metrics
+
+        >>> @metrics.lambda_metric('my_metric')
+        ... def my_metric(y_pred, y_true):
+        ...     return y_pred + y_true
+        ...
+        >>> metric = metrics.ToDict(my_metric().build())
+        >>> metric.process({'y_pred': 4, 'y_true': 5})
+        {'my_metric': 9}
+        >>> metric.eval()
+        >>> metric.process({'y_pred': 4, 'y_true': 5})
+        {'val_my_metric': 9}
+
+    :param metric: The :class:`.Metric` instance to *wrap*.
+    :type metric: metrics.Metric
+    """
+
     def __init__(self, metric):
         super(ToDict, self).__init__(metric.name)
 
@@ -45,23 +73,20 @@ class ToDict(metrics.AdvancedMetric):
 
 class BatchLambda(metrics.Metric):
     """A metric which returns the output of the given function on each batch.
+
+    :param name: The name of the metric.
+    :type name: str
+    :param metric_function: A metric function('y_pred', 'y_true') to wrap.
     """
 
     def __init__(self, name, metric_function):
-        """Construct a metric with the given name which wraps the given function.
-
-        :param name: The name of the metric.
-        :type name: str
-        :param metric_function: A metric function('y_pred', 'y_true') to wrap.
-
-        """
         super(BatchLambda, self).__init__(name)
         self._metric_function = metric_function
 
     def process(self, state):
         """Return the output of the wrapped function.
 
-        :param state: The model state.
+        :param state: The :class:`.torchbearer.Model` state.
         :type state: dict
         :return: The value of the metric function('y_pred', 'y_true').
 
@@ -73,20 +98,17 @@ class EpochLambda(metrics.AdvancedMetric):
     """A metric wrapper which computes the given function for concatenated values of 'y_true' and 'y_pred' each epoch.
     Can be used as a running metric which computes the function for batches of outputs with a given step size during
     training.
+
+    :param name: The name of the metric.
+    :type name: str
+    :param metric_function: The function('y_pred', 'y_true') to use as the metric.
+    :param running: True if this should act as a running metric.
+    :type running: bool
+    :param step_size: Step size to use between calls if running=True.
+    :type step_size: int
     """
 
     def __init__(self, name, metric_function, running=True, step_size=50):
-        """Wrap the given function as a metric with the given name.
-
-        :param name: The name of the metric.
-        :type name: str
-        :param metric_function: The function('y_pred', 'y_true') to use as the metric.
-        :param running: True if this should act as a running metric.
-        :type running: bool
-        :param step_size: Step size to use between calls if running=True.
-        :type step_size: int
-
-        """
         super(EpochLambda, self).__init__(name)
         self._step = metric_function
         self._final = metric_function
@@ -100,7 +122,7 @@ class EpochLambda(metrics.AdvancedMetric):
         """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension. If this is a running metric,
         evaluates the function every number of steps.
 
-        :param state: The model state.
+        :param state: The :class:`.torchbearer.Model` state.
         :type state: dict
         :return: The current running result.
 
@@ -114,7 +136,7 @@ class EpochLambda(metrics.AdvancedMetric):
     def process_final_train(self, state):
         """Evaluate the function with the aggregated outputs.
 
-        :param state: The model state.
+        :param state: The :class:`.torchbearer.Model` state.
         :type state: dict
         :return: The result of the function.
 
@@ -124,7 +146,7 @@ class EpochLambda(metrics.AdvancedMetric):
     def process_validate(self, state):
         """During validation, just concatenate 'y_true' and y_pred'.
 
-        :param state: The model state.
+        :param state: The :class:`.torchbearer.Model` state.
         :type state: dict
 
         """
@@ -134,7 +156,7 @@ class EpochLambda(metrics.AdvancedMetric):
     def process_final_validate(self, state):
         """Evaluate the function with the aggregated outputs.
 
-        :param state: The model state.
+        :param state: The :class:`.torchbearer.Model` state.
         :type state: dict
         :return: The result of the function.
 
@@ -144,7 +166,7 @@ class EpochLambda(metrics.AdvancedMetric):
     def reset(self, state):
         """Reset the 'y_true' and 'y_pred' caches.
 
-        :param state: The model state.
+        :param state: The :class:`.torchbearer.Model` state.
         :type state: dict
 
         """

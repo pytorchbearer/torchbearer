@@ -1,3 +1,9 @@
+"""
+Aggregators are a special kind of :class:`.Metric` which takes as input, the output from a previous metric or metrics.
+As a result, via a :class:`.MetricTree`, a series of aggregators can collect statistics such as Mean or Standard
+Deviation without needing to compute the underlying metric multiple times. This can, however, make the aggregators
+complex to use. It is therefore typically better to use the :mod:`decorator API<.decorators>`.
+"""
 from torchbearer import metrics
 from abc import ABCMeta, abstractmethod
 from collections import deque
@@ -10,22 +16,18 @@ class RunningMetric(metrics.AdvancedMetric):
 
     .. note::
 
-        This class only provides output during training.
+       Running metrics only provide output during training.
 
+    :param name: The name of the metric.
+    :type name: str
+    :param batch_size: The size of the deque to store of previous results.
+    :type batch_size: int
+    :param step_size: The number of iterations between aggregations.
+    :type step_size: int
     """
     __metaclass__ = ABCMeta
 
     def __init__(self, name, batch_size=50, step_size=10):
-        """Initialise the deque of results.
-
-        :param name: The name of the metric. Will be prepended with 'running_'.
-        :type name: str
-        :param batch_size: The size of the deque to store of previous results.
-        :type batch_size: int
-        :param step_size: The number of iterations between aggregations.
-        :type step_size: int
-
-        """
         super().__init__(name)
         self._batch_size = batch_size
         self._step_size = step_size
@@ -36,8 +38,7 @@ class RunningMetric(metrics.AdvancedMetric):
     def _process_train(self, *args):
         """Process the metric for a single train step.
 
-        :param state: The current model state.
-        :type state: dict
+        :param args: The output of some :class:`.Metric`
         :return: The metric value.
 
         """
@@ -57,8 +58,7 @@ class RunningMetric(metrics.AdvancedMetric):
     def process_train(self, *args):
         """Add the current metric value to the cache and call '_step' is needed.
 
-        :param state: The current model state.
-        :type state: dict
+        :param args: The output of some :class:`.Metric`
         :return: The current metric value.
 
         """
@@ -81,19 +81,17 @@ class RunningMetric(metrics.AdvancedMetric):
 
 
 class RunningMean(RunningMetric):
-    """A running metric wrapper which outputs the mean of a sequence of observations.
+    """A :class:`RunningMetric` which outputs the mean of a sequence of its input over the course of an epoch.
+
+    :param name: The name of this running mean.
+    :type name: str
+    :param batch_size: The size of the deque to store of previous results.
+    :type batch_size: int
+    :param step_size: The number of iterations between aggregations.
+    :type step_size: int
     """
 
     def __init__(self, name, batch_size=50, step_size=10):
-        """Wrap the given metric in initialise the parent :class:`RunningMetric`.
-
-        :param metric: The metric to wrap.
-        :type metric: Metric
-        :param batch_size: The size of the deque to store of previous results.
-        :type batch_size: int
-        :param step_size: The number of iterations between aggregations.
-        :type step_size: int
-        """
         super().__init__(name, batch_size=batch_size, step_size=step_size)
 
     def _process_train(self, data):
@@ -104,17 +102,20 @@ class RunningMean(RunningMetric):
 
 
 class Std(metrics.Metric):
-    """Metric wrapper which calculates the standard deviation of process outputs between calls to reset.
+    """Metric aggregator which calculates the standard deviation of process outputs between calls to reset.
+
+    :param name: The name of this metric.
+    :type name: str
     """
 
     def __init__(self, name):
         super(Std, self).__init__(name)
 
     def process(self, data):
-        """Process the wrapped metric and compute values required for the std.
+        """Compute values required for the std from the input.
 
-        :param state: The model state.
-        :type state: dict
+        :param data:  The output of some previous call to :meth:`.Metric.process`.
+        :type data: torch.Tensor
 
         """
         self._sum += data.sum().item()
@@ -128,8 +129,8 @@ class Std(metrics.Metric):
     def process_final(self, data):
         """Compute and return the final standard deviation.
 
-        :param state: The model state.
-        :type state: dict
+        :param data:  The output of some previous call to :meth:`.Metric.process_final`.
+        :type data: torch.Tensor
         :return: The standard deviation of each observation since the last reset call.
 
         """
@@ -151,17 +152,20 @@ class Std(metrics.Metric):
 
 
 class Mean(metrics.Metric):
-    """Metric wrapper which calculates the mean value of a series of observations between reset calls.
+    """Metric aggregator which calculates the mean of process outputs between calls to reset.
+
+    :param name: The name of this metric.
+    :type name: str
     """
 
     def __init__(self, name):
         super(Mean, self).__init__(name)
 
     def process(self, data):
-        """Compute the metric value and add it to the rolling sum.
+        """Add the input to the rolling sum.
 
-        :param state: The model state.
-        :type state: dict
+        :param data:  The output of some previous call to :meth:`.Metric.process`.
+        :type data: torch.Tensor
 
         """
         self._sum += data.sum().item()
@@ -174,8 +178,8 @@ class Mean(metrics.Metric):
     def process_final(self, data):
         """Compute and return the mean of all metric values since the last call to reset.
 
-        :param state: The model state.
-        :type state: dict
+        :param data:  The output of some previous call to :meth:`.Metric.process_final`.
+        :type data: torch.Tensor
         :return: The mean of the metric values since the last call to reset.
 
         """
