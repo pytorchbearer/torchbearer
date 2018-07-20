@@ -8,7 +8,6 @@ from torchbearer import metrics as torchbearer_metrics
 from torchbearer.callbacks.aggregate_predictions import AggregatePredictions
 from torchbearer.callbacks.callbacks import CallbackList
 from torchbearer.callbacks.printer import Tqdm
-from torchbearer.cv_utils import get_train_valid_sets
 
 
 class Model:
@@ -57,7 +56,7 @@ class Model:
         :param validation_split: Fraction of the training dataset to be set aside for validation testing
         :type validation_split: float
         :param validation_data: Optional validation data tensor
-        :type validation_data: torch.Tensor
+        :type validation_data: (torch.Tensor, torch.Tensor)
         :param shuffle: If True mini-batches of training/validation data are randomly selected, if False mini-batches samples are selected in order defined by dataset
         :type shuffle: bool
         :param initial_epoch: The integer value representing the first epoch - useful for continuing training after a number of epochs
@@ -74,7 +73,7 @@ class Model:
         :rtype: dict[str,any]
         """
         
-        trainset, valset = get_train_valid_sets(x, y, validation_data, validation_split, shuffle=shuffle)
+        trainset, valset = torchbearer.cv_utils.get_train_valid_sets(x, y, validation_data, validation_split, shuffle=shuffle)
         trainloader = DataLoader(trainset, batch_size, shuffle=shuffle, num_workers=workers)
 
         if valset is not None:
@@ -325,7 +324,7 @@ class Model:
 
         return state[torchbearer.METRICS]
 
-    def predict(self, x=None, batch_size=None, verbose=1, steps=None, pass_state=False):
+    def predict(self, x=None, batch_size=32, verbose=1, steps=None, pass_state=False):
         """ Perform a prediction loop on given data tensor to predict labels
 
         :param x: The input data tensor
@@ -341,7 +340,7 @@ class Model:
         :return: Tensor of final predicted labels
         :rtype: torch.Tensor
         """
-        pred_set = DataLoader(TensorDataset(x, None), batch_size, steps)
+        pred_set = DataLoader(TensorDataset(x), batch_size, steps)
         return self.predict_generator(pred_set, verbose, pass_state=pass_state)
 
     def predict_generator(self, generator, verbose=1, steps=None, pass_state=False):
