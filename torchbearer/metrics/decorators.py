@@ -15,8 +15,7 @@ from torchbearer.metrics import MetricFactory, EpochLambda, BatchLambda, ToDict,
 def default_for_key(key):
     """The :func:`default_for_key` decorator will register the given metric in the global metric dict
     (`metrics.DEFAULT_METRICS`) so that it can be referenced by name in instances of :class:`.MetricList` such as in the
-    list given to
-    :meth:`.torchbearer.Model.fit`.
+    list given to the :class:`.torchbearer.Model`.
 
     Example: ::
 

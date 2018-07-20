@@ -1,3 +1,13 @@
+"""
+Base metrics are the base classes which represent the metrics supplied with torchbearer. The all use the
+:func:`.default_for_key` decorator so that they can be accessed in the call to :class:`.torchbearer.Model` via the
+following strings:
+
+- '`acc`' or '`accuracy`': The :class:`.CategoricalAccuracy` metric
+- '`loss`': The :class:`.Loss` metric
+- '`epoch`': The :class:`.Epoch` metric
+- '`roc_auc`' or '`roc_auc_score`': The :class:`.RocAucScore` metric
+"""
 import torchbearer
 from torchbearer import metrics
 
@@ -63,9 +73,7 @@ class Epoch(metrics.Metric):
 
 
 @metrics.default_for_key('epoch')
-@metrics.running_mean
-@metrics.std
-@metrics.mean
+@metrics.to_dict
 class EpochFactory(metrics.MetricFactory):
     def build(self):
         return Epoch()
