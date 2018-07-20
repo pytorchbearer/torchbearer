@@ -4,21 +4,25 @@
    contain the root `toctree` directive.
 
 Welcome to torchbearer's documentation!
-====================================
+=======================================
 
 .. toctree::
    :glob:
    :maxdepth: 1
    :caption: Examples
 
-   examples/*
+   examples/quickstart
+   examples/vae
+   examples/gan
 
 .. toctree::
    :glob:
    :maxdepth: 1
    :caption: Package Reference
 
-   code/*
+   code/main
+   code/callbacks
+   code/metrics
 
 
 Indices and tables

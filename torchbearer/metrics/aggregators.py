@@ -1,46 +1,106 @@
-import torchbearer
 from torchbearer import metrics
+from abc import ABCMeta, abstractmethod
+from collections import deque
 
 import torch
 
 
-class ToDict(metrics.AdvancedMetric):
-    def __init__(self, metric):
-        super(ToDict, self).__init__(metric.name)
+class RunningMetric(metrics.AdvancedMetric):
+    """A metric which aggregates batches of results and presents a method to periodically process these into a value.
 
-        self.metric = metric
+    .. note::
+
+        This class only provides output during training.
+
+    """
+    __metaclass__ = ABCMeta
+
+    def __init__(self, name, batch_size=50, step_size=10):
+        """Initialise the deque of results.
+
+        :param name: The name of the metric. Will be prepended with 'running_'.
+        :type name: str
+        :param batch_size: The size of the deque to store of previous results.
+        :type batch_size: int
+        :param step_size: The number of iterations between aggregations.
+        :type step_size: int
+
+        """
+        super().__init__(name)
+        self._batch_size = batch_size
+        self._step_size = step_size
+        self._cache = deque()
+        self._result = {}
+
+    @abstractmethod
+    def _process_train(self, *args):
+        """Process the metric for a single train step.
+
+        :param state: The current model state.
+        :type state: dict
+        :return: The metric value.
+
+        """
+        ...
+
+    @abstractmethod
+    def _step(self, cache):
+        """Aggregate the cache to produce a single metric value.
+
+        :param cache: The current stored metric cache.
+        :type cache: list
+        :return: The new metric value.
+
+        """
+        ...
 
     def process_train(self, *args):
-        val = self.metric.process(*args)
-        if val is not None:
-            return {self.metric.name: val}
+        """Add the current metric value to the cache and call '_step' is needed.
 
-    def process_validate(self, *args):
-        val = self.metric.process(*args)
-        if val is not None:
-            return {'val_' + self.metric.name: val}
+        :param state: The current model state.
+        :type state: dict
+        :return: The current metric value.
 
-    def process_final_train(self, *args):
-        val = self.metric.process_final(*args)
-        if val is not None:
-            return {self.metric.name: val}
-
-    def process_final_validate(self, *args):
-        val = self.metric.process_final(*args)
-        if val is not None:
-            return {'val_' + self.metric.name: val}
-
-    def eval(self):
-        super().eval()
-        self.metric.eval()
-
-    def train(self):
-        super().train()
-        self.metric.train()
+        """
+        self._cache.append(self._process_train(*args))
+        if len(self._cache) > self._batch_size:
+            self._cache.popleft()
+        if self._i % self._step_size == 0:
+            self._result = self._step(list(self._cache))
+        self._i += 1
+        return self._result
 
     def reset(self, state):
-        super().reset(state)
-        self.metric.reset(state)
+        """Reset the step counter. Does not clear the cache.
+
+        :param state: The current model state.
+        :type state: dict
+
+        """
+        self._i = 0
+
+
+class RunningMean(RunningMetric):
+    """A running metric wrapper which outputs the mean of a sequence of observations.
+    """
+
+    def __init__(self, name, batch_size=50, step_size=10):
+        """Wrap the given metric in initialise the parent :class:`RunningMetric`.
+
+        :param metric: The metric to wrap.
+        :type metric: Metric
+        :param batch_size: The size of the deque to store of previous results.
+        :type batch_size: int
+        :param step_size: The number of iterations between aggregations.
+        :type step_size: int
+        """
+        super().__init__(name, batch_size=batch_size, step_size=step_size)
+
+    def _process_train(self, data):
+        return data.mean().item()
+
+    def _step(self, cache):
+        return sum(cache) / float(len(cache))
 
 
 class Std(metrics.Metric):
@@ -131,116 +191,3 @@ class Mean(metrics.Metric):
         super().reset(state)
         self._sum = 0.0
         self._count = 0
-
-
-class BatchLambda(metrics.Metric):
-    """A metric which returns the output of the given function on each batch.
-    """
-
-    def __init__(self, name, metric_function):
-        """Construct a metric with the given name which wraps the given function.
-
-        :param name: The name of the metric.
-        :type name: str
-        :param metric_function: A metric function('y_pred', 'y_true') to wrap.
-
-        """
-        super(BatchLambda, self).__init__(name)
-        self._metric_function = metric_function
-
-    def process(self, state):
-        """Return the output of the wrapped function.
-
-        :param state: The model state.
-        :type state: dict
-        :return: The value of the metric function('y_pred', 'y_true').
-
-        """
-        return self._metric_function(state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
-
-
-class EpochLambda(metrics.AdvancedMetric):
-    """A metric wrapper which computes the given function for concatenated values of 'y_true' and 'y_pred' each epoch.
-    Can be used as a running metric which computes the function for batches of outputs with a given step size during
-    training.
-    """
-
-    def __init__(self, name, metric_function, running=True, step_size=50):
-        """Wrap the given function as a metric with the given name.
-
-        :param name: The name of the metric.
-        :type name: str
-        :param metric_function: The function('y_pred', 'y_true') to use as the metric.
-        :param running: True if this should act as a running metric.
-        :type running: bool
-        :param step_size: Step size to use between calls if running=True.
-        :type step_size: int
-
-        """
-        super(EpochLambda, self).__init__(name)
-        self._step = metric_function
-        self._final = metric_function
-        self._step_size = step_size
-        self._result = 0.0
-
-        if not running:
-            self._step = lambda y_pred, y_true: ...
-
-    def process_train(self, state):
-        """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension. If this is a running metric,
-        evaluates the function every number of steps.
-
-        :param state: The model state.
-        :type state: dict
-        :return: The current running result.
-
-        """
-        self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED].float()), dim=0)
-        if state[torchbearer.BATCH] % self._step_size == 0:
-            self._result = self._step(self._y_pred, self._y_true)
-        return self._result
-
-    def process_final_train(self, state):
-        """Evaluate the function with the aggregated outputs.
-
-        :param state: The model state.
-        :type state: dict
-        :return: The result of the function.
-
-        """
-        return self._final(self._y_pred, self._y_true)
-
-    def process_validate(self, state):
-        """During validation, just concatenate 'y_true' and y_pred'.
-
-        :param state: The model state.
-        :type state: dict
-
-        """
-        self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED].to(self._y_pred.dtype)), dim=0)
-
-    def process_final_validate(self, state):
-        """Evaluate the function with the aggregated outputs.
-
-        :param state: The model state.
-        :type state: dict
-        :return: The result of the function.
-
-        """
-        return self._final(self._y_pred, self._y_true)
-
-    def reset(self, state):
-        """Reset the 'y_true' and 'y_pred' caches.
-
-        :param state: The model state.
-        :type state: dict
-
-        """
-        super().reset(state)
-        self._y_true = torch.zeros(0).long()
-        self._y_pred = torch.zeros(0, 0)
-
-        self._y_true = self._y_true.to(state[torchbearer.DEVICE])
-        self._y_pred = self._y_pred.to(state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
