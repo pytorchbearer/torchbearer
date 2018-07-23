@@ -59,6 +59,13 @@ Weight Decay
 ..  automodule:: torchbearer.callbacks.weight_decay
         :members:
         :undoc-members:
+
+Decorators
+------------------------------------
+
+..  automodule:: torchbearer.callbacks.decorators
+        :members:
+        :undoc-members:
 """
 
 from .callbacks import *
