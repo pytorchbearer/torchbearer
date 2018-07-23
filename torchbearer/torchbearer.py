@@ -253,6 +253,7 @@ class Model:
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
                     state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
+                    callbacks.on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
 
                 callbacks.on_step_validation(state)

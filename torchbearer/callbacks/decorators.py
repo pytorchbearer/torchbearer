@@ -197,6 +197,20 @@ def on_forward_validation(func):
     return new_callback
 
 
+def on_criterion_validation(func):
+    """ The :func:`on_criterion_validation` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_criterion_validation`
+    calling the decorated function
+
+    :param func: The function(state) to *decorate*
+    :type func: function
+    :return: Initialised callback with :meth:`.Callback.on_criterion_validation` calling func
+    :rtype: :class:`.Callback`
+    """
+    new_callback = Callback()
+    new_callback.on_criterion_validation = func
+    return new_callback
+
+
 def on_end_validation(func):
     """ The :func:`on_end_validation` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_end_validation`
     calling the decorated function
@@ -239,5 +253,5 @@ def add_to_loss(func):
 
     new_callback = Callback()
     new_callback.on_criterion = add_to_loss_func
-    new_callback.on_step_validation = add_to_loss_func
+    new_callback.on_criterion_validation = add_to_loss_func
     return new_callback

@@ -88,6 +88,12 @@ class TestDecorators(unittest.TestCase):
         def example(state):
             return state
         state = 'test'
+        self.assertTrue(callbacks.on_criterion_validation(example).on_criterion_validation(state) == state)
+
+    def test_on_criterion_validation(self):
+        def example(state):
+            return state
+        state = 'test'
         self.assertTrue(callbacks.on_forward_validation(example).on_forward_validation(state) == state)
 
     def test_on_end_validation(self):
@@ -108,7 +114,7 @@ class TestDecorators(unittest.TestCase):
         state = {'test': 'test', torchbearer.LOSS: 0}
         callbacks.add_to_loss(example).on_criterion(state)
         self.assertTrue(state[torchbearer.LOSS] == 1)
-        callbacks.add_to_loss(example).on_step_validation(state)
+        callbacks.add_to_loss(example).on_criterion_validation(state)
         self.assertTrue(state[torchbearer.LOSS] == 2)
 
 
