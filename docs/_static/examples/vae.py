@@ -84,40 +84,39 @@ def bce_loss(y_pred, y_true):
     return BCE
 
 
-class AddKLDLoss(Callback):
-    def on_criterion(self, state):
-        super().on_criterion(state)
-        KLD = self.KLD_Loss(state['mu'], state['logvar'])
-        state[torchbearer.LOSS] = state[torchbearer.LOSS] + KLD
-
-    def KLD_Loss(self, mu, logvar):
-        KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-        return KLD
+def kld_Loss(mu, logvar):
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return KLD
 
 
-class SaveReconstruction(Callback):
-    def __init__(self, num_images=8, folder='results/'):
-        super().__init__()
-        self.num_images = num_images
-        self.folder = folder
+@torchbearer.callbacks.add_to_loss
+def add_kld_loss_callback(state):
+    KLD = kld_Loss(state['mu'], state['logvar'])
+    return KLD
 
-    def on_step_validation(self, state):
-        super().on_step_validation(state)
+
+def save_reconstruction_callback(num_images=8, folder='results/'):
+    import os
+    os.makedirs(os.path.dirname(folder), exist_ok=True)
+
+    @torchbearer.callbacks.on_step_validation
+    def saver(state):
         if state[torchbearer.BATCH] == 0:
             data = state[torchbearer.X]
             recon_batch = state[torchbearer.Y_PRED]
-            comparison = torch.cat([data[:self.num_images],
-                                    recon_batch.view(128, 1, 28, 28)[:self.num_images]])
+            comparison = torch.cat([data[:num_images],
+                                    recon_batch.view(128, 1, 28, 28)[:num_images]])
             save_image(comparison.cpu(),
-                       str(self.folder) + 'reconstruction_' + str(state[torchbearer.EPOCH]) + '.png', nrow=self.num_images)
+                       str(folder) + 'reconstruction_' + str(state[torchbearer.EPOCH]) + '.png', nrow=num_images)
+    return saver
 
 
 model = VAE()
-
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = bce_loss
 
 from torchbearer import Model
 
 torchbearer_model = Model(model, optimizer, loss, metrics=['loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen, callbacks=[AddKLDLoss(), SaveReconstruction()], pass_state=True)
+torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen,
+                                callbacks=[add_kld_loss_callback, save_reconstruction_callback()], pass_state=True)
