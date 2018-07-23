@@ -95,3 +95,10 @@ def on_step_validation(func):
     new_callback = Callback()
     new_callback.on_step_validation = func
     return new_callback
+
+
+def add_to_loss(func):
+    new_callback = Callback()
+    new_callback.on_criterion = func
+    new_callback.on_step_validation = func
+    return new_callback
