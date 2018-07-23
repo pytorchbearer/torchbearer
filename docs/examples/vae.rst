@@ -39,26 +39,31 @@ Defining the Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Now we have the model and data, we will need a loss function to optimize.
 VAEs typically take the sum of a reconstruction loss and a KL-divergence loss to form the final loss value.
+
+.. literalinclude:: /_static/examples/vae.py
+   :language: python
+   :lines: 82-84
+
+.. literalinclude:: /_static/examples/vae.py
+   :language: python
+   :lines: 87-89
+
 There are two ways this can be done in torchbearer - one is very similar to the PyTorch example method and the other utilises the torchbearer state.
 
 PyTorch method
 ------------------------------------
 
-The loss function from the PyTorch example is:
+The loss function slightly modified from the PyTorch example is:
 
 .. literalinclude:: /_static/examples/vae_standard.py
    :language: python
-   :lines: 82-87
+   :lines: 87-95
 
 This requires the packing of the reconstruction, mean and log-variance into the model output and unpacking it for the loss function to use.
 
 .. literalinclude:: /_static/examples/vae_standard.py
    :language: python
    :lines: 70-73
-
-.. literalinclude:: /_static/examples/vae_standard.py
-   :language: python
-   :lines: 76-79
 
 
 Using Torchbearer State
@@ -80,17 +85,17 @@ We can then modify the model forward pass to store the mean and log-variance und
    :language: python
    :lines: 74-79
 
-The loss can then be separated into a standard reconstruction loss and a separate KL-divergence loss using intermediate tensor values.
+The reconstruction loss is a standard loss taking network output and the true label
 
 .. literalinclude:: /_static/examples/vae.py
    :language: python
-   :lines: 82-84
+   :lines: 116
 
-Since loss functions cannot access state, we utilise a simple callback to complete the loss calculation.
+Since loss functions cannot access state, we utilise a simple callback to combine the kld loss which does not act on network output or true label.
 
 .. literalinclude:: /_static/examples/vae.py
    :language: python
-   :lines: 87-95
+   :lines: 92-95
 
 
 Visualising Results
@@ -102,7 +107,7 @@ For auto-encoding problems it is often useful to visualise the reconstructions. 
 .. _save_image: https://pytorch.org/docs/stable/torchvision/utils.html?highlight=save#torchvision.utils.save_image
 
 .. literalinclude:: /_static/examples/vae.py
-   :lines: 98-112
+   :lines: 98-111
 
 Training the Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -113,7 +118,7 @@ We train the model by creating a torchmodel and a torchbearermodel and calling f
 
 
 .. literalinclude:: /_static/examples/vae.py
-   :lines: 115-120
+   :lines: 114-122
 
 The visualised results after ten epochs then look like this:
 

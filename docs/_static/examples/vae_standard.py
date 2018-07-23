@@ -73,16 +73,24 @@ class VAE(nn.Module):
         return self.decode(z), mu, logvar
 
 
-def bce_plus_kld_loss(y_pred, y_true):
-    recon_x, mu, logvar = y_pred
-    x = y_true
-    return loss_function(recon_x, x, mu, logvar)
+def bce_loss(recon_x, x):
+    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), size_average=False)
+    return BCE
+
+
+def kld_Loss(mu, logvar):
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return KLD
+
 
 # Reconstruction + KL divergence losses summed over all elements and batch
-def loss_function(recon_x, x, mu, logvar):
-    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), size_average=False)
+def loss_function(y_pred, y_true):
+    recon_x, mu, logvar = y_pred
+    x = y_true
 
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    BCE = bce_loss(recon_x, x)
+
+    KLD = kld_Loss(mu, logvar)
 
     return BCE + KLD
 
