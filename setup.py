@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name='torchbearer',
-    version='0.1.3',
+    version='0.1.4',
     packages=['torchbearer', 'torchbearer.metrics', 'torchbearer.callbacks', 'tests', 'tests.metrics', 'tests.callbacks'],
     url='https://github.com/ecs-vlc/torchbearer',
-    download_url='https://github.com/ecs-vlc/torchbearer/archive/0.1.3.tar.gz',
+    download_url='https://github.com/ecs-vlc/torchbearer/archive/0.1.4.tar.gz',
     license='GPL-3.0',
     author='Matt Painter',
     author_email='mp2u16@ecs.soton.ac.uk',

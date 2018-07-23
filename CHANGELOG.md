@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.1.4] - 2018-07-23
 ### Added
 - Added a decorator API for metrics which allows decorators to be used for metric construction
 - Added a default_for_key decorator which can be used to associate a string with a given metric in metric lists
