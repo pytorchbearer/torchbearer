@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added a decorator API for metrics which allows decorators to be used for metric construction
 - Added a default_for_key decorator which can be used to associate a string with a given metric in metric lists
+- Added a decorator API for callbacks which allows decorators to be used for simple callback construction
+- Added a add_to_loss callback decorator which allows quicker constructions of callbacks that add values to the loss
 ### Changed
 - Changed the API for running metrics and aggregators to no longer wrap a metric but instead receive input
 ### Deprecated

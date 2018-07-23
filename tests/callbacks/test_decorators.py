@@ -1,6 +1,7 @@
 import unittest
 
 import torchbearer.callbacks as callbacks
+import torchbearer
 
 
 class TestDecorators(unittest.TestCase):
@@ -101,5 +102,13 @@ class TestDecorators(unittest.TestCase):
         state = 'test'
         self.assertTrue(callbacks.on_step_validation(example).on_step_validation(state) == state)
 
+    def test_add_to_loss(self):
+        def example(state):
+            return 1
+        state = {'test': 'test', torchbearer.LOSS: 0}
+        callbacks.add_to_loss(example).on_criterion(state)
+        self.assertTrue(state[torchbearer.LOSS] == 1)
+        callbacks.add_to_loss(example).on_step_validation(state)
+        self.assertTrue(state[torchbearer.LOSS] == 2)
 
 
