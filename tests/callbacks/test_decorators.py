@@ -88,13 +88,13 @@ class TestDecorators(unittest.TestCase):
         def example(state):
             return state
         state = 'test'
-        self.assertTrue(callbacks.on_criterion_validation(example).on_criterion_validation(state) == state)
+        self.assertTrue(callbacks.on_forward_validation(example).on_forward_validation(state) == state)
 
     def test_on_criterion_validation(self):
         def example(state):
             return state
         state = 'test'
-        self.assertTrue(callbacks.on_forward_validation(example).on_forward_validation(state) == state)
+        self.assertTrue(callbacks.on_criterion_validation(example).on_criterion_validation(state) == state)
 
     def test_on_end_validation(self):
         def example(state):

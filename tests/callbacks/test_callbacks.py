@@ -24,6 +24,7 @@ class TestCallback(TestCase):
         self.assertIsNone(callback.on_forward_validation({}))
         self.assertIsNone(callback.on_end_validation({}))
         self.assertIsNone(callback.on_step_validation({}))
+        self.assertIsNone(callback.on_criterion_validation({}))
 
 
 class TestCallbackList(TestCase):
