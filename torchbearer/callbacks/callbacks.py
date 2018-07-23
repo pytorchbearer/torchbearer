@@ -134,6 +134,16 @@ class Callback(object):
         """
         pass
 
+    def on_criterion_validation(self, state):
+        """Perform some action with the given state as context after the criterion evaluation has been completed
+        with the validation data.
+
+        :param state: The current state dict of the :class:`Model`.
+        :type state: dict[str,any]
+
+        """
+        pass
+
     def on_end_validation(self, state):
         """Perform some action with the given state as context at the end of the validation loop.
 
@@ -305,6 +315,15 @@ class CallbackList(Callback):
 
         """
         self._for_list(lambda callback: callback.on_forward_validation(state))
+
+    def on_criterion_validation(self, state):
+        """Call on_criterion_validation on each callback in turn with the given state.
+
+        :param state: The current state dict of the :class:`Model`.
+        :type state: dict[str,any]
+
+        """
+        self._for_list(lambda callback: callback.on_criterion_validation(state))
 
     def on_end_validation(self, state):
         """Call on_end_validation on each callback in turn with the given state.
