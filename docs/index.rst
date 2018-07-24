@@ -9,6 +9,13 @@ Welcome to torchbearer's documentation!
 .. toctree::
    :glob:
    :maxdepth: 1
+   :caption: Notes
+
+   notes/*
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
    :caption: Examples
 
    examples/quickstart

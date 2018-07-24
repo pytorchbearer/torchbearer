@@ -4,7 +4,7 @@ of :class:`Metric` or :class:`MetricFactory`. These can then be collected in a :
 :class:`MetricTree`. The :class:`MetricList` simply aggregates calls from a list of metrics, whereas the
 :class:`MetricTree` will pass data from its root metric to each child and collect the outputs. This enables complex
 running metrics and statistics, without needing to compute the underlying values more than once. Typically,
-constructions of this kind should be handled using the :mod:`decorator API <.decorators>`.
+constructions of this kind should be handled using the :mod:`decorator API <.metrics.decorators>`.
 """
 
 import abc

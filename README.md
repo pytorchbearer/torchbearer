@@ -106,7 +106,7 @@ torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testge
 
 ## Documentation
 
-Our documentation containing the API reference, examples and some notes can be found at [https://torchbearer.readthedocs.io](torchbearer.readthedocs.io)
+Our documentation containing the API reference, examples and some notes can be found at [https://torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
 
 <a name="others"/>
 

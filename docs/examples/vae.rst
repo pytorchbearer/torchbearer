@@ -77,7 +77,7 @@ By default the model forward pass does not have access to the state dictionary, 
 
 .. literalinclude:: /_static/examples/vae.py
    :language: python
-   :lines: 123
+   :lines: 121-122
 
 We can then modify the model forward pass to store the mean and log-variance under suitable keys.
 
