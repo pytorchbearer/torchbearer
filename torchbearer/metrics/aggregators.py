@@ -2,7 +2,7 @@
 Aggregators are a special kind of :class:`.Metric` which takes as input, the output from a previous metric or metrics.
 As a result, via a :class:`.MetricTree`, a series of aggregators can collect statistics such as Mean or Standard
 Deviation without needing to compute the underlying metric multiple times. This can, however, make the aggregators
-complex to use. It is therefore typically better to use the :mod:`decorator API<.decorators>`.
+complex to use. It is therefore typically better to use the :mod:`decorator API<.metrics.decorators>`.
 """
 from torchbearer import metrics
 from abc import ABCMeta, abstractmethod
