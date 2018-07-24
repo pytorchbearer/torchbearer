@@ -1,7 +1,8 @@
 import math
 
 import torch
-from torch.utils.data import TensorDataset
+from torch.utils.data import TensorDataset, Dataset
+import random
 
 
 def train_valid_splitter(x, y, split, shuffle=True):
@@ -62,3 +63,44 @@ def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
         valset = TensorDataset(x_val, y_val)
 
     return trainset, valset
+
+
+class DatasetValidationSplitter:
+    def __init__(self, dataset_len, split_fraction, shuffle_seed=None):
+        super().__init__()
+        self.dataset_len = dataset_len
+        self.split_fraction = split_fraction
+        self.valid_ids = None
+        self.train_ids = None
+        self._gen_split_ids(shuffle_seed)
+
+    def _gen_split_ids(self, seed):
+        all_ids = list(range(self.dataset_len))
+
+        if seed is not None:
+            random.seed(seed)
+        random.shuffle(all_ids)
+
+        num_valid_ids = math.floor(self.dataset_len*self.split_fraction)
+        self.valid_ids = all_ids[:num_valid_ids]
+        self.train_ids = all_ids[num_valid_ids:]
+
+    def get_train_dataset(self, dataset):
+        return SubsetDataset(dataset, self.train_ids)
+
+    def get_val_dataset(self, dataset):
+        return SubsetDataset(dataset, self.valid_ids)
+
+
+class SubsetDataset(Dataset):
+    def __init__(self, dataset, ids):
+        super().__init__()
+        self.dataset = dataset
+        self.ids = ids
+
+    def __getitem__(self, index):
+        return self.dataset.__getitem__(self.ids[index])
+
+    def __len__(self):
+        return len(self.ids)
+

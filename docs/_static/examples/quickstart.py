@@ -4,14 +4,21 @@ import torch.optim as optim
 import torchvision
 from torchvision import transforms
 
+from torchbearer.cv_utils import DatasetValidationSplitter
+
 BATCH_SIZE = 128
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
 
-trainset = torchvision.datasets.CIFAR10(root='./data/cifar', train=True, download=True,
+dataset = torchvision.datasets.CIFAR10(root='./data/cifar', train=True, download=True,
                                         transform=transforms.Compose([transforms.ToTensor(), normalize]))
+splitter = DatasetValidationSplitter(len(dataset), 0.1)
+trainset = splitter.get_train_dataset(dataset)
+valset = splitter.get_val_dataset(dataset)
+
 traingen = torch.utils.data.DataLoader(trainset, pin_memory=True, batch_size=BATCH_SIZE, shuffle=True, num_workers=10)
+valgen = torch.utils.data.DataLoader(valset, pin_memory=True, batch_size=BATCH_SIZE, shuffle=True, num_workers=10)
 
 
 testset = torchvision.datasets.CIFAR10(root='./data/cifar', train=False, download=True,
@@ -50,4 +57,6 @@ loss = nn.CrossEntropyLoss()
 from torchbearer import Model
 
 torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen)
+torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=valgen)
+
+torchbearer_model.evaluate_generator(testgen)
