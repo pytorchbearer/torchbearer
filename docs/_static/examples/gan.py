@@ -94,7 +94,7 @@ class GAN(nn.Module):
         z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
         state[GEN_IMGS] = self.generator(z)
         state[DISC_GEN] = self.discriminator(state[GEN_IMGS])
-        # We don't want to discriminator gradients on the generator forward pass
+        # We don't want to keep discriminator gradients on the generator forward pass
         self.discriminator.zero_grad()
 
         # Discriminator Forward
