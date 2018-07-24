@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added a on_validation_criterion callback hook
+- Added a DatasetValidationSplitter which can be used to create a validation split if required for datasets like Cifar10 or MNIST
 ### Changed
 ### Deprecated
 ### Removed

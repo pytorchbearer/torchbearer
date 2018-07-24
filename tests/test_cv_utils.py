@@ -190,4 +190,37 @@ class TestCVUtils(unittest.TestCase):
         self.assertTrue(valset is None)
         self.assertTrue(len(trainset) == len(x))
 
+    def test_DatasetValidationSplitter(self):
+        data = torch.Tensor(list(range(1000)))
+        dataset = TensorDataset(data)
+
+        splitter = DatasetValidationSplitter(len(dataset), 0.1)
+        trainset = splitter.get_train_dataset(dataset)
+        validset = splitter.get_val_dataset(dataset)
+
+        self.assertTrue(len(trainset) == 900)
+        self.assertTrue(len(validset) == 100)
+
+        # Check for ids in both train and validation set
+        collision = False
+        for id in trainset:
+            if id in validset.ids:
+                collision = True
+        self.assertFalse(collision)
+
+    def test_DatasetValidationSplitter_seed(self):
+        data = torch.Tensor(list(range(1000)))
+        dataset = TensorDataset(data)
+
+        splitter_1 = DatasetValidationSplitter(len(dataset), 0.1, shuffle_seed=1)
+        trainset_1 = splitter_1.get_train_dataset(dataset)
+        validset_1 = splitter_1.get_val_dataset(dataset)
+
+        splitter_2 = DatasetValidationSplitter(len(dataset), 0.1, shuffle_seed=1)
+        trainset_2 = splitter_2.get_train_dataset(dataset)
+        validset_2 = splitter_2.get_val_dataset(dataset)
+
+        self.assertTrue(trainset_1.ids[0] == trainset_2.ids[0])
+        self.assertTrue(validset_1.ids[0] == validset_2.ids[0])
+
 
