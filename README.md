@@ -41,16 +41,22 @@ The easiest way to install torchbearer is with pip:
 
 ## Quickstart
 
-- Define your data and model as usual (here we use a simple CNN on Cifar10):
+- Define your data and model as usual (here we use a simple CNN on Cifar10). Note that we use torchbearers DatasetValidationSplitter here to create a validation set (10% of the data). This is essential to avoid [over-fitting to your test data](http://blog.kaggle.com/2012/07/06/the-dangers-of-overfitting-psychopathy-post-mortem/):
+
 ```python
 BATCH_SIZE = 128
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
 
-trainset = torchvision.datasets.CIFAR10(root='./data/cifar', train=True, download=True,
+dataset = torchvision.datasets.CIFAR10(root='./data/cifar', train=True, download=True,
                                         transform=transforms.Compose([transforms.ToTensor(), normalize]))
+splitter = DatasetValidationSplitter(len(dataset), 0.1)
+trainset = splitter.get_train_dataset(dataset)
+valset = splitter.get_val_dataset(dataset)
+
 traingen = torch.utils.data.DataLoader(trainset, pin_memory=True, batch_size=BATCH_SIZE, shuffle=True, num_workers=10)
+valgen = torch.utils.data.DataLoader(valset, pin_memory=True, batch_size=BATCH_SIZE, shuffle=True, num_workers=10)
 
 
 testset = torchvision.datasets.CIFAR10(root='./data/cifar', train=False, download=True,
@@ -93,20 +99,28 @@ loss = nn.CrossEntropyLoss()
 from torchbearer import Model
 
 torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen)
+torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=valgen)
+
+torchbearer_model.evaluate_generator(testgen)
 ```
 - Running that code gives output using Tqdm and providing running accuracies and losses during the training phase:
 
 ```
-0/10(t): 100%|██████████| 391/391 [00:01<00:00, 211.19it/s, running_acc=0.549, running_loss=1.25, acc=0.469, acc_std=0.499, loss=1.48, loss_std=0.238]
-0/10(v): 100%|██████████| 79/79 [00:00<00:00, 265.14it/s, val_acc=0.556, val_acc_std=0.497, val_loss=1.25, val_loss_std=0.0785]
+0/10(t): 100%|██████████| 352/352 [00:01<00:00, 233.36it/s, running_acc=0.536, running_loss=1.32, acc=0.459, acc_std=0.498, loss=1.52, loss_std=0.239]
+0/10(v): 100%|██████████| 40/40 [00:00<00:00, 239.40it/s, val_acc=0.536, val_acc_std=0.499, val_loss=1.29, val_loss_std=0.0731]
+.
+.
+.
+9/10(t): 100%|██████████| 352/352 [00:01<00:00, 215.76it/s, running_acc=0.741, running_loss=0.735, acc=0.754, acc_std=0.431, loss=0.703, loss_std=0.0897]
+9/10(v): 100%|██████████| 40/40 [00:00<00:00, 222.72it/s, val_acc=0.68, val_acc_std=0.466, val_loss=0.948, val_loss_std=0.181]
+0/1(e): 100%|██████████| 79/79 [00:00<00:00, 268.70it/s, val_acc=0.678, val_acc_std=0.467, val_loss=0.925, val_loss_std=0.109]
 ```
 
 <a name="docs"/>
 
 ## Documentation
 
-Our documentation containing the API reference, examples and some notes can be found at [https://torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
+Our documentation containing the API reference, examples and some notes can be found at [torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
 
 <a name="others"/>
 
