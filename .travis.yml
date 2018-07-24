@@ -10,3 +10,8 @@ script:
   - nosetests tests -v --with-coverage --cover-package=torchbearer
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
