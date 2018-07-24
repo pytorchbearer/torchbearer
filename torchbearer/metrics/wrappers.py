@@ -1,7 +1,7 @@
 """
 Metric wrappers are classes which wrap instances of :class:`.Metric` or, in the case of :class:`EpochLambda` and
-:class:`BatchLambda`, functions. Typically, these should **not** be used directly (although this is entirely possible), but
-via the :mod:`decorator API<.decorators>`.
+:class:`BatchLambda`, functions. Typically, these should **not** be used directly (although this is entirely possible),
+but via the :mod:`decorator API<.metrics.decorators>`.
 """
 import torchbearer
 from torchbearer import metrics
