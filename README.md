@@ -126,7 +126,8 @@ Our documentation containing the API reference, examples and some notes can be f
 
 ## Other Libraries
 
-Torchbearer isn't the only library for training PyTorch models. Here are a few others that might better suit your needs:
+Torchbearer isn't the only library for training PyTorch models. Here are a few others that might better suit your needs (this is by no means a complete list, see the [awesome pytorch list](https://github.com/bharathgs/Awesome-pytorch-list) for more):
+- [skorch](https://github.com/dnouri/skorch), model wrapper that enables use with scikit-learn - crossval etc. can be very useful
 - [PyToune](https://github.com/GRAAL-Research/pytoune), simple Keras style API
 - [ignite](https://github.com/pytorch/ignite), advanced model training from the makers of PyTorch, can need a lot of code for advanced functions (e.g. Tensorboard)
 - [TorchNetTwo (TNT)](https://github.com/pytorch/tnt), can be complex to use but well established, somewhat replaced by ignite
