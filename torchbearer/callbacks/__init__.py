@@ -21,6 +21,10 @@ Logging
         :members:
         :undoc-members:
 
+..  automodule:: torchbearer.callbacks.timer
+        :members:
+        :undoc-members:
+
 Tensorboard
 ------------------------------------
 
@@ -80,3 +84,4 @@ from .torch_scheduler import *
 from .weight_decay import *
 from .aggregate_predictions import *
 from .decorators import *
+from .timer import *
