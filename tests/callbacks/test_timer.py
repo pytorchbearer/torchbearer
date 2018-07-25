@@ -10,11 +10,11 @@ class TestTimer(TestCase):
         time.return_value = 0
         timer = TimerCallback()
         time.return_value = 1
-        timer.update_time('test')
+        timer.update_time('test', {})
         self.assertTrue(timer.get_timings()['test'] == 1)
 
         time.return_value = 3
-        timer.update_time('test_2')
+        timer.update_time('test_2', {})
         self.assertTrue(timer.get_timings()['test_2'] == 2)
 
     def test_calls(self):
