@@ -48,18 +48,6 @@ class TimerCallback(Callback):
         super().on_step_training(state)
         self.update_time('OnStep', state)
 
-    def on_end_training(self, state):
-        super().on_end_training(state)
-        self.update_time('OnEndTraining', state)
-
-    def on_end_epoch(self, state):
-        super().on_end_epoch(state)
-        self.update_time('OnEndEpoch', state)
-
-    def on_end(self, state):
-        super().on_end(state)
-        self.update_time('OnEnd', state)
-
     def on_start_validation(self, state):
         super().on_start_validation(state)
         self.update_time('OnStartValidation', state)
@@ -75,10 +63,6 @@ class TimerCallback(Callback):
     def on_criterion_validation(self, state):
         super().on_criterion_validation(state)
         self.update_time('OnCriterionValidation', state)
-
-    def on_end_validation(self, state):
-        super().on_end_validation(state)
-        self.update_time('OnEndValidation', state)
 
     def on_step_validation(self, state):
         super().on_step_validation(state)
