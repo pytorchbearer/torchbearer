@@ -31,7 +31,7 @@ Optimising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We need two more things before we can start optimising with torchbearer.
-We need out initial guess - which we've set to [2.0, 1.0, 10.0] and we need to tell torchbearer how "long" an epoch is - ie how many optimisation steps we want for each epoch.
+We need our initial guess - which we've set to [2.0, 1.0, 10.0] and we need to tell torchbearer how "long" an epoch is - I.e. how many optimisation steps we want for each epoch.
 For our simple function, we can complete the optimisation in a single epoch, but for more complex optimisations we might want to take multiple epochs and include tensorboard logging and perhaps learning rate annealing to find a final solution.
 We have set the number of optimisation steps for this example as 50000.
 
