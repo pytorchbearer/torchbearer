@@ -66,4 +66,5 @@ This simple metric is used to display the estimate throughout the optimisation p
    :lines: 34-40
 
 The final estimate is very close to our desired minimum at [5, 0, 1]:
+
 tensor([ 4.9988e+00,  4.5355e-05,  1.0004e+00])
