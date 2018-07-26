@@ -46,11 +46,13 @@ We define the model and optimiser in the standard way.
    :language: python
    :lines: 46-47
 
-Finally we start the optimising and print the final minimum estimate.
+Finally we start the optimising (giving as "data" and "targets" the number of steps desired) and print the final minimum estimate.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
    :lines: 49-51
+
+Note that we could use targets that are meaningful as they are given to the loss function, however this is not done for this example.
 
 
 Viewing Progress
