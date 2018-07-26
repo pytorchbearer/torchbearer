@@ -1,7 +1,7 @@
-import torchbearer as tb
-from torch.nn import Module
 import torch
-import torchbearer.metrics
+from torch.nn import Module
+
+import torchbearer as tb
 
 
 class Net(Module):

@@ -21,6 +21,7 @@ Welcome to torchbearer's documentation!
    examples/quickstart
    examples/vae
    examples/gan
+   examples/basic_opt
 
 .. toctree::
    :glob:

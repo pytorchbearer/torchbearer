@@ -14,17 +14,17 @@ We store the current estimates for the minimum as parameters in the model (so Py
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 6-25
+   :lines: 7-27
 
 The Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For function minimisation we have a simple analogue to neural network losses - the value of the function under the current estimates of the minimum.
+For function minimisation we have an analogue to neural network losses - we minimise the value of the function under the current estimates of the minimum.
 Note that as we are using a base loss, torchbearer passes this the network output and the "label" (which is of no use here).
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 28-29
+   :lines: 30-31
 
 
 Optimising
