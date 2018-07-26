@@ -36,7 +36,7 @@ class Model:
             torchbearer.SELF: self
         }
 
-    def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=0.0,
+    def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=None,
             validation_data=None, shuffle=True, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, workers=1, pass_state=False):
         """ Perform fitting of a model to given data and label tensors
