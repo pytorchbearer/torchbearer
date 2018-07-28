@@ -117,7 +117,9 @@ class Model:
         # Get train and validation steps
         if validation_steps is None and validation_generator is not None:
             validation_steps = len(validation_generator)
-        if train_steps is None or train_steps > len(generator):
+        if train_steps is None:
+            train_steps = len(generator)
+        if generator is not None and train_steps > len(generator):
             train_steps = len(generator)
         if not isinstance(train_steps, int):
             train_steps = int(train_steps)
@@ -146,7 +148,8 @@ class Model:
         for state[torchbearer.EPOCH] in range(initial_epoch, epochs):
             _callbacks.on_start_epoch(state)
 
-            state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
+            if state[torchbearer.GENERATOR] is not None:
+                state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
             self.train()
 
             _callbacks.on_start_training(state)
@@ -155,7 +158,11 @@ class Model:
 
             for state[torchbearer.BATCH] in range(0, state[torchbearer.TRAIN_STEPS]):
                 # Extract batch
-                self._load_batch_standard('train', state)
+                if state[torchbearer.GENERATOR] is None: # TODO: Replace with flag check
+                    self._load_batch_none('train', state)
+                else:
+                    self._load_batch_standard('train', state)
+
                 _callbacks.on_sample(state)
 
                 # Zero grads
@@ -191,7 +198,7 @@ class Model:
             _callbacks.on_end_training(state)
 
             # Validate
-            if validation_generator is not None:
+            if validation_generator is not None or validation_steps is not None:
                 state[torchbearer.VALIDATION_GENERATOR] = validation_generator
                 state[torchbearer.VALIDATION_STEPS] = validation_steps
                 self.eval()
@@ -226,15 +233,17 @@ class Model:
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
 
-
-            if num_steps is None or num_steps > len(state[torchbearer.VALIDATION_GENERATOR]):
+            if num_steps is None:
+                num_steps = len(state[torchbearer.VALIDATION_GENERATOR])
+            if state[torchbearer.VALIDATION_GENERATOR] is not None and num_steps > len(state[torchbearer.VALIDATION_GENERATOR]):
                 num_steps = len(state[torchbearer.VALIDATION_GENERATOR])
             if not isinstance(num_steps, int):
                 num_steps = int(num_steps)
                 warnings.warn('Num test steps is not an int, converting to int.', Warning)
 
             state[torchbearer.VALIDATION_STEPS] = num_steps
-            state[torchbearer.VALIDATION_ITERATOR] = iter(state[torchbearer.VALIDATION_GENERATOR])
+            if state[torchbearer.VALIDATION_GENERATOR] is not None:
+                state[torchbearer.VALIDATION_ITERATOR] = iter(state[torchbearer.VALIDATION_GENERATOR])
 
             callbacks.on_start_validation(state)
 
@@ -321,7 +330,13 @@ class Model:
         _callbacks = []
         if verbose == 1:
             _callbacks.append(Tqdm('e'))
-        self._test_loop(state, CallbackList(_callbacks), pass_state, self._load_batch_standard, steps)
+
+        if state[torchbearer.VALIDATION_GENERATOR] is None:
+            batch_loader = self._load_batch_none
+        else:
+            batch_loader = self._load_batch_standard
+
+        self._test_loop(state, CallbackList(_callbacks), pass_state, batch_loader, steps)
 
         return state[torchbearer.METRICS]
 
@@ -480,6 +495,10 @@ class Model:
         :type state: dict[str,any]
         """
         state[torchbearer.X], state[torchbearer.Y_TRUE] = Model._deep_to(next(state[iterator + '_iterator']), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
+
+    @staticmethod
+    def _load_batch_none(iterator, state):
+        state[torchbearer.X], state[torchbearer.Y_TRUE] = None, None
 
     @staticmethod
     def _load_batch_predict(iterator, state):

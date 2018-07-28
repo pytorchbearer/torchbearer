@@ -310,6 +310,28 @@ class TestTorchbearer(TestCase):
 
         self.assertTrue(warning.call_count == 1)
 
+    def test_main_loop_gen_none(self):
+        metric = Metric('test')
+
+        generator = None
+        train_steps = 8
+
+        epochs = 1
+
+        callback = MagicMock()
+
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
+        torchbearerstate = torchbearermodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+
+        self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == train_steps)
+
     def test_main_loop_train_steps_too_big(self):
         metric = Metric('test')
 
@@ -795,6 +817,32 @@ class TestTorchbearer(TestCase):
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 1)
+
+    def test_test_loop_none_gen(self):
+        metric = Metric('test')
+        metric_list = MetricList([metric])
+
+        validation_generator = None
+        validation_steps = 8
+
+        callback = MagicMock()
+        callback_List = torchbearer.CallbackList([callback])
+
+        torchmodel = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        criterion = Mock(return_value=2)
+
+        torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
+
+        state = torchbearermodel.main_state.copy()
+        state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
+                      torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
+                      torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
+        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_none, num_steps=validation_steps)
+
+        self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == validation_steps)
 
     def test_evaluate(self):
         x = torch.rand(1,5)
