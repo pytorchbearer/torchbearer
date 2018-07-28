@@ -497,7 +497,12 @@ class Model:
         state[torchbearer.X], state[torchbearer.Y_TRUE] = Model._deep_to(next(state[iterator + '_iterator']), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
 
     @staticmethod
-    def _load_batch_none(iterator, state):
+    def _load_batch_none(_, state):
+        """Static method to load a none (none, none) tuple mini-batch into state
+
+        :param state: The current state dict of the :class:`Model`.
+        :type state: dict[str,any]
+        """
         state[torchbearer.X], state[torchbearer.Y_TRUE] = None, None
 
     @staticmethod
