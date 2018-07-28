@@ -884,6 +884,23 @@ class TestTorchbearer(TestCase):
         self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
         self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
 
+    def test_evaluate_generator_none(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = None
+
+        pass_state = False
+        steps = 10
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.METRICS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][1].callback_list == [])
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
     def test_evaluate_generator_verbose(self):
         from torchbearer.callbacks import Tqdm
 
