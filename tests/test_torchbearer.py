@@ -310,7 +310,7 @@ class TestTorchbearer(TestCase):
 
         self.assertTrue(warning.call_count == 1)
 
-    def test_main_loop_gen_none(self):
+    def test_main_loop_none_gen(self):
         metric = Metric('test')
 
         generator = None
