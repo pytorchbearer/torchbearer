@@ -46,13 +46,14 @@ We define the model and optimiser in the standard way.
    :language: python
    :lines: 46-47
 
-Finally we start the optimising (giving as "data" and "targets" the number of steps desired) and print the final minimum estimate.
+Finally we start the optimising on the GPU and print the final minimum estimate.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
    :lines: 49-51
 
-Note that we could use targets that are meaningful as they are given to the loss function, however this is not done for this example.
+Usually torchbearer will infer the number of training steps from the data generator.
+Since for this example we have no data to give the model (which will be passed `None`), we need to tell torchbearer how many steps to run by setting the ``training_steps`` argument.
 
 
 Viewing Progress
@@ -68,3 +69,10 @@ This simple metric is used to display the estimate throughout the optimisation p
 The final estimate is very close to our desired minimum at [5, 0, 1]:
 
 tensor([ 4.9988e+00,  4.5355e-05,  1.0004e+00])
+
+Source Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The source code for the example is given below:
+
+ :download:`Download Python source code: basic_opt.py </_static/examples/basic_opt.py>`
