@@ -23,7 +23,7 @@ class TestTorchbearer(TestCase):
         optimizer = MagicMock()
         metric = Metric('test')
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         gtvs.return_value = (1, 2)
@@ -48,7 +48,7 @@ class TestTorchbearer(TestCase):
         optimizer = MagicMock()
         metric = Metric('test')
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -76,7 +76,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -102,7 +102,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         import sys
@@ -133,7 +133,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -157,7 +157,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -181,7 +181,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -208,7 +208,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -231,7 +231,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -254,7 +254,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -278,7 +278,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -302,13 +302,35 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
         torchbearerstate = torchbearermodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
         self.assertTrue(warning.call_count == 1)
+
+    def test_main_loop_none_gen(self):
+        metric = Metric('test')
+
+        generator = None
+        train_steps = 8
+
+        epochs = 1
+
+        callback = MagicMock()
+
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
+        torchbearerstate = torchbearermodel.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
+
+        self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == train_steps)
 
     def test_main_loop_train_steps_too_big(self):
         metric = Metric('test')
@@ -325,7 +347,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -348,7 +370,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -371,7 +393,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -394,7 +416,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -417,7 +439,7 @@ class TestTorchbearer(TestCase):
         torchmodel.forward = Mock(return_value=1)
         optimizer = MagicMock()
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -796,6 +818,32 @@ class TestTorchbearer(TestCase):
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 1)
 
+    def test_test_loop_none_gen(self):
+        metric = Metric('test')
+        metric_list = MetricList([metric])
+
+        validation_generator = None
+        validation_steps = 8
+
+        callback = MagicMock()
+        callback_List = torchbearer.CallbackList([callback])
+
+        torchmodel = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        criterion = Mock(return_value=2)
+
+        torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
+
+        state = torchbearermodel.main_state.copy()
+        state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
+                      torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
+                      torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
+        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_none, num_steps=validation_steps)
+
+        self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == validation_steps)
+
     def test_evaluate(self):
         x = torch.rand(1,5)
         y = torch.rand(1,5)
@@ -807,7 +855,7 @@ class TestTorchbearer(TestCase):
         optimizer = MagicMock()
         metric = Metric('test')
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
@@ -826,6 +874,23 @@ class TestTorchbearer(TestCase):
 
         pass_state = False
         steps = None
+
+        torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
+        torchbearermodel.main_state[torchbearer.METRICS] = 1
+        torchbearermodel._test_loop = Mock()
+
+        torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][1].callback_list == [])
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+
+    def test_evaluate_generator_none(self):
+        torchmodel = MagicMock()
+        optimizer = MagicMock()
+        generator = None
+
+        pass_state = False
+        steps = 10
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
@@ -893,7 +958,7 @@ class TestTorchbearer(TestCase):
         optimizer = MagicMock()
         metric = Metric('test')
 
-        loss = torch.tensor([2], requires_grad=True)
+        loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
