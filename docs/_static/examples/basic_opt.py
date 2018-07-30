@@ -40,12 +40,12 @@ class est(tb.metrics.Metric):
         return state['est'].data
 
 
-steps = torch.tensor(list(range(50000)))
 p = torch.tensor([2.0, 1.0, 10.0])
+training_steps = 50000
 
 model = Net(p)
 optim = torch.optim.SGD(model.parameters(), lr=0.0001)
 
-tbmodel = tb.Model(model, optim, loss, [est(), 'loss'])
-tbmodel.fit(steps, steps, 1, pass_state=True)
+tbmodel = tb.Model(model, optim, loss, [est(), 'loss']).to('cuda')
+tbmodel.fit_generator(None, pass_state=True, train_steps=training_steps)
 print(list(model.parameters())[0].data)
