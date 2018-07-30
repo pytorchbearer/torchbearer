@@ -181,7 +181,7 @@ class CallbackList(Callback):
         for i in range(len(callback_list)):
             callback = callback_list[i]
 
-            if isinstance(CallbackList, Callback):
+            if isinstance(callback, CallbackList):
                 self.callback_list = self.callback_list + callback.callback_list
             else:
                 self.callback_list.append(callback)
