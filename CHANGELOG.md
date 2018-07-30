@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed a bug where checkpointers would not save the model in some cases
 
 ## [0.1.4] - 2018-07-23
 ### Added
