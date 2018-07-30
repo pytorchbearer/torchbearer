@@ -5,16 +5,15 @@ from torchbearer.callbacks import TimerCallback
 
 
 class TestTimer(TestCase):
-    @patch('time.time')
-    def test_update_time(self, time):
-        time.return_value = 0
+    def test_update_time(self):
         timer = TimerCallback()
-        time.return_value = 1
-        timer.update_time('test', {})
+        timerMetric = TimerCallback()
+        timerMetric.process = Mock(return_value=1)
+        timer.update_time('test', timerMetric, {})
         self.assertTrue(timer.get_timings()['test'] == 1)
 
-        time.return_value = 3
-        timer.update_time('test_2', {})
+        timerMetric.process = Mock(return_value=2)
+        timer.update_time('test_2', timerMetric, {})
         self.assertTrue(timer.get_timings()['test_2'] == 2)
 
     def test_calls(self):
