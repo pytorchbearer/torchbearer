@@ -14,7 +14,7 @@ def train_valid_splitter(x, y, split, shuffle=True):
     :type y: torch.Tensor
     :param split: Fraction of dataset to be used for validation
     :type split: float
-    :param shuffle: If True randomize tensor order before splitting else do not randomize 
+    :param shuffle: If True randomize tensor order before splitting else do not randomize
     :type shuffle: bool
     :return: Training and validation tensors (training data, training labels, validation data, validation labels)
     :rtype: tuple
@@ -39,7 +39,7 @@ def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
     :type x: torch.Tensor
     :param y: Label tensor for dataset
     :type y: torch.Tensor
-    :param validation_data: Optional validation data (x_val, y_val) to be used instead of splitting x and y tensors 
+    :param validation_data: Optional validation data (x_val, y_val) to be used instead of splitting x and y tensors
     :type validation_data: (torch.Tensor, torch.Tensor)
     :param validation_split: Fraction of dataset to be used for validation
     :type validation_split: float

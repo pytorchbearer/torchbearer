@@ -86,9 +86,9 @@ class MostRecent(_Checkpointer):
         super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.filepath = filepath
 
-    def on_end_epoch(self, model_state):
-        super().on_end_training(model_state)
-        self.save_checkpoint(model_state, overwrite_most_recent=True)
+    def on_end_epoch(self, state):
+        super().on_end_training(state)
+        self.save_checkpoint(state, overwrite_most_recent=True)
 
 
 class Best(_Checkpointer):

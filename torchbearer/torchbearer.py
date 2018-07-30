@@ -72,7 +72,6 @@ class Model:
         :return: The final state context dictionary
         :rtype: dict[str,any]
         """
-        
         trainset, valset = torchbearer.cv_utils.get_train_valid_sets(x, y, validation_data, validation_split, shuffle=shuffle)
         trainloader = DataLoader(trainset, batch_size, shuffle=shuffle, num_workers=workers)
 
@@ -531,7 +530,7 @@ class Model:
         :return: Updated main state dictionary
         :rtype: dict[str,any]
         """
-        for key, val in kwargs.items():
+        for key, _ in kwargs.items():
             if key == torchbearer.DATA_TYPE:
                 main_state[torchbearer.DATA_TYPE] = kwargs[torchbearer.DATA_TYPE]
             elif torchbearer.DEVICE in kwargs:
