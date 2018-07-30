@@ -6,6 +6,7 @@ import numpy as np
 
 @metrics.default_for_key('roc_auc')
 @metrics.default_for_key('roc_auc_score')
+@metrics.to_dict
 class RocAucScore(metrics.EpochLambda):
     """Area Under ROC curve metric.
 
