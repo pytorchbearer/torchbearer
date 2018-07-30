@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Removed
 ### Fixed
 - Fixed a bug where checkpointers would not save the model in some cases
+- Fixed a bug with the ROC metric causing it to not work
 
 ## [0.1.4] - 2018-07-23
 ### Added
