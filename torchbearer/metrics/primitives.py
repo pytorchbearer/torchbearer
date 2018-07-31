@@ -42,7 +42,8 @@ class Loss(metrics.Metric):
     def __init__(self):
         super().__init__('loss')
 
-    def process(self, state):
+    def process(self, *args):
+        state = args[0]
         return state[torchbearer.LOSS]
 
 
@@ -62,13 +63,16 @@ class Epoch(metrics.Metric):
     def __init__(self):
         super().__init__('epoch')
 
-    def process_final(self, state):
-        return self._process(state)
+    def process_final(self, *args):
+        state = args[0]
+        return Epoch._process(state)
 
-    def process(self, state):
-        return self._process(state)
+    def process(self, *args):
+        state = args[0]
+        return Epoch._process(state)
 
-    def _process(self, state):
+    @staticmethod
+    def _process(state):
         return state[torchbearer.EPOCH]
 
 

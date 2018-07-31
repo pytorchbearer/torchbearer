@@ -11,28 +11,30 @@ class ConsolePrinter(Callback):
         super().__init__()
         self.validation_label = validation_label_letter
 
-    def _step(self, state, letter, steps):
+    @staticmethod
+    def _step(state, letter, steps):
         epoch_str = '{:d}/{:d}({:s}): '.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
         batch_str = '{:d}/{:d} '.format(state[torchbearer.BATCH], steps)
         stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[torchbearer.METRICS].items()])
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
-    def _end(self, state, letter):
+    @staticmethod
+    def _end(state, letter):
         epoch_str = '{:d}/{:d}({:s}): '.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
         stats_str = ', '.join(['{0}:{1:.03g}'.format(key, value) for (key, value) in state[torchbearer.METRICS].items()])
         print('\r' + epoch_str + stats_str)
 
     def on_step_training(self, state):
-        self._step(state, 't', state[torchbearer.TRAIN_STEPS])
+        ConsolePrinter._step(state, 't', state[torchbearer.TRAIN_STEPS])
 
     def on_end_training(self, state):
-        self._end(state, 't')
+        ConsolePrinter._end(state, 't')
 
     def on_step_validation(self, state):
-        self._step(state, self.validation_label, state[torchbearer.VALIDATION_STEPS])
+        ConsolePrinter._step(state, self.validation_label, state[torchbearer.VALIDATION_STEPS])
 
     def on_end_validation(self, state):
-        self._end(state, self.validation_label)
+        ConsolePrinter._end(state, self.validation_label)
 
 
 class Tqdm(Callback):
