@@ -111,7 +111,7 @@ class TensorBoardImages(Callback):
                  nrow=8,
                  padding=2,
                  normalize=False,
-                 range=None,
+                 norm_range=None,
                  scale_each=False,
                  pad_value=0):
         """Create TensorBoardImages callback which writes images from the given key to the given path. Full name of
@@ -132,7 +132,7 @@ class TensorBoardImages(Callback):
         :param nrow: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
         :param padding: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
         :param normalize: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-        :param range: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+        :param norm_range: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
         :param scale_each: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
         :param pad_value: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
         """
@@ -145,7 +145,7 @@ class TensorBoardImages(Callback):
         self.nrow = nrow
         self.padding = padding
         self.normalize = normalize
-        self.range = range
+        self.norm_range = norm_range
         self.scale_each = scale_each
         self.pad_value = pad_value
 
@@ -182,7 +182,7 @@ class TensorBoardImages(Callback):
                     nrow=self.nrow,
                     padding=self.padding,
                     normalize=self.normalize,
-                    range=self.range,
+                    range=self.norm_range,
                     scale_each=self.scale_each,
                     pad_value=self.pad_value
                 )

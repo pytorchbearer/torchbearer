@@ -9,8 +9,7 @@ constructions of this kind should be handled using the :mod:`decorator API <.met
 
 import abc
 
-"""The global dict of default metrics which maps keys to metrics in the :class:`MetricList`.
-"""
+# The global dict of default metrics which maps keys to metrics in the :class:`MetricList`.
 DEFAULT_METRICS = {}
 
 
@@ -38,7 +37,7 @@ class Metric(object):
         :return: None, or the value of the metric for this batch
 
         """
-        ...
+        pass
 
     def process_final(self, *args):
         """Process the terminal state and output the final value of the metric.
@@ -47,17 +46,17 @@ class Metric(object):
         :return: None or the value of the metric for this epoch
 
         """
-        ...
+        pass
 
     def eval(self):
         """Put the metric in eval mode during model validation.
         """
-        ...
+        pass
 
     def train(self):
         """Put the metric in train mode during model training.
         """
-        ...
+        pass
 
     def reset(self, state):
         """Reset the metric, called before the start of an epoch.
@@ -65,7 +64,7 @@ class Metric(object):
         :param state: The current state dict of the :class:`.Model`.
 
         """
-        ...
+        pass
 
 
 class MetricFactory(object):
@@ -161,8 +160,7 @@ class MetricList(Metric):
 
         self.metric_list = []
 
-        for i in range(len(metric_list)):
-            metric = metric_list[i]
+        for metric in metric_list:
 
             if str(metric) == metric:
                 metric = DEFAULT_METRICS[metric]
@@ -170,7 +168,7 @@ class MetricList(Metric):
             if isinstance(metric, MetricFactory):
                 metric = metric.build()
 
-            if type(metric) is MetricList:
+            if isinstance(metric, MetricList):
                 self.metric_list = self.metric_list + metric.metric_list
             else:
                 self.metric_list.append(metric)
@@ -183,23 +181,21 @@ class MetricList(Metric):
                 result.update(out)
         return result
 
-    def process(self, state):
+    def process(self, *args):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
-        :param state: The current state dict of the :class:`.Model`.
         :return: dict[str,any] -- A dictionary which maps metric names to values.
 
         """
-        return self._for_list(lambda metric: metric.process(state))
+        return self._for_list(lambda metric: metric.process(*args))
 
-    def process_final(self, state):
+    def process_final(self, *args):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
-        :param state: The current state dict of the :class:`.Model`.
         :return: dict[str,any] -- A dictionary which maps metric names to values.
 
         """
-        return self._for_list(lambda metric: metric.process_final(state))
+        return self._for_list(lambda metric: metric.process_final(*args))
 
     def train(self):
         """Put each metric in train mode.
@@ -237,45 +233,38 @@ class AdvancedMetric(Metric):
     def process_train(self, *args):
         """Process the given state and return the metric value for a training iteration.
 
-        :param state: The current state dict of the :class:`.Model`.
         :return: The metric value for a training iteration.
 
         """
-        ...
+        pass
 
     def process_validate(self, *args):
         """Process the given state and return the metric value for a validation iteration.
 
-        :param state: The current state dict of the :class:`.Model`.
         :return: The metric value for a validation iteration.
 
         """
-        ...
+        pass
 
     def process_final_train(self, *args):
         """Process the given state and return the final metric value for a training iteration.
 
-        :param state: The current state dict of the :class:`.Model`.
         :return: The final metric value for a training iteration.
 
         """
-        ...
+        pass
 
     def process_final_validate(self, *args):
         """Process the given state and return the final metric value for a validation iteration.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict
         :return: The final metric value for a validation iteration.
 
         """
-        ...
+        pass
 
     def process(self, *args):
         """Depending on the current mode, return the result of either 'process_train' or 'process_validate'.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict
         :return: The metric value.
 
         """
@@ -284,8 +273,6 @@ class AdvancedMetric(Metric):
     def process_final(self, *args):
         """Depending on the current mode, return the result of either 'process_final_train' or 'process_final_validate'.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict
         :return: The final metric value.
 
         """

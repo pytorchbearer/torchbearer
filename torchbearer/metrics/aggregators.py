@@ -42,7 +42,7 @@ class RunningMetric(metrics.AdvancedMetric):
         :return: The metric value.
 
         """
-        ...
+        pass
 
     @abstractmethod
     def _step(self, cache):
@@ -53,7 +53,7 @@ class RunningMetric(metrics.AdvancedMetric):
         :return: The new metric value.
 
         """
-        ...
+        pass
 
     def process_train(self, *args):
         """Add the current metric value to the cache and call '_step' is needed.
@@ -94,7 +94,8 @@ class RunningMean(RunningMetric):
     def __init__(self, name, batch_size=50, step_size=10):
         super().__init__(name, batch_size=batch_size, step_size=step_size)
 
-    def _process_train(self, data):
+    def _process_train(self, *args):
+        data = args[0]
         return data.mean().item()
 
     def _step(self, cache):
@@ -111,13 +112,14 @@ class Std(metrics.Metric):
     def __init__(self, name):
         super(Std, self).__init__(name)
 
-    def process(self, data):
+    def process(self, *args):
         """Compute values required for the std from the input.
 
-        :param data:  The output of some previous call to :meth:`.Metric.process`.
-        :type data: torch.Tensor
+        :param args:  The output of some previous call to :meth:`.Metric.process`.
+        :type args: torch.Tensor
 
         """
+        data = args[0]
         self._sum += data.sum().item()
         self._sum_sq += data.pow(2).sum().item()
 
@@ -126,11 +128,9 @@ class Std(metrics.Metric):
         else:
             self._count += data.size(0)
 
-    def process_final(self, data):
+    def process_final(self, *args):
         """Compute and return the final standard deviation.
 
-        :param data:  The output of some previous call to :meth:`.Metric.process_final`.
-        :type data: torch.Tensor
         :return: The standard deviation of each observation since the last reset call.
 
         """
@@ -161,13 +161,14 @@ class Mean(metrics.Metric):
     def __init__(self, name):
         super(Mean, self).__init__(name)
 
-    def process(self, data):
+    def process(self, *args):
         """Add the input to the rolling sum.
 
-        :param data:  The output of some previous call to :meth:`.Metric.process`.
-        :type data: torch.Tensor
+        :param args:  The output of some previous call to :meth:`.Metric.process`.
+        :type args: torch.Tensor
 
         """
+        data = args[0]
         self._sum += data.sum().item()
 
         if data.size() == torch.Size([]):
@@ -175,11 +176,9 @@ class Mean(metrics.Metric):
         else:
             self._count += data.size(0)
 
-    def process_final(self, data):
+    def process_final(self, *args):
         """Compute and return the mean of all metric values since the last call to reset.
 
-        :param data:  The output of some previous call to :meth:`.Metric.process_final`.
-        :type data: torch.Tensor
         :return: The mean of the metric values since the last call to reset.
 
         """

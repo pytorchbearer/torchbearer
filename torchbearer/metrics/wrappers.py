@@ -83,14 +83,15 @@ class BatchLambda(metrics.Metric):
         super(BatchLambda, self).__init__(name)
         self._metric_function = metric_function
 
-    def process(self, state):
+    def process(self, *args):
         """Return the output of the wrapped function.
 
-        :param state: The :class:`.torchbearer.Model` state.
-        :type state: dict
+        :param args: The :class:`.torchbearer.Model` state.
+        :type args: dict
         :return: The value of the metric function('y_pred', 'y_true').
 
         """
+        state = args[0]
         return self._metric_function(state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
 
 
@@ -118,46 +119,44 @@ class EpochLambda(metrics.AdvancedMetric):
         if not running:
             self._step = lambda y_pred, y_true: ...
 
-    def process_train(self, state):
+    def process_train(self, *args):
         """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension. If this is a running metric,
         evaluates the function every number of steps.
 
-        :param state: The :class:`.torchbearer.Model` state.
-        :type state: dict
+        :param args: The :class:`.torchbearer.Model` state.
+        :type args: dict
         :return: The current running result.
 
         """
+        state = args[0]
         self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
         self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED].float()), dim=0)
         if state[torchbearer.BATCH] % self._step_size == 0:
             self._result = self._step(self._y_pred, self._y_true)
         return self._result
 
-    def process_final_train(self, state):
+    def process_final_train(self, *args):
         """Evaluate the function with the aggregated outputs.
 
-        :param state: The :class:`.torchbearer.Model` state.
-        :type state: dict
         :return: The result of the function.
 
         """
         return self._final(self._y_pred, self._y_true)
 
-    def process_validate(self, state):
+    def process_validate(self, *args):
         """During validation, just concatenate 'y_true' and y_pred'.
 
-        :param state: The :class:`.torchbearer.Model` state.
-        :type state: dict
+        :param args: The :class:`.torchbearer.Model` state.
+        :type args: dict
 
         """
+        state = args[0]
         self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
         self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED].to(self._y_pred.dtype)), dim=0)
 
-    def process_final_validate(self, state):
+    def process_final_validate(self, *args):
         """Evaluate the function with the aggregated outputs.
 
-        :param state: The :class:`.torchbearer.Model` state.
-        :type state: dict
         :return: The result of the function.
 
         """
