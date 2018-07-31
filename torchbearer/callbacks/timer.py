@@ -1,14 +1,14 @@
 import time
 from torchbearer.callbacks import Callback
 import torchbearer
-from torchbearer.metrics import RunningMean
+from torchbearer.metrics import Metric
 
 
-class TimerCallback(Callback):
-    def __init__(self):
+class TimerCallback(Callback, Metric):
+    def __init__(self, name, time_keys=()):
         """ Timer callback that aggregates timings for each stage of model execution
         """
-        super().__init__()
+        super(TimerCallback, self).__init__(name=name)
         self.t0 = time.time()
         self.time_dict = {}
         self.batch_timer = TimerMetric('t_batch')
@@ -16,10 +16,16 @@ class TimerCallback(Callback):
         self.train_timer = TimerMetric('t_train')
         self.valid_timer = TimerMetric('t_valid')
         self.total_timer = TimerMetric('t_total')
+        self.time_keys = time_keys
 
     def update_time(self, text, metric, state):
         self.time_dict[text] = metric.process(state)
         state[torchbearer.TIMINGS] = self.time_dict
+
+    def process(self, state):
+        super().process(state)
+        d_out = {key: self.time_dict[key] for key in self.time_keys if key in self.time_dict}
+        return d_out
 
     def on_start(self, state):
         self.t0 = time.time()
