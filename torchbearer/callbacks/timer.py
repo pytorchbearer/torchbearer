@@ -40,8 +40,8 @@ class TimerCallback(Callback, Metric):
         self.time_dict[text] = metric.process(state)
         state[torchbearer.TIMINGS] = self.time_dict
 
-    def process(self, state):
-        super().process(state)
+    def process(self, *args):
+        super().process(*args)
         d_out = {key: self.time_dict[key] for key in self.time_keys if key in self.time_dict}
         return d_out
 
