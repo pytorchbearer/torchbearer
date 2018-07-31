@@ -20,19 +20,19 @@ TOTAL_TIME = 'total_time'
 VALIDATION_TIME = 'validation_time'
 
 
-class TimerCallback(Callback, Metric):
+class TimerMetric(Callback, Metric):
     def __init__(self, time_keys=()):
         """ Timer callback that aggregates timings for each stage of model execution
         """
-        super(TimerCallback, self).__init__(name='timer')
+        super(TimerMetric, self).__init__(name='timer')
         self.t0 = time.time()
         self.time_dict = {}
         # self.init_keys()
-        self.batch_timer = TimerMetric('t_batch')
-        self.epoch_timer = TimerMetric('t_epoch')
-        self.train_timer = TimerMetric('t_train')
-        self.valid_timer = TimerMetric('t_valid')
-        self.total_timer = TimerMetric('t_total')
+        self.batch_timer = _TimerMetric('t_batch')
+        self.epoch_timer = _TimerMetric('t_epoch')
+        self.train_timer = _TimerMetric('t_train')
+        self.valid_timer = _TimerMetric('t_valid')
+        self.total_timer = _TimerMetric('t_total')
         self.time_keys = time_keys
         self.added_callback = False
 
@@ -132,7 +132,7 @@ class TimerCallback(Callback, Metric):
         return self.time_dict
 
 
-class TimerMetric(torchbearer.metrics.Metric):
+class _TimerMetric(torchbearer.metrics.Metric):
     def __init__(self, name):
         super().__init__(name)
         self.t = time.time()
