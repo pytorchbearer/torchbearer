@@ -177,18 +177,21 @@ class CallbackList(Callback):
         """
         super().__init__()
         self.callback_list = []
-
-        for i in range(len(callback_list)):
-            callback = callback_list[i]
-
-            if isinstance(callback, CallbackList):
-                self.callback_list = self.callback_list + callback.callback_list
-            else:
-                self.callback_list.append(callback)
+        self.append(callback_list)
 
     def _for_list(self, function):
         for callback in self.callback_list:
             function(callback)
+
+    def __iter__(self):
+        return self.callback_list.__iter__()
+
+    def append(self, callback_list):
+        for callback in callback_list:
+            if isinstance(callback, CallbackList):
+                self.callback_list = self.callback_list + callback.callback_list
+            else:
+                self.callback_list.append(callback)
         
     def on_start(self, state):
         """Call on_start on each callback in turn with the given state.

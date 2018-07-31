@@ -1,13 +1,14 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, MagicMock, patch
 
-from torchbearer.callbacks import TimerCallback
+from torchbearer.callbacks import TimerCallback, TimerMetric
+import torchbearer
 
 
 class TestTimer(TestCase):
     def test_update_time(self):
-        timer = TimerCallback()
-        timerMetric = TimerCallback()
+        timer = TimerCallback('test')
+        timerMetric = TimerMetric('test2')
         timerMetric.process = Mock(return_value=1)
         timer.update_time('test', timerMetric, {})
         self.assertTrue(timer.get_timings()['test'] == 1)
@@ -17,8 +18,12 @@ class TestTimer(TestCase):
         self.assertTrue(timer.get_timings()['test_2'] == 2)
 
     def test_calls(self):
-        timer = TimerCallback()
-        timer.update_time = Mock()
+        timer = TimerCallback('test')
+        timer.batch_timer = MagicMock()
+        timer.epoch_timer = MagicMock()
+        timer.train_timer = MagicMock()
+        timer.total_timer = MagicMock()
+        timer.valid_timer = MagicMock()
 
         timer.on_start({})
         timer.on_start_training({})
@@ -33,4 +38,50 @@ class TestTimer(TestCase):
         timer.on_forward_validation({})
         timer.on_criterion_validation({})
         timer.on_step_validation({})
-        self.assertTrue(timer.update_time.call_count == 13)
+        timer.on_end_training({})
+        timer.on_end_validation({})
+        timer.on_end_epoch({})
+        timer.on_end({})
+
+        self.assertTrue(timer.batch_timer.process.call_count == 11)
+        self.assertTrue(timer.total_timer.process.call_count == 1)
+        self.assertTrue(timer.epoch_timer.process.call_count == 1)
+        self.assertTrue(timer.train_timer.process.call_count == 2)
+        self.assertTrue(timer.valid_timer.process.call_count == 1)
+
+    def test_process(self):
+        timer = TimerCallback((torchbearer.callbacks.timer.ON_FORWARD, ))
+        timer.time_dict = {torchbearer.callbacks.timer.ON_FORWARD: 1, 'test': 2}
+        self.assertTrue(timer.process({})[torchbearer.callbacks.timer.ON_FORWARD] == 1)
+
+    def test_reset(self):
+        state = {torchbearer.CALLBACK_LIST: torchbearer.callbacks.CallbackList([])}
+
+        timer = TimerCallback()
+        self.assertTrue(state[torchbearer.CALLBACK_LIST].callback_list == [])
+        timer.reset(state)
+        self.assertIsInstance(state[torchbearer.CALLBACK_LIST].callback_list[0], TimerCallback)
+
+        timer.reset(state)
+        self.assertTrue(len(state[torchbearer.CALLBACK_LIST].callback_list) == 1)
+
+
+class TestTimerMetric(TestCase):
+    @patch('time.time')
+    def test_process(self, time):
+        time.return_value = 1
+        timer_metric = TimerMetric('test')
+        time.return_value = 2
+        dt = timer_metric.process({})
+
+        self.assertTrue(dt == 1)
+
+    @patch('time.time')
+    def test_reset(self, time):
+        time.return_value = 1
+        timer_metric = TimerMetric('test')
+
+        time.return_value = 3
+        timer_metric.reset({})
+        self.assertTrue(timer_metric.t == 3)
+
