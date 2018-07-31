@@ -1,13 +1,13 @@
 from unittest import TestCase
 from unittest.mock import Mock, MagicMock, patch
 
-from torchbearer.callbacks import TimerCallback, TimerMetric
+from torchbearer.metrics.timer import TimerMetric, _TimerMetric
 import torchbearer
 
 
 class TestTimer(TestCase):
     def test_update_time(self):
-        timer = TimerCallback('test')
+        timer = TimerMetric('test')
         timerMetric = TimerMetric('test2')
         timerMetric.process = Mock(return_value=1)
         timer.update_time('test', timerMetric, {})
@@ -18,7 +18,7 @@ class TestTimer(TestCase):
         self.assertTrue(timer.get_timings()['test_2'] == 2)
 
     def test_calls(self):
-        timer = TimerCallback('test')
+        timer = TimerMetric('test')
         timer.batch_timer = MagicMock()
         timer.epoch_timer = MagicMock()
         timer.train_timer = MagicMock()
@@ -50,17 +50,17 @@ class TestTimer(TestCase):
         self.assertTrue(timer.valid_timer.process.call_count == 1)
 
     def test_process(self):
-        timer = TimerCallback((torchbearer.callbacks.timer.ON_FORWARD, ))
-        timer.time_dict = {torchbearer.callbacks.timer.ON_FORWARD: 1, 'test': 2}
-        self.assertTrue(timer.process({})[torchbearer.callbacks.timer.ON_FORWARD] == 1)
+        timer = TimerMetric((torchbearer.metrics.timer.ON_FORWARD, ))
+        timer.time_dict = {torchbearer.metrics.timer.ON_FORWARD: 1, 'test': 2}
+        self.assertTrue(timer.process({})[torchbearer.metrics.timer.ON_FORWARD] == 1)
 
     def test_reset(self):
         state = {torchbearer.CALLBACK_LIST: torchbearer.callbacks.CallbackList([])}
 
-        timer = TimerCallback()
+        timer = TimerMetric()
         self.assertTrue(state[torchbearer.CALLBACK_LIST].callback_list == [])
         timer.reset(state)
-        self.assertIsInstance(state[torchbearer.CALLBACK_LIST].callback_list[0], TimerCallback)
+        self.assertIsInstance(state[torchbearer.CALLBACK_LIST].callback_list[0], TimerMetric)
 
         timer.reset(state)
         self.assertTrue(len(state[torchbearer.CALLBACK_LIST].callback_list) == 1)
@@ -70,7 +70,7 @@ class TestTimerMetric(TestCase):
     @patch('time.time')
     def test_process(self, time):
         time.return_value = 1
-        timer_metric = TimerMetric('test')
+        timer_metric = _TimerMetric('test')
         time.return_value = 2
         dt = timer_metric.process({})
 
@@ -79,7 +79,7 @@ class TestTimerMetric(TestCase):
     @patch('time.time')
     def test_reset(self, time):
         time.return_value = 1
-        timer_metric = TimerMetric('test')
+        timer_metric = _TimerMetric('test')
 
         time.return_value = 3
         timer_metric.reset({})

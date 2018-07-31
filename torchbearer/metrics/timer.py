@@ -132,7 +132,7 @@ class TimerMetric(Callback, Metric):
         return self.time_dict
 
 
-class _TimerMetric(torchbearer.metrics.Metric):
+class _TimerMetric(Metric):
     def __init__(self, name):
         super().__init__(name)
         self.t = time.time()
