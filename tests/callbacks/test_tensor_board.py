@@ -131,7 +131,7 @@ class TestTensorBoardImages(TestCase):
 
         state = {'x': torch.ones(18, 3, 10, 10), torchbearer.EPOCH: 1, torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
-        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=False, num_images=18, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=False, num_images=18, nrow=9, padding=3, normalize=True, norm_range='tmp', scale_each=True, pad_value=1)
 
         tboard.on_start(state)
         tboard.on_step_validation(state)
@@ -150,7 +150,7 @@ class TestTensorBoardImages(TestCase):
 
         state = {'x': torch.ones(18, 3, 10, 10), torchbearer.EPOCH: 1, torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
-        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=False, num_images=36, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=False, num_images=36, nrow=9, padding=3, normalize=True, norm_range='tmp', scale_each=True, pad_value=1)
 
         tboard.on_start(state)
         tboard.on_step_validation(state)
@@ -170,7 +170,7 @@ class TestTensorBoardImages(TestCase):
 
         state = {'x': torch.ones(18, 3, 10, 10), torchbearer.EPOCH: 1, torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
-        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=36, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=36, nrow=9, padding=3, normalize=True, norm_range='tmp', scale_each=True, pad_value=1)
 
         tboard.on_start(state)
         tboard.on_step_validation(state)
@@ -191,7 +191,7 @@ class TestTensorBoardImages(TestCase):
 
         state = {'x': torch.ones(18, 10, 10), torchbearer.EPOCH: 1, torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
-        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=18, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=18, nrow=9, padding=3, normalize=True, norm_range='tmp', scale_each=True, pad_value=1)
 
         tboard.on_start(state)
         tboard.on_step_validation(state)
@@ -210,7 +210,7 @@ class TestTensorBoardImages(TestCase):
 
         state = {'x': torch.ones(18, 3, 10, 10), torchbearer.EPOCH: 1, torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
 
-        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=40, nrow=9, padding=3, normalize=True, range='tmp', scale_each=True, pad_value=1)
+        tboard = TensorBoardImages(name='test', key='x', write_each_epoch=True, num_images=40, nrow=9, padding=3, normalize=True, norm_range='tmp', scale_each=True, pad_value=1)
 
         tboard.on_start(state)
         tboard.on_step_validation(state)
