@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Timer callback can now also be used as a metric which allows display of specified timings to printers and has been moved to metrics.
 ### Deprecated
 ### Removed
 ### Fixed
