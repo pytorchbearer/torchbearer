@@ -33,7 +33,8 @@ class Model:
             torchbearer.DEVICE: 'cpu',
             torchbearer.DATA_TYPE: torch.float32,
             torchbearer.METRIC_LIST: torchbearer_metrics.MetricList(metrics),
-            torchbearer.SELF: self
+            torchbearer.SELF: self,
+            torchbearer.CALLBACK_LIST: torchbearer.callbacks.CallbackList([])
         }
 
     def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=None,
@@ -141,17 +142,18 @@ class Model:
             torchbearer.STOP_TRAINING: False
         }
         state.update(self.main_state)
+        state[torchbearer.CALLBACK_LIST].append(_callbacks)
 
-        _callbacks.on_start(state)
+        state[torchbearer.CALLBACK_LIST].on_start(state)
 
         for state[torchbearer.EPOCH] in range(initial_epoch, epochs):
-            _callbacks.on_start_epoch(state)
+            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
             if state[torchbearer.GENERATOR] is not None:
                 state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
             self.train()
 
-            _callbacks.on_start_training(state)
+            state[torchbearer.CALLBACK_LIST].on_start_training(state)
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
 
@@ -162,7 +164,7 @@ class Model:
                 else:
                     self._load_batch_standard('train', state)
 
-                _callbacks.on_sample(state)
+                state[torchbearer.CALLBACK_LIST].on_sample(state)
 
                 # Zero grads
                 state[torchbearer.OPTIMIZER].zero_grad()
@@ -172,21 +174,21 @@ class Model:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
                 else:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-                _callbacks.on_forward(state)
+                state[torchbearer.CALLBACK_LIST].on_forward(state)
 
                 # Loss Calculation
                 state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
 
-                _callbacks.on_criterion(state)
+                state[torchbearer.CALLBACK_LIST].on_criterion(state)
                 state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
 
                 # Backwards pass
                 state[torchbearer.LOSS].backward()
-                _callbacks.on_backward(state)
+                state[torchbearer.CALLBACK_LIST].on_backward(state)
 
                 # Update parameters
                 state[torchbearer.OPTIMIZER].step()
-                _callbacks.on_step_training(state)
+                state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
                 if state[torchbearer.STOP_TRAINING]:
                     break
@@ -194,22 +196,22 @@ class Model:
             state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
             final_metrics = state[torchbearer.METRICS]
 
-            _callbacks.on_end_training(state)
+            state[torchbearer.CALLBACK_LIST].on_end_training(state)
 
             # Validate
             if validation_generator is not None or validation_steps is not None:
                 state[torchbearer.VALIDATION_GENERATOR] = validation_generator
                 state[torchbearer.VALIDATION_STEPS] = validation_steps
                 self.eval()
-                self._validate(state, _callbacks, pass_state)
+                self._validate(state, state[torchbearer.CALLBACK_LIST], pass_state)
 
             final_metrics.update(state[torchbearer.METRICS])
             state[torchbearer.METRICS] = final_metrics
-            _callbacks.on_end_epoch(state)
+            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
 
             if state[torchbearer.STOP_TRAINING]:
                 break
-        _callbacks.on_end(state)
+        state[torchbearer.CALLBACK_LIST].on_end(state)
 
         return state
 
@@ -229,6 +231,7 @@ class Model:
         :rtype: dict[str,any]
         """
         with torch.no_grad():
+            state[torchbearer.CALLBACK_LIST] = callbacks
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
 
@@ -244,33 +247,33 @@ class Model:
             if state[torchbearer.VALIDATION_GENERATOR] is not None:
                 state[torchbearer.VALIDATION_ITERATOR] = iter(state[torchbearer.VALIDATION_GENERATOR])
 
-            callbacks.on_start_validation(state)
+            state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
             for state[torchbearer.BATCH] in range(state[torchbearer.VALIDATION_STEPS]):
                 # Load batch
                 batch_loader('validation', state)
-                callbacks.on_sample_validation(state)
+                state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward pass
                 if pass_state:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
                 else:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-                callbacks.on_forward_validation(state)
+                state[torchbearer.CALLBACK_LIST].on_forward_validation(state)
 
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
                     state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
-                    callbacks.on_criterion_validation(state)
+                    state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
 
-                callbacks.on_step_validation(state)
+                state[torchbearer.CALLBACK_LIST].on_step_validation(state)
                 if state[torchbearer.STOP_TRAINING]:
                     break
 
             if torchbearer.Y_TRUE in state:
                 state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
-            callbacks.on_end_validation(state)
+            state[torchbearer.CALLBACK_LIST].on_end_validation(state)
 
         return state
 

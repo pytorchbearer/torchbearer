@@ -43,3 +43,4 @@ from .aggregators import *
 from .decorators import *
 from .roc_auc_score import *
 from .primitives import *
+from .timer import TimerMetric
