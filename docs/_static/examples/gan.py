@@ -94,7 +94,7 @@ class GAN(nn.Module):
         z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
         state[GEN_IMGS] = self.generator(z)
         state[DISC_GEN] = self.discriminator(state[GEN_IMGS])
-        # We don't want to keep discriminator gradients on the generator forward pass
+        # This clears the function graph built up for the discriminator
         self.discriminator.zero_grad()
 
         # Discriminator Forward
@@ -156,10 +156,6 @@ class d_loss(tb.metrics.Metric):
         return state[D_LOSS]
 
 
-def zero_loss(y_pred, y_true):
-    return torch.zeros(y_true.shape[0], 1)
-
-
-torchbearermodel = tb.Model(model, optim, zero_loss, ['loss', g_loss(), d_loss()])
+torchbearermodel = tb.Model(model, optim, loss_criterion=None, metrics=['loss', g_loss(), d_loss()])
 torchbearermodel.to(device)
 torchbearermodel.fit_generator(dataloader, epochs=200, pass_state=True, callbacks=[loss_callback, saver_callback])
