@@ -1004,7 +1004,7 @@ class TestTorchbearer(TestCase):
         torchbearermodel._test_loop = Mock()
 
         torchbearermodel.predict_generator(generator, 1, steps, pass_state)
-        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[1], Tqdm)
+        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[0], Tqdm)
         self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
         self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
 
