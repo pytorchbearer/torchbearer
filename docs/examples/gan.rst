@@ -43,12 +43,7 @@ Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Since our loss is complicated in this example, we shall forgo the basic loss criterion used in normal torchbearer models.
-
-.. literalinclude:: /_static/examples/gan.py
-   :language: python
-   :lines: 159-160
-
-Instead use a callback to provide the loss. Since this callback is very simple we can use callback decorators on a function (which takes state) to tell torchbearer when it should be called.
+Instead we use a callback to provide the loss. Since this callback is very simple we can use callback decorators on a function (which takes state) to tell torchbearer when it should be called.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
@@ -73,7 +68,7 @@ We can then train the torchbearer model on the GPU in the standard way.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 163-165
+   :lines: 159-161
 
 Visualising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

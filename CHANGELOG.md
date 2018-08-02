@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a verbose level (options are now 0,1,2) which will print progress for the entire fit call, updating every epoch. Useful when doing dynamic programming with little data.
 ### Changed
 - Timer callback can now also be used as a metric which allows display of specified timings to printers and has been moved to metrics.
+- The loss_criterion is renamed to criterion in `torchbearer.Model` arguments.
+- The criterion in `torchbearer.Model` is now optional and will provide a zero loss tensor if it is not given.
 ### Deprecated
 ### Removed
 ### Fixed
