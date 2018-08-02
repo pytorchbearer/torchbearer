@@ -22,6 +22,7 @@ Welcome to torchbearer's documentation!
    examples/vae
    examples/gan
    examples/basic_opt
+   examples/svm_linear
 
 .. toctree::
    :glob:
