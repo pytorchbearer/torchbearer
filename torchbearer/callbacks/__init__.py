@@ -21,10 +21,6 @@ Logging
         :members:
         :undoc-members:
 
-..  automodule:: torchbearer.callbacks.timer
-        :members:
-        :undoc-members:
-
 Tensorboard
 ------------------------------------
 
