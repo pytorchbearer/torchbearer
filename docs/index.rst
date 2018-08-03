@@ -16,12 +16,19 @@ Welcome to torchbearer's documentation!
 .. toctree::
    :glob:
    :maxdepth: 1
-   :caption: Examples
+   :caption: Deep Learning
 
    examples/quickstart
    examples/vae
    examples/gan
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Differentiable Programming
+
    examples/basic_opt
+   examples/svm_linear
 
 .. toctree::
    :glob:
