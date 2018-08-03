@@ -1,7 +1,13 @@
 """
+Model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 ..  automodule:: torchbearer.torchbearer
         :members:
         :undoc-members:
+
+Utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  automodule:: torchbearer.state
         :members:
