@@ -79,11 +79,11 @@ We borrow the image saving method from PyTorch_GAN_ and put it in a call back to
    :language: python
    :lines: 115-119
 
-After 172400 iterations we see the following.
+Here is a Gif created from the saved images.
 
-.. figure:: /_static/img/172400.png
+.. figure:: /_static/img/gan.gif
    :scale: 200 %
-   :alt: GAN generated samples after 172400 iterations
+   :alt: GAN generated samples
 
 
 Source Code
