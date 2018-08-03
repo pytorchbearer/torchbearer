@@ -2,6 +2,13 @@ STATE_KEYS = []
 
 
 def state_key(key):
+    """ Computes and returns a non-conflicting key for the state dictionary when given a seed key
+    
+    :param key: The seed key - basis for new state key
+    :type key: String
+    :return: New state key
+    :rtype: String
+    """
     if key in STATE_KEYS:
         count = 1
         my_key = key + '_' + str(count)
