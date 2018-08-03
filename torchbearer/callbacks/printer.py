@@ -6,6 +6,9 @@ from tqdm import tqdm
 
 class ConsolePrinter(Callback):
     """The ConsolePrinter callback simply outputs the training metrics to the console.
+
+    :param validation_label_letter: This is the letter displayed after the epoch number indicating the current phase of training
+    :type validation_label_letter: String
     """
     def __init__(self, validation_label_letter='v'):
         super().__init__()
@@ -38,17 +41,14 @@ class ConsolePrinter(Callback):
 
 
 class Tqdm(Callback):
-    """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM.
+    """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM. The given key is used to label validation output.
+
+    :param validation_label_letter: The letter to use for validation outputs.
+    :type validation_label_letter: str
+    :param on_epoch: If True, output a single progress bar which tracks epochs
+    :type on_epoch: bool
     """
-
     def __init__(self, validation_label_letter='v', on_epoch=False):
-        """Create Tqdm callback which uses the given key to label validation output.
-
-        :param validation_label_letter: The letter to use for validation outputs.
-        :type validation_label_letter: str
-        :param on_epoch: If True, output a single progress bar which tracks epochs
-        :type on_epoch: bool
-        """
         self._loader = None
         self.validation_label = validation_label_letter
         self._on_epoch = on_epoch

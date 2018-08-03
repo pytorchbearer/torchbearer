@@ -6,16 +6,13 @@ import math
 
 
 class TerminateOnNaN(Callback):
-    """Callback that terminates training when the given metric is nan or inf.
+    """Callback which montiors the given metric and halts training if its value is nan or
+    inf.
+
+    :param monitor: The metric name to monitor
+    :type monitor: str
     """
-
     def __init__(self, monitor='running_loss'):
-        """Create a TerminateOnNaN callback which montiors the given metric and halts training if its value is nan or
-        inf.
-
-        :param monitor: The metric name to monitor
-        :type monitor: str
-        """
         super(TerminateOnNaN, self).__init__()
         self._monitor = monitor
 
