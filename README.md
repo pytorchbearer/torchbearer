@@ -18,6 +18,8 @@ torchbearer: A model training library for researchers using PyTorch
 Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you. Our design decisions are geared towards flexibility and customisability whilst trying to maintain the simplest possible API. Here's a linear SVM (differentiable program) visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html) implemented using torcbearer and pytorch in less than 100 lines of code:
 
 ![SVM fitting](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/svm_fit.gif)
+![SVM fitting](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/gan.gif)
+
 
 <a name="features"/>
 

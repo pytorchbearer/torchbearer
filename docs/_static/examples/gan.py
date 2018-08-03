@@ -156,6 +156,6 @@ class d_loss(tb.metrics.Metric):
         return state[D_LOSS]
 
 
-torchbearermodel = tb.Model(model, optim, loss_criterion=None, metrics=['loss', g_loss(), d_loss()])
+torchbearermodel = tb.Model(model, optim, criterion=None, metrics=['loss', g_loss(), d_loss()])
 torchbearermodel.to(device)
 torchbearermodel.fit_generator(dataloader, epochs=200, pass_state=True, callbacks=[loss_callback, saver_callback])
