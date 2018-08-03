@@ -13,30 +13,34 @@ from torchbearer.callbacks.printer import Tqdm
 class Model:
     """ Torchbearermodel to wrap base torch model and provide training environment around it
     """
-    def __init__(self, model, optimizer, loss_criterion, metrics=[]):
+    def __init__(self, model, optimizer, criterion=None, metrics=[]):
         """ Create torchbearermodel which wraps a base torchmodel and provides a training environment surrounding it
 
         :param model: The base pytorch model
         :type model: torch.nn.Module
         :param optimizer: The optimizer used for pytorch model weight updates
         :type optimizer: torch.optim.Optimizer
-        :param loss_criterion: The final loss criterion that provides a loss value to the optimizer
-        :type loss_criterion: function
+        :param criterion: The final loss criterion that provides a loss value to the optimizer
+        :type criterion: function or None
         :param metrics: Additional metrics for display and use within callbacks
         :type metrics: list
         """
         super().__init__()
+        if criterion is None:
+            criterion = lambda y_pred, y_true: torch.zeros(y_true.shape[0], device=y_true.device)
+
         self.main_state = {
             torchbearer.MODEL: model,
-            torchbearer.CRITERION: loss_criterion,
+            torchbearer.CRITERION: criterion,
             torchbearer.OPTIMIZER: optimizer,
             torchbearer.DEVICE: 'cpu',
             torchbearer.DATA_TYPE: torch.float32,
             torchbearer.METRIC_LIST: torchbearer_metrics.MetricList(metrics),
-            torchbearer.SELF: self
+            torchbearer.SELF: self,
+            torchbearer.CALLBACK_LIST: torchbearer.callbacks.CallbackList([])
         }
 
-    def fit(self, x, y, batch_size=None, epochs=1, verbose=1, callbacks=[], validation_split=None,
+    def fit(self, x, y, batch_size=None, epochs=1, verbose=2, callbacks=[], validation_split=None,
             validation_data=None, shuffle=True, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, workers=1, pass_state=False):
         """ Perform fitting of a model to given data and label tensors
@@ -49,7 +53,7 @@ class Model:
         :type batch_size: int
         :param epochs: The number of training epochs to be run (each sample from the dataset is viewed exactly once)
         :type epochs: int
-        :param verbose: If 1 use tqdm progress frontend, else display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
         :type verbose: int
         :param callbacks: The list of torchbearer callbacks to be called during training and validation
         :type callbacks: list
@@ -84,7 +88,7 @@ class Model:
                                   callbacks=callbacks, validation_generator=valloader, validation_steps=validation_steps,
                                   initial_epoch=initial_epoch, pass_state=pass_state)
 
-    def fit_generator(self, generator, train_steps=None, epochs=1, verbose=1, callbacks=[],
+    def fit_generator(self, generator, train_steps=None, epochs=1, verbose=2, callbacks=[],
                       validation_generator=None, validation_steps=None, initial_epoch=0, pass_state=False):
         """ Perform fitting of a model to given data generator
 
@@ -94,7 +98,7 @@ class Model:
         :type train_steps: int
         :param epochs: The number of training epochs to be run (each sample from the dataset is viewed exactly once)
         :type epochs: int
-        :param verbose: If 1 use tqdm progress frontend, else display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
         :type verbose: int
         :param callbacks: The list of torchbearer callbacks to be called during training and validation
         :type callbacks: list
@@ -109,8 +113,7 @@ class Model:
         :return: The final state context dictionary
         :rtype: dict[str,any]
         """
-        if verbose == 1:
-            callbacks = [Tqdm()] + callbacks
+        callbacks = Model._add_printer(callbacks, verbose)
         _callbacks = CallbackList(callbacks)
 
         # Get train and validation steps
@@ -141,17 +144,18 @@ class Model:
             torchbearer.STOP_TRAINING: False
         }
         state.update(self.main_state)
+        state[torchbearer.CALLBACK_LIST].append(_callbacks)
 
-        _callbacks.on_start(state)
+        state[torchbearer.CALLBACK_LIST].on_start(state)
 
         for state[torchbearer.EPOCH] in range(initial_epoch, epochs):
-            _callbacks.on_start_epoch(state)
+            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
             if state[torchbearer.GENERATOR] is not None:
                 state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
             self.train()
 
-            _callbacks.on_start_training(state)
+            state[torchbearer.CALLBACK_LIST].on_start_training(state)
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
 
@@ -162,7 +166,7 @@ class Model:
                 else:
                     self._load_batch_standard('train', state)
 
-                _callbacks.on_sample(state)
+                state[torchbearer.CALLBACK_LIST].on_sample(state)
 
                 # Zero grads
                 state[torchbearer.OPTIMIZER].zero_grad()
@@ -172,21 +176,21 @@ class Model:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
                 else:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-                _callbacks.on_forward(state)
+                state[torchbearer.CALLBACK_LIST].on_forward(state)
 
                 # Loss Calculation
                 state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
 
-                _callbacks.on_criterion(state)
+                state[torchbearer.CALLBACK_LIST].on_criterion(state)
                 state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
 
                 # Backwards pass
                 state[torchbearer.LOSS].backward()
-                _callbacks.on_backward(state)
+                state[torchbearer.CALLBACK_LIST].on_backward(state)
 
                 # Update parameters
                 state[torchbearer.OPTIMIZER].step()
-                _callbacks.on_step_training(state)
+                state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
                 if state[torchbearer.STOP_TRAINING]:
                     break
@@ -194,22 +198,22 @@ class Model:
             state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
             final_metrics = state[torchbearer.METRICS]
 
-            _callbacks.on_end_training(state)
+            state[torchbearer.CALLBACK_LIST].on_end_training(state)
 
             # Validate
             if validation_generator is not None or validation_steps is not None:
                 state[torchbearer.VALIDATION_GENERATOR] = validation_generator
                 state[torchbearer.VALIDATION_STEPS] = validation_steps
                 self.eval()
-                self._validate(state, _callbacks, pass_state)
+                self._validate(state, state[torchbearer.CALLBACK_LIST], pass_state)
 
             final_metrics.update(state[torchbearer.METRICS])
             state[torchbearer.METRICS] = final_metrics
-            _callbacks.on_end_epoch(state)
+            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
 
             if state[torchbearer.STOP_TRAINING]:
                 break
-        _callbacks.on_end(state)
+        state[torchbearer.CALLBACK_LIST].on_end(state)
 
         return state
 
@@ -229,6 +233,7 @@ class Model:
         :rtype: dict[str,any]
         """
         with torch.no_grad():
+            state[torchbearer.CALLBACK_LIST] = callbacks
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
 
@@ -244,33 +249,33 @@ class Model:
             if state[torchbearer.VALIDATION_GENERATOR] is not None:
                 state[torchbearer.VALIDATION_ITERATOR] = iter(state[torchbearer.VALIDATION_GENERATOR])
 
-            callbacks.on_start_validation(state)
+            state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
             for state[torchbearer.BATCH] in range(state[torchbearer.VALIDATION_STEPS]):
                 # Load batch
                 batch_loader('validation', state)
-                callbacks.on_sample_validation(state)
+                state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward pass
                 if pass_state:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
                 else:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-                callbacks.on_forward_validation(state)
+                state[torchbearer.CALLBACK_LIST].on_forward_validation(state)
 
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
                     state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
-                    callbacks.on_criterion_validation(state)
+                    state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
 
-                callbacks.on_step_validation(state)
+                state[torchbearer.CALLBACK_LIST].on_step_validation(state)
                 if state[torchbearer.STOP_TRAINING]:
                     break
 
             if torchbearer.Y_TRUE in state:
                 state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
-            callbacks.on_end_validation(state)
+            state[torchbearer.CALLBACK_LIST].on_end_validation(state)
 
         return state
 
@@ -287,7 +292,7 @@ class Model:
         """
         self._test_loop(state, _callbacks, pass_state, self._load_batch_standard, state[torchbearer.VALIDATION_STEPS])
 
-    def evaluate(self, x=None, y=None, batch_size=32, verbose=1, steps=None, pass_state=False):
+    def evaluate(self, x=None, y=None, batch_size=32, verbose=2, steps=None, pass_state=False):
         """ Perform an evaluation loop on given data and label tensors to evaluate metrics
 
         :param x: The input data tensor
@@ -296,7 +301,7 @@ class Model:
         :type y: torch.Tensor
         :param batch_size: The mini-batch size (number of samples processed for a single weight update)
         :type batch_size: int
-        :param verbose: If 1 use tqdm progress frontend, else display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no progress
         :type verbose: int
         :param steps: The number of evaluation mini-batches to run
         :type steps: int
@@ -308,12 +313,12 @@ class Model:
         trainset = DataLoader(TensorDataset(x, y), batch_size, steps)
         return self.evaluate_generator(trainset, verbose, pass_state=pass_state)
 
-    def evaluate_generator(self, generator, verbose=1, steps=None, pass_state=False):
+    def evaluate_generator(self, generator, verbose=2, steps=None, pass_state=False):
         """ Perform an evaluation loop on given data generator to evaluate metrics
 
         :param generator: The evaluation data generator (usually a pytorch DataLoader)
         :type generator: DataLoader
-        :param verbose: If 1 use tqdm progress frontend, else display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no progress
         :type verbose: int
         :param steps: The number of evaluation mini-batches to run
         :type steps: int
@@ -326,9 +331,7 @@ class Model:
         state = {torchbearer.EPOCH: 0, torchbearer.MAX_EPOCHS: 1, torchbearer.STOP_TRAINING: False, torchbearer.VALIDATION_GENERATOR: generator}
         state.update(self.main_state)
 
-        _callbacks = []
-        if verbose == 1:
-            _callbacks.append(Tqdm('e'))
+        _callbacks = Model._add_printer([], verbose, validation_label_letter='e')
 
         if state[torchbearer.VALIDATION_GENERATOR] is None:
             batch_loader = self._load_batch_none
@@ -339,14 +342,14 @@ class Model:
 
         return state[torchbearer.METRICS]
 
-    def predict(self, x=None, batch_size=32, verbose=1, steps=None, pass_state=False):
+    def predict(self, x=None, batch_size=32, verbose=2, steps=None, pass_state=False):
         """ Perform a prediction loop on given data tensor to predict labels
 
         :param x: The input data tensor
         :type x: torch.Tensor
         :param batch_size: The mini-batch size (number of samples processed for a single weight update)
         :type batch_size: int
-        :param verbose: If 1 use tqdm progress frontend, else display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no progress
         :type verbose: int
         :param steps: The number of evaluation mini-batches to run
         :type steps: int
@@ -358,12 +361,12 @@ class Model:
         pred_set = DataLoader(TensorDataset(x), batch_size, steps)
         return self.predict_generator(pred_set, verbose, pass_state=pass_state)
 
-    def predict_generator(self, generator, verbose=1, steps=None, pass_state=False):
+    def predict_generator(self, generator, verbose=2, steps=None, pass_state=False):
         """Perform a prediction loop on given data generator to predict labels
 
         :param generator: The prediction data generator (usually a pytorch DataLoader)
         :type generator: DataLoader
-        :param verbose: If 1 use tqdm progress frontend, else display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no progress
         :type verbose: int
         :param steps: The number of evaluation mini-batches to run
         :type steps: int
@@ -375,9 +378,8 @@ class Model:
         state = {torchbearer.EPOCH: 0, torchbearer.MAX_EPOCHS: 1, torchbearer.STOP_TRAINING: False, torchbearer.VALIDATION_GENERATOR: generator}
         state.update(self.main_state)
 
-        _callbacks = [AggregatePredictions()]
-        if verbose == 1:
-            _callbacks.append(Tqdm('p'))
+        _callbacks = Model._add_printer([AggregatePredictions()], verbose, validation_label_letter='p')
+
         self._test_loop(state, CallbackList(_callbacks), pass_state, self._load_batch_predict, steps)
 
         return state[torchbearer.FINAL_PREDICTIONS]
@@ -455,6 +457,26 @@ class Model:
             torchbearer.OPTIMIZER: self.main_state[torchbearer.OPTIMIZER].state_dict()
         }
         return state_dict
+
+    @staticmethod
+    def _add_printer(callbacks, verbose, validation_label_letter='v'):
+        """Static method used to add the printer callback to the given list for the given verbose level
+
+        :param callbacks: The list to add to
+        :type callbacks: list
+        :param verbose: 2, 1 or 0, Most -> Least verbose
+        :type verbose: int
+        :param validation_label_letter: Pass to Tqdm
+        :type validation_label_letter: str
+        :return: The updated list
+        :rtype: list
+        """
+        if verbose >= 2:
+            return [Tqdm(validation_label_letter=validation_label_letter)] + callbacks
+        elif verbose >= 1:
+            return [Tqdm(validation_label_letter=validation_label_letter, on_epoch=True)] + callbacks
+        else:
+            return callbacks
 
     @staticmethod
     def _deep_to(batch, device, dtype):

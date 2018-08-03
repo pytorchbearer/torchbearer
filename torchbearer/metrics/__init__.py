@@ -35,6 +35,13 @@ Base Metrics
 
 ..  automodule:: torchbearer.metrics.roc_auc_score
         :members:
+
+
+Timer
+------------------------------------
+..  automodule:: torchbearer.metrics.timer
+        :members:
+        :undoc-members:
 """
 
 from .metrics import *
@@ -43,3 +50,4 @@ from .aggregators import *
 from .decorators import *
 from .roc_auc_score import *
 from .primitives import *
+from .timer import TimerMetric
