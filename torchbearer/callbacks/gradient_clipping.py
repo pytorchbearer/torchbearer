@@ -6,16 +6,13 @@ import torch
 
 
 class GradientNormClipping(Callback):
-    """GradientNormClipping callback, uses 'torch.nn.utils.clip_grad_norm\_'
+    """GradientNormClipping callback, which uses 'torch.nn.utils.clip_grad_norm\_' to clip the gradient norms to the given value. If params is None they will be retrieved from state.
+
+    :param max_norm: The max norm value
+    :param norm_type: The norm type to use
+    :param params: The parameters to clip or None
     """
-
     def __init__(self, max_norm, norm_type=2, params=None):
-        """Clip the given norm level to the given value. If params is None they will be retrieved from state.
-
-        :param max_norm: The max norm value
-        :param norm_type: The norm type to use
-        :param params: The parameters to clip or None
-        """
         super(GradientNormClipping, self).__init__()
 
         self.max_norm = max_norm
@@ -42,16 +39,13 @@ class GradientNormClipping(Callback):
 
 
 class GradientClipping(Callback):
-    """GradientClipping callback, uses 'torch.nn.utils.clip_grad_value\_'
+    """GradientClipping callback, which uses 'torch.nn.utils.clip_grad_value\_' to clip the gradients of the given parameters to the given value. If params is None they will be retrieved from state.
+
+    :param clip_value: The maximum absolute value of the gradient
+    :param params: The parameters to clip or None
     """
-
     def __init__(self, clip_value, params=None):
-        """Clip the gradients of the given parameters to the given value. If params is None they will be retrieved from
-        state.
 
-        :param clip_value: The maximum absolute value of the gradient
-        :param params: The parameters to clip or None
-        """
         super(GradientClipping, self).__init__()
 
         self.clip_value = clip_value

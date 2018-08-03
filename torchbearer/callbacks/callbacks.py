@@ -10,7 +10,7 @@ class Callback(object):
     def on_start(self, state):
         """Perform some action with the given state as context at the start of a model fit.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -19,7 +19,7 @@ class Callback(object):
     def on_start_epoch(self, state):
         """Perform some action with the given state as context at the start of each epoch.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -28,7 +28,7 @@ class Callback(object):
     def on_start_training(self, state):
         """Perform some action with the given state as context at the start of the training loop.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -37,7 +37,7 @@ class Callback(object):
     def on_sample(self, state):
         """Perform some action with the given state as context after data has been sampled from the generator.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -46,7 +46,7 @@ class Callback(object):
     def on_forward(self, state):
         """Perform some action with the given state as context after the forward pass (model output) has been completed.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -55,7 +55,7 @@ class Callback(object):
     def on_criterion(self, state):
         """Perform some action with the given state as context after the criterion has been evaluated.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -64,7 +64,7 @@ class Callback(object):
     def on_backward(self, state):
         """Perform some action with the given state as context after backward has been called on the loss.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -73,7 +73,7 @@ class Callback(object):
     def on_step_training(self, state):
         """Perform some action with the given state as context after step has been called on the optimiser.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -82,7 +82,7 @@ class Callback(object):
     def on_end_training(self, state):
         """Perform some action with the given state as context after the training loop has completed.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -91,7 +91,7 @@ class Callback(object):
     def on_end_epoch(self, state):
         """Perform some action with the given state as context at the end of each epoch.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -100,7 +100,7 @@ class Callback(object):
     def on_end(self, state):
         """Perform some action with the given state as context at the end of the model fitting.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -109,7 +109,7 @@ class Callback(object):
     def on_start_validation(self, state):
         """Perform some action with the given state as context at the start of the validation loop.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -118,7 +118,7 @@ class Callback(object):
     def on_sample_validation(self, state):
         """Perform some action with the given state as context after data has been sampled from the validation generator.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -128,7 +128,7 @@ class Callback(object):
         """Perform some action with the given state as context after the forward pass (model output) has been completed
         with the validation data.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -138,7 +138,7 @@ class Callback(object):
         """Perform some action with the given state as context after the criterion evaluation has been completed
         with the validation data.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -147,7 +147,7 @@ class Callback(object):
     def on_end_validation(self, state):
         """Perform some action with the given state as context at the end of the validation loop.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -156,7 +156,7 @@ class Callback(object):
     def on_step_validation(self, state):
         """Perform some action with the given state as context at the end of each validation step.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -164,17 +164,15 @@ class Callback(object):
 
 
 class CallbackList(Callback):
-    """The :class:`CallbackList` class is a wrapper for a list of callbacks which acts as a single callback.
+    """The :class:`CallbackList` class is a wrapper for a list of callbacks which acts as a single :class:`Callback` and internally calls each :class:`Callback` in the given list in turn.
+
+    :param callback_list:The list of callbacks to be wrapped. If the list contains a :class:`CallbackList`, this will be unwrapped.
+    :type callback_list:list
+
     """
 
     def __init__(self, callback_list):
-        """Create a new callback which wraps and internally calls each callback in the given list in turn.
 
-        :param callback_list:The list of callbacks to be wrapped. If the list contains a :class:`CallbackList`, this
-        will be unwrapped.
-        :type callback_list:list
-
-        """
         super().__init__()
         self.callback_list = []
         self.append(callback_list)
@@ -196,7 +194,7 @@ class CallbackList(Callback):
     def on_start(self, state):
         """Call on_start on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -205,7 +203,7 @@ class CallbackList(Callback):
     def on_start_epoch(self, state):
         """Call on_start_epoch on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -214,7 +212,7 @@ class CallbackList(Callback):
     def on_start_training(self, state):
         """Call on_start_training on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -223,7 +221,7 @@ class CallbackList(Callback):
     def on_sample(self, state):
         """Call on_sample on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -232,7 +230,7 @@ class CallbackList(Callback):
     def on_forward(self, state):
         """Call on_forward on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -241,7 +239,7 @@ class CallbackList(Callback):
     def on_criterion(self, state):
         """Call on_criterion on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -250,7 +248,7 @@ class CallbackList(Callback):
     def on_backward(self, state):
         """Call on_backward on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -259,7 +257,7 @@ class CallbackList(Callback):
     def on_step_training(self, state):
         """Call on_step_training on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -268,7 +266,7 @@ class CallbackList(Callback):
     def on_end_training(self, state):
         """Call on_end_training on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -277,7 +275,7 @@ class CallbackList(Callback):
     def on_end_epoch(self, state):
         """Call on_end_epoch on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -286,7 +284,7 @@ class CallbackList(Callback):
     def on_end(self, state):
         """Call on_end on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -295,7 +293,7 @@ class CallbackList(Callback):
     def on_start_validation(self, state):
         """Call on_start_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -304,7 +302,7 @@ class CallbackList(Callback):
     def on_sample_validation(self, state):
         """Call on_sample_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -313,7 +311,7 @@ class CallbackList(Callback):
     def on_forward_validation(self, state):
         """Call on_forward_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -322,7 +320,7 @@ class CallbackList(Callback):
     def on_criterion_validation(self, state):
         """Call on_criterion_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -331,7 +329,7 @@ class CallbackList(Callback):
     def on_end_validation(self, state):
         """Call on_end_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
@@ -340,7 +338,7 @@ class CallbackList(Callback):
     def on_step_validation(self, state):
         """Call on_step_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`Model`.
+        :param state: The current state dict of the :class:`.Model`.
         :type state: dict[str,any]
 
         """
