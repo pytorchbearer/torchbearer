@@ -102,14 +102,13 @@ class GAN(nn.Module):
         state[DISC_REAL] = self.discriminator(real_imgs)
 
 
-@callbacks.on_criterion
+@callbacks.add_to_loss
 def loss_callback(state):
     fake_loss = adversarial_loss(state[DISC_GEN_DET], fake)
     real_loss = adversarial_loss(state[DISC_REAL], valid)
     state[G_LOSS] = adversarial_loss(state[DISC_GEN], valid)
     state[D_LOSS] = (real_loss + fake_loss) / 2
-    # This is the loss that backward is called on.
-    state[tb.LOSS] = state[G_LOSS] + state[D_LOSS]
+    return state[G_LOSS] + state[D_LOSS]
 
 
 @callbacks.on_step_training

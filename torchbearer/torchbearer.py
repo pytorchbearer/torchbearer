@@ -25,7 +25,7 @@ class Model:
     def __init__(self, model, optimizer, criterion=None, metrics=[]):
         super().__init__()
         if criterion is None:
-            criterion = lambda y_pred, y_true: torch.zeros(y_true.shape[0], device=y_true.device)
+            criterion = lambda y_pred, y_true: torch.zeros(1, device=y_true.device)
 
         self.main_state = {
             torchbearer.MODEL: model,

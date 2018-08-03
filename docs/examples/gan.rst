@@ -16,7 +16,7 @@ We first define all constants for the example.
    :language: python
    :lines: 19-29
 
-We then define a number of state keys for convenience. This is optional, however, it automatically avoids key conflicts.
+We then define a number of state keys for convenience using :func:`.state_key`. This is optional, however, it automatically avoids key conflicts.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
@@ -26,7 +26,7 @@ We then define the dataset and dataloader - for this example, MNIST.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 124-131
+   :lines: 123-130
 
 Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -42,14 +42,15 @@ Note that we have to be careful to remove the gradient information from the disc
 Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since our loss is complicated in this example, we shall forgo the basic loss criterion used in normal torchbearer models.
-Instead we use a callback to provide the loss. Since this callback is very simple we can use callback decorators on a function (which takes state) to tell torchbearer when it should be called.
+Since our loss computation in this example is complicated, we shall forgo the basic loss criterion used in normal torchbearer models.
+Instead we use a callback to provide the loss, in this case we use the :func:`.add_to_loss` callback decorator.
+This decorates a function that returns a loss and automatically adds this to the main loss in training and validation.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 105-112
+   :lines: 105-111
 
-Note that we have summed the separate discriminator and generator losses since their graphs are separated, this is allowable.
+Note that we have summed the separate discriminator and generator losses, since their graphs are separated, this is allowable.
 
 Metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -65,19 +66,20 @@ Training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We can then train the torchbearer model on the GPU in the standard way.
+Note that when torchbearer is passed a ``None`` criterion it automatically sets the base loss to 0.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 159-161
+   :lines: 158-160
 
 Visualising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save on training step - again using decorators.
+We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save :func:`~torchbearer.callbacks.decorators.on_step_training` - again using decorators.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 115-119
+   :lines: 114-118
 
 Here is a Gif created from the saved images.
 
