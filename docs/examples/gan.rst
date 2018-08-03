@@ -43,9 +43,8 @@ Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Since our loss computation in this example is complicated, we shall forgo the basic loss criterion used in normal torchbearer models.
-Instead we use a callback to provide the loss.
-Since this callback is very simple we can use callback decorators on a function (which takes state) to tell torchbearer when it should be called.
-For this example we use the :func:`.add_to_loss` callback decorator which decorates a function which returns a loss and automatically adds it to the loss in training and validation.
+Instead we use a callback to provide the loss, in this case we use the :func:`.add_to_loss` callback decorator.
+This decorates a function that returns a loss and automatically adds this to the main loss in training and validation.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
