@@ -11,20 +11,18 @@ from torchbearer.callbacks.printer import Tqdm
 
 
 class Model:
-    """ Torchbearermodel to wrap base torch model and provide training environment around it
+    """ Create torchbearermodel which wraps a base torchmodel and provides a training environment surrounding it
+
+    :param model: The base pytorch model
+    :type model: torch.nn.Module
+    :param optimizer: The optimizer used for pytorch model weight updates
+    :type optimizer: torch.optim.Optimizer
+    :param criterion: The final loss criterion that provides a loss value to the optimizer
+    :type criterion: function or None
+    :param metrics: Additional metrics for display and use within callbacks
+    :type metrics: list
     """
     def __init__(self, model, optimizer, criterion=None, metrics=[]):
-        """ Create torchbearermodel which wraps a base torchmodel and provides a training environment surrounding it
-
-        :param model: The base pytorch model
-        :type model: torch.nn.Module
-        :param optimizer: The optimizer used for pytorch model weight updates
-        :type optimizer: torch.optim.Optimizer
-        :param criterion: The final loss criterion that provides a loss value to the optimizer
-        :type criterion: function or None
-        :param metrics: Additional metrics for display and use within callbacks
-        :type metrics: list
-        """
         super().__init__()
         if criterion is None:
             criterion = lambda y_pred, y_true: torch.zeros(y_true.shape[0], device=y_true.device)

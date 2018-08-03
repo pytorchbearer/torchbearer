@@ -5,26 +5,22 @@ from torchbearer.callbacks import Callback
 
 class EarlyStopping(Callback):
     """Callback to stop training when a monitored quantity has stopped improving.
+
+    :param monitor: Quantity to be monitored
+    :type monitor: str
+    :param min_delta: Minimum change in the monitored quantity to qualify as an improvement, i.e. an absolute change of less than min_delta, will count as no improvement.
+    :type min_delta: float
+    :param patience: Number of epochs with no improvement after which training will be stopped.
+    :type patience: int
+    :param verbose: Verbosity mode, will print stopping info if verbose > 0
+    :type verbose: int
+    :param mode: One of {auto, min, max}. In `min` mode, training will stop when the quantity monitored has stopped decreasing; in `max` mode it will stop when the quantity monitored has stopped increasing; in `auto` mode, the direction is automatically inferred from the name of the monitored quantity.
+    :type mode: str
     """
 
     def __init__(self, monitor='val_loss',
                  min_delta=0, patience=0, verbose=0, mode='auto'):
-        """Stop training when a monitored quantity has stopped improving.
 
-        :param monitor: Quantity to be monitored
-        :type monitor: str
-        :param min_delta: Minimum change in the monitored quantity to qualify as an improvement, i.e. an absolute change
-        of less than min_delta, will count as no improvement.
-        :type min_delta: float
-        :param patience: Number of epochs with no improvement after which training will be stopped.
-        :type patience: int
-        :param verbose: Verbosity mode, will print stopping info if verbose > 0
-        :type verbose: int
-        :param mode: One of {auto, min, max}. In `min` mode, training will stop when the quantity monitored has stopped
-        decreasing; in `max` mode it will stop when the quantity monitored has stopped increasing; in `auto` mode, the
-        direction is automatically inferred from the name of the monitored quantity.
-        :type mode: str
-        """
         super(EarlyStopping, self).__init__()
 
         self.monitor = monitor
