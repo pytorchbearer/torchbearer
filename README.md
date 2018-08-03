@@ -7,6 +7,7 @@ torchbearer: A model training library for researchers using PyTorch
 - [About](#about)
 - [Key Features](#features)
 - [Installation](#installation)
+- [Examples](#examples)
 - [Quickstart](#quick)
 - [Documentation](#docs)
 - [Other Libraries](#others)
@@ -15,7 +16,7 @@ torchbearer: A model training library for researchers using PyTorch
 
 ## About
 
-Torchbearer is a PyTorch model training library designed by researchers, for researchers. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you. Our design decisions are geared towards flexibility and customisability whilst trying to maintain the simplest possible API.
+Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you. Our design decisions are geared towards flexibility and customisability whilst trying to maintain the simplest possible API. 
 
 <a name="features"/>
 
@@ -26,7 +27,7 @@ Torchbearer is a PyTorch model training library designed by researchers, for res
 - Simple [callback API](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html) with a persistent model state that supports adding to the loss or accessing the metric values
 - A host of callbacks included from the start that enable: [tensorboard logging](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.tensor_board) (for metrics, images and data), [model checkpointing](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.checkpointers), [weight decay](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.weight_decay), [learning rate schedulers](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.torch_scheduler), [gradient clipping](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.gradient_clipping) and more
 - Decorator APIs for [metrics](http://torchbearer.readthedocs.io/en/latest/code/metrics.html#module-torchbearer.metrics.decorators) and [callbacks](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.decorators) that allow for simple construction of callbacks and metrics
-- An [example library](http://torchbearer.readthedocs.io/en/latest/examples/quickstart.html) (still under construction) with a set of demos showing how complex models (such as [GANs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) and [VAEs](http://torchbearer.readthedocs.io/en/latest/examples/vae.html)) can be implemented easily with torchbearer
+- An [example library](http://torchbearer.readthedocs.io/en/latest/examples/quickstart.html) (still under construction) with a set of demos showing how complex deep learning models (such as [GANs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) and [VAEs](http://torchbearer.readthedocs.io/en/latest/examples/vae.html)) and differentiable programs (like [SVMs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html)) can be implemented easily with torchbearer
 - Fully tested; as researchers we want to trust that our metrics and callbacks work properly, we have therefore tested everything thouroughly for peace of mind
 
 <a name="installation"/>
@@ -36,6 +37,18 @@ Torchbearer is a PyTorch model training library designed by researchers, for res
 The easiest way to install torchbearer is with pip:
 
 `pip install torchbearer`
+
+<a name="examples"/>
+
+## Examples
+
+Here's a linear SVM (differentiable program) visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html) implemented using torcbearer and pytorch in less than 100 lines of code:
+
+![SVM fitting](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/svm_fit.gif)
+
+And a GAN visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) implemented using torcbearer and pytorch:
+
+![GAN Gif](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/gan.gif)
 
 <a name="quick"/>
 
