@@ -49,13 +49,9 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
     :type filepath: str
     :param monitor: Quantity to monitor
     :type monitor: str
-    :param save_best_only: If `save_best_only=True`, the latest best model according to the quantity monitored will not\
-    be overwritten
+    :param save_best_only: If `save_best_only=True`, the latest best model according to the quantity monitored will not be overwritten
     :type save_best_only: bool
-    :param mode: One of {auto, min, max}. If `save_best_only=True`, the decision to overwrite the current save file is\
-    made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this should be\
-    `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically inferred from the\
-    name of the monitored quantity.
+    :param mode: One of {auto, min, max}. If `save_best_only=True`, the decision to overwrite the current save file is made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this should be `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically inferred from the name of the monitored quantity.
     :type mode: str
     :param period: Interval (number of epochs) between checkpoints
     :type period: int
@@ -97,10 +93,7 @@ class Best(_Checkpointer):
     :type filepath: str
     :param monitor: Quantity to monitor
     :type monitor: str
-    :param mode: One of {auto, min, max}. The decision to overwrite the current save file is made based on either\
-    the maximization or the minimization of the monitored quantity. For `val_acc`, this should be `max`, for\
-    `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically inferred from the name of\
-    the monitored quantity.
+    :param mode: One of {auto, min, max}. The decision to overwrite the current save file is made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this should be `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically inferred from the name of the monitored quantity.
     :type mode: str
     :param period: Interval (number of epochs) between checkpoints
     :type period: int

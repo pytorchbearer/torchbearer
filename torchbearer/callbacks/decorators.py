@@ -1,6 +1,7 @@
 from torchbearer.callbacks import Callback
 import torchbearer
 
+
 def on_start(func):
     """ The :func:`on_start` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_start`
     calling the decorated function
