@@ -1269,6 +1269,21 @@ class TestTorchbearer(TestCase):
             self.assertTrue(tensor.to.call_args[0][0] == new_device)
             self.assertTrue(tensor.to.call_args[0][1] == new_dtype)
 
+    def test_deep_to_dict(self):
+        tensor_1 = torch.Tensor([0])
+        tensor_1.to = Mock()
+        tensor_2 = torch.Tensor([0])
+        tensor_2.to = Mock()
+        tensors = {'t1': tensor_1, 't2': tensor_2}
+        new_dtype = torch.float16
+        new_device = 'cuda:1'
+
+        Model._deep_to(tensors, new_device, new_dtype)
+        self.assertTrue(tensor_1.to.call_args[0][0] == new_device)
+        self.assertTrue(tensor_1.to.call_args[0][1] == new_dtype)
+        self.assertTrue(tensor_2.to.call_args[0][0] == new_device)
+        self.assertTrue(tensor_2.to.call_args[0][1] == new_dtype)
+
     def test_load_batch_standard(self):
         items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
         iterator = iter(items)
