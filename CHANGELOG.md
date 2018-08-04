@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added a verbose level (options are now 0,1,2) which will print progress for the entire fit call, updating every epoch. Useful when doing dynamic programming with little data.
+- Added support for dictionary outputs of dataloader
 ### Changed
 - Timer callback can now also be used as a metric which allows display of specified timings to printers and has been moved to metrics.
 - The loss_criterion is renamed to criterion in `torchbearer.Model` arguments.
