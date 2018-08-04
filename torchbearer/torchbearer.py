@@ -496,6 +496,9 @@ class Model:
             for i in range(len(batch)):
                 batch[i] = Model._deep_to(batch[i], device, dtype)
             batch = tuple(batch) if is_tuple else batch
+        elif isinstance(batch, dict):
+            for key in batch:
+                batch[key] = Model._deep_to(batch[key], device, dtype)
         else:
             if batch.dtype.is_floating_point:
                 batch = batch.to(device, dtype)
