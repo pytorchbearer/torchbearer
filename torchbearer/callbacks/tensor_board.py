@@ -72,6 +72,8 @@ class AbstractTensorBoard(Callback):
         :return: the `SummaryWriter`
         """
         if log_dir is None:
+            if self.writer is None:
+                self.writer = get_writer(self.log_dir, self)
             return self.writer
         else:
             return get_writer(log_dir, self)
@@ -91,10 +93,10 @@ class AbstractTensorBoard(Callback):
 
     def on_start(self, state):
         self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
-        self.writer = get_writer(self.log_dir, self)
+        self.writer = self.get_writer()
 
     def on_end(self, state):
-        close_writer(self.log_dir, self)
+        self.close_writer()
 
 
 class TensorBoard(AbstractTensorBoard):
