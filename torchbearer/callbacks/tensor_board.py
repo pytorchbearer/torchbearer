@@ -98,6 +98,7 @@ class AbstractTensorBoard(Callback):
     def on_end(self, state):
         self.close_writer()
 
+
 class TensorBoard(AbstractTensorBoard):
     """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
 
