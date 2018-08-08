@@ -22,7 +22,7 @@ def get_writer(log_dir, logger) -> SummaryWriter:
     :return: the `SummaryWriter` object
     """
     if log_dir not in __writers__:
-        __writers__[log_dir] = {'writer': SummaryWriter(log_dir), 'references': set()}
+        __writers__[log_dir] = {'writer': SummaryWriter(log_dir=log_dir), 'references': set()}
 
     __writers__[log_dir]['references'].add(logger)
     return __writers__[log_dir]['writer']
@@ -166,9 +166,8 @@ class TensorBoard(AbstractTensorBoard):
             self.close_writer(self.batch_log_dir)
 
         if self.write_epoch_metrics:
-            writer = self.get_writer()
             for metric in state[torchbearer.METRICS]:
-                writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
+                self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
 
 class TensorBoardImages(AbstractTensorBoard):
