@@ -1,21 +1,103 @@
 import copy
-
-import torchvision.utils as utils
-
-from tensorboardX import SummaryWriter
-
-import torch.nn.functional as F
-
-import torchbearer
-
-from torchbearer.callbacks import Callback
-
 import os
 
 import torch
+import torch.nn.functional as F
+import torchvision.utils as utils
+from tensorboardX import SummaryWriter
+
+import torchbearer
+from torchbearer.callbacks import Callback
+
+__writers__ = dict()
 
 
-class TensorBoard(Callback):
+def get_writer(log_dir, logger) -> SummaryWriter:
+    """
+    Get the writer assigned to the given log directory.
+    If the writer doesn't exist it will be created, and a reference to the logger added.
+
+    :param log_dir: the log directory
+    :param logger: the object requesting the writer. That object should call `close_writer` when its finished
+    :return: the `SummaryWriter` object
+    """
+    if log_dir not in __writers__:
+        __writers__[log_dir] = {'writer': SummaryWriter(log_dir), 'references': set()}
+
+    __writers__[log_dir]['references'].add(logger)
+    return __writers__[log_dir]['writer']
+
+
+def close_writer(log_dir, logger):
+    """
+    Decrement the reference count for a writer belonging to a specific log directory.
+    If the reference count gets to zero, the writer will be closed and removed.
+
+    :param log_dir: the log directory
+    :param logger: the object releasing the writer
+    """
+    if log_dir in __writers__:
+        __writers__[log_dir]['references'].discard(logger)
+
+        if len(__writers__[log_dir]['references']) is 0:
+            __writers__[log_dir]['writer'].close()
+            del __writers__[log_dir]
+
+
+class AbstractTensorBoard(Callback):
+    """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
+
+    :param log_dir: The tensorboard log path for output
+    :type log_dir: str
+    :param comment: Descriptive comment to append to path
+    :type comment: str
+    """
+
+    def __init__(self, log_dir='./logs',
+                 comment='torchbearer'):
+        super(AbstractTensorBoard, self).__init__()
+
+        self.raw_log_dir = log_dir
+        self.log_dir = log_dir
+        self.comment = comment
+        self.writer = None
+
+    def get_writer(self, log_dir=None) -> SummaryWriter:
+        """
+        Get a SummaryWriter for the given directory (or the default writer if the directory is not given).
+        If you are getting a `SummaryWriter` for a custom directory, it is your responsibility to close
+        it using `close_writer`.
+        :param log_dir: the (optional) directory
+        :type log_dir: str
+        :return: the `SummaryWriter`
+        """
+        if log_dir is None:
+            return self.writer
+        else:
+            return get_writer(log_dir, self)
+
+    def close_writer(self, log_dir=None):
+        """
+        Decrement the reference count for a writer belonging to the given log directory
+        (or the default writer if the directory is not given). If the reference count gets to zero,
+        the writer will be closed and removed.
+        :param log_dir: the (optional) directory
+        :type log_dir: str
+        """
+        if log_dir is None:
+            close_writer(self.log_dir, self)
+        else:
+            close_writer(log_dir, self)
+
+    def on_start(self, state):
+        self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
+        self.writer = get_writer(self.log_dir, self)
+
+    def on_end(self, state):
+        close_writer(self.log_dir, self)
+
+
+class TensorBoard(AbstractTensorBoard):
     """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
 
     :param log_dir: The tensorboard log path for output
@@ -31,45 +113,38 @@ class TensorBoard(Callback):
     :param comment: Descriptive comment to append to path
     :type comment: str
     """
+
     def __init__(self, log_dir='./logs',
                  write_graph=True,
                  write_batch_metrics=False,
                  batch_step_size=10,
                  write_epoch_metrics=True,
                  comment='torchbearer'):
-        super(TensorBoard, self).__init__()
+        super(TensorBoard, self).__init__(log_dir, comment)
 
-        self.log_dir = log_dir
         self.write_graph = write_graph
         self.write_batch_metrics = write_batch_metrics
         self.batch_step_size = batch_step_size
         self.write_epoch_metrics = write_epoch_metrics
-        self.comment = comment
 
         if self.write_graph:
             def handle_graph(state):
                 dummy = torch.rand(state[torchbearer.X].size(), requires_grad=False)
                 model = copy.deepcopy(state[torchbearer.MODEL]).to('cpu')
-                self._writer.add_graph(model, (dummy, ))
+                self.writer.add_graph(model, (dummy,))
                 self._handle_graph = lambda _: ...
+
             self._handle_graph = handle_graph
         else:
             self._handle_graph = lambda _: ...
 
-        self._writer = None
-        self._batch_writer = None
-
-    def on_start(self, state):
-        self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
-        self._writer = SummaryWriter(log_dir=self.log_dir)
+        self.batch_log_dir = None
+        self.batch_writer = None
 
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
-            log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
-            self._batch_writer = SummaryWriter(log_dir=log_dir)
-
-    def on_end(self, state):
-        self._writer.close()
+            self.batch_log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
+            self.batch_writer = self.get_writer(self.batch_log_dir)
 
     def on_sample(self, state):
         self._handle_graph(state)
@@ -77,26 +152,29 @@ class TensorBoard(Callback):
     def on_step_training(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             for metric in state[torchbearer.METRICS]:
-                self._batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
+                self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
+                                             state[torchbearer.BATCH])
 
     def on_step_validation(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             for metric in state[torchbearer.METRICS]:
-                self._batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
+                self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
+                                             state[torchbearer.BATCH])
 
     def on_end_epoch(self, state):
         if self.write_batch_metrics:
-            self._batch_writer.close()
+            self.close_writer(self.batch_log_dir)
 
         if self.write_epoch_metrics:
+            writer = self.get_writer()
             for metric in state[torchbearer.METRICS]:
-                self._writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
+                writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
 
-class TensorBoardImages(Callback):
+class TensorBoardImages(AbstractTensorBoard):
     """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
-    TensorboardX library and torchvision.utils.make_grid. Images are selected from the given key and saved to the given path. Full name of
-    image sub directory will be model name + _ + comment.
+    TensorboardX library and torchvision.utils.make_grid. Images are selected from the given key and saved to the given
+    path. Full name of image sub directory will be model name + _ + comment.
 
     :param log_dir: The tensorboard log path for output
     :type log_dir: str
@@ -110,13 +188,20 @@ class TensorBoardImages(Callback):
     :type write_each_epoch: bool
     :param num_images: The number of images to write
     :type num_images: int
-    :param nrow: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param padding: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param normalize: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param norm_range: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param scale_each: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param pad_value: See `torchvision.utils.make_grid https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param nrow: See `torchvision.utils.make_grid
+                 https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param padding: See `torchvision.utils.make_grid
+                    https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param normalize: See `torchvision.utils.make_grid
+                      https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param norm_range: See `torchvision.utils.make_grid
+                       https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param scale_each: See `torchvision.utils.make_grid
+                       https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param pad_value: See `torchvision.utils.make_grid
+                      https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
     """
+
     def __init__(self, log_dir='./logs',
                  comment='torchbearer',
                  name='Image',
@@ -129,8 +214,7 @@ class TensorBoardImages(Callback):
                  norm_range=None,
                  scale_each=False,
                  pad_value=0):
-        self.log_dir = log_dir
-        self.comment = comment
+        super(TensorBoardImages, self).__init__(log_dir, comment)
         self.name = name
         self.key = key
         self.write_each_epoch = write_each_epoch
@@ -142,13 +226,8 @@ class TensorBoardImages(Callback):
         self.scale_each = scale_each
         self.pad_value = pad_value
 
-        self._writer = None
         self._data = None
         self.done = False
-
-    def on_start(self, state):
-        log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
-        self._writer = SummaryWriter(log_dir=log_dir)
 
     def on_step_validation(self, state):
         if not self.done:
@@ -179,7 +258,7 @@ class TensorBoardImages(Callback):
                     scale_each=self.scale_each,
                     pad_value=self.pad_value
                 )
-                self._writer.add_image(self.name, image, state[torchbearer.EPOCH])
+                self.writer.add_image(self.name, image, state[torchbearer.EPOCH])
                 self.done = True
                 self._data = None
 
@@ -187,12 +266,10 @@ class TensorBoardImages(Callback):
         if self.write_each_epoch:
             self.done = False
 
-    def on_end(self, state):
-        self._writer.close()
 
-
-class TensorBoardProjector(Callback):
-    """The TensorBoardProjector callback is used to write images from the validation pass to Tensorboard using the TensorboardX library. Images are written to the given directory and, if required, so are associated features.
+class TensorBoardProjector(AbstractTensorBoard):
+    """The TensorBoardProjector callback is used to write images from the validation pass to Tensorboard using the
+    TensorboardX library. Images are written to the given directory and, if required, so are associated features.
 
     :param log_dir: The tensorboard log path for output
     :type log_dir: str
@@ -200,7 +277,8 @@ class TensorBoardProjector(Callback):
     :type comment: str
     :param num_images: The number of images to write
     :type num_images: int
-    :param avg_pool_size: Size of the average pool to perform on the image. This is recommended to reduce the overall image sizes and improve latency
+    :param avg_pool_size: Size of the average pool to perform on the image. This is recommended to reduce the overall
+                          image sizes and improve latency
     :type avg_pool_size: int
     :param avg_data_channels: If True, the image data will be averaged in the channel dimension
     :type avg_data_channels: bool
@@ -208,9 +286,11 @@ class TensorBoardProjector(Callback):
     :type write_data: bool
     :param write_features: If True, the image features will be written as an embedding
     :type write_features: bool
-    :param features_key: The key in state to use for the embedding. Typically model output but can be used to show features from any layer of the model.
+    :param features_key: The key in state to use for the embedding. Typically model output but can be used to show
+                         features from any layer of the model.
     :type features_key: str
     """
+
     def __init__(self, log_dir='./logs',
                  comment='torchbearer',
                  num_images=100,
@@ -219,22 +299,18 @@ class TensorBoardProjector(Callback):
                  write_data=True,
                  write_features=True,
                  features_key=torchbearer.Y_PRED):
-        self.log_dir = log_dir
-        self.comment = comment
+        super(TensorBoardProjector, self).__init__(log_dir, comment)
         self.num_images = num_images
         self.avg_pool_size = avg_pool_size
         self.avg_data_channels = avg_data_channels
         self.write_data = write_data
         self.write_features = write_features
         self.features_key = features_key
-
-        self._writer = None
-
         self.done = False
-
-    def on_start(self, state):
-        log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
-        self._writer = SummaryWriter(log_dir=log_dir)
+        self._images = None
+        self._labels = None
+        self._features = None
+        self._data = None
 
     def on_step_validation(self, state):
         if not self.done:
@@ -291,14 +367,13 @@ class TensorBoardProjector(Callback):
 
             if self._labels.size(0) >= self.num_images:
                 if state[torchbearer.EPOCH] == 0 and self.write_data:
-                    self._writer.add_embedding(self._data, metadata=self._labels, label_img=self._images, tag='data', global_step=-1)
+                    self.writer.add_embedding(self._data, metadata=self._labels, label_img=self._images, tag='data',
+                                              global_step=-1)
                 if self.write_features:
-                    self._writer.add_embedding(self._features, metadata=self._labels, label_img=self._images, tag='features', global_step=state[torchbearer.EPOCH])
+                    self.writer.add_embedding(self._features, metadata=self._labels, label_img=self._images,
+                                              tag='features', global_step=state[torchbearer.EPOCH])
                 self.done = True
 
     def on_end_epoch(self, state):
         if self.write_features:
             self.done = False
-
-    def on_end(self, state):
-        self._writer.close()
