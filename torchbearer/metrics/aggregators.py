@@ -138,7 +138,7 @@ class Std(metrics.Metric):
         mean = mean ** 2
         variance = (self._sum_sq / self._count) - mean
         if variance < 0:
-            return -1
+            return 0
         else: 
             return variance ** 0.5
 
