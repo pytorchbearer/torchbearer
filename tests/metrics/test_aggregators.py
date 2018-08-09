@@ -35,6 +35,16 @@ class TestStd(unittest.TestCase):
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
 
+    def test_underflow(self):
+        self._std.train()
+        for i in range(5):
+            val=(self._metric.process() + 1) * 1e-23
+            self._std.process(val)
+            self._std.process(val)
+
+        result = self._std.process_final({})
+        self.assertAlmostEqual(-1, result)
+
 
 class TestMean(unittest.TestCase):
     def setUp(self):
