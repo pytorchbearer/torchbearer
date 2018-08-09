@@ -28,7 +28,7 @@ def get_writer(log_dir, logger, use_visdom=False):
             ##### If we want to write to a log then we need to do this unless tensorboardX puts args in
             # from visdom import Visdom
             # del w.vis
-            # w.vis = Visdom(log_to_filename='/home/matt/tmp/test.log')
+            # w.vis = Visdom(log_to_filename=log_dir)
         else:
             w = SummaryWriter()
         __writers__[log_dir] = {'writer': w, 'references': set()}
