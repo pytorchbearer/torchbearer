@@ -29,6 +29,7 @@ Welcome to torchbearer's documentation!
 
    examples/basic_opt
    examples/svm_linear
+   examples/amsgrad
 
 .. toctree::
    :glob:
