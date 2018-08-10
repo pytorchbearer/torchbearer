@@ -54,11 +54,10 @@ def get_writer(log_dir, logger, visdom=False):
             w = VisdomWriter()
             try:
                 from visdom import Visdom
-                del w.vis
                 os.makedirs(log_dir, exist_ok=True)
-                VisdomParams.LOG_TO_FILENAME = log_dir+'/log.log'
+                VisdomParams.LOG_TO_FILENAME = os.path.join(log_dir,'log.log')
                 w.vis = Visdom(**VisdomParams.__to_dict__())
-            except:
+            except Exception as e:
                 warnings.warn('Failed importing visdom or passing custom arguments.')
         else:
             w = SummaryWriter(log_dir=log_dir)
@@ -80,8 +79,13 @@ def close_writer(log_dir, logger):
         __writers__[log_dir]['references'].discard(logger)
 
         if len(__writers__[log_dir]['references']) is 0:
-            __writers__[log_dir]['writer'].close()
-            del __writers__[log_dir]
+            if 'writer' in __writers__[log_dir]:
+                __writers__[log_dir]['writer'].close()
+
+            if 'writer_visdom' in __writers__[log_dir]:
+                __writers__[log_dir]['writer_visdom'].close()
+
+        del __writers__[log_dir]
 
 
 class AbstractTensorBoard(Callback):
@@ -178,7 +182,7 @@ class TensorBoard(AbstractTensorBoard):
         self.write_epoch_metrics = write_epoch_metrics
         self.visdom = visdom
 
-        if self.write_graph:
+        if self.write_graph and not visdom:
             def handle_graph(state):
                 dummy = torch.rand(state[torchbearer.X].size(), requires_grad=False)
                 model = copy.deepcopy(state[torchbearer.MODEL]).to('cpu')
@@ -236,6 +240,7 @@ class TensorBoard(AbstractTensorBoard):
                     self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
     def on_end(self, state):
+        super().on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
 
@@ -334,7 +339,7 @@ class TensorBoardImages(AbstractTensorBoard):
                     name = self.name + str(state[torchbearer.EPOCH])
                 else:
                     name = self.name
-                self.writer.add_image(self.name, image, state[torchbearer.EPOCH])
+                self.writer.add_image(name, image, state[torchbearer.EPOCH])
                 self.done = True
                 self._data = None
 
