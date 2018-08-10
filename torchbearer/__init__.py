@@ -18,6 +18,8 @@ Utilities
         :undoc-members:
 """
 
+from .version import __version__
+
 from .state import *
 from . import metrics
 from . import callbacks
