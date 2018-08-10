@@ -35,25 +35,14 @@ class TestStd(unittest.TestCase):
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
 
-    def test_underflow(self):
-        self._std.train()
-        for i in range(5):
-            val=(self._metric.process() + 1) * 1e-23
-            self._std.process(val)
-            self._std.process(val)
-
-        result = self._std.process_final({})
-        self.assertAlmostEqual(0, result)
-
     def test_precision_error(self):
         self._std.train()
-        for i in range(5):
-            val=torch.as_tensor([0.55])
-            self._std.process(val)
+        val = torch.tensor([0.55])
+        for i in range(2):
             self._std.process(val)
 
         result = self._std.process_final({})
-        self.assertAlmostEqual(0, result)
+        self.assertEqual(0, result)
 
 
 class TestMean(unittest.TestCase):
