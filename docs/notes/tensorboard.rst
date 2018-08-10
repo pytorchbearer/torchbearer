@@ -2,7 +2,13 @@ Using the Tensorboard Callback
 ====================================
 
 In this note we will cover the use of the :class:`TensorBoard callback <.TensorBoard>`. This is one of three callbacks
-in torchbearer which use the `TensorboardX <https://github.com/lanpa/tensorboardX>`_ library.
+in torchbearer which use the `TensorboardX <https://github.com/lanpa/tensorboardX>`_ library. The PyPi version of
+tensorboardX (1.4) is somewhat outdated at the time of writing so it may be worth installing from source if some of the
+examples don't run correctly:
+
+.. code-block:: bash
+
+    pip install git+https://github.com/lanpa/tensorboardX
 
 The :class:`TensorBoard callback <.TensorBoard>` is simply used to log metric values (and optionally a model graph) to
 tensorboard. Let's have a look at some examples.
