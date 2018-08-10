@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Standard deviation calculation now returns 0 instead of complex value when given very close samples
 
 ## [0.1.5] - 2018-07-30
 ### Added
