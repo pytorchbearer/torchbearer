@@ -35,6 +35,15 @@ class TestStd(unittest.TestCase):
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result)
 
+    def test_precision_error(self):
+        self._std.train()
+        val = torch.tensor([0.55])
+        for i in range(2):
+            self._std.process(val)
+
+        result = self._std.process_final({})
+        self.assertEqual(0, result)
+
 
 class TestMean(unittest.TestCase):
     def setUp(self):
