@@ -61,8 +61,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'torchbearer'
-copyright = '2018, Ethan Harris and Matthew Painter'
-author = 'Ethan Harris and Matthew Painter'
+copyright = '2018, Ethan Harris, Matthew Painter and Jonathon Hare'
+author = 'Ethan Harris, Matthew Painter and Jonathon Hare'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
