@@ -11,8 +11,8 @@ from the paper.
 Online Optimization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Online learning basically just means learning from one example at a time, in sequence. The function give in the paper is
-defined as follows:
+Online learning basically just means learning from one example at a time, in sequence. The function given in the paper
+is defined as follows:
 
 :math:`f_t(x) = \begin{cases}1010x, & \text{for } t \; \texttt{mod} \; 101 = 1 \\ -10x, & \text{otherwise}\end{cases}`
 
