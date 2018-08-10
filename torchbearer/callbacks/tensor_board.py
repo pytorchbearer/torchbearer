@@ -45,7 +45,11 @@ def get_writer(log_dir, logger, visdom=False):
     :param visdom: if true VisdomWriter is returned instead of tensorboard SummaryWriter
     :return: the `SummaryWriter` or `VisdomWriter` object
     """
-    if log_dir not in __writers__:
+    writer_key = 'writer'
+    if visdom:
+        writer_key = 'writer_visdom'
+
+    if log_dir not in __writers__ or writer_key not in __writers__[log_dir]:
         if visdom:
             w = VisdomWriter()
             try:
@@ -57,11 +61,11 @@ def get_writer(log_dir, logger, visdom=False):
             except:
                 warnings.warn('Failed importing visdom or passing custom arguments.')
         else:
-            w = SummaryWriter()
-        __writers__[log_dir] = {'writer': w, 'references': set()}
+            w = SummaryWriter(log_dir=log_dir)
+        __writers__[log_dir] = {writer_key: w, 'references': set()}
 
     __writers__[log_dir]['references'].add(logger)
-    return __writers__[log_dir]['writer']
+    return __writers__[log_dir][writer_key]
 
 
 def close_writer(log_dir, logger):
@@ -190,7 +194,10 @@ class TensorBoard(AbstractTensorBoard):
 
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
-            self.batch_log_dir = os.path.join(self.log_dir, 'epoch/')
+            if self.visdom:
+                self.batch_log_dir = os.path.join(self.log_dir, 'epoch/')
+            else:
+                self.batch_log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
             self.batch_writer = self.get_writer(self.batch_log_dir, visdom=self.visdom)
 
     def on_sample(self, state):
@@ -204,8 +211,7 @@ class TensorBoard(AbstractTensorBoard):
                                                  state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[
                                                      torchbearer.BATCH], main_tag='batch')
                 else:
-                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
-                                                 state[torchbearer.BATCH])
+                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
 
     def on_step_validation(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
@@ -215,8 +221,7 @@ class TensorBoard(AbstractTensorBoard):
                                                  state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[
                                                      torchbearer.BATCH], main_tag='batch')
                 else:
-                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
-                                                state[torchbearer.EPOCH]*(state[torchbearer.VALIDATION_STEPS])+state[torchbearer.BATCH])
+                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
 
     def on_end_epoch(self, state):
         if self.write_batch_metrics and not self.visdom:
