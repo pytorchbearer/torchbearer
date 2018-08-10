@@ -5,6 +5,7 @@ import torch
 import torch.nn.functional as F
 import torchvision.utils as utils
 from tensorboardX import SummaryWriter
+from tensorboardX.torchvis import VisdomWriter
 
 import torchbearer
 from torchbearer.callbacks import Callback
@@ -12,17 +13,25 @@ from torchbearer.callbacks import Callback
 __writers__ = dict()
 
 
-def get_writer(log_dir, logger) -> SummaryWriter:
+def get_writer(log_dir, logger, use_visdom=False):
     """
     Get the writer assigned to the given log directory.
     If the writer doesn't exist it will be created, and a reference to the logger added.
 
     :param log_dir: the log directory
     :param logger: the object requesting the writer. That object should call `close_writer` when its finished
-    :return: the `SummaryWriter` object
+    :return: the `SummaryWriter` or `VisdomWriter` object
     """
     if log_dir not in __writers__:
-        __writers__[log_dir] = {'writer': SummaryWriter(log_dir=log_dir), 'references': set()}
+        if use_visdom:
+            w = VisdomWriter()
+            ##### If we want to write to a log then we need to do this unless tensorboardX puts args in
+            # from visdom import Visdom
+            # del w.vis
+            # w.vis = Visdom(log_to_filename=log_dir)
+        else:
+            w = SummaryWriter()
+        __writers__[log_dir] = {'writer': w, 'references': set()}
 
     __writers__[log_dir]['references'].add(logger)
     return __writers__[log_dir]['writer']
