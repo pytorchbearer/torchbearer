@@ -136,7 +136,11 @@ class Std(metrics.Metric):
         """
         mean = self._sum / self._count
         mean = mean ** 2
-        return ((self._sum_sq / self._count) - mean) ** 0.5
+        variance = (self._sum_sq / self._count) - mean
+        if variance < 0:
+            return 0
+        else: 
+            return variance ** 0.5
 
     def reset(self, state):
         """Reset the statistics to compute the next deviation.
