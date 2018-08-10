@@ -9,26 +9,53 @@ from tensorboardX.torchvis import VisdomWriter
 
 import torchbearer
 from torchbearer.callbacks import Callback
+import warnings
 
 __writers__ = dict()
 
 
-def get_writer(log_dir, logger, use_visdom=False):
+class VisdomParams:
+    """
+    Class to hold visdom client arguments. Modify member variables before initialising tensorboard callbacks for custom arguments.
+    """
+    SERVER = 'http://localhost'
+    ENDPOINT = 'events'
+    PORT = 8097
+    IPV6 = True
+    HTTP_PROXY_HOST = None
+    HTTP_PROXY_PORT = None
+    ENV = 'main'
+    SEND = True
+    RAISE_EXCEPTIONS = None
+    USE_INCOMING_SOCKET = True
+    LOG_TO_FILENAME = None
+
+    @staticmethod
+    def __to_dict__():
+        return {e.lower(): VisdomParams.__dict__[e] for e in VisdomParams.__dict__ if '__' not in e}
+
+
+def get_writer(log_dir, logger, visdom=False):
     """
     Get the writer assigned to the given log directory.
     If the writer doesn't exist it will be created, and a reference to the logger added.
 
     :param log_dir: the log directory
     :param logger: the object requesting the writer. That object should call `close_writer` when its finished
+    :param visdom: if true VisdomWriter is returned instead of tensorboard SummaryWriter
     :return: the `SummaryWriter` or `VisdomWriter` object
     """
     if log_dir not in __writers__:
-        if use_visdom:
+        if visdom:
             w = VisdomWriter()
-            ##### If we want to write to a log then we need to do this unless tensorboardX puts args in
-            # from visdom import Visdom
-            # del w.vis
-            # w.vis = Visdom(log_to_filename=log_dir)
+            try:
+                from visdom import Visdom
+                del w.vis
+                os.makedirs(log_dir, exist_ok=True)
+                VisdomParams.LOG_TO_FILENAME = log_dir+'/log.log'
+                w.vis = Visdom(**VisdomParams.__to_dict__())
+            except:
+                warnings.warn('Failed importing visdom or passing custom arguments.')
         else:
             w = SummaryWriter()
         __writers__[log_dir] = {'writer': w, 'references': set()}
@@ -60,32 +87,37 @@ class AbstractTensorBoard(Callback):
     :type log_dir: str
     :param comment: Descriptive comment to append to path
     :type comment: str
+    :param visdom: If true, log to visdom instead of tensorboard
+    :type visdom: bool
     """
 
     def __init__(self, log_dir='./logs',
-                 comment='torchbearer'):
+                 comment='torchbearer', visdom=False):
         super(AbstractTensorBoard, self).__init__()
 
         self.raw_log_dir = log_dir
         self.log_dir = log_dir
         self.comment = comment
         self.writer = None
+        self.visdom = visdom
 
-    def get_writer(self, log_dir=None) -> SummaryWriter:
+    def get_writer(self, log_dir=None, visdom=False):
         """
         Get a SummaryWriter for the given directory (or the default writer if the directory is not given).
         If you are getting a `SummaryWriter` for a custom directory, it is your responsibility to close
         it using `close_writer`.
         :param log_dir: the (optional) directory
         :type log_dir: str
-        :return: the `SummaryWriter`
+        :param visdom: If true, return VisdomWriter, if false return tensorboard SummaryWriter
+        :type visdom: bool
+        :return: the `SummaryWriter` or `VisdomWriter`
         """
         if log_dir is None:
             if self.writer is None:
-                self.writer = get_writer(self.log_dir, self)
+                self.writer = get_writer(self.log_dir, self, visdom=visdom)
             return self.writer
         else:
-            return get_writer(log_dir, self)
+            return get_writer(log_dir, self, visdom=visdom)
 
     def close_writer(self, log_dir=None):
         """
@@ -102,7 +134,7 @@ class AbstractTensorBoard(Callback):
 
     def on_start(self, state):
         self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
-        self.writer = self.get_writer()
+        self.writer = self.get_writer(visdom=self.visdom)
 
     def on_end(self, state):
         self.close_writer()
@@ -123,6 +155,8 @@ class TensorBoard(AbstractTensorBoard):
     :type write_epoch_metrics: True
     :param comment: Descriptive comment to append to path
     :type comment: str
+    :param visdom: If true, log to visdom instead of tensorboard
+    :type visdom: bool
     """
 
     def __init__(self, log_dir='./logs',
@@ -130,13 +164,15 @@ class TensorBoard(AbstractTensorBoard):
                  write_batch_metrics=False,
                  batch_step_size=10,
                  write_epoch_metrics=True,
-                 comment='torchbearer'):
-        super(TensorBoard, self).__init__(log_dir, comment)
+                 comment='torchbearer',
+                 visdom=False):
+        super(TensorBoard, self).__init__(log_dir, comment, visdom)
 
         self.write_graph = write_graph
         self.write_batch_metrics = write_batch_metrics
         self.batch_step_size = batch_step_size
         self.write_epoch_metrics = write_epoch_metrics
+        self.visdom = visdom
 
         if self.write_graph:
             def handle_graph(state):
@@ -154,8 +190,8 @@ class TensorBoard(AbstractTensorBoard):
 
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
-            self.batch_log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
-            self.batch_writer = self.get_writer(self.batch_log_dir)
+            self.batch_log_dir = os.path.join(self.log_dir, 'epoch/')
+            self.batch_writer = self.get_writer(self.batch_log_dir, visdom=self.visdom)
 
     def on_sample(self, state):
         self._handle_graph(state)
@@ -163,22 +199,40 @@ class TensorBoard(AbstractTensorBoard):
     def on_step_training(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             for metric in state[torchbearer.METRICS]:
-                self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
-                                             state[torchbearer.BATCH])
+                if self.visdom:
+                    self.batch_writer.add_scalar(metric, state[torchbearer.METRICS][metric],
+                                                 state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[
+                                                     torchbearer.BATCH], main_tag='batch')
+                else:
+                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
+                                                 state[torchbearer.BATCH])
 
     def on_step_validation(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             for metric in state[torchbearer.METRICS]:
-                self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
-                                             state[torchbearer.BATCH])
+                if self.visdom:
+                    self.batch_writer.add_scalar(metric, state[torchbearer.METRICS][metric],
+                                                 state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[
+                                                     torchbearer.BATCH], main_tag='batch')
+                else:
+                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric],
+                                                state[torchbearer.EPOCH]*(state[torchbearer.VALIDATION_STEPS])+state[torchbearer.BATCH])
 
     def on_end_epoch(self, state):
-        if self.write_batch_metrics:
+        if self.write_batch_metrics and not self.visdom:
             self.close_writer(self.batch_log_dir)
 
         if self.write_epoch_metrics:
             for metric in state[torchbearer.METRICS]:
-                self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
+                if self.visdom:
+                    self.writer.add_scalar(metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH],
+                                           main_tag='epoch')
+                else:
+                    self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
+
+    def on_end(self, state):
+        if self.write_batch_metrics and self.visdom:
+            self.close_writer(self.batch_log_dir)
 
 
 class TensorBoardImages(AbstractTensorBoard):
@@ -210,6 +264,8 @@ class TensorBoardImages(AbstractTensorBoard):
                        https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
     :param pad_value: See `torchvision.utils.make_grid
                       https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
+    :param visdom: If true, log to visdom instead of tensorboard
+    :type visdom: bool
     """
 
     def __init__(self, log_dir='./logs',
@@ -223,8 +279,9 @@ class TensorBoardImages(AbstractTensorBoard):
                  normalize=False,
                  norm_range=None,
                  scale_each=False,
-                 pad_value=0):
-        super(TensorBoardImages, self).__init__(log_dir, comment)
+                 pad_value=0,
+                 visdom=False):
+        super(TensorBoardImages, self).__init__(log_dir, comment, visdom=visdom)
         self.name = name
         self.key = key
         self.write_each_epoch = write_each_epoch
@@ -268,6 +325,10 @@ class TensorBoardImages(AbstractTensorBoard):
                     scale_each=self.scale_each,
                     pad_value=self.pad_value
                 )
+                if self.visdom:
+                    name = self.name + str(state[torchbearer.EPOCH])
+                else:
+                    name = self.name
                 self.writer.add_image(self.name, image, state[torchbearer.EPOCH])
                 self.done = True
                 self._data = None
