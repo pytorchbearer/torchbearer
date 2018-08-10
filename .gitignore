@@ -106,3 +106,4 @@ ENV/
 /docs/_static/examples/results
 /docs/_static/examples/data
 /docs/_static/examples/images
+/docs/_static/examples/logs
