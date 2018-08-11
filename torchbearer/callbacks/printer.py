@@ -1,7 +1,7 @@
 import torchbearer
 
 from torchbearer.callbacks import Callback
-from tqdm import tqdm
+from tqdm import tqdm, tqdm_notebook
 
 
 class ConsolePrinter(Callback):
@@ -48,14 +48,19 @@ class Tqdm(Callback):
     :param on_epoch: If True, output a single progress bar which tracks epochs
     :type on_epoch: bool
     """
-    def __init__(self, validation_label_letter='v', on_epoch=False):
+    def __init__(self, validation_label_letter='v', on_epoch=False, notebook=False):
         self._loader = None
         self.validation_label = validation_label_letter
         self._on_epoch = on_epoch
+        self.notebook = notebook
 
     def _on_start(self, state, letter, steps):
         bar_desc = '{:d}/{:d}({:s})'.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
-        self._loader = tqdm(total=steps, desc=bar_desc)
+        if self.notebook:
+            self._loader = tqdm_notebook(total=steps, desc=bar_desc)
+        else:
+            self._loader = tqdm(total=steps, desc=bar_desc)
+
 
     def _update(self, state):
         self._loader.update(1)
@@ -67,7 +72,11 @@ class Tqdm(Callback):
 
     def on_start(self, state):
         if self._on_epoch:
-            self._loader = tqdm(total=state[torchbearer.MAX_EPOCHS])
+            if self.notebook:
+                self._loader = tqdm_notebook(total=state[torchbearer.MAX_EPOCHS])
+            else:
+                self._loader = tqdm(total=state[torchbearer.MAX_EPOCHS])
+
 
     def on_end_epoch(self, state):
         if self._on_epoch:
