@@ -4,6 +4,7 @@ python:
 # command to install dependencies
 install:
   - pip install coverage
+  - pip install visdom
   - python setup.py develop
 # command to run tests
 script:
