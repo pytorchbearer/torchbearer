@@ -58,7 +58,7 @@ def get_writer(log_dir, logger, visdom=False):
                 VisdomParams.LOG_TO_FILENAME = os.path.join(log_dir,'log.log')
                 w.vis = Visdom(**VisdomParams.__to_dict__())
             except Exception as e:
-                warnings.warn('Failed importing visdom or passing custom arguments.')
+                warnings.warn('Failed importing visdom or passing custom arguments with error:' + str(e))
         else:
             w = SummaryWriter(log_dir=log_dir)
         __writers__[log_dir] = {writer_key: w, 'references': set()}
