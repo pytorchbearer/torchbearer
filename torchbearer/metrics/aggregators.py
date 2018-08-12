@@ -9,6 +9,7 @@ from abc import ABCMeta, abstractmethod
 from collections import deque
 
 import torch
+import numpy as np
 
 
 class RunningMetric(metrics.AdvancedMetric):
@@ -126,7 +127,7 @@ class Std(metrics.Metric):
         if data.size() == torch.Size([]):
             self._count += 1
         else:
-            self._count += data.size(0)
+            self._count += float(np.prod(list(data.size())))
 
     def process_final(self, *args):
         """Compute and return the final standard deviation.
@@ -178,7 +179,7 @@ class Mean(metrics.Metric):
         if data.size() == torch.Size([]):
             self._count += 1
         else:
-            self._count += data.size(0)
+            self._count += float(np.prod(list(data.size())))
 
     def process_final(self, *args):
         """Compute and return the mean of all metric values since the last call to reset.
