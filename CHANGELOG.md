@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added visdom logging support to tensorbard callbacks
 ### Changed
+- ModelCheckpoint now saves full state dict, including callbacks, instead of just model & optimizer.
+- Can initialize training with state dict.
 ### Deprecated
 ### Removed
 ### Fixed
