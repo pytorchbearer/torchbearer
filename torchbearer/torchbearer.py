@@ -442,6 +442,7 @@ class Model:
         """
         self.main_state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
         self.main_state[torchbearer.OPTIMIZER].load_state_dict(state_dict[torchbearer.OPTIMIZER])
+        self.main_state[torchbearer.CALLBACK_LIST].load_state_dict(state_dict[torchbearer.CALLBACK_LIST])
 
     def state_dict(self, **kwargs):
         """
@@ -452,7 +453,8 @@ class Model:
         """
         state_dict = {
             torchbearer.MODEL: self.main_state[torchbearer.MODEL].state_dict(**kwargs),
-            torchbearer.OPTIMIZER: self.main_state[torchbearer.OPTIMIZER].state_dict()
+            torchbearer.OPTIMIZER: self.main_state[torchbearer.OPTIMIZER].state_dict(),
+            torchbearer.CALLBACK_LIST: self.main_state[torchbearer.CALLBACK_LIST]
         }
         return state_dict
 
