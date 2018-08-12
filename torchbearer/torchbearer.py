@@ -454,7 +454,7 @@ class Model:
         state_dict = {
             torchbearer.MODEL: self.main_state[torchbearer.MODEL].state_dict(**kwargs),
             torchbearer.OPTIMIZER: self.main_state[torchbearer.OPTIMIZER].state_dict(),
-            torchbearer.CALLBACK_LIST: self.main_state[torchbearer.CALLBACK_LIST]
+            torchbearer.CALLBACK_LIST: self.main_state[torchbearer.CALLBACK_LIST].state_dict()
         }
         return state_dict
 
