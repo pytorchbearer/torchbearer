@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 
 import torchbearer
 from torchbearer.callbacks import Tqdm, ConsolePrinter
@@ -29,15 +29,11 @@ class TestConsolePrinter(TestCase):
 
 
 class TestTqdm(TestCase):
-    @patch("torchbearer.callbacks.printer.tqdm")
-    def test_tqdm(self, mock_tqdm):
-        mock_tqdm.return_value = Mock()
-        mock_tqdm.return_value.set_postfix = Mock()
-        mock_tqdm.return_value.close = Mock()
-        mock_tqdm.return_value.update = Mock()
-
+    def test_tqdm(self):
         state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100, torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: 'test'}
         tqdm = Tqdm(validation_label_letter='e')
+        tqdm.tqdm_module = MagicMock()
+        mock_tqdm = tqdm.tqdm_module
 
         tqdm.on_start_training(state)
         mock_tqdm.assert_called_once_with(total=100, desc='1/10(t)')
