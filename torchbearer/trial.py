@@ -1,11 +1,48 @@
+import warnings
+
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+import torchbearer
+from torchbearer.metrics import MetricList
+from torchbearer.callbacks import CallbackList
+
+
 def fluent(func):
-    def decorator(self, *args, **kwargs):
+    """Decorator for class methods which forces return of self.
+    """
+    def wrapper(self, *args, **kwargs):
         func(self, *args, **kwargs)
         return self
-    return decorator
+    return wrapper
 
 
-class Trial:
+def update_device_and_dtype(state, *args, **kwargs):
+    """Function get data type and device values from the args / kwargs and update state.
+
+    :param state: The dict to update
+    :type state: dict
+    :param args: Arguments to the :func:`Trial.to` function
+    :param kwargs: Keyword arguments to the :func:`Trial.to` function
+    :return: device, dtype pair
+    :rtype: tuple
+    """
+    for key, _ in kwargs.items():
+        if key == torchbearer.DATA_TYPE:
+            state[torchbearer.DATA_TYPE] = kwargs['dtype']
+        elif torchbearer.DEVICE in kwargs:
+            state[torchbearer.DEVICE] = kwargs['device']
+
+    for arg in args:
+        if isinstance(arg, torch.dtype):
+            state[torchbearer.DATA_TYPE] = arg
+        else:
+            state[torchbearer.DEVICE] = arg
+
+    return state
+
+
+class Trial(object):
     """ The trial class contains all of the required hyper-parameters for model running in torchbearer and presents an
     API for model fitting, evaluating and predicting.
 
@@ -23,7 +60,22 @@ class Trial:
     :type pass_state: bool
     """
     def __init__(self, model, criterion=None, optimizer=None, metrics=[], callbacks=[], pass_state=False):
-        pass
+        if criterion is None:
+            def criterion(_, y_true):
+                torch.zeros(1, device=y_true.device)
+
+        self.pass_state = pass_state
+
+        self.state = {
+            torchbearer.MODEL: model,
+            torchbearer.CRITERION: criterion,
+            torchbearer.OPTIMIZER: optimizer,
+            torchbearer.METRIC_LIST: MetricList(metrics),
+            torchbearer.CALLBACK_LIST: CallbackList(callbacks),
+            torchbearer.DEVICE: 'cpu',
+            torchbearer.DATA_TYPE: torch.float32,
+            torchbearer.SELF: self
+        }
 
     @fluent
     def with_train_generator(self, generator, steps=None):
@@ -36,7 +88,16 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        self.state[torchbearer.GENERATOR] = generator
+
+        steps = len(generator) if steps is None else steps
+        if not isinstance(steps, int):
+            warnings.warn("Number of training steps is not an int, casting to int")
+            steps = int(steps)
+        if steps > len(generator):
+            warnings.warn("Number of training steps exceeds number of data items, limiting to number of items")
+            steps = len(generator)
+        self.state[torchbearer.TRAIN_STEPS] = steps
 
     @fluent
     def with_train_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
@@ -57,7 +118,9 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        dataset = TensorDataset(x, y)
+        dataloader = DataLoader(dataset, batch_size, shuffle=shuffle, num_workers=num_workers)
+        self.with_train_generator(dataloader, steps=steps)
 
     @fluent
     def with_val_generator(self, generator, steps=None):
@@ -71,7 +134,16 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        self.state[torchbearer.VALIDATION_GENERATOR] = generator
+
+        steps = len(generator) if steps is None else steps
+        if not isinstance(steps, int):
+            warnings.warn("Number of validation steps is not an int, casting to int")
+            steps = int(steps)
+        if steps > len(generator):
+            warnings.warn("Number of validation steps exceeds number of data items, limiting to number of items")
+            steps = len(generator)
+        self.state[torchbearer.VALIDATION_STEPS] = steps
 
     @fluent
     def with_val_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
@@ -92,7 +164,9 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        dataset = TensorDataset(x, y)
+        dataloader = DataLoader(dataset, batch_size, shuffle=shuffle, num_workers=num_workers)
+        self.with_val_generator(dataloader, steps=steps)
 
     @fluent
     def with_test_generator(self, generator, steps=None):
@@ -105,7 +179,16 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        self.state[torchbearer.TEST_GENERATOR] = generator
+
+        steps = len(generator) if steps is None else steps
+        if not isinstance(steps, int):
+            warnings.warn("Number of test steps is not an int, casting to int")
+            steps = int(steps)
+        if steps > len(generator):
+            warnings.warn("Number of test steps exceeds number of data items, limiting to number of items")
+            steps = len(generator)
+        self.state[torchbearer.TEST_STEPS] = steps
 
     @fluent
     def with_test_data(self, x, batch_size=1, num_workers=1, steps=None):
@@ -122,20 +205,9 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
-
-    @fluent
-    def with_split(self, split, val_steps=None):
-        """Use this trial with a validation data split from the train data.
-
-        :param split: Fraction of the training data to set aside for validation
-        :type split: float
-        :param val_steps: Number of validation steps to take or None to default to the length of the split
-        :type val_steps: int
-        :return: self
-        :rtype: Trial
-        """
-        pass
+        dataset = TensorDataset(x)
+        dataloader = DataLoader(dataset, batch_size, num_workers=num_workers)
+        self.with_test_generator(dataloader, steps=steps)
 
     def fit(self, epochs=1, verbose=2):
         """Fit this trial for the given number of epochs, starting from the last trained epoch.
@@ -169,16 +241,27 @@ class Trial:
         """
         pass
 
+    @fluent
     def train(self):
         """Set model and metrics to training mode.
-        """
-        pass
 
+        :return: self
+        :rtype: Trial
+        """
+        self.state[torchbearer.MODEL].train()
+        self.state[torchbearer.METRIC_LIST].train()
+
+    @fluent
     def eval(self):
         """Set model and metrics to evaluation mode
-        """
-        pass
 
+        :return: self
+        :rtype: Trial
+        """
+        self.state[torchbearer.MODEL].eval()
+        self.state[torchbearer.METRIC_LIST].eval()
+
+    @fluent
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
 
@@ -187,8 +270,16 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        self.state[torchbearer.MODEL].to(*args, **kwargs)
 
+        for state in self.state[torchbearer.OPTIMIZER].state.values():
+            for k, v in state.items():
+                if torch.is_tensor(v):
+                    state[k] = v.to(*args, **kwargs)
+
+        self.state = update_device_and_dtype(self.state, *args, **kwargs)
+
+    @fluent
     def cuda(self, device=None):
         """ Moves all model parameters and buffers to the GPU.
 
@@ -197,15 +288,18 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        if device is None:
+            device = torch.cuda.current_device()
+        self.to('cuda:' + str(device))
 
+    @fluent
     def cpu(self):
         """ Moves all model parameters and buffers to the CPU.
 
         :return: self
         :rtype: Trial
         """
-        pass
+        self.to('cpu')
 
     def state_dict(self, **kwargs):
         """Get a dict containing the model and optimizer states, as well as the model history.
@@ -214,8 +308,14 @@ class Trial:
         :return: A dict containing parameters and persistent buffers.
         :rtype: dict
         """
-        pass
+        state_dict = {
+            torchbearer.MODEL: self.state[torchbearer.MODEL].state_dict(**kwargs),
+            torchbearer.OPTIMIZER: self.state[torchbearer.OPTIMIZER].state_dict(),
+            torchbearer.HISTORY: self.state[torchbearer.HISTORY]
+        }
+        return state_dict
 
+    @fluent
     def load_state_dict(self, state_dict, resume=True, **kwargs):
         """Resume this trial from the given state. Expects that this trial was constructed in the same way. Optionally,
         just load the model state.
@@ -227,4 +327,9 @@ class Trial:
         :return: self
         :rtype: Trial
         """
-        pass
+        if resume:
+            self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
+            self.state[torchbearer.OPTIMIZER].load_state_dict(state_dict[torchbearer.OPTIMIZER])
+            self.state[torchbearer.HISTORY] = state_dict[torchbearer.HISTORY]
+        else:
+            self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
