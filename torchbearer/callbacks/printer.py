@@ -2,6 +2,7 @@ import torchbearer
 
 from torchbearer.callbacks import Callback
 from tqdm import tqdm, tqdm_notebook
+import sys
 
 
 class ConsolePrinter(Callback):
@@ -56,11 +57,7 @@ class Tqdm(Callback):
 
     def _on_start(self, state, letter, steps):
         bar_desc = '{:d}/{:d}({:s})'.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
-        if self.notebook:
-            self._loader = tqdm_notebook(total=steps, desc=bar_desc)
-        else:
-            self._loader = tqdm(total=steps, desc=bar_desc)
-
+        self._loader = tqdm(total=steps, desc=bar_desc)
 
     def _update(self, state):
         self._loader.update(1)
@@ -72,11 +69,7 @@ class Tqdm(Callback):
 
     def on_start(self, state):
         if self._on_epoch:
-            if self.notebook:
-                self._loader = tqdm_notebook(total=state[torchbearer.MAX_EPOCHS])
-            else:
-                self._loader = tqdm(total=state[torchbearer.MAX_EPOCHS])
-
+            self._loader = tqdm(total=state[torchbearer.MAX_EPOCHS])
 
     def on_end_epoch(self, state):
         if self._on_epoch:
