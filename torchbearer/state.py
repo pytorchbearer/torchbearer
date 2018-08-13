@@ -16,6 +16,10 @@ def state_key(key):
 
 class Statekey:
     def __init__(self, key):
+        """ Statekey class that is a unique state key based of input string key
+
+        :param key: Base key
+        """
         super().__init__()
         self.key = self._gen_key_(key)
 
