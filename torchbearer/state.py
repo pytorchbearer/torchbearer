@@ -15,11 +15,11 @@ def state_key(key):
 
 
 class Statekey:
-    def __init__(self, key):
-        """ Statekey class that is a unique state key based of input string key
+    """ Statekey class that is a unique state key based of input string key
 
-        :param key: Base key
-        """
+    :param key: Base key
+    """
+    def __init__(self, key):
         super().__init__()
         self.key = self._gen_key_(key)
 
@@ -45,10 +45,10 @@ class Statekey:
 
 
 class State(dict):
+    """
+    State dictionary that behaves like a python dict but accepts Statekeys
+    """
     def __init__(self):
-        """
-        State dictionary that behaves like a python dict but accepts Statekeys
-        """
         super().__init__()
 
     def get_key(self, statekey):
