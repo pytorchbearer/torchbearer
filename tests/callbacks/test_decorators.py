@@ -3,8 +3,6 @@ import unittest
 import torchbearer.callbacks as callbacks
 import torchbearer
 
-import types
-
 
 class TestDecorators(unittest.TestCase):
 
