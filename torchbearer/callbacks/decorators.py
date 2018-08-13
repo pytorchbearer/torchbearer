@@ -266,11 +266,12 @@ def once(fcn):
     """
     done = False
 
-    def _once(_, __):
+    def _once(_):
         nonlocal done
         if not done:
             done = True
-        return done
+            return True
+        return False
 
     return only_if(_once)(fcn)
 
@@ -283,7 +284,7 @@ def once_per_epoch(fcn):
     """
     last_epoch = None
 
-    def ope(_, state):
+    def ope(state):
         nonlocal last_epoch
         if state[torchbearer.EPOCH] != last_epoch:
             last_epoch = state[torchbearer.EPOCH]
@@ -303,8 +304,8 @@ def only_if(condition_expr):
     :return: the decorator
     """
     def condition_decorator(fcn):
-        def decfcn(*args, **kwargs):
-            if condition_expr(*args, **kwargs):
-                fcn(*args, **kwargs)
+        def decfcn(o, state):
+            if condition_expr(state):
+                fcn(o, state)
         return decfcn
     return condition_decorator

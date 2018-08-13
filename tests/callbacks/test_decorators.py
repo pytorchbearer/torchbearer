@@ -3,6 +3,8 @@ import unittest
 import torchbearer.callbacks as callbacks
 import torchbearer
 
+import types
+
 
 class TestDecorators(unittest.TestCase):
 
@@ -117,4 +119,67 @@ class TestDecorators(unittest.TestCase):
         callbacks.add_to_loss(example).on_criterion_validation(state)
         self.assertTrue(state[torchbearer.LOSS] == 2)
 
+    def test_once(self):
+        class Example(callbacks.Callback):
+            @callbacks.once
+            def on_step_validation(self, state):
+                state['value'] += 1
+
+        state = {'epoch': 0, 'value': 0}
+
+        cb = Example()
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        state['epoch'] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+    def test_once_per_epoch(self):
+        class Example(callbacks.Callback):
+            @callbacks.once_per_epoch
+            def on_step_validation(self, state):
+                state['value'] += 1
+
+        state = {'epoch': 0, 'value': 0}
+
+        cb = Example()
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        state['epoch'] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
+
+    def test_only_if(self):
+        class Example(callbacks.Callback):
+            @callbacks.only_if(lambda s: s['epoch'] % 2 == 0)
+            def on_step_validation(self, state):
+                state['value'] += 1
+
+        state = {'epoch': 0, 'value': 0}
+
+        cb = Example()
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
+
+        state['epoch'] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
+
+        state['epoch'] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 3)
 
