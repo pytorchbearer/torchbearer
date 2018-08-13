@@ -9,7 +9,6 @@ from abc import ABCMeta, abstractmethod
 from collections import deque
 
 import torch
-import numpy as np
 
 
 class RunningMetric(metrics.AdvancedMetric):
