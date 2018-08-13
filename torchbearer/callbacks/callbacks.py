@@ -172,7 +172,6 @@ class CallbackList(Callback):
     """
 
     def __init__(self, callback_list):
-
         super().__init__()
         self.callback_list = []
         self.append(callback_list)
@@ -183,6 +182,12 @@ class CallbackList(Callback):
 
     def __iter__(self):
         return self.callback_list.__iter__()
+
+    def __copy__(self):
+        return CallbackList(self.callback_list)
+
+    def copy(self):
+        return self.__copy__()
 
     def append(self, callback_list):
         for callback in callback_list:
