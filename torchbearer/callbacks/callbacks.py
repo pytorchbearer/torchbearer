@@ -182,6 +182,13 @@ class CallbackList(Callback):
 
     def __iter__(self):
         return self.callback_list.__iter__()
+    
+    def load_state_dict(self, state_dict):
+        self.callback_list = []
+        self.append(state_dict)
+    
+    def state_dict(self):
+        return self.callback_list
 
     def __copy__(self):
         return CallbackList(self.callback_list)
