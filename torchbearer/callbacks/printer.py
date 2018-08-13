@@ -1,8 +1,7 @@
 import torchbearer
 
 from torchbearer.callbacks import Callback
-from tqdm import tqdm, tqdm_notebook
-import sys
+from tqdm import tqdm
 
 
 class ConsolePrinter(Callback):
