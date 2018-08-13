@@ -269,6 +269,7 @@ def from_state(key_list):
     """
     def from_state_class(klass):
         klass_seed = klass.seed
+
         def new_klass_seed(self, state):
             seed_keys = [key for key in key_list if key in self.__dict__ and isinstance(self.__dict__[key], Statekey)]
             for k in seed_keys:
