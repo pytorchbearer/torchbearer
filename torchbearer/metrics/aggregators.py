@@ -123,11 +123,7 @@ class Std(metrics.Metric):
         data = args[0]
         self._sum += data.sum().item()
         self._sum_sq += data.pow(2).sum().item()
-
-        if data.size() == torch.Size([]):
-            self._count += 1
-        else:
-            self._count += float(np.prod(list(data.size())))
+        self._count += float(torch.numel(data))
 
     def process_final(self, *args):
         """Compute and return the final standard deviation.
@@ -175,11 +171,7 @@ class Mean(metrics.Metric):
         """
         data = args[0]
         self._sum += data.sum().item()
-
-        if data.size() == torch.Size([]):
-            self._count += 1
-        else:
-            self._count += float(np.prod(list(data.size())))
+        self._count += float(torch.numel(data))
 
     def process_final(self, *args):
         """Compute and return the mean of all metric values since the last call to reset.
