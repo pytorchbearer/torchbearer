@@ -9,6 +9,8 @@ from torchbearer.callbacks.aggregate_predictions import AggregatePredictions
 from torchbearer.callbacks.callbacks import CallbackList
 from torchbearer.callbacks.printer import Tqdm
 
+from torchbearer import Trial
+
 
 class Model:
     """ Create torchbearermodel which wraps a base torchmodel and provides a training environment surrounding it
@@ -74,17 +76,21 @@ class Model:
         :return: The final state context dictionary
         :rtype: dict[str,any]
         """
-        trainset, valset = torchbearer.cv_utils.get_train_valid_sets(x, y, validation_data, validation_split, shuffle=shuffle)
-        trainloader = DataLoader(trainset, batch_size, shuffle=shuffle, num_workers=workers)
+        warnings.warn('Model.fit is deprecated and will be removed in the next release, use Trial.fit instead', DeprecationWarning)
+        trial = Trial(self.main_state[torchbearer.MODEL],
+                      criterion=self.main_state[torchbearer.CRITERION],
+                      optimizer=self.main_state[torchbearer.OPTIMIZER],
+                      metrics=self.main_state[torchbearer.METRIC_LIST],
+                      callbacks=callbacks,
+                      pass_state=pass_state)
+        trial.with_train_data(x, y, batch_size=batch_size, shuffle=shuffle, num_workers=workers, steps=steps_per_epoch)
 
-        if valset is not None:
-            valloader = DataLoader(valset, batch_size, shuffle=shuffle, num_workers=workers)
-        else:
-            valloader = None
+        if validation_split is not None:
+            trial.with_split(validation_split, val_steps=validation_steps)
+        elif validation_data is not None:
+            trial.with_val_data(validation_data[0], validation_data[1], batch_size=batch_size, shuffle=shuffle, num_workers=workers, steps=validation_steps)
 
-        return self.fit_generator(trainloader, train_steps=steps_per_epoch, epochs=epochs, verbose=verbose,
-                                  callbacks=callbacks, validation_generator=valloader, validation_steps=validation_steps,
-                                  initial_epoch=initial_epoch, pass_state=pass_state)
+        return trial.fit(epochs=epochs, verbose=verbose)
 
     def fit_generator(self, generator, train_steps=None, epochs=1, verbose=2, callbacks=[],
                       validation_generator=None, validation_steps=None, initial_epoch=0, pass_state=False):
