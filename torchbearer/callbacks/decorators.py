@@ -256,3 +256,56 @@ def add_to_loss(func):
     new_callback.on_criterion = add_to_loss_func
     new_callback.on_criterion_validation = add_to_loss_func
     return new_callback
+
+
+def once(fcn):
+    """
+    Decorator to fire a callback once in the entire fitting procedure.
+    :param fcn: the `torchbearer callback` function to decorate.
+    :return: the decorator
+    """
+    done = False
+
+    def _once(_):
+        nonlocal done
+        if not done:
+            done = True
+            return True
+        return False
+
+    return only_if(_once)(fcn)
+
+
+def once_per_epoch(fcn):
+    """
+    Decorator to fire a callback once (on the first call) in any given epoch.
+    :param fcn: the `torchbearer callback` function to decorate.
+    :return: the decorator
+    """
+    last_epoch = None
+
+    def ope(state):
+        nonlocal last_epoch
+        if state[torchbearer.EPOCH] != last_epoch:
+            last_epoch = state[torchbearer.EPOCH]
+            return True
+        return False
+
+    return only_if(ope)(fcn)
+
+
+def only_if(condition_expr):
+    """
+    Decorator to fire a callback only if the given conditional expression function returns True.
+    :param condition_expr: a function/lambda that must evaluate to true for the
+                           decorated `torchbearer callback` to be called. The `state`
+                           object passed to the callback will be passed as an argument
+                           to the condition function.
+    :return: the decorator
+    """
+    def condition_decorator(fcn):
+        def decfcn(o, state):
+            if condition_expr(state):
+                fcn(o, state)
+        return decfcn
+    return condition_decorator
