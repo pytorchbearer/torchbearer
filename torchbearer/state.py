@@ -42,6 +42,9 @@ class Statekey:
 
 class State(dict):
     def __init__(self):
+        """
+        State dictionary that behaves like a python dict but accepts Statekeys
+        """
         super().__init__()
 
     def get_key(self, statekey):
