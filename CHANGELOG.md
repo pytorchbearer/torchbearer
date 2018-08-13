@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Mean and standard deviation calculations now work correctly for network outputs with many dimensions
 - Callback list no longer shared between fit calls, now a new copy is made each fit
 
 ## [0.1.6] - 2018-08-10
