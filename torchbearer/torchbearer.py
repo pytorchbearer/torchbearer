@@ -142,6 +142,7 @@ class Model:
             torchbearer.STOP_TRAINING: False
         }
         state.update(self.main_state)
+        state[torchbearer.CALLBACK_LIST] = CallbackList(state[torchbearer.CALLBACK_LIST].callback_list)
         state[torchbearer.CALLBACK_LIST].append(_callbacks)
 
         state[torchbearer.CALLBACK_LIST].on_start(state)
