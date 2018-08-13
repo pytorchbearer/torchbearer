@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added visdom logging support to tensorbard callbacks
+- Added option to choose tqdm module (tqdm, tqdm_notebook, ...) to Tqdm callback
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Mean and standard deviation calculations now work correctly for network outputs with many dimensions
+- Callback list no longer shared between fit calls, now a new copy is made each fit
+
+## [0.1.6] - 2018-08-10
+### Added
 - Added a verbose level (options are now 0,1,2) which will print progress for the entire fit call, updating every epoch. Useful when doing dynamic programming with little data.
 - Added support for dictionary outputs of dataloader
 - Added abstract superclass for building TensorBoardX based callbacks
@@ -17,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Standard deviation calculation now returns 0 instead of complex value when given very close samples
 
 ## [0.1.5] - 2018-07-30
 ### Added
