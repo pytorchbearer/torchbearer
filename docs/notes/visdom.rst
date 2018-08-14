@@ -60,3 +60,9 @@ We can then edit the visdom client parameters, for example changing the environm
 The only paramenter that the :class:`TensorBoard callback <.TensorBoard>` sets explicity (and cannot be overrided) is the `LOG_TO_FILENAME` parameter.
 This is set to the `log_dir` given to the callback on init.
 
+Source Code
+------------------------------------
+
+The source code for this example is given below:
+
+ :download:`Download Python source code: visdom.py </_static/examples/visdom.py>`
