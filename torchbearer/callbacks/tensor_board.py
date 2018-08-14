@@ -16,7 +16,7 @@ __writers__ = dict()
 
 class VisdomParams:
     """
-    Class to hold visdom client arguments. Modify member variables before initialising tensorboard callbacks for custom arguments.
+    Class to hold visdom client arguments. Modify member variables before initialising tensorboard callbacks for custom arguments. See: `visdom <https://github.com/facebookresearch/visdom#visdom-arguments-python-only>`_
     """
     SERVER = 'http://localhost'
     ENDPOINT = 'events'

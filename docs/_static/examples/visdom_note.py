@@ -59,14 +59,14 @@ from torchbearer.callbacks import TensorBoard
 
 torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
 
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=valgen,
+torchbearer_model.fit_generator(traingen, epochs=5, validation_generator=valgen,
                                 callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)])
 
-torchbearer_model.fit_generator(traingen, epochs=100, validation_generator=valgen,
+torchbearer_model.fit_generator(traingen, epochs=5, validation_generator=valgen,
                                 callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=False, write_epoch_metrics=True)])
 
 import torchbearer.callbacks.tensor_board as tensorboard
 
 tensorboard.VisdomParams.ENV = 'Test'
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=valgen,
+torchbearer_model.fit_generator(traingen, epochs=5, validation_generator=valgen,
                                 callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)])
