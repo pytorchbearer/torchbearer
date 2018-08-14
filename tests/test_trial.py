@@ -333,6 +333,244 @@ class TestWithData(TestCase):
         td.assert_called_once_with(x)
 
 
+class TestRun(TestCase):
+    def test_run_callback_calls(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 1
+
+        callback = MagicMock()
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        callback.on_start.assert_called_once()
+        callback.on_start_epoch.assert_called_once()
+        callback.on_end_epoch.assert_called_once()
+        callback.on_end.assert_called_once()
+
+    def test_run_epochs_ran_normal(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 4
+
+        callback = MagicMock()
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        self.assertTrue(torchbearertrial._fit_pass.call_count == epochs)
+
+    def test_run_epochs_ran_negative(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = -1
+
+        callback = MagicMock()
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        self.assertTrue(torchbearertrial._fit_pass.call_count == 0)
+
+    def test_run_epochs_history_populated(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 10
+
+        callback = MagicMock()
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.state[tb.HISTORY] = [1,2,3,4,5]
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        self.assertTrue(torchbearertrial._fit_pass.call_count == 5)
+
+    def test_run_fit_pass_Args(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 1
+        torchmodel = 1
+
+        torchbearertrial = Trial(torchmodel, None, None, [], callbacks=[], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        torchbearertrial._fit_pass.assert_called_once()
+
+    def test_run_stop_training(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 10
+
+        callback = MagicMock()
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.state[tb.STOP_TRAINING] = True
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        callback.on_start_epoch.assert_called_once()
+        self.assertTrue(callback.on_end_epoch.call_count == 0)
+        callback.on_end.assert_called_once()
+
+    def test_run_stop_training_second(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 10
+        callback = MagicMock()
+
+        @tb.callbacks.on_end_epoch
+        def stop_callback(state):
+            state[tb.STOP_TRAINING] = True
+
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[stop_callback, callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock()
+        torchbearertrial._validation_pass = Mock()
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        torchbearertrial.run(epochs=epochs, verbose=0)
+
+        callback.on_start_epoch.assert_called_once()
+        callback.on_end_epoch.assert_called_once()
+        callback.on_end.assert_called_once()
+
+    def test_run_history_metrics(self):
+        metric = Metric('test')
+        metric.process = Mock(return_value={'test': 0})
+        metric.process_final = Mock(return_value={'test': 0})
+        metric.reset = Mock(return_value=None)
+
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+
+        epochs = 1
+
+        callback = MagicMock()
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+        optimizer = MagicMock()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = Mock(return_value=loss)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric], callbacks=[callback], pass_state=False)
+        torchbearertrial._fit_pass = Mock(return_value={'fit_test': 1})
+        torchbearertrial._validation_pass = Mock(return_value={'val_test': 2})
+        torchbearertrial.with_train_generator(generator, steps=train_steps)
+        history = torchbearertrial.run(epochs=epochs, verbose=0)
+        self.assertDictEqual(history[0], {'fit_test': 1, 'val_test': 2})
+
+
+
+
+
+
+
+
+
 
 
 
