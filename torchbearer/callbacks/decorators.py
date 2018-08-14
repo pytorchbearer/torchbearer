@@ -297,9 +297,9 @@ def once_per_epoch(fcn):
 def only_if(condition_expr):
     """
     Decorator to fire a callback only if the given conditional expression function returns True.
-    :param condition_expr: a function/lambda that must evaluate to true for the
-                           decorated `torchbearer callback` to be called. The `state`
-                           object passed to the callback will be passed as an argument
+    :param condition_expr: a function/lambda that must evaluate to true for the\
+                           decorated `torchbearer callback` to be called. The `state`\
+                           object passed to the callback will be passed as an argument\
                            to the condition function.
     :return: the decorator
     """
