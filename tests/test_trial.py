@@ -640,7 +640,7 @@ class TestTrial(TestCase):
         torchbearertrial = Trial(torchtrial, optimizer, criterion, [metric])
         torchbearerstate = torchbearertrial.fit_generator(generator, train_steps, epochs, 0, [callback], initial_epoch=0, pass_state=False)
 
-        self.assertTrue(warning.call_count == 1)
+        self.assertTrue(warning.call_count >= 1)
 
     def test_main_loop_none_gen(self):
         metric = Metric('test')
