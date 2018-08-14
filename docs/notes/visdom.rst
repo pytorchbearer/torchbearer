@@ -15,6 +15,48 @@ We'll use the same setup as the `tensorboard note <../notes/tensorboard.html>`_.
 .. literalinclude:: /_static/examples/tensorboard.py
    :lines: 29-55
 
-Logging Batch Metrics
+Logging Epoch and Batch Metrics
 ------------------------------------
-Visdom does not support logging model graphs so we shall start with logging batch metrics.
+Visdom does not support logging model graphs so we shall start with logging epoch and batch metrics.
+The only change we need to make to the tensorboard example to start logging to visdom is setting :code:`visdom=True` in the :class:`TensorBoard callback <.TensorBoard>` constructor.
+
+.. literalinclude:: /_static/examples/tensorboard.py
+   :lines: 62-66
+
+If the visdom server is running then you should see something similar to the figure below:
+
+TODO: Figure
+
+Visdom Client Parameters
+------------------------------------
+The visdom client defaults to logging to localhost:8097 in the main environment however this is rather restrictive.
+We would like to be able to log to any server on any port and in any environment. To allow this we need to edit the :class:`.VisdomParameters` class.
+
+.. code-block:: python
+    class VisdomParams:
+        """ ... """
+        SERVER = 'http://localhost'
+        ENDPOINT = 'events'
+        PORT = 8097
+        IPV6 = True
+        HTTP_PROXY_HOST = None
+        HTTP_PROXY_PORT = None
+        ENV = 'main'
+        SEND = True
+        RAISE_EXCEPTIONS = None
+        USE_INCOMING_SOCKET = True
+        LOG_TO_FILENAME = None
+
+To do this, we first import the tensorboard file.
+
+.. literalinclude:: /_static/examples/tensorboard.py
+   :lines: 68
+
+We can then edit the visdom client parameters, for example changing the environment to "Test".
+
+.. literalinclude:: /_static/examples/tensorboard.py
+   :lines: 69
+
+The only paramenter that the :class:`TensorBoard callback <.TensorBoard>` sets explicity (and cannot be overrided) is the `LOG_TO_FILENAME` parameter.
+This is set to the `log_dir` given to the callback on init.
+
