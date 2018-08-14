@@ -185,7 +185,7 @@ class TestTorchbearer(TestCase):
         criterion = Mock(return_value=loss)
 
         torchbearermodel = Model(torchmodel, optimizer, criterion, [metric])
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
         torchbearerstate = torchbearermodel.fit_generator(generator, train_steps, epochs, 0, [callback],
                                                           validation_generator=valgenerator, initial_epoch=0,
                                                           pass_state=False)
@@ -557,7 +557,7 @@ class TestTorchbearer(TestCase):
                  torchbearer.CallbackList: callback_List, torchbearer.MODEL: torchmodel, torchbearer.VALIDATION_STEPS: validation_steps,
                  torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         torchbearerstate[torchbearer.METRIC_LIST].metric_list[0].reset.assert_called_once()
         self.assertTrue(torchbearerstate[torchbearer.METRIC_LIST].metric_list[0].process.call_count == len(data))
@@ -587,7 +587,7 @@ class TestTorchbearer(TestCase):
                  torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                  torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 3)
         self.assertTrue(torchbearerstate[torchbearer.Y_PRED] == 1)
@@ -615,7 +615,7 @@ class TestTorchbearer(TestCase):
                  torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                  torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.CRITERION].call_count == 3)
         self.assertTrue(torchbearerstate[torchbearer.LOSS] == 2)
@@ -644,7 +644,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, True, Model._load_batch_standard, num_steps=None)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, True, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 3)
         self.assertTrue(len(torchbearerstate[torchbearer.MODEL].call_args) == 2)
@@ -673,7 +673,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 2)
 
@@ -702,7 +702,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 2)
 
@@ -730,7 +730,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == len(data))
 
@@ -758,7 +758,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 0)
 
@@ -786,7 +786,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 0)
 
@@ -814,7 +814,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: True, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 1)
 
@@ -840,7 +840,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
-        torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_none, num_steps=validation_steps)
+        torchbearerstate = torchbearermodel._test_pass(state, callback_List, False, Model._load_batch_none, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == validation_steps)
 
@@ -877,12 +877,12 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][1].callback_list == [])
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][1].callback_list == [])
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][4] == steps)
 
     def test_evaluate_generator_none(self):
         torchmodel = MagicMock()
@@ -894,12 +894,12 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][1].callback_list == [])
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][1].callback_list == [])
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][4] == steps)
 
     def test_evaluate_generator_verbose(self):
         from torchbearer.callbacks import Tqdm
@@ -913,10 +913,10 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.evaluate_generator(generator, 1, steps, pass_state)
-        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[0], Tqdm)
+        self.assertIsInstance(torchbearermodel._test_pass.call_args[0][1].callback_list[0], Tqdm)
 
     def test_evaluate_generator_pass_state(self):
         torchmodel = MagicMock()
@@ -928,10 +928,10 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][2] == pass_state)
 
     def test_evaluate_generator_steps(self):
         torchmodel = MagicMock()
@@ -943,10 +943,10 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][4] == steps)
 
     def test_predict(self):
         x = torch.rand(1,5)
@@ -982,12 +982,12 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.predict_generator(generator, 0, steps, pass_state)
-        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[0], AggregatePredictions)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+        self.assertIsInstance(torchbearermodel._test_pass.call_args[0][1].callback_list[0], AggregatePredictions)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][4] == steps)
 
     def test_predict_generator_verbose(self):
         from torchbearer.callbacks import Tqdm
@@ -1001,12 +1001,12 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.predict_generator(generator, 1, steps, pass_state)
-        self.assertIsInstance(torchbearermodel._test_loop.call_args[0][1].callback_list[0], Tqdm)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+        self.assertIsInstance(torchbearermodel._test_pass.call_args[0][1].callback_list[0], Tqdm)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][4] == steps)
 
     def test_predict_generator_steps(self):
         torchmodel = MagicMock()
@@ -1018,10 +1018,10 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.predict_generator(generator, 0, steps, pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][4] == steps)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][4] == steps)
 
     def test_predict_generator_pass_state(self):
         torchmodel = MagicMock()
@@ -1033,10 +1033,10 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
-        torchbearermodel._test_loop = Mock()
+        torchbearermodel._test_pass = Mock()
 
         torchbearermodel.predict_generator(generator, 0, steps, pass_state)
-        self.assertTrue(torchbearermodel._test_loop.call_args[0][2] == pass_state)
+        self.assertTrue(torchbearermodel._test_pass.call_args[0][2] == pass_state)
 
     def test_train(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))

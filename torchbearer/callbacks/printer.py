@@ -85,7 +85,7 @@ class Tqdm(Callback):
         :type state: dict
         """
         if not self._on_epoch:
-            self._on_start(state, 't', state[torchbearer.TRAIN_STEPS])
+            self._on_start(state, 't', state[torchbearer.STEPS])
 
     def on_step_training(self, state):
         """Update the bar with the metrics from this step.
@@ -112,7 +112,7 @@ class Tqdm(Callback):
         :type state: dict
         """
         if not self._on_epoch:
-            self._on_start(state, self.validation_label, state[torchbearer.VALIDATION_STEPS])
+            self._on_start(state, self.validation_label, state[torchbearer.STEPS])
 
     def on_step_validation(self, state):
         """Update the bar with the metrics from this step.

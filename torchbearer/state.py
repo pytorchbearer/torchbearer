@@ -46,15 +46,15 @@ class StateKey:
 
 class State(dict):
     """
-    State dictionary that behaves like a python dict but accepts Statekeys
+    State dictionary that behaves like a python dict but accepts StateKeys
     """
     def __init__(self):
         super().__init__()
 
     def get_key(self, statekey):
         if isinstance(statekey, str):
-            warnings.warn("State was accessed with a string, generate keys with Statekey(str).")
-        return str(statekey)
+            warnings.warn("State was accessed with a string: {}, generate keys with StateKey(str).".format(statekey), stacklevel=2)
+        return statekey
 
     def __getitem__(self, key):
         return super().__getitem__(self.get_key(key))
@@ -85,12 +85,20 @@ METRICS = state_key('metrics')
 SELF = state_key('self')
 EPOCH = state_key('epoch')
 MAX_EPOCHS = state_key('max_epochs')
-TRAIN_STEPS = state_key('train_steps')
+
 GENERATOR = state_key('generator')
-TRAIN_ITERATOR = state_key('train_iterator')
-VALIDATION_ITERATOR = state_key('validation_iterator')
+ITERATOR = state_key('iterator')
+STEPS = state_key('steps')
+
+TRAIN_GENERATOR = state_key('train_generator')
+TRAIN_STEPS = state_key('train_steps')
+
 VALIDATION_GENERATOR = state_key('validation_generator')
 VALIDATION_STEPS = state_key('validation_steps')
+
+TEST_GENERATOR = state_key('test_generator')
+TEST_STEPS = state_key('test_steps')
+
 STOP_TRAINING = state_key('stop_training')
 Y_TRUE = state_key('y_true')
 Y_PRED = state_key('y_pred')
@@ -100,3 +108,4 @@ FINAL_PREDICTIONS = state_key('final_predictions')
 BATCH = state_key('t')
 TIMINGS = state_key('timings')
 CALLBACK_LIST = state_key('callback_list')
+HISTORY = state_key('history')
