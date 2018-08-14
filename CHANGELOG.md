@@ -3,11 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.1.7] - 2018-08-14
 ### Added
 - Added visdom logging support to tensorbard callbacks
 - Added option to choose tqdm module (tqdm, tqdm_notebook, ...) to Tqdm callback
+- Added some new decorators to simplify custom callbacks that must only run under certain conditions (or even just once).
 ### Changed
+- Instantiation of Model will now trigger a warning pending the new Trial API in the next version
+- TensorboardX dependancy now version 1.4
 ### Deprecated
 ### Removed
 ### Fixed
