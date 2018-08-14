@@ -11,11 +11,11 @@ def state_key(key):
     :return: New state key
     :rtype: String
     """
-    return Statekey(key)
+    return StateKey(key)
 
 
-class Statekey:
-    """ Statekey class that is a unique state key based of input string key
+class StateKey:
+    """ StateKey class that is a unique state key based of input string key
 
     :param key: Base key
     """
@@ -100,15 +100,3 @@ FINAL_PREDICTIONS = state_key('final_predictions')
 BATCH = state_key('t')
 TIMINGS = state_key('timings')
 CALLBACK_LIST = state_key('callback_list')
-
-
-# d = {CALLBACK_LIST: 'test_update', MODEL: '123'}
-# s = State()
-# s[MODEL] = 'test'
-# m1=state_key('model')
-# s[m1] = 'two'
-# s[state_key('model')] = 'three'
-# s['ttt'] = 't'
-# s.update(d)
-# print(s)
-# print(len(s))

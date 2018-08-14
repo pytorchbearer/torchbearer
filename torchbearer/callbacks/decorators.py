@@ -1,6 +1,6 @@
 from torchbearer.callbacks import Callback
 import torchbearer
-from torchbearer.state import Statekey
+from torchbearer.state import StateKey
 
 
 def on_start(func):
@@ -271,7 +271,7 @@ def from_state(key_list):
         klass_seed = klass.seed
 
         def new_klass_seed(self, state):
-            seed_keys = [key for key in key_list if key in self.__dict__ and isinstance(self.__dict__[key], Statekey)]
+            seed_keys = [key for key in key_list if key in self.__dict__ and isinstance(self.__dict__[key], StateKey)]
             for k in seed_keys:
                 self.__dict__[k] = state[self.__dict__[k]]
             klass_seed(klass, state)

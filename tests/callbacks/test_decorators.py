@@ -118,10 +118,10 @@ class TestDecorators(unittest.TestCase):
         self.assertTrue(state[torchbearer.LOSS] == 2)
 
     def test_from_state_both_keys(self):
-        from torchbearer.state import Statekey, State
+        from torchbearer.state import StateKey, State
         from torchbearer.callbacks import from_state, Callback
-        T = Statekey('c_t')
-        Q = Statekey('c_q')
+        T = StateKey('c_t')
+        Q = StateKey('c_q')
 
         @from_state(['t', 'q'])
         class c(Callback):
@@ -142,10 +142,10 @@ class TestDecorators(unittest.TestCase):
         self.assertTrue(cl.q == state[Q])
 
     def test_from_state_single_keys(self):
-        from torchbearer.state import Statekey, State
+        from torchbearer.state import StateKey, State
         from torchbearer.callbacks import from_state, Callback
-        T = Statekey('c_t')
-        Q = Statekey('c_q')
+        T = StateKey('c_t')
+        Q = StateKey('c_q')
 
         @from_state(['t'])
         class c(Callback):
@@ -166,10 +166,10 @@ class TestDecorators(unittest.TestCase):
         self.assertTrue(cl.q == 8)
 
     def test_from_state_no_keys_expected_one(self):
-        from torchbearer.state import Statekey, State
+        from torchbearer.state import StateKey, State
         from torchbearer.callbacks import from_state, Callback
-        T = Statekey('c_t')
-        Q = Statekey('c_q')
+        T = StateKey('c_t')
+        Q = StateKey('c_q')
 
         @from_state(['t'])
         class c(Callback):
