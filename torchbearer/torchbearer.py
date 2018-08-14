@@ -23,6 +23,8 @@ class Model:
     :type metrics: list
     """
     def __init__(self, model, optimizer, criterion=None, metrics=[]):
+        import warnings
+        warnings.warn('The Model class and all of its methods will be deprecated in the next version (0.2.0) in favor of the upcoming Trial API')
         super().__init__()
         if criterion is None:
             criterion = lambda y_pred, y_true: torch.zeros(1, device=y_true.device)

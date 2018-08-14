@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added option to choose tqdm module (tqdm, tqdm_notebook, ...) to Tqdm callback
 - Added some new decorators to simplify custom callbacks that must only run under certain conditions (or even just once).
 ### Changed
+- Instantiation of Model will now trigger a warning pending the new Trial API in the next version
 ### Deprecated
 ### Removed
 ### Fixed
