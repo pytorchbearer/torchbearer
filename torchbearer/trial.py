@@ -227,7 +227,7 @@ class Trial(object):
     :param pass_state: If True, the torchbearer state will be passed to the model during fitting
     :type pass_state: bool
     """
-    def __init__(self, model, criterion=None, optimizer=None, metrics=[], callbacks=[], pass_state=False):
+    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False):
         if criterion is None:
             def criterion(_, y_true):
                 torch.zeros(1, device=y_true.device)
