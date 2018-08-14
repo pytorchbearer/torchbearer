@@ -1,4 +1,6 @@
-STATE_KEYS = []
+import warnings
+
+__keys__ = []
 
 
 def state_key(key):
@@ -9,18 +11,68 @@ def state_key(key):
     :return: New state key
     :rtype: String
     """
-    if key in STATE_KEYS:
-        count = 1
-        my_key = key + '_' + str(count)
+    return StateKey(key)
 
-        while my_key in STATE_KEYS:
-            count += 1
+
+class StateKey:
+    """ StateKey class that is a unique state key based of input string key
+
+    :param key: Base key
+    """
+    def __init__(self, key):
+        super().__init__()
+        self.key = self._gen_key_(key)
+
+    def _gen_key_(self, key):
+        if key in __keys__:
+            count = 1
             my_key = key + '_' + str(count)
 
-        key = my_key
+            while my_key in __keys__:
+                count += 1
+                my_key = key + '_' + str(count)
 
-    STATE_KEYS.append(key)
-    return key
+            key = my_key
+
+        __keys__.append(key)
+        return key
+
+    def __repr__(self):
+        return self.key
+
+    def __str__(self):
+        return self.key
+
+
+class State(dict):
+    """
+    State dictionary that behaves like a python dict but accepts Statekeys
+    """
+    def __init__(self):
+        super().__init__()
+
+    def get_key(self, statekey):
+        if isinstance(statekey, str):
+            warnings.warn("State was accessed with a string, generate keys with Statekey(str).")
+        return str(statekey)
+
+    def __getitem__(self, key):
+        return super().__getitem__(self.get_key(key))
+
+    def __setitem__(self, key, val):
+        super().__setitem__(self.get_key(key), val)
+
+    def __delitem__(self, val):
+        super().__delitem__(val)
+
+    def __contains__(self, o: object) -> bool:
+        return super().__contains__(self.get_key(o))
+
+    def update(self, d):
+        new_dict = {}
+        for key in d:
+            new_dict[self.get_key(key)] = d[key]
+        super().update(new_dict)
 
 
 MODEL = state_key('model')
