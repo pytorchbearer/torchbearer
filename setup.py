@@ -20,6 +20,6 @@ setup(
     description='A model training library for pytorch',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['numpy', 'torch>=0.4', 'torchvision', 'scipy', 'scikit-learn', 'tqdm', 'tensorboardX>=1.2'],
+    install_requires=['numpy', 'torch>=0.4', 'torchvision', 'scipy', 'scikit-learn', 'tqdm', 'tensorboardX>=1.4'],
     python_requires='>=3',
 )
