@@ -1,9 +1,10 @@
 import unittest
+from unittest.mock import patch
 
 from torch.autograd import Variable
 
 import torchbearer
-from torchbearer.metrics import Loss, Epoch, CategoricalAccuracy
+from torchbearer.metrics import Loss, Epoch, CategoricalAccuracy, CategoricalAccuracyFactory
 
 import torch
 
@@ -57,6 +58,11 @@ class TestCategoricalAccuracy(unittest.TestCase):
         }
         self._targets = [1, 1, 1, 0, 0]
         self._metric = CategoricalAccuracy()
+
+    @patch('torchbearer.metrics.primitives.CategoricalAccuracy')
+    def test_ignore_index_args_passed(self, mock):
+        CategoricalAccuracyFactory(ignore_index=1).build()
+        mock.assert_called_once_with(ignore_index=1)
 
     def test_ignore_index(self):
         metric = CategoricalAccuracy(ignore_index=1)

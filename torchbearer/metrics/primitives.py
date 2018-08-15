@@ -43,8 +43,17 @@ class CategoricalAccuracy(metrics.Metric):
 @metrics.std
 @metrics.mean
 class CategoricalAccuracyFactory(metrics.MetricFactory):
+    """Categorical accuracy metric factory. Essentially a :class:`.CategoricalAccuracy` with running mean, mean and std.
+
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
+    :type ignore_index: int
+    """
+
+    def __init__(self, ignore_index=-100):
+        self.ignore_index = ignore_index
+
     def build(self):
-        return CategoricalAccuracy()
+        return CategoricalAccuracy(ignore_index=self.ignore_index)
 
 
 class Loss(metrics.Metric):
