@@ -14,15 +14,27 @@ from torchbearer import metrics
 import torch
 
 
-class CategoricalAccuracy(metrics.BatchLambda):
+class CategoricalAccuracy(metrics.Metric):
     """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets.
+
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
+    :type ignore_index: int
     """
 
-    def __init__(self):
-        def metric_function(y_pred, y_true):
-            _, y_pred = torch.max(y_pred, 1)
-            return (y_pred == y_true).float()
-        super(CategoricalAccuracy, self).__init__('acc', metric_function)
+    def __init__(self, ignore_index=-100):
+        super(CategoricalAccuracy, self).__init__('acc')
+
+        self.ignore_index = ignore_index
+
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+        mask = y_true.eq(self.ignore_index).eq(0)
+        y_pred = y_pred[mask]
+        y_true = y_true[mask]
+        _, y_pred = torch.max(y_pred, 1)
+        return (y_pred == y_true).float()
 
 
 @metrics.default_for_key('acc')
@@ -31,8 +43,17 @@ class CategoricalAccuracy(metrics.BatchLambda):
 @metrics.std
 @metrics.mean
 class CategoricalAccuracyFactory(metrics.MetricFactory):
+    """Categorical accuracy metric factory. Essentially a :class:`.CategoricalAccuracy` with running mean, mean and std.
+
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
+    :type ignore_index: int
+    """
+
+    def __init__(self, ignore_index=-100):
+        self.ignore_index = ignore_index
+
     def build(self):
-        return CategoricalAccuracy()
+        return CategoricalAccuracy(ignore_index=self.ignore_index)
 
 
 class Loss(metrics.Metric):
