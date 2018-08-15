@@ -47,16 +47,18 @@ class Tqdm(Callback):
     :type validation_label_letter: str
     :param on_epoch: If True, output a single progress bar which tracks epochs
     :type on_epoch: bool
+    :param tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `https://github.com/tqdm/tqdm#parameters`_ for more details.
     """
-    def __init__(self, tqdm_module=tqdm, validation_label_letter='v', on_epoch=False):
+    def __init__(self, tqdm_module=tqdm, validation_label_letter='v', on_epoch=False, **tqdm_args):
         self.tqdm_module = tqdm_module
         self._loader = None
         self.validation_label = validation_label_letter
         self._on_epoch = on_epoch
+        self.tqdm_args = tqdm_args
 
     def _on_start(self, state, letter, steps):
         bar_desc = '{:d}/{:d}({:s})'.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
-        self._loader = self.tqdm_module(total=steps, desc=bar_desc)
+        self._loader = self.tqdm_module(total=steps, desc=bar_desc, **self.tqdm_args)
 
     def _update(self, state):
         self._loader.update(1)
@@ -68,7 +70,7 @@ class Tqdm(Callback):
 
     def on_start(self, state):
         if self._on_epoch:
-            self._loader = self.tqdm_module(total=state[torchbearer.MAX_EPOCHS])
+            self._loader = self.tqdm_module(total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
 
     def on_end_epoch(self, state):
         if self._on_epoch:
