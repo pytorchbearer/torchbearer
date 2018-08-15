@@ -251,7 +251,7 @@ class Trial(object):
     def with_train_generator(self, generator, steps=None):
         """Use this trial with the given train generator. Returns self so that methods can be chained for convenience.
 
-        :param generator: The train data generator to use during calls to :meth:`.fit`
+        :param generator: The train data generator to use during calls to :meth:`.run`
         :type generator: DataLoader
         :param steps: The number of steps per epoch to take when using this generator
         :type steps: int
@@ -273,9 +273,9 @@ class Trial(object):
     def with_train_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
         """Use this trial with the given train data. Returns self so that methods can be chained for convenience.
 
-        :param x: The train x data to use during calls to :meth:`.fit`
+        :param x: The train x data to use during calls to :meth:`.run`
         :type x: torch.Tensor
-        :param y: The train labels to use during calls to :meth:`.fit`
+        :param y: The train labels to use during calls to :meth:`.run`
         :type y: torch.Tensor
         :param batch_size: The size of each batch to sample from the data
         :type batch_size: int
@@ -297,7 +297,7 @@ class Trial(object):
         """Use this trial with the given validation generator. Returns self so that methods can be chained for
         convenience.
 
-        :param generator: The validation data generator to use during calls to :meth:`.fit` and :meth:`.evaluate`
+        :param generator: The validation data generator to use during calls to :meth:`.run` and :meth:`.evaluate`
         :type generator: DataLoader
         :param steps: The number of steps per epoch to take when using this generator
         :type steps: int
@@ -319,9 +319,9 @@ class Trial(object):
     def with_val_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
         """Use this trial with the given validation data. Returns self so that methods can be chained for convenience.
 
-        :param x: The validation x data to use during calls to :meth:`.fit` and :meth:`.evaluate`
+        :param x: The validation x data to use during calls to :meth:`.run` and :meth:`.evaluate`
         :type x: torch.Tensor
-        :param y: The validation labels to use during calls to :meth:`.fit` and :meth:`.evaluate`
+        :param y: The validation labels to use during calls to :meth:`.run` and :meth:`.evaluate`
         :type y: torch.Tensor
         :param batch_size: The size of each batch to sample from the data
         :type batch_size: int
@@ -378,6 +378,32 @@ class Trial(object):
         dataset = TensorDataset(x)
         dataloader = DataLoader(dataset, batch_size, num_workers=num_workers)
         self.with_test_generator(dataloader, steps=steps)
+
+    @fluent
+    def with_generators(self, train_generator=None, train_steps=None, val_generator=None, val_steps=None, test_generator=None, test_steps=None):
+        """Use this trial with the given generators. Returns self so that methods can be chained for convenience.
+
+        :param train_generator: The training data generator to use during calls to :meth:`.run`
+        :type train_generator: DataLoader
+        :param train_steps: The number of steps per epoch to take when using the training generator
+        :type train_steps: int
+        :param val_generator: The validation data generator to use during calls to :meth:`.run` and :meth:`.evaluate`
+        :type val_generator: DataLoader
+        :param val_steps: The number of steps per epoch to take when using the validation generator
+        :type val_steps: int
+        :param test_generator: The testing data generator to use during calls to :meth:`.predict`
+        :type test_generator: DataLoader
+        :param test_steps: The number of steps per epoch to take when using the testing generator
+        :type test_steps: int
+        :return: self
+        :rtype: Trial
+        """
+        if train_generator is not None:
+            self.with_train_generator(train_generator, train_steps)
+        if val_generator is not None:
+            self.with_val_generator(val_generator, val_steps)
+        if test_generator is not None:
+            self.with_test_generator(test_generator, test_steps)
 
     @inject_printer()
     def run(self, epochs=1, verbose=2):
