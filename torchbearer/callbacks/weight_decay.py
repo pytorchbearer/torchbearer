@@ -38,7 +38,7 @@ class WeightDecay(Callback):
         :type state: dict
         """
         for param in self.params:
-            state['loss'] += self.rate * torch.pow(param, self.p).sum()
+            state[torchbearer.LOSS] += self.rate * torch.pow(param, self.p).sum()
 
 
 class L1WeightDecay(WeightDecay):
