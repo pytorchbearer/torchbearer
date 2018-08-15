@@ -403,7 +403,7 @@ class Trial(object):
         for state[torchbearer.EPOCH] in range(len(state[torchbearer.HISTORY]), state[torchbearer.MAX_EPOCHS]):
             state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            final_metrics = self._fit_pass(state)
+            final_metrics = self._fit_pass(state)[torchbearer.METRICS]
 
             if state[torchbearer.STOP_TRAINING]:
                 break
@@ -426,8 +426,8 @@ class Trial(object):
 
         self.train()
 
-        state[torchbearer.STEPS] = self.state[torchbearer.TRAIN_STEPS]
-        state[torchbearer.GENERATOR] = self.state[torchbearer.TRAIN_GENERATOR]
+        state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
+        state[torchbearer.GENERATOR] = state[torchbearer.TRAIN_GENERATOR]
         state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
 
         state[torchbearer.METRIC_LIST].reset(state)
@@ -469,7 +469,7 @@ class Trial(object):
         state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
 
         state[torchbearer.CALLBACK_LIST].on_end_training(state)
-        return state[torchbearer.METRICS]
+        return state
 
     def _test_pass(self, state):
         with torch.no_grad():
