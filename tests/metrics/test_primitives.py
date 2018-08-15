@@ -58,6 +58,17 @@ class TestCategoricalAccuracy(unittest.TestCase):
         self._targets = [1, 1, 1, 0, 0]
         self._metric = CategoricalAccuracy()
 
+    def test_ignore_index(self):
+        metric = CategoricalAccuracy(ignore_index=1)
+        targets = [1, 1, 0]
+
+        metric.train()
+        result = metric.process(self._state)
+        for i in range(0, len(targets)):
+            self.assertEqual(result[i], targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(targets[i])
+                                 + ' in: ' + str(result))
+
     def test_train_process(self):
         self._metric.train()
         result = self._metric.process(self._state)
