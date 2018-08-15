@@ -109,3 +109,7 @@ BATCH = state_key('t')
 TIMINGS = state_key('timings')
 CALLBACK_LIST = state_key('callback_list')
 HISTORY = state_key('history')
+
+# Legacy
+VALIDATION_ITERATOR = 'validation_iterator'
+TRAIN_ITERATOR = 'train_iterator'

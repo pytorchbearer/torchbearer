@@ -24,7 +24,8 @@ class _Checkpointer(Callback):
         state.update(model_state)
         state.update(model_state[torchbearer.METRICS])
 
-        filepath = self.fileformat.format(**state)
+        string_state = {str(key): state[key] for key in state.keys()}
+        filepath = self.fileformat.format(**string_state)
 
         if self.most_recent is not None and overwrite_most_recent:
             os.remove(self.most_recent)

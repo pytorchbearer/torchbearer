@@ -557,10 +557,10 @@ class Model:
         :rtype: dict[str,any]
         """
         for key, _ in kwargs.items():
-            if key == torchbearer.DATA_TYPE:
-                main_state[torchbearer.DATA_TYPE] = kwargs[torchbearer.DATA_TYPE]
-            elif torchbearer.DEVICE in kwargs:
-                main_state[torchbearer.DEVICE] = kwargs[torchbearer.DEVICE]
+            if key == 'device':
+                main_state[torchbearer.DATA_TYPE] = kwargs['dtype']
+            elif 'device' in kwargs:
+                main_state[torchbearer.DEVICE] = kwargs['device']
 
         for arg in args:
             if isinstance(arg, torch.dtype):

@@ -194,7 +194,7 @@ class TestDecorators(unittest.TestCase):
             def on_step_validation(self, state):
                 state['value'] += 1
 
-        state = {'epoch': 0, 'value': 0}
+        state = {torchbearer.EPOCH: 0, 'value': 0}
 
         cb = Example()
 
@@ -204,7 +204,7 @@ class TestDecorators(unittest.TestCase):
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 1)
 
-        state['epoch'] += 1
+        state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 1)
 
@@ -214,7 +214,7 @@ class TestDecorators(unittest.TestCase):
             def on_step_validation(self, state):
                 state['value'] += 1
 
-        state = {'epoch': 0, 'value': 0}
+        state = {torchbearer.EPOCH: 0, 'value': 0}
 
         cb = Example()
 
@@ -224,17 +224,17 @@ class TestDecorators(unittest.TestCase):
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 1)
 
-        state['epoch'] += 1
+        state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 2)
 
     def test_only_if(self):
         class Example(callbacks.Callback):
-            @callbacks.only_if(lambda s: s['epoch'] % 2 == 0)
+            @callbacks.only_if(lambda s: s[torchbearer.EPOCH] % 2 == 0)
             def on_step_validation(self, state):
                 state['value'] += 1
 
-        state = {'epoch': 0, 'value': 0}
+        state = {torchbearer.EPOCH: 0, 'value': 0}
 
         cb = Example()
 
@@ -244,10 +244,10 @@ class TestDecorators(unittest.TestCase):
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 2)
 
-        state['epoch'] += 1
+        state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 2)
 
-        state['epoch'] += 1
+        state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 3)

@@ -150,7 +150,7 @@ class TestEarlyStopping(TestCase):
 
         for i in range(3):
             stopper.on_end_epoch(state)
-            self.assertFalse(state['stop_training'])
+            self.assertFalse(state[torchbearer.STOP_TRAINING])
 
         state[torchbearer.METRICS]['test_metric'] = 0.0001
         stopper.on_end_epoch(state)
