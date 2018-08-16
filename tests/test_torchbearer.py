@@ -10,6 +10,10 @@ from torchbearer.metrics import MetricList, Metric
 
 
 class TestTorchbearer(TestCase):
+    def test_deprecation_warning(self):
+        with self.assertWarns(DeprecationWarning):
+            Model(None, None)
+
     @patch('torchbearer.cv_utils.get_train_valid_sets')
     def test_fit_valid_sets_args(self, gtvs):
         x = torch.rand(1,5)

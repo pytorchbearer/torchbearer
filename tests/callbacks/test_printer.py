@@ -63,3 +63,22 @@ class TestTqdm(TestCase):
         tqdm.on_end_validation(state)
         mock_tqdm.return_value.set_postfix.assert_called_once_with('test')
         mock_tqdm.return_value.close.assert_called_once()
+
+    def test_tqdm_custom_args(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100,
+                 torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: 'test'}
+        tqdm = Tqdm(ascii=True)
+
+        tqdm.tqdm_module = MagicMock()
+        mock_tqdm = tqdm.tqdm_module
+
+        tqdm.on_start_training(state)
+        mock_tqdm.assert_called_once_with(total=100, desc='1/10(t)', ascii=True)
+
+        tqdm = Tqdm(on_epoch=True, ascii=True)
+
+        tqdm.tqdm_module = MagicMock()
+        mock_tqdm = tqdm.tqdm_module
+
+        tqdm.on_start(state)
+        mock_tqdm.assert_called_once_with(total=10, ascii=True)
