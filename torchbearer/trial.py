@@ -672,7 +672,8 @@ class Trial(object):
         state_dict = {
             torchbearer.MODEL: self.state[torchbearer.MODEL].state_dict(**kwargs),
             torchbearer.OPTIMIZER: self.state[torchbearer.OPTIMIZER].state_dict(),
-            torchbearer.HISTORY: self.state[torchbearer.HISTORY]
+            torchbearer.HISTORY: self.state[torchbearer.HISTORY],
+            torchbearer.CALLBACK_LIST: self.state[torchbearer.CALLBACK_LIST].state_dict()
         }
         return state_dict
 
@@ -692,5 +693,6 @@ class Trial(object):
             self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
             self.state[torchbearer.OPTIMIZER].load_state_dict(state_dict[torchbearer.OPTIMIZER])
             self.state[torchbearer.HISTORY] = state_dict[torchbearer.HISTORY]
+            self.state[torchbearer.CALLBACK_LIST].load_state_dict(state_dict[torchbearer.CALLBACK_LIST])
         else:
             self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
