@@ -100,8 +100,6 @@ def deep_to(batch, device, dtype):
     return batch
 
 
-@torchbearer.callbacks.on_sample
-@torchbearer.callbacks.on_sample_validation
 def load_batch_standard(state):
     """ Callback to load a standard (input data, target) tuple mini-batch from iterator into state
 
@@ -113,8 +111,6 @@ def load_batch_standard(state):
                                                               state[torchbearer.DATA_TYPE])
 
 
-@torchbearer.callbacks.on_sample
-@torchbearer.callbacks.on_sample_validation
 def load_batch_none(state):
     """Callback to load a none (none, none) tuple mini-batch into state
 
@@ -124,8 +120,6 @@ def load_batch_none(state):
     state[torchbearer.X], state[torchbearer.Y_TRUE] = None, None
 
 
-@torchbearer.callbacks.on_sample
-@torchbearer.callbacks.on_sample_validation
 def load_batch_predict(state):
     """ Callback to load a prediction (input data, target) or (input data) mini-batch from iterator into state
 
@@ -137,25 +131,31 @@ def load_batch_predict(state):
         state[torchbearer.X], state[torchbearer.Y_TRUE] = data
     else:
         state[torchbearer.X] = data
+        
+        
+class Sampler:
+    def __init__(self, batch_loader):
+        super().__init__()
+        self.batch_loader = batch_loader
+
+    def sample(self, state):
+        self.batch_loader(state)
 
 
 def inject_sampler(generator, predict=False):
     def decorator(func):
         def wrapper(self, *args, **kwargs):
             if self.state[generator] is None:
-                callback = load_batch_none
+                loader = load_batch_none
             elif predict:
-                callback = load_batch_predict
+                loader = load_batch_predict
             else:
-                callback = load_batch_standard
+                loader = load_batch_standard
 
-            callback_list_old = self.state[torchbearer.CALLBACK_LIST]
-
-            self.state[torchbearer.CALLBACK_LIST] = CallbackListInjection(callback, callback_list_old)
+            self.state[torchbearer.SAMPLER] = Sampler(loader)
 
             res = func(self, *args, **kwargs)
 
-            self.state[torchbearer.CALLBACK_LIST] = callback_list_old
             return res
         return wrapper
     return decorator
@@ -462,6 +462,7 @@ class Trial(object):
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
 
         for state[torchbearer.BATCH] in range(0, state[torchbearer.STEPS]):
+            state[torchbearer.SAMPLER].sample(state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
             # Zero grads
@@ -507,6 +508,7 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
+                state[torchbearer.SAMPLER].sample(state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward Pass
