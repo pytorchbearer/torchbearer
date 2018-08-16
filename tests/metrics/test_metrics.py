@@ -1,13 +1,37 @@
 import unittest
 from unittest.mock import Mock
 
+import torch
+import torchbearer
 from torchbearer.metrics import MetricFactory, MetricList, Metric, MetricTree, AdvancedMetric
-
+from torchbearer.metrics.primitives import CategoricalAccuracy
 
 class TestMetricFactory(unittest.TestCase):
     def test_empty_build(self):
         factory = MetricFactory()
         self.assertTrue(factory.build() is None)
+
+
+class TestMetric(unittest.TestCase):
+    def setUp(self):
+        self._state = {
+            torchbearer.Y_TRUE: torch.LongTensor([0, 1, 2, 2, 1]).requires_grad,
+            torchbearer.Y_PRED: torch.FloatTensor([
+                [0.9, 0.1, 0.1], # Correct
+                [0.1, 0.9, 0.1], # Correct
+                [0.1, 0.1, 0.9], # Correct
+                [0.9, 0.1, 0.1], # Incorrect
+                [0.9, 0.1, 0.1], # Incorrect
+            ])
+        }
+        self._state[torchbearer.Y_PRED].requires_grad = True
+        self._targets = [1, 1, 1, 0, 0]
+        self._metric = CategoricalAccuracy()
+
+    def test_requires_grad(self):
+        result = self._metric.process(self._state)
+        self.assertTrue(self._state[torchbearer.Y_PRED].requires_grad == True)
+        self.assertTrue(result.requires_grad == False)
 
 
 class TestMetricTree(unittest.TestCase):
