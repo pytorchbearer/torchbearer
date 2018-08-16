@@ -10,6 +10,27 @@ from torchbearer.callbacks.callbacks import CallbackList
 from torchbearer.callbacks.printer import Tqdm
 
 
+def deprecated(Cls):
+    class NewCls(Cls):
+        def __init__(self, *args, **kwargs):
+            super(NewCls, self).__init__(*args, **kwargs)
+
+        def __getattribute__(self, item):
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                DeprecationWarning, stacklevel=2)
+            return super(NewCls, self).__getattribute__(item)
+
+        def __setattr__(self, key, value):
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                DeprecationWarning, stacklevel=2)
+            return super(NewCls, self).__setattr__(key, value)
+
+    return NewCls
+
+
+@deprecated
 class Model:
     """ Create torchbearermodel which wraps a base torchmodel and provides a training environment surrounding it
 
@@ -23,8 +44,6 @@ class Model:
     :type metrics: list
     """
     def __init__(self, model, optimizer, criterion=None, metrics=[]):
-        import warnings
-        warnings.warn('The Model class and all of its methods will be deprecated in the next version (0.2.0) in favor of the upcoming Trial API')
         super().__init__()
         if criterion is None:
             criterion = lambda y_pred, y_true: torch.zeros(1, device=y_true.device)
