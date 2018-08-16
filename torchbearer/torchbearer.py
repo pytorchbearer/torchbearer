@@ -18,13 +18,19 @@ def deprecated(Cls):
         def __getattribute__(self, item):
             warnings.warn(
                 'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
-                DeprecationWarning, stacklevel=2)
+                DeprecationWarning)
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                UserWarning)
             return super(NewCls, self).__getattribute__(item)
 
         def __setattr__(self, key, value):
             warnings.warn(
                 'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
-                DeprecationWarning, stacklevel=2)
+                DeprecationWarning)
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                UserWarning)
             return super(NewCls, self).__setattr__(key, value)
 
     return NewCls
