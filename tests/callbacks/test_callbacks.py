@@ -1,10 +1,17 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
-from torchbearer.callbacks import CallbackList, Callback
+import torchbearer
+from torchbearer.callbacks import CallbackList, Callback, Tqdm, TensorBoard
 
 
 class TestCallback(TestCase):
+    def test_state_dict(self):
+        callback = Callback()
+
+        self.assertEqual(callback.state_dict(), {})
+        self.assertEqual(callback.load_state_dict({}), callback)
+
     def test_empty_methods(self):
         callback = Callback()
 
@@ -30,10 +37,42 @@ class TestCallback(TestCase):
 class TestCallbackList(TestCase):
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
-        self.callback_1 = MagicMock()
-        self.callback_2 = MagicMock()
+        self.callback_1 = MagicMock(spec=torchbearer.callbacks.printer.Tqdm())
+        self.callback_2 = MagicMock(spec=torchbearer.callbacks.tensor_board.TensorBoard())
         callbacks = [self.callback_1, self.callback_2]
         self.list = CallbackList(callbacks)
+
+    def test_state_dict(self):
+        self.callback_1.state_dict = Mock(return_value='test_1')
+        self.callback_2.state_dict = Mock(return_value='test_2')
+
+        state = self.list.state_dict()
+
+        self.callback_1.state_dict.assert_called_once()
+        self.callback_2.state_dict.assert_called_once()
+        self.assertEqual(state[CallbackList.CALLBACK_STATES][0], 'test_1')
+        self.assertEqual(state[CallbackList.CALLBACK_STATES][1], 'test_2')
+        self.assertEqual(state[CallbackList.CALLBACK_TYPES][0], Tqdm().__class__)
+        self.assertEqual(state[CallbackList.CALLBACK_TYPES][1], TensorBoard().__class__)
+
+    def test_load_state_dict(self):
+        self.callback_1.load_state_dict = Mock(return_value='test_1')
+        self.callback_2.load_state_dict = Mock(return_value='test_2')
+
+        self.callback_1.state_dict = Mock(return_value='test_1')
+        self.callback_2.state_dict = Mock(return_value='test_2')
+
+        state = self.list.state_dict()
+        self.list.load_state_dict(state)
+
+        self.callback_1.load_state_dict.assert_called_once_with('test_1')
+        self.callback_2.load_state_dict.assert_called_once_with('test_2')
+
+        state = self.list.state_dict()
+        state[CallbackList.CALLBACK_TYPES] = list(reversed(state[CallbackList.CALLBACK_TYPES]))
+
+        with self.assertWarns(UserWarning, msg='Callback classes did not match, expected: {\'TensorBoard\', \'Tqdm\'}'):
+            self.list.load_state_dict(state)
 
     def test_for_list(self):
         self.list.on_start({})
