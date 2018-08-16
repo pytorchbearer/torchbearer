@@ -196,9 +196,9 @@ def update_device_and_dtype(state, *args, **kwargs):
     :rtype: tuple
     """
     for key, _ in kwargs.items():
-        if key == torchbearer.DATA_TYPE:
+        if key == str(torchbearer.DATA_TYPE):
             state[torchbearer.DATA_TYPE] = kwargs['dtype']
-        elif torchbearer.DEVICE in kwargs:
+        elif str(torchbearer.DEVICE) in kwargs:
             state[torchbearer.DEVICE] = kwargs['device']
 
     for arg in args:
@@ -230,7 +230,7 @@ class Trial(object):
     def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False):
         if criterion is None:
             def criterion(_, y_true):
-                torch.zeros(1, device=y_true.device)
+                return torch.zeros(1, device=y_true.device)
 
         self.pass_state = pass_state
 
@@ -540,8 +540,8 @@ class Trial(object):
         if state[torchbearer.VALIDATION_GENERATOR] is not None or state[torchbearer.VALIDATION_STEPS] is not None:
             self.eval()
 
-            state[torchbearer.STEPS] = self.state[torchbearer.VALIDATION_STEPS]
-            state[torchbearer.GENERATOR] = self.state[torchbearer.VALIDATION_GENERATOR]
+            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
+            state[torchbearer.GENERATOR] = state[torchbearer.VALIDATION_GENERATOR]
 
             self._test_pass(state)
         return state[torchbearer.METRICS]
@@ -568,8 +568,8 @@ class Trial(object):
         if state[torchbearer.VALIDATION_GENERATOR] is not None or state[torchbearer.VALIDATION_STEPS] is not None:
             self.eval()
 
-            state[torchbearer.STEPS] = self.state[torchbearer.VALIDATION_STEPS]
-            state[torchbearer.GENERATOR] = self.state[torchbearer.VALIDATION_GENERATOR]
+            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
+            state[torchbearer.GENERATOR] = state[torchbearer.VALIDATION_GENERATOR]
 
             return self._test_pass(state)[torchbearer.METRICS]
         return {}
