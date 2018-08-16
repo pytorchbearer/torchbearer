@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 import torchbearer as tb
 from torchbearer import Trial
 from torchbearer.metrics import Metric
+from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype
 
 
 class TestWithGenerators(TestCase):
@@ -249,6 +250,37 @@ class TestWithGenerators(TestCase):
         torchbearertrial.with_test_generator(generator, None)
 
         self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 2)
+
+    @patch('warnings.warn')
+    def test_with_generators(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+
+        train_generator = MagicMock()
+        train_generator.__len__.return_value = 2
+        train_steps = 1
+
+        val_generator = MagicMock()
+        val_generator.__len__.return_value = 3
+        val_steps = 2
+
+        test_generator = MagicMock()
+        test_generator.__len__.return_value = 4
+        test_steps = 3
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        traingen = torchbearertrial.with_train_generator = MagicMock()
+        valgen = torchbearertrial.with_val_generator = MagicMock()
+        testgen = torchbearertrial.with_test_generator = MagicMock()
+
+        torchbearertrial.with_generators(train_generator, train_steps, val_generator, val_steps, test_generator, test_steps)
+        traingen.assert_called_once_with(train_generator, train_steps)
+        valgen.assert_called_once_with(val_generator, val_steps)
+        testgen.assert_called_once_with(test_generator, test_steps)
 
 
 class TestWithData(TestCase):
@@ -1359,7 +1391,122 @@ class TestTestPass(TestCase):
         self.assertTrue(state[tb.METRICS]['test'] == 2)
 
 
+class TestTrialValEvalPred(TestCase):
+    def test_validation_pass(self):
+        generator = MagicMock()
+        steps = 5
+        tb.CallbackListInjection = Mock()
+
+        state = {tb.VALIDATION_GENERATOR: generator, tb.VALIDATION_STEPS: steps, tb.METRICS: 1}
+        t = Trial(MagicMock())
+        eval_mock = t.eval = Mock()
+        test_pass_mock = t._test_pass = Mock()
+        t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None}
+        metrics = t._validation_pass(state)
+
+        eval_mock.assert_called_once()
+        test_pass_mock.assert_called_once()
+        test_pass_state = test_pass_mock.call_args[0][0]
+        self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
+        self.assertTrue(test_pass_state[tb.STEPS] == steps)
+        self.assertTrue(metrics == 1)
+
+    def test_validation_pass_none(self):
+        generator = None
+        steps = None
+        tb.CallbackListInjection = Mock()
+
+        state = {tb.VALIDATION_GENERATOR: generator, tb.VALIDATION_STEPS: steps, tb.METRICS: 1}
+        t = Trial(MagicMock())
+        eval_mock = t.eval = Mock()
+        t._test_pass = Mock()
+        t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None}
+        t._validation_pass(state)
+
+        self.assertTrue(eval_mock.call_count == 0)
+        
+    def test_evaluate(self):
+        generator = MagicMock()
+        steps = 5
+        tb.CallbackListInjection = Mock()
+
+        state = {tb.VALIDATION_GENERATOR: generator, tb.VALIDATION_STEPS: steps, tb.METRICS: 1}
+        t = Trial(MagicMock())
+        eval_mock = t.eval = Mock()
+        test_pass_mock = t._test_pass = Mock(return_value={tb.METRICS: 1})
+        t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.VALIDATION_STEPS: steps}
+        metrics = t.evaluate(state)
+
+        eval_mock.assert_called_once()
+        test_pass_mock.assert_called_once()
+        test_pass_state = test_pass_mock.call_args[0][0]
+        self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
+        self.assertTrue(test_pass_state[tb.STEPS] == steps)
+        self.assertTrue(metrics == 1)
+
+    def test_evaluate_none(self):
+        generator = None
+        steps = None
+        tb.CallbackListInjection = Mock()
+
+        state = {tb.VALIDATION_GENERATOR: generator, tb.VALIDATION_STEPS: steps, tb.METRICS: 1}
+        t = Trial(MagicMock())
+        eval_mock = t.eval = Mock()
+        test_pass_mock = t._test_pass = Mock(return_value={tb.METRICS: 1})
+        t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.VALIDATION_STEPS: steps}
+        metrics = t.evaluate(state)
+
+        self.assertTrue(eval_mock.call_count == 0)
+
+    def test_predict(self):
+        generator = MagicMock()
+        steps = 5
+        tb.CallbackListInjection = Mock()
+
+        state = {tb.TEST_GENERATOR: generator, tb.TEST_STEPS: steps, tb.METRICS: 1}
+        t = Trial(MagicMock())
+        eval_mock = t.eval = Mock()
+        test_pass_mock = t._test_pass = Mock(return_value={tb.FINAL_PREDICTIONS: 1})
+        t.state = {tb.TEST_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.TEST_STEPS: steps}
+        metrics = t.predict(state)
+
+        eval_mock.assert_called_once()
+        test_pass_mock.assert_called_once()
+        test_pass_state = test_pass_mock.call_args[0][0]
+        self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
+        self.assertTrue(test_pass_state[tb.STEPS] == steps)
+        self.assertTrue(metrics == 1)
+
+    def test_predict_none(self):
+        generator = None
+        steps = None
+        tb.CallbackListInjection = Mock()
+
+        state = {tb.TEST_GENERATOR: generator, tb.TEST_STEPS: steps, tb.METRICS: 1}
+        t = Trial(MagicMock())
+        eval_mock = t.eval = Mock()
+        test_pass_mock = t._test_pass = Mock(return_value={tb.FINAL_PREDICTIONS: 1})
+        t.state = {tb.TEST_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.TEST_STEPS: steps}
+        metrics = t.predict(state)
+
+        self.assertTrue(eval_mock.call_count == 0)
+
+
 class TestTrialMembers(TestCase):
+    def test_init_none_criterion(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
+        optimizer = MagicMock()
+        metric = MagicMock()
+        x = MagicMock()
+        y_true = MagicMock()
+        y_true.device = 'cpu'
+
+        torchbearertrial = Trial(torchmodel, optimizer, None, [metric], [], pass_state=False)
+        loss = torchbearertrial.state[tb.CRITERION](x, y_true)
+        self.assertTrue(torch.is_tensor(loss))
+        self.assertTrue(loss.shape == torch.Size([1]))
+        self.assertTrue(loss.item() == 0)
+
     def test_train(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         optimizer = MagicMock()
@@ -1572,3 +1719,257 @@ class TestTrialMembers(TestCase):
 
         self.assertTrue(torchmodel.state_dict.call_args[1] == keywords)
         self.assertTrue(optimizer.state_dict.call_args[1] == {})
+
+
+class TestTrialFunctions(TestCase):
+    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_printer_no_tqdm(self, c_inj, tq):
+        callback_list = tb.callbacks.CallbackList([])
+
+        class SomeClass:
+            @tb.inject_printer('v')
+            def test_func(self, verbose=0):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list}
+        t.test_func(verbose=0)
+        c_inj.assert_called_once()
+        self.assertTrue(tq.call_count==0)
+
+    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_printer_tqdm_on_epoch(self, c_inj, tq):
+        callback_list = tb.callbacks.CallbackList([])
+
+        class SomeClass:
+            @tb.inject_printer('t')
+            def test_func(self, verbose=0):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list}
+        t.test_func(verbose=1)
+        c_inj.assert_called_once()
+        self.assertTrue(tq.call_count==1)
+        self.assertTrue(tq.call_args[1]['validation_label_letter'] == 't')
+        self.assertTrue(tq.call_args[1]['on_epoch'] == True)
+
+    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_printer_tqdm_on_batch(self, c_inj, tq):
+        callback_list = tb.callbacks.CallbackList([])
+
+        class SomeClass:
+            @tb.inject_printer('t')
+            def test_func(self, verbose=0):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list}
+        t.test_func(verbose=2)
+        c_inj.assert_called_once()
+        self.assertTrue(tq.call_count==1)
+        self.assertTrue(tq.call_args[1]['validation_label_letter'] == 't')
+        self.assertTrue(len(tq.call_args[1]) == 1)
+
+    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_printer_tqdm_default(self, c_inj, tq):
+        callback_list = tb.callbacks.CallbackList([])
+
+        class SomeClass:
+            @tb.inject_printer('t')
+            def test_func(self, verbose=2):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list}
+        t.test_func()
+        c_inj.assert_called_once()
+        self.assertTrue(tq.call_count==1)
+        self.assertTrue(tq.call_args[1]['validation_label_letter'] == 't')
+        self.assertTrue(len(tq.call_args[1]) == 1)
+
+    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_printer_injection(self, c_inj, tq):
+        callback_list = tb.callbacks.CallbackList([])
+
+        class SomeClass:
+            @tb.inject_printer('v')
+            def test_func(self, verbose=0):
+                c_inj.assert_called_once()
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list}
+        t.test_func()
+        self.assertTrue(t.state[tb.CALLBACK_LIST] == callback_list)
+
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_sampler_standard(self, c_inj):
+        callback_list = tb.callbacks.CallbackList([])
+        generator = MagicMock()
+
+        class SomeClass:
+            @tb.inject_sampler(tb.GENERATOR)
+            def test_func(self):
+                c_inj.assert_called_once()
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list, tb.GENERATOR: generator}
+        t.test_func()
+        self.assertTrue(c_inj.call_args[0][0] == tb.trial.load_batch_standard)
+
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_sampler_none(self, c_inj):
+        callback_list = tb.callbacks.CallbackList([])
+        generator = None
+
+        class SomeClass:
+            @tb.inject_sampler(tb.GENERATOR)
+            def test_func(self):
+                c_inj.assert_called_once()
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list, tb.GENERATOR: generator}
+        t.test_func()
+        self.assertTrue(c_inj.call_args[0][0] == tb.trial.load_batch_none)
+
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_sampler_predict(self, c_inj):
+        callback_list = tb.callbacks.CallbackList([])
+        generator = MagicMock()
+
+        class SomeClass:
+            @tb.inject_sampler(tb.GENERATOR, predict=True)
+            def test_func(self):
+                c_inj.assert_called_once()
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list, tb.GENERATOR: generator}
+        t.test_func()
+        self.assertTrue(c_inj.call_args[0][0] == tb.trial.load_batch_predict)
+
+    @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_callback(self, c_inj):
+        callback_list = tb.callbacks.CallbackList([])
+        test_callback = MagicMock()
+
+        class SomeClass:
+            @tb.inject_callback(test_callback)
+            def test_func(self):
+                c_inj.assert_called_once()
+
+        t = SomeClass()
+        t.state = {tb.CALLBACK_LIST: callback_list}
+        t.test_func()
+        self.assertTrue(c_inj.call_args[0][0] == test_callback)
+
+    def test_deep_to_tensor(self):
+        tensor = MagicMock()
+        new_dtype = torch.float16
+        new_device = 'cuda:1'
+
+        deep_to(tensor, new_device, new_dtype)
+        self.assertTrue(tensor.to.call_args[0][0] == new_device)
+        self.assertTrue(tensor.to.call_args[0][1] == new_dtype)
+
+    def test_deep_to_tensor_int_dtype(self):
+        tensor = MagicMock()
+        tensor.dtype = torch.uint8
+        new_device = 'cuda:1'
+        new_dtype = torch.uint8
+
+        deep_to(tensor, new_device, new_dtype)
+        self.assertTrue(tensor.to.call_args[0][0] == new_device)
+        self.assertTrue(len(tensor.to.call_args[0]) == 1)
+
+    def test_deep_to_list(self):
+        tensor_1 = MagicMock()
+        tensor_2 = MagicMock()
+        tensors = [tensor_1, tensor_2]
+        new_dtype = torch.float16
+        new_device = 'cuda:1'
+
+        deep_to(tensors, new_device, new_dtype)
+        for tensor in tensors:
+            self.assertTrue(tensor.to.call_args[0][0] == new_device)
+            self.assertTrue(tensor.to.call_args[0][1] == new_dtype)
+
+    def test_deep_to_dict(self):
+        tensor_1 = torch.Tensor([0])
+        tensor_1.to = Mock()
+        tensor_2 = torch.Tensor([0])
+        tensor_2.to = Mock()
+        tensors = {'t1': tensor_1, 't2': tensor_2}
+        new_dtype = torch.float16
+        new_device = 'cuda:1'
+
+        deep_to(tensors, new_device, new_dtype)
+        self.assertTrue(tensor_1.to.call_args[0][0] == new_device)
+        self.assertTrue(tensor_1.to.call_args[0][1] == new_dtype)
+        self.assertTrue(tensor_2.to.call_args[0][0] == new_device)
+        self.assertTrue(tensor_2.to.call_args[0][1] == new_dtype)
+
+    def test_load_batch_standard(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
+        iterator = iter(items)
+
+        state = {tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        load_batch_standard.on_sample(state)
+        self.assertTrue(state[tb.X].item() == items[0][0].item())
+        self.assertTrue(state[tb.Y_TRUE].item() == items[0][1].item())
+
+    def test_load_batch_none(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
+        iterator = iter(items)
+
+        state = {tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        load_batch_none.on_sample(state)
+        self.assertTrue(state[tb.X] is None)
+        self.assertTrue(state[tb.Y_TRUE] is None)
+
+    def test_load_batch_predict_data(self):
+        items = [torch.Tensor([1]), torch.Tensor([2])]
+        iterator = iter(items)
+
+        state = {tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+        load_batch_predict.on_sample(state)
+        self.assertTrue(state[tb.X].item() == items[0].item())
+
+    def test_load_batch_predict_list(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
+        iterator = iter(items)
+
+        state = {tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        load_batch_predict.on_sample(state)
+        self.assertTrue(state[tb.X].item() == items[0][0].item())
+        self.assertTrue(state[tb.Y_TRUE].item() == items[0][1].item())
+
+    def test_update_device_and_dtype_only_kwarg(self):
+        main_state = {}
+        dtype = torch.float16
+        dev = 'cuda:1'
+
+        kwargs = {str(tb.DEVICE): dev, str(tb.DATA_TYPE): dtype}
+
+        main_state = update_device_and_dtype(main_state, **kwargs)
+
+        self.assertTrue(main_state[tb.DATA_TYPE] == dtype)
+        self.assertTrue(main_state[tb.DEVICE] == dev)
+
+    def test_update_device_and_dtype_only_arg(self):
+        main_state = {}
+        dtype = torch.float16
+        dev = 'cuda:1'
+        args = (dtype, dev)
+
+        main_state = update_device_and_dtype(main_state, *args)
+
+        self.assertTrue(main_state[tb.DATA_TYPE] == dtype)
+        self.assertTrue(main_state[tb.DEVICE] == dev)
