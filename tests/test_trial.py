@@ -672,7 +672,8 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)
@@ -707,7 +708,8 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)
@@ -737,7 +739,8 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)
@@ -771,7 +774,8 @@ class TestFitPass(TestCase):
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)
@@ -806,7 +810,8 @@ class TestFitPass(TestCase):
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)
@@ -843,7 +848,8 @@ class TestFitPass(TestCase):
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)
@@ -1018,7 +1024,8 @@ class TestFitPass(TestCase):
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1]
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1],
+            tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[], pass_state=False)

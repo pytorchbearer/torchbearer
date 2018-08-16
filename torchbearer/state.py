@@ -110,6 +110,7 @@ BATCH = state_key('t')
 TIMINGS = state_key('timings')
 CALLBACK_LIST = state_key('callback_list')
 HISTORY = state_key('history')
+BACKWARD_ARGS = state_key('backward_args')
 
 # Legacy
 VALIDATION_ITERATOR = 'validation_iterator'
