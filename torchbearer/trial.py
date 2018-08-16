@@ -295,7 +295,8 @@ class Trial(object):
             torchbearer.DEVICE: 'cpu',
             torchbearer.DATA_TYPE: torch.float32,
             torchbearer.SELF: self,
-            torchbearer.HISTORY: []
+            torchbearer.HISTORY: [],
+            torchbearer.BACKWARD_ARGS: {}
         })
 
     @fluent
@@ -534,7 +535,7 @@ class Trial(object):
                 state[torchbearer.CALLBACK_LIST].on_criterion(state)
 
                 # Backwards pass
-                state[torchbearer.LOSS].backward()
+                state[torchbearer.LOSS].backward(**state[torchbearer.BACKWARD_ARGS])
                 state[torchbearer.CALLBACK_LIST].on_backward(state)
 
             # Update parameters
