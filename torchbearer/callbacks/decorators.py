@@ -2,6 +2,8 @@ from torchbearer.callbacks import Callback
 import torchbearer
 from torchbearer.state import StateKey
 
+from inspect import signature
+
 
 class LambdaCallback(Callback):
     def __init__(self, func):
@@ -311,16 +313,17 @@ def only_if(condition_expr):
     """
     def condition_decorator(fcn):
         if isinstance(fcn, LambdaCallback):
-            def lambda_decorator(fcn):
+            fcn.on_lambda = condition_decorator(fcn.on_lambda)
+            return fcn
+        else:
+            params = signature(fcn).parameters
+            if len(params) == 2:  # Assume Class method
+                def decfcn(o, state):
+                    if condition_expr(state):
+                        fcn(o, state)
+            else:  # Assume function of state
                 def decfcn(state):
                     if condition_expr(state):
                         fcn(state)
-                return decfcn
-            fcn.on_lambda = lambda_decorator(fcn.on_lambda)
-            return fcn
-        else:
-            def decfcn(o, state):
-                if condition_expr(state):
-                    fcn(o, state)
             return decfcn
     return condition_decorator

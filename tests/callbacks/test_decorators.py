@@ -290,3 +290,27 @@ class TestDecorators(unittest.TestCase):
         state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 3)
+
+    def test_lambda_only_if(self):
+        @callbacks.on_step_validation
+        @callbacks.only_if(lambda s: s[torchbearer.EPOCH] % 2 == 0)
+        def callback_func(state):
+            state['value'] += 1
+
+        state = {torchbearer.EPOCH: 0, 'value': 0}
+
+        cb = callback_func
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
+
+        state[torchbearer.EPOCH] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
+
+        state[torchbearer.EPOCH] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 3)
