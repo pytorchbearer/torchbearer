@@ -15,7 +15,7 @@ class TestMetricFactory(unittest.TestCase):
 class TestMetric(unittest.TestCase):
     def setUp(self):
         self._state = {
-            torchbearer.Y_TRUE: torch.LongTensor([0, 1, 2, 2, 1]).requires_grad,
+            torchbearer.Y_TRUE: torch.LongTensor([0, 1, 2, 2, 1]),
             torchbearer.Y_PRED: torch.FloatTensor([
                 [0.9, 0.1, 0.1], # Correct
                 [0.1, 0.9, 0.1], # Correct
