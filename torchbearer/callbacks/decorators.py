@@ -2,6 +2,27 @@ from torchbearer.callbacks import Callback
 import torchbearer
 from torchbearer.state import StateKey
 
+from inspect import signature
+
+
+class LambdaCallback(Callback):
+    def __init__(self, func):
+        self.func = func
+
+    def on_lambda(self, state):
+        return self.func(state)
+
+
+def bind_to(target):
+    def decorator(func):
+        if isinstance(func, LambdaCallback):
+            callback = func
+        else:
+            callback = LambdaCallback(func)
+        setattr(callback, target.__name__, lambda state: callback.on_lambda(state))
+        return callback
+    return decorator
+
 
 def on_start(func):
     """ The :func:`on_start` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_start`
@@ -12,13 +33,7 @@ def on_start(func):
     :return: Initialised callback with :meth:`~.Callback.on_start` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_start = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_start)(func)
 
 
 def on_start_epoch(func):
@@ -30,13 +45,7 @@ def on_start_epoch(func):
     :return: Initialised callback with :meth:`~.Callback.on_start_epoch` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_start_epoch = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_start_epoch)(func)
 
 
 def on_start_training(func):
@@ -48,13 +57,7 @@ def on_start_training(func):
     :return: Initialised callback with :meth:`.Callback.on_start_training` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_start_training = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_start_training)(func)
 
 
 def on_sample(func):
@@ -66,13 +69,7 @@ def on_sample(func):
     :return: Initialised callback with :meth:`.Callback.on_sample` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_sample = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_sample)(func)
 
 
 def on_forward(func):
@@ -84,13 +81,7 @@ def on_forward(func):
     :return: Initialised callback with :meth:`.Callback.on_forward` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_forward = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_forward)(func)
 
 
 def on_criterion(func):
@@ -102,13 +93,7 @@ def on_criterion(func):
     :return: Initialised callback with :meth:`.Callback.on_criterion` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_criterion = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_criterion)(func)
 
 
 def on_backward(func):
@@ -120,13 +105,7 @@ def on_backward(func):
     :return: Initialised callback with :meth:`.Callback.on_backward` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_backward = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_backward)(func)
 
 
 def on_step_training(func):
@@ -138,13 +117,7 @@ def on_step_training(func):
     :return: Initialised callback with :meth:`.Callback.on_step_training` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_step_training = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_step_training)(func)
 
 
 def on_end_training(func):
@@ -156,13 +129,7 @@ def on_end_training(func):
     :return: Initialised callback with :meth:`.Callback.on_end_training` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_end_training = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_end_training)(func)
 
 
 def on_end_epoch(func):
@@ -174,13 +141,7 @@ def on_end_epoch(func):
     :return: Initialised callback with :meth:`.Callback.on_end_epoch` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_end_epoch = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_end_epoch)(func)
 
 
 def on_end(func):
@@ -192,13 +153,7 @@ def on_end(func):
     :return: Initialised callback with :meth:`.Callback.on_end` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_end = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_end)(func)
 
 
 def on_start_validation(func):
@@ -210,13 +165,7 @@ def on_start_validation(func):
     :return: Initialised callback with :meth:`.Callback.on_start_validation` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_start_validation = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_start_validation)(func)
 
 
 def on_sample_validation(func):
@@ -228,13 +177,7 @@ def on_sample_validation(func):
     :return: Initialised callback with :meth:`.Callback.on_sample_validation` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_sample_validation = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_sample_validation)(func)
 
 
 def on_forward_validation(func):
@@ -246,13 +189,7 @@ def on_forward_validation(func):
     :return: Initialised callback with :meth:`.Callback.on_forward_validation` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_forward_validation = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_forward_validation)(func)
 
 
 def on_criterion_validation(func):
@@ -264,13 +201,7 @@ def on_criterion_validation(func):
     :return: Initialised callback with :meth:`.Callback.on_criterion_validation` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_criterion_validation = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_criterion_validation)(func)
 
 
 def on_end_validation(func):
@@ -282,13 +213,7 @@ def on_end_validation(func):
     :return: Initialised callback with :meth:`.Callback.on_end_validation` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_end_validation = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_end_validation)(func)
 
 
 def on_step_validation(func):
@@ -300,13 +225,7 @@ def on_step_validation(func):
     :return: Initialised callback with :meth:`.Callback.on_step_validation` calling func
     :rtype: :class:`.Callback`
     """
-    if isinstance(func, Callback):
-        callback = func
-    else:
-        callback = Callback()
-        callback.on_lambda = func
-    callback.on_step_validation = callback.on_lambda
-    return callback
+    return bind_to(Callback.on_step_validation)(func)
 
 
 def add_to_loss(func):
@@ -318,13 +237,12 @@ def add_to_loss(func):
     :return: Initialised callback which adds the returned value from func to the loss
     :rtype: :class:`.Callback`
     """
-    def add_to_loss_func(state):
+    @on_criterion
+    @on_criterion_validation
+    def add_to_loss_callback(state):
         state[torchbearer.LOSS] += func(state)
 
-    new_callback = Callback()
-    new_callback.on_criterion = add_to_loss_func
-    new_callback.on_criterion_validation = add_to_loss_func
-    return new_callback
+    return add_to_loss_callback
 
 
 def from_state(key_list):
@@ -394,8 +312,18 @@ def only_if(condition_expr):
     :return: the decorator
     """
     def condition_decorator(fcn):
-        def decfcn(o, state):
-            if condition_expr(state):
-                fcn(o, state)
-        return decfcn
+        if isinstance(fcn, LambdaCallback):
+            fcn.on_lambda = condition_decorator(fcn.on_lambda)
+            return fcn
+        else:
+            params = signature(fcn).parameters
+            if len(params) == 2:  # Assume Class method
+                def decfcn(o, state):
+                    if condition_expr(state):
+                        fcn(o, state)
+            else:  # Assume function of state
+                def decfcn(state):
+                    if condition_expr(state):
+                        fcn(state)
+            return decfcn
     return condition_decorator

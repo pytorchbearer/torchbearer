@@ -2,11 +2,34 @@ import warnings
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from torch.optim import Optimizer
 
 import torchbearer
 from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
+
+
+class MockOptimizer(Optimizer):
+    """The Mock Optimizer will be used inplace of an optimizer in the event that none is passed to the Trial class.
+    """
+    def __init__(self):
+        super(MockOptimizer, self).__init__([torch.zeros(1)], [])
+
+    def add_param_group(self, param_group):
+        pass  # Do Nothing
+
+    def load_state_dict(self, state_dict):
+        pass  # Do Nothing
+
+    def state_dict(self):
+        return {}  # Return Empty
+
+    def step(self, closure=None):
+        pass  # Do Nothing
+
+    def zero_grad(self):
+        pass  # Do Nothing
 
 
 class CallbackListInjection(CallbackList):
@@ -16,12 +39,20 @@ class CallbackListInjection(CallbackList):
 
     :param callback: The callback to inject
     :param callback_list: The underlying callback list
+    :type callback_list: CallbackList
     """
     def __init__(self, callback, callback_list):
         super(CallbackListInjection, self).__init__([])
 
         self.callback = callback
         self.callback_list = callback_list
+
+    def state_dict(self):
+        return self.callback_list.state_dict()
+
+    def load_state_dict(self, state_dict):
+        self.callback_list.load_state_dict(state_dict)
+        return self
 
     def __iter__(self):
         return self.callback_list.__iter__()
@@ -238,7 +269,7 @@ class Trial(object):
         self.state.update({
             torchbearer.MODEL: model,
             torchbearer.CRITERION: criterion,
-            torchbearer.OPTIMIZER: optimizer,
+            torchbearer.OPTIMIZER: optimizer if optimizer is not None else MockOptimizer(),
             torchbearer.METRIC_LIST: MetricList(metrics),
             torchbearer.CALLBACK_LIST: CallbackList(callbacks),
             torchbearer.DEVICE: 'cpu',
@@ -464,29 +495,30 @@ class Trial(object):
         for state[torchbearer.BATCH] in range(0, state[torchbearer.STEPS]):
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
-            # Zero grads
-            state[torchbearer.OPTIMIZER].zero_grad()
+            def closure():
+                # Zero grads
+                state[torchbearer.OPTIMIZER].zero_grad()
 
-            # Forward Pass
-            if self.pass_state:
-                state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-            else:
-                state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
+                # Forward Pass
+                if self.pass_state:
+                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
+                else:
+                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
 
-            state[torchbearer.CALLBACK_LIST].on_forward(state)
+                state[torchbearer.CALLBACK_LIST].on_forward(state)
 
-            # Loss Calculation
-            state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
+                # Loss Calculation
+                state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
 
-            state[torchbearer.CALLBACK_LIST].on_criterion(state)
-            state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
+                state[torchbearer.CALLBACK_LIST].on_criterion(state)
 
-            # Backwards pass
-            state[torchbearer.LOSS].backward()
-            state[torchbearer.CALLBACK_LIST].on_backward(state)
+                # Backwards pass
+                state[torchbearer.LOSS].backward()
+                state[torchbearer.CALLBACK_LIST].on_backward(state)
 
             # Update parameters
-            state[torchbearer.OPTIMIZER].step()
+            state[torchbearer.OPTIMIZER].step(closure)
+            state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
             state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
             if state[torchbearer.STOP_TRAINING]:

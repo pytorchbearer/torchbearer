@@ -660,6 +660,7 @@ class TestFitPass(TestCase):
         epochs = 1
         torchmodel = MagicMock()
         optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
@@ -694,6 +695,7 @@ class TestFitPass(TestCase):
         epochs = 1
         torchmodel = MagicMock()
         optimizer = MagicMock()
+        optimizer.step = Mock(side_effect=lambda closure: closure())
 
         loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
@@ -723,6 +725,7 @@ class TestFitPass(TestCase):
         epochs = 1
         torchmodel = MagicMock()
         optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
@@ -754,6 +757,7 @@ class TestFitPass(TestCase):
         epochs = 1
         torchmodel = MagicMock()
         optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
@@ -788,6 +792,7 @@ class TestFitPass(TestCase):
         torchmodel = MagicMock()
         torchmodel.return_value = 5
         optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
@@ -824,6 +829,7 @@ class TestFitPass(TestCase):
         torchmodel = MagicMock()
         torchmodel.return_value = 5
         optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
 
         loss = MagicMock()
         criterion = Mock(return_value=loss)
@@ -996,6 +1002,7 @@ class TestFitPass(TestCase):
         torchmodel = MagicMock()
         torchmodel.return_value = 5
         optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
         criterion = Mock(return_value=loss)
