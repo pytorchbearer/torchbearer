@@ -7,6 +7,24 @@ class Callback(object):
 
     """
 
+    def state_dict(self):
+        """Get a dict containing the callback state.
+
+        :return: A dict containing parameters and persistent buffers.
+        :rtype: dict
+        """
+        return {}
+
+    def load_state_dict(self, state_dict):
+        """Resume this callback from the given state. Expects that this callback was constructed in the same way.
+
+        :param state_dict: The state dict to reload
+        :type state_dict: dict
+        :return: self
+        :rtype: Callback
+        """
+        return self
+
     def on_start(self, state):
         """Perform some action with the given state as context at the start of a model fit.
 
@@ -171,10 +189,55 @@ class CallbackList(Callback):
 
     """
 
+    CALLBACK_STATES = 'callback_states'
+    CALLBACK_TYPES = 'callback_types'
+
     def __init__(self, callback_list):
         super().__init__()
         self.callback_list = []
         self.append(callback_list)
+
+    def state_dict(self):
+        """Get a dict containing all of the callback states.
+
+        :return: A dict containing parameters and persistent buffers.
+        :rtype: dict
+        """
+        state_dict = {
+            CallbackList.CALLBACK_STATES: [],
+            CallbackList.CALLBACK_TYPES: []
+        }
+
+        def to_state(callback):
+            state_dict[CallbackList.CALLBACK_STATES].append(callback.state_dict())
+            state_dict[CallbackList.CALLBACK_TYPES].append(callback.__class__)
+
+        self._for_list(to_state)
+
+        return state_dict
+
+    def load_state_dict(self, state_dict):
+        """Resume this callback list from the given state. Callbacks must be given in the same order for this to work.
+
+        :param state_dict: The state dict to reload
+        :type state_dict: dict
+        :return: self
+        :rtype: CallbackList
+        """
+
+        t_iter = iter(state_dict[CallbackList.CALLBACK_TYPES])
+        s_iter = iter(state_dict[CallbackList.CALLBACK_STATES])
+
+        def from_state(callback):
+            if callback.__class__ == next(t_iter):
+                callback.load_state_dict(next(s_iter))
+            else:
+                import warnings
+                warnings.warn('Callback classes did not match, expected: ' + str({c.__name__ for c in state_dict[CallbackList.CALLBACK_TYPES]}))
+
+        self._for_list(from_state)
+
+        return self
 
     def _for_list(self, function):
         for callback in self.callback_list:
