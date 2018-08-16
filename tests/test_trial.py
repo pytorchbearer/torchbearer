@@ -1657,9 +1657,13 @@ class TestTrialMembers(TestCase):
         optimizer.load_state_dict = Mock()
         optimizer_state = optimizer.state_dict()
 
+        callback_list = MagicMock()
+        callback_list.state_dict = Mock(return_value = 1)
+
         history = ['test']
 
         torchbearertrial = Trial(torchmodel, optimizer, None, [], [], pass_state=False)
+        torchbearertrial.state[tb.CALLBACK_LIST] = callback_list
         torchbearertrial.state[tb.HISTORY] = history
         torchbearer_state = torchbearertrial.state_dict()
         torchbearertrial.state[tb.HISTORY] = 'Wrong'
@@ -1669,9 +1673,12 @@ class TestTrialMembers(TestCase):
         self.assertTrue(torchmodel.load_state_dict.call_args[0][0] == torch_state)
         self.assertTrue(optimizer.load_state_dict.call_args[0][0] == optimizer_state)
         self.assertTrue(optimizer.load_state_dict.call_args[0][0] == optimizer_state)
+        self.assertTrue(callback_list.load_state_dict.call_args[0][0] == 1)
+
         self.assertTrue(torchbearertrial.state[tb.HISTORY] == history)
         torchbearertrial.state[tb.MODEL].load_state_dict.assert_called_once()
         torchbearertrial.state[tb.OPTIMIZER].load_state_dict.assert_called_once()
+        torchbearertrial.state[tb.CALLBACK_LIST].load_state_dict.assert_called_once()
         self.assertTrue(torchmodel.load_state_dict.call_args[1] == key_words)
 
     def test_load_state_dict_no_resume(self):
@@ -1706,14 +1713,19 @@ class TestTrialMembers(TestCase):
         optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
         optimizer_state = optimizer.state_dict()
 
+        callback_list = MagicMock()
+        callback_list.state_dict = Mock(return_value = 1)
+
         history = ['test']
 
         torchbearertrial = Trial(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearertrial.state[tb.HISTORY] = history
+        torchbearertrial.state[tb.CALLBACK_LIST] = callback_list
         torchbearer_state = torchbearertrial.state_dict()
 
         self.assertTrue(torchbearer_state[tb.MODEL] == torchmodel_state)
         self.assertTrue(torchbearer_state[tb.OPTIMIZER] == optimizer_state)
+        self.assertTrue(torchbearer_state[tb.CALLBACK_LIST] == 1)
         self.assertTrue(torchbearer_state[tb.HISTORY] == history)
 
     def test_state_dict_kwargs(self):
