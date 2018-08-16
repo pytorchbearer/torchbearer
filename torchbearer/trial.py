@@ -101,7 +101,7 @@ def deep_to(batch, device, dtype):
 
 
 def load_batch_standard(state):
-    """ Callback to load a standard (input data, target) tuple mini-batch from iterator into state
+    """ Load a standard (input data, target) tuple mini-batch from iterator into state
 
     :param state: The current state dict of the :class:`Model`.
     :type state: dict[str,any]
@@ -112,7 +112,7 @@ def load_batch_standard(state):
 
 
 def load_batch_none(state):
-    """Callback to load a none (none, none) tuple mini-batch into state
+    """ Load a none (none, none) tuple mini-batch into state
 
     :param state: The current state dict of the :class:`Model`.
     :type state: dict[str,any]
@@ -121,7 +121,7 @@ def load_batch_none(state):
 
 
 def load_batch_predict(state):
-    """ Callback to load a prediction (input data, target) or (input data) mini-batch from iterator into state
+    """ Load a prediction (input data, target) or (input data) mini-batch from iterator into state
 
     :param state: The current state dict of the :class:`Model`.
     :type state: dict[str,any]
@@ -134,6 +134,12 @@ def load_batch_predict(state):
         
         
 class Sampler:
+    """
+    Sampler wraps a batch loader function and executes it when :meth:`Sampler.sample` is called
+
+    :param batch_loader: The batch loader to execute
+    :type batch_loader: function
+    """
     def __init__(self, batch_loader):
         super().__init__()
         self.batch_loader = batch_loader
@@ -143,6 +149,14 @@ class Sampler:
 
 
 def inject_sampler(generator, predict=False):
+    """ Decorator to inject a sampler into state[torchbearer.SAMPLER]
+
+    :param generator: The data generator for the sampler to load data from
+    :type generator: DataLoader
+    :param predict: If true, the prediction batch loader is used, if false the standard data loader is used
+    :type predict: bool
+    :return: the decorator
+    """
     def decorator(func):
         def wrapper(self, *args, **kwargs):
             if self.state[generator] is None:
@@ -162,6 +176,12 @@ def inject_sampler(generator, predict=False):
 
 
 def inject_callback(callback):
+    """ Decorator to inject a callback into the callback list and remove the callback after the decorated function has executed
+    
+    :param callback: Callback to be injected
+    :type callback: Callback
+    :return: the decorator
+    """
     def decorator(func):
         def wrapper(self, *args, **kwargs):
             callback_list_old = self.state[torchbearer.CALLBACK_LIST]
