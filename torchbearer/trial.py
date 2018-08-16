@@ -103,7 +103,7 @@ def deep_to(batch, device, dtype):
 def load_batch_standard(state):
     """ Load a standard (input data, target) tuple mini-batch from iterator into state
 
-    :param state: The current state dict of the :class:`Model`.
+    :param state: The current state dict of the :class:`Trial`.
     :type state: dict[str,any]
     """
     state[torchbearer.X], state[torchbearer.Y_TRUE] = deep_to(next(state[torchbearer.ITERATOR]),
@@ -114,7 +114,7 @@ def load_batch_standard(state):
 def load_batch_none(state):
     """ Load a none (none, none) tuple mini-batch into state
 
-    :param state: The current state dict of the :class:`Model`.
+    :param state: The current state dict of the :class:`Trial`.
     :type state: dict[str,any]
     """
     state[torchbearer.X], state[torchbearer.Y_TRUE] = None, None
@@ -123,7 +123,7 @@ def load_batch_none(state):
 def load_batch_predict(state):
     """ Load a prediction (input data, target) or (input data) mini-batch from iterator into state
 
-    :param state: The current state dict of the :class:`Model`.
+    :param state: The current state dict of the :class:`Trial`.
     :type state: dict[str,any]
     """
     data = deep_to(next(state[torchbearer.ITERATOR]), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
@@ -149,7 +149,7 @@ class Sampler:
 
 
 def inject_sampler(generator, predict=False):
-    """ Decorator to inject a sampler into state[torchbearer.SAMPLER]
+    """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER]
 
     :param generator: The data generator for the sampler to load data from
     :type generator: DataLoader
