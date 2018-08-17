@@ -4,7 +4,7 @@ from unittest.mock import patch
 from torch.autograd import Variable
 
 import torchbearer
-from torchbearer.metrics import Loss, Epoch, CategoricalAccuracy, CategoricalAccuracyFactory
+from torchbearer.metrics import Loss, Epoch, CategoricalAccuracy
 
 import torch
 
@@ -15,7 +15,7 @@ class TestLoss(unittest.TestCase):
             self._state = {
                 torchbearer.LOSS: torch.FloatTensor([2.35])
             }
-        self._metric = Loss()
+        self._metric = Loss().root  # Get root node of Tree for testing
 
     def test_train_process(self):
         self._metric.train()
@@ -33,7 +33,7 @@ class TestEpoch(unittest.TestCase):
         self._state = {
             torchbearer.EPOCH: 101
         }
-        self._metric = Epoch()
+        self._metric = Epoch().metric  # Get wrapped metric for testing
 
     def test_process(self):
         result = self._metric.process(self._state)
@@ -57,15 +57,10 @@ class TestCategoricalAccuracy(unittest.TestCase):
             ]))
         }
         self._targets = [1, 1, 1, 0, 0]
-        self._metric = CategoricalAccuracy()
-
-    @patch('torchbearer.metrics.primitives.CategoricalAccuracy')
-    def test_ignore_index_args_passed(self, mock):
-        CategoricalAccuracyFactory(ignore_index=1).build()
-        mock.assert_called_once_with(ignore_index=1)
+        self._metric = CategoricalAccuracy().root  # Get root node of Tree for testing
 
     def test_ignore_index(self):
-        metric = CategoricalAccuracy(ignore_index=1)
+        metric = CategoricalAccuracy(ignore_index=1).root  # Get root node of Tree for testing
         targets = [1, 1, 0]
 
         metric.train()

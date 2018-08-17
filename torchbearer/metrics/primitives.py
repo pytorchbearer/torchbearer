@@ -1,5 +1,5 @@
 """
-Base metrics are the base classes which represent the metrics supplied with torchbearer. The all use the
+Base metrics are the base classes which represent the metrics supplied with torchbearer. They all use the
 :func:`.default_for_key` decorator so that they can be accessed in the call to :class:`.torchbearer.Model` via the
 following strings:
 
@@ -14,15 +14,21 @@ from torchbearer import metrics
 import torch
 
 
+@metrics.default_for_key('acc')
+@metrics.default_for_key('accuracy')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
 class CategoricalAccuracy(metrics.Metric):
-    """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets.
+    """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets. Decorated with a
+    mean, running_mean and std. Default for keys: 'acc' and 'accuracy'
 
     :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
     :type ignore_index: int
     """
 
     def __init__(self, ignore_index=-100):
-        super(CategoricalAccuracy, self).__init__('acc')
+        super().__init__('acc')
 
         self.ignore_index = ignore_index
 
@@ -37,27 +43,13 @@ class CategoricalAccuracy(metrics.Metric):
         return (y_pred == y_true).float()
 
 
-@metrics.default_for_key('acc')
-@metrics.default_for_key('accuracy')
+@metrics.default_for_key('loss')
 @metrics.running_mean
 @metrics.std
 @metrics.mean
-class CategoricalAccuracyFactory(metrics.MetricFactory):
-    """Categorical accuracy metric factory. Essentially a :class:`.CategoricalAccuracy` with running mean, mean and std.
-
-    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
-    :type ignore_index: int
-    """
-
-    def __init__(self, ignore_index=-100):
-        self.ignore_index = ignore_index
-
-    def build(self):
-        return CategoricalAccuracy(ignore_index=self.ignore_index)
-
-
 class Loss(metrics.Metric):
-    """Simply returns the 'loss' value from the model state.
+    """Simply returns the 'loss' value from the model state. Decorated with a mean, running_mean and std. Default for
+    key: 'loss'.
     """
 
     def __init__(self):
@@ -68,17 +60,10 @@ class Loss(metrics.Metric):
         return state[torchbearer.LOSS]
 
 
-@metrics.default_for_key('loss')
-@metrics.running_mean
-@metrics.std
-@metrics.mean
-class LossFactory(metrics.MetricFactory):
-    def build(self):
-        return Loss()
-
-
+@metrics.default_for_key('epoch')
+@metrics.to_dict
 class Epoch(metrics.Metric):
-    """Returns the 'epoch' from the model state.
+    """Returns the 'epoch' from the model state. Default for key: 'epoch'.
     """
 
     def __init__(self):
@@ -86,19 +71,11 @@ class Epoch(metrics.Metric):
 
     def process_final(self, *args):
         state = args[0]
-        return Epoch._process(state)
+        return self._process(state)
 
     def process(self, *args):
         state = args[0]
-        return Epoch._process(state)
+        return self._process(state)
 
-    @staticmethod
-    def _process(state):
+    def _process(self, state):
         return state[torchbearer.EPOCH]
-
-
-@metrics.default_for_key('epoch')
-@metrics.to_dict
-class EpochFactory(metrics.MetricFactory):
-    def build(self):
-        return Epoch()

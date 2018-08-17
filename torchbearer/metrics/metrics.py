@@ -6,11 +6,20 @@ of :class:`Metric` or :class:`MetricFactory`. These can then be collected in a :
 running metrics and statistics, without needing to compute the underlying values more than once. Typically,
 constructions of this kind should be handled using the :mod:`decorator API <.metrics.decorators>`.
 """
+import inspect
 
-import abc
+__defaults__ = {}
 
-# The global dict of default metrics which maps keys to metrics in the :class:`MetricList`.
-DEFAULT_METRICS = {}
+
+def add_default(key, metric):
+    __defaults__[key] = metric
+
+
+def get_default(key):
+    metric = __defaults__[key]
+    if inspect.isclass(metric):
+        metric = metric()
+    return metric
 
 
 class Metric(object):
@@ -65,20 +74,6 @@ class Metric(object):
 
         """
         pass
-
-
-class MetricFactory(object):
-    """A simple implementation of a factory pattern. Used to enable construction of complex metrics using decorators.
-    """
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def build(self):
-        """Build and return a usable :class:`Metric` instance.
-
-        :return: The constructed :class:`Metric`
-        """
-        ...
 
 
 class MetricTree(Metric):
@@ -163,10 +158,7 @@ class MetricList(Metric):
         for metric in metric_list:
 
             if str(metric) == metric:
-                metric = DEFAULT_METRICS[metric]
-
-            if isinstance(metric, MetricFactory):
-                metric = metric.build()
+                metric = get_default(metric)
 
             if isinstance(metric, MetricList):
                 self.metric_list = self.metric_list + metric.metric_list
