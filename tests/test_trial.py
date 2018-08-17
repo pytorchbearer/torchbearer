@@ -1506,6 +1506,40 @@ class TestTrialValEvalPred(TestCase):
         self.assertTrue(eval_mock.call_count == 0)
 
 
+class TestReplay(TestCase):
+    @patch('torchbearer.trial.Tqdm')
+    def test_replay_tqdm(self, tq):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback])
+        tq.assert_called_once()
+
+    @patch('torchbearer.trial.Tqdm')
+    def test_replay_no_tqdm(self, tq):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback], verbose=0)
+        tq.assert_not_called()
+
+    def test_replay_no_tqdm(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback], verbose=0)
+        callback.on_start.assert_called_once()
+        self.assertTrue(callback.on_sample.call_count == 100)
+        self.assertTrue(callback.on_sample_validation.call_count == 50)
+
+
+
 class TestTrialMembers(TestCase):
     def test_init_none_criterion(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
