@@ -43,6 +43,36 @@ class CategoricalAccuracy(metrics.Metric):
         return (y_pred == y_true).float()
 
 
+@metrics.default_for_key('top_5_acc')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
+class TopKCategoricalAccuracy(metrics.Metric):
+    """Top K Categorical accuracy metric. Uses torch.topk to determine the top k predictions and compares to targets.
+    Decorated with a mean, running_mean and std. Default for key: 'top_5_acc'.
+
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
+    :type ignore_index: int
+    """
+
+    def __init__(self, k=5, ignore_index=-100):
+        super().__init__('top_' + str(k) + '_acc')
+        self.k = k
+        self.ignore_index = ignore_index
+
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+        mask = y_true.eq(self.ignore_index).eq(0)
+        y_pred = y_pred[mask]
+        y_true = y_true[mask]
+
+        sorted_indices = torch.topk(y_pred, self.k, dim=1)[1]
+        expanded_y = y_true.view(-1, 1).expand(-1, self.k)
+        return torch.sum(torch.eq(sorted_indices, expanded_y), dim=1).float()
+
+
 @metrics.default_for_key('loss')
 @metrics.running_mean
 @metrics.std

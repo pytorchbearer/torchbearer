@@ -1,12 +1,10 @@
 import unittest
-from unittest.mock import patch
 
+import torch
 from torch.autograd import Variable
 
 import torchbearer
-from torchbearer.metrics import Loss, Epoch, CategoricalAccuracy
-
-import torch
+from torchbearer.metrics import Loss, Epoch, CategoricalAccuracy, TopKCategoricalAccuracy
 
 
 class TestLoss(unittest.TestCase):
@@ -62,6 +60,49 @@ class TestCategoricalAccuracy(unittest.TestCase):
     def test_ignore_index(self):
         metric = CategoricalAccuracy(ignore_index=1).root  # Get root node of Tree for testing
         targets = [1, 1, 0]
+
+        metric.train()
+        result = metric.process(self._state)
+        for i in range(0, len(targets)):
+            self.assertEqual(result[i], targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(targets[i])
+                                 + ' in: ' + str(result))
+
+    def test_train_process(self):
+        self._metric.train()
+        result = self._metric.process(self._state)
+        for i in range(0, len(self._targets)):
+            self.assertEqual(result[i], self._targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
+                                 + ' in: ' + str(result))
+
+    def test_validate_process(self):
+        self._metric.eval()
+        result = self._metric.process(self._state)
+        for i in range(0, len(self._targets)):
+            self.assertEqual(result[i], self._targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
+                                 + ' in: ' + str(result))
+
+
+class TestTopKCategoricalAccuracy(unittest.TestCase):
+    def setUp(self):
+        self._state = {
+            torchbearer.Y_TRUE: Variable(torch.LongTensor([0, 5, 2, 3, 1])),
+            torchbearer.Y_PRED: Variable(torch.FloatTensor([
+                [0.9, 0.8, 0.7, 0.6, 0.5, 0.4],  # Correct
+                [0.4, 0.5, 0.6, 0.7, 0.8, 0.9],  # Correct
+                [0.6, 0.5, 0.4, 0.7, 0.8, 0.9],  # Incorrect
+                [0.6, 0.5, 0.7, 0.4, 0.8, 0.9],  # Incorrect
+                [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # Correct
+            ]))
+        }
+        self._targets = [1, 1, 0, 0, 1]
+        self._metric = TopKCategoricalAccuracy(k=5).root  # Get root node of Tree for testing
+
+    def test_ignore_index(self):
+        metric = TopKCategoricalAccuracy(ignore_index=1).root  # Get root node of Tree for testing
+        targets = [1, 1, 0, 0]
 
         metric.train()
         result = metric.process(self._state)
