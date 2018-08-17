@@ -14,7 +14,7 @@ class TestRocAucScore(unittest.TestCase):
     @patch('sklearn.metrics')
     def test_one_hot(self, mock_sklearn_metrics):
         mock_sklearn_metrics.roc_auc_score = Mock()
-        metric = RocAucScore(one_hot_classes=3, one_hot_offset=1).build()
+        metric = RocAucScore(one_hot_classes=3, one_hot_offset=1)
         metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
         res = metric.process({torchbearer.BATCH: 0, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32,
                         torchbearer.Y_TRUE: torch.LongTensor([1, 2, 3]),
@@ -32,7 +32,7 @@ class TestRocAucScore(unittest.TestCase):
     @patch('sklearn.metrics')
     def test_non_one_hot(self, mock_sklearn_metrics):
         mock_sklearn_metrics.roc_auc_score = Mock()
-        metric = RocAucScore(one_hot_labels=False).build()
+        metric = RocAucScore(one_hot_labels=False)
         metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
         res = metric.process({torchbearer.BATCH: 0, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32,
                         torchbearer.Y_TRUE: torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),

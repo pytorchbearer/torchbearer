@@ -1,13 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from torchbearer.metrics import MetricFactory, MetricList, Metric, MetricTree, AdvancedMetric
-
-
-class TestMetricFactory(unittest.TestCase):
-    def test_empty_build(self):
-        factory = MetricFactory()
-        self.assertTrue(factory.build() is None)
+from torchbearer.metrics import MetricList, Metric, MetricTree, AdvancedMetric
 
 
 class TestMetricTree(unittest.TestCase):
