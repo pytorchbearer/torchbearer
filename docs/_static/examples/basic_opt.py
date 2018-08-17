@@ -23,7 +23,6 @@ class Net(Module):
         return torch.sum(out**2)
 
     def forward(self, _, state):
-        state['est'] = self.pars
         return self.f()
 
 
@@ -37,7 +36,7 @@ class est(tb.metrics.Metric):
         super().__init__('est')
 
     def process(self, state):
-        return state['est'].data
+        return state[tb.MODEL].pars.data
 
 
 p = torch.tensor([2.0, 1.0, 10.0])
@@ -46,6 +45,6 @@ training_steps = 50000
 model = Net(p)
 optim = torch.optim.SGD(model.parameters(), lr=0.0001)
 
-tbmodel = tb.Model(model, optim, loss, [est(), 'loss']).to('cuda')
-tbmodel.fit_generator(None, pass_state=True, train_steps=training_steps)
+tbmodel = tb.Trial(model, optim, loss, [est(), 'loss'], pass_state=True).for_train_steps(training_steps).to('cuda')
+tbmodel.run()
 print(list(model.parameters())[0].data)

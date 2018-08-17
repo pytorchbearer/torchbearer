@@ -302,8 +302,34 @@ class Trial(object):
             torchbearer.DATA_TYPE: torch.float32,
             torchbearer.SELF: self,
             torchbearer.HISTORY: [],
-            torchbearer.BACKWARD_ARGS: {}
+            torchbearer.BACKWARD_ARGS: {},
+            torchbearer.TRAIN_GENERATOR: None,
+            torchbearer.VALIDATION_GENERATOR: None,
+            torchbearer.TEST_GENERATOR: None,
+            torchbearer.TRAIN_STEPS: None,
+            torchbearer.VALIDATION_STEPS: None,
+            torchbearer.TEST_STEPS: None
         })
+
+    @fluent
+    def for_train_steps(self, steps):
+        """Run this trial for the given number of training steps. Note that the generator will output (None, None) if it
+        has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
+        convenience.
+
+        :param steps: The number of training steps per epoch to run
+        :type steps: int
+        :return: self
+        :rtype: Trial
+        """
+        if not isinstance(steps, int):
+            warnings.warn("Number of training steps is not an int, casting to int")
+            steps = int(steps)
+        generator = self.state[torchbearer.TRAIN_GENERATOR]
+        if generator is not None and steps > len(generator):
+            warnings.warn("Number of training steps exceeds number of data items, limiting to number of items")
+            steps = len(generator)
+        self.state[torchbearer.TRAIN_STEPS] = steps
 
     @fluent
     def with_train_generator(self, generator, steps=None):
@@ -317,15 +343,8 @@ class Trial(object):
         :rtype: Trial
         """
         self.state[torchbearer.TRAIN_GENERATOR] = generator
-
         steps = len(generator) if steps is None else steps
-        if not isinstance(steps, int):
-            warnings.warn("Number of training steps is not an int, casting to int")
-            steps = int(steps)
-        if steps > len(generator):
-            warnings.warn("Number of training steps exceeds number of data items, limiting to number of items")
-            steps = len(generator)
-        self.state[torchbearer.TRAIN_STEPS] = steps
+        self.for_train_steps(steps)
 
     @fluent
     def with_train_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
@@ -351,6 +370,26 @@ class Trial(object):
         self.with_train_generator(dataloader, steps=steps)
 
     @fluent
+    def for_val_steps(self, steps):
+        """Run this trial for the given number of validation steps. Note that the generator will output (None, None) if
+        it has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
+        convenience.
+
+        :param steps: The number of validation steps per epoch to run
+        :type steps: int
+        :return: self
+        :rtype: Trial
+        """
+        if not isinstance(steps, int):
+            warnings.warn("Number of validation steps is not an int, casting to int")
+            steps = int(steps)
+        generator = self.state[torchbearer.VALIDATION_GENERATOR]
+        if generator is not None and steps > len(generator):
+            warnings.warn("Number of validation steps exceeds number of data items, limiting to number of items")
+            steps = len(generator)
+        self.state[torchbearer.VALIDATION_STEPS] = steps
+
+    @fluent
     def with_val_generator(self, generator, steps=None):
         """Use this trial with the given validation generator. Returns self so that methods can be chained for
         convenience.
@@ -363,15 +402,8 @@ class Trial(object):
         :rtype: Trial
         """
         self.state[torchbearer.VALIDATION_GENERATOR] = generator
-
         steps = len(generator) if steps is None else steps
-        if not isinstance(steps, int):
-            warnings.warn("Number of validation steps is not an int, casting to int")
-            steps = int(steps)
-        if steps > len(generator):
-            warnings.warn("Number of validation steps exceeds number of data items, limiting to number of items")
-            steps = len(generator)
-        self.state[torchbearer.VALIDATION_STEPS] = steps
+        self.for_val_steps(steps)
 
     @fluent
     def with_val_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
@@ -397,6 +429,26 @@ class Trial(object):
         self.with_val_generator(dataloader, steps=steps)
 
     @fluent
+    def for_test_steps(self, steps):
+        """Run this trial for the given number of test steps. Note that the generator will output (None, None) if
+        it has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
+        convenience.
+
+        :param steps: The number of test steps per epoch to run (when using :meth:`.predict`)
+        :type steps: int
+        :return: self
+        :rtype: Trial
+        """
+        if not isinstance(steps, int):
+            warnings.warn("Number of test steps is not an int, casting to int")
+            steps = int(steps)
+        generator = self.state[torchbearer.TEST_GENERATOR]
+        if generator is not None and steps > len(generator):
+            warnings.warn("Number of test steps exceeds number of data items, limiting to number of items")
+            steps = len(generator)
+        self.state[torchbearer.TEST_STEPS] = steps
+
+    @fluent
     def with_test_generator(self, generator, steps=None):
         """Use this trial with the given test generator. Returns self so that methods can be chained for convenience.
 
@@ -408,15 +460,8 @@ class Trial(object):
         :rtype: Trial
         """
         self.state[torchbearer.TEST_GENERATOR] = generator
-
         steps = len(generator) if steps is None else steps
-        if not isinstance(steps, int):
-            warnings.warn("Number of test steps is not an int, casting to int")
-            steps = int(steps)
-        if steps > len(generator):
-            warnings.warn("Number of test steps exceeds number of data items, limiting to number of items")
-            steps = len(generator)
-        self.state[torchbearer.TEST_STEPS] = steps
+        self.for_test_steps(steps)
 
     @fluent
     def with_test_data(self, x, batch_size=1, num_workers=1, steps=None):
@@ -436,6 +481,27 @@ class Trial(object):
         dataset = TensorDataset(x)
         dataloader = DataLoader(dataset, batch_size, num_workers=num_workers)
         self.with_test_generator(dataloader, steps=steps)
+
+    @fluent
+    def for_steps(self, train_steps=None, val_steps=None, test_steps=None):
+        """Use this trial for the given number of train, val and test steps. Returns self so that methods can be chained
+        for convenience.
+
+        :param train_steps: The number of training steps per epoch to run
+        :type train_steps: int, optional
+        :param val_steps: The number of validation steps per epoch to run
+        :type val_steps: int, optional
+        :param test_steps: The number of test steps per epoch to run (when using :meth:`.predict`)
+        :type test_steps: int, optional
+        :return: self
+        :rtype: Trial
+        """
+        if train_steps is not None:
+            self.for_train_steps(train_steps)
+        if val_steps is not None:
+            self.for_val_steps(val_steps)
+        if test_steps is not None:
+            self.for_test_steps(test_steps)
 
     @fluent
     def with_generators(self, train_generator=None, train_steps=None, val_generator=None, val_steps=None, test_generator=None, test_steps=None):
