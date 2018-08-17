@@ -768,7 +768,7 @@ class Trial(object):
         state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
         state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" not in key}
         callback_list.on_start_training(state)
-        for state[torchbearer.BATCH] in range(state[torchbearer.TRAIN_STEPS]):
+        for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
             callback_list.on_sample(state)
             callback_list.on_forward(state)
             callback_list.on_criterion(state)
@@ -779,20 +779,23 @@ class Trial(object):
         callback_list.on_end_training(state)
 
         # Validation pass
-        state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
-        state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" in key}
-        callback_list.on_start_validation(state)
-        for state[torchbearer.BATCH] in range(state[torchbearer.VALIDATION_STEPS]):
-            callback_list.on_sample_validation(state)
-            callback_list.on_forward_validation(state)
-            callback_list.on_criterion_validation(state)
-            callback_list.on_step_validation(state)
-            if state[torchbearer.STOP_TRAINING]:
-                break
-        callback_list.on_end_validation(state)
+        if not state[torchbearer.STOP_TRAINING]:
+            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
+            state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" in key}
+            callback_list.on_start_validation(state)
+            for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
+                callback_list.on_sample_validation(state)
+                callback_list.on_forward_validation(state)
+                callback_list.on_criterion_validation(state)
+                callback_list.on_step_validation(state)
+                if state[torchbearer.STOP_TRAINING]:
+                    break
+            callback_list.on_end_validation(state)
 
         state[torchbearer.METRICS] = all_metrics
         callback_list.on_end_epoch(state)
+
+
 
     @fluent
     def train(self):
