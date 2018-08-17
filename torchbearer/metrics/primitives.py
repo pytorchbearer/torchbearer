@@ -23,7 +23,7 @@ class CategoricalAccuracy(metrics.Metric):
     """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets. Decorated with a
     mean, running_mean and std. Default for keys: 'acc' and 'accuracy'
 
-    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     :type ignore_index: int
     """
 
