@@ -7,8 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added the ability to pass custom arguments to the tqdm callback
 - Added an ignore_index flag to the categorical accuracy metric, similar to nn.CrossEntropyLoss. Usage: ``metrics=[CategoricalAccuracyFactory(ignore_index=0)]``
-- Added TopKCategoricalAccuracy metric
-- Added BinaryAccuracy metric 
+- Added TopKCategoricalAccuracy metric (default for key: top\_5\_acc)
+- Added BinaryAccuracy metric (default for key: binary\_acc)
+- Added MeanSquaredError metric (default for key: mse)
 ### Changed
 ### Deprecated
 ### Removed

@@ -16,11 +16,10 @@ import torch
 
 @metrics.default_for_key('binary_acc')
 @metrics.running_mean
-@metrics.std
 @metrics.mean
 class BinaryAccuracy(metrics.Metric):
-    """Binary accuracy metric. Uses torch.eq to compare predictions to targets. Decorated with a mean, running_mean and
-    std. Default for key: 'binary_acc'.
+    """Binary accuracy metric. Uses torch.eq to compare predictions to targets. Decorated with a mean and running_mean.
+    Default for key: 'binary_acc'.
     """
 
     def __init__(self):
@@ -91,6 +90,24 @@ class TopKCategoricalAccuracy(metrics.Metric):
         sorted_indices = torch.topk(y_pred, self.k, dim=1)[1]
         expanded_y = y_true.view(-1, 1).expand(-1, self.k)
         return torch.sum(torch.eq(sorted_indices, expanded_y), dim=1).float()
+
+
+@metrics.default_for_key('mse')
+@metrics.running_mean
+@metrics.mean
+class MeanSquaredError(metrics.Metric):
+    """Mean squared error metric. Computes the pixelwise squared error which is then averaged with decorators.
+    Decorated with a mean and running_mean. Default for key: 'mse'.
+    """
+
+    def __init__(self):
+        super().__init__('mse')
+
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+        return torch.pow(y_pred - y_true.view_as(y_pred), 2)
 
 
 @metrics.default_for_key('loss')
