@@ -299,7 +299,10 @@ class Trial(object):
             torchbearer.BACKWARD_ARGS: {},
             torchbearer.TRAIN_GENERATOR: None,
             torchbearer.VALIDATION_GENERATOR: None,
-            torchbearer.TEST_GENERATOR: None
+            torchbearer.TEST_GENERATOR: None,
+            torchbearer.TRAIN_STEPS: None,
+            torchbearer.VALIDATION_STEPS: None,
+            torchbearer.TEST_STEPS: None
         })
 
     @fluent
