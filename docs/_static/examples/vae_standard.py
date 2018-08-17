@@ -5,6 +5,7 @@ import torch.optim as optim
 import torchvision
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
+from torchbearer.cv_utils import DatasetValidationSplitter
 
 
 class AutoEncoderMNIST(Dataset):
@@ -22,23 +23,24 @@ class AutoEncoderMNIST(Dataset):
 
 BATCH_SIZE = 128
 
-normalize = transforms.Compose([transforms.ToTensor()])
+transform = transforms.Compose([transforms.ToTensor()])
 
-# Define standard classification mnist dataset
+# Define standard classification mnist dataset with random validation set
 
-basetrainset = torchvision.datasets.MNIST('./data/mnist', train=True, download=True, transform=normalize)
-
-basetestset = torchvision.datasets.MNIST('./data/mnist', train=False, download=True, transform=normalize)
+dataset = torchvision.datasets.MNIST('./data/mnist', train=True, download=True, transform=transform)
+splitter = DatasetValidationSplitter(len(dataset), 0.1)
+basetrainset = splitter.get_train_dataset(dataset)
+basevalset = splitter.get_val_dataset(dataset)
 
 # Wrap base classification mnist dataset to return the image as the target
 
 trainset = AutoEncoderMNIST(basetrainset)
 
-testset = AutoEncoderMNIST(basetestset)
+valset = AutoEncoderMNIST(basevalset)
 
 traingen = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
 
-testgen = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
+valgen = torch.utils.data.DataLoader(valset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
 
 
 class VAE(nn.Module):
@@ -65,7 +67,7 @@ class VAE(nn.Module):
 
     def decode(self, z):
         h3 = F.relu(self.fc3(z))
-        return F.sigmoid(self.fc4(h3))
+        return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
         mu, logvar = self.encode(x.view(-1, 784))
@@ -74,7 +76,7 @@ class VAE(nn.Module):
 
 
 def bce_loss(recon_x, x):
-    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), size_average=False)
+    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='sum')
     return BCE
 
 
@@ -100,7 +102,8 @@ model = VAE()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = loss_function
 
-from torchbearer import Model
+from torchbearer import Trial
 
-torchbearer_model = Model(model, optimizer, loss, metrics=['loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen, pass_state=False)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['loss'], pass_state=False).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=10)
