@@ -14,7 +14,7 @@ We store the current estimates for the minimum as parameters in the model (so Py
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 7-27
+   :lines: 7-26
 
 The Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -24,7 +24,7 @@ Note that as we are using a base loss, torchbearer passes this the network outpu
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 30-31
+   :lines: 29-30
 
 
 Optimising
@@ -37,23 +37,23 @@ We have set the number of optimisation steps for this example as 50000.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 43-44
+   :lines: 42-43
 
 The learning rate chosen for this example is very low and we could get convergence much faster with a larger rate, however this allows us to view convergence in real time.
 We define the model and optimiser in the standard way.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 46-47
+   :lines: 45-46
 
 Finally we start the optimising on the GPU and print the final minimum estimate.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 49-51
+   :lines: 48-50
 
 Usually torchbearer will infer the number of training steps from the data generator.
-Since for this example we have no data to give the model (which will be passed `None`), we need to tell torchbearer how many steps to run by setting the ``training_steps`` argument.
+Since for this example we have no data to give the model (which will be passed `None`), we need to tell torchbearer how many steps to run using the ``for_train_steps`` method.
 
 
 Viewing Progress
@@ -64,9 +64,9 @@ This simple metric is used to display the estimate throughout the optimisation p
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 34-40
+   :lines: 33-39
 
-The final estimate is very close to our desired minimum at [5, 0, 1]:
+The final estimate is very close to the true minimum at [5, 0, 1]:
 
 tensor([ 4.9988e+00,  4.5355e-05,  1.0004e+00])
 
