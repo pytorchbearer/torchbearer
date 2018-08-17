@@ -3,7 +3,10 @@ Base metrics are the base classes which represent the metrics supplied with torc
 :func:`.default_for_key` decorator so that they can be accessed in the call to :class:`.torchbearer.Model` via the
 following strings:
 
+- '`binary_acc`': The :class:`.BinaryAccuracy` metric
 - '`acc`' or '`accuracy`': The :class:`.CategoricalAccuracy` metric
+- '`top_5_acc`': The :class:`.TopKCategoricalAccuracy` metric
+- '`mse`': The :class:`.MeanSquaredError` metric
 - '`loss`': The :class:`.Loss` metric
 - '`epoch`': The :class:`.Epoch` metric
 - '`roc_auc`' or '`roc_auc_score`': The :class:`.RocAucScore` metric
