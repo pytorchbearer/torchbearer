@@ -22,7 +22,7 @@ Typically we would need a training loop and a series of calls to backward, step 
 Instead, with torchbearer, we can define our optimiser and some metrics (just 'acc' and 'loss' for now) and let it do the work.
 
 .. literalinclude:: /_static/examples/quickstart.py
-   :lines: 54-62
+   :lines: 54-63
 
 Running the above produces the following output:
 
