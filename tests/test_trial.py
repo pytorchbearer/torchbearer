@@ -645,7 +645,7 @@ class TestRun(TestCase):
         torchbearertrial._validation_pass = Mock(return_value={'val_test': 2})
         torchbearertrial.with_train_generator(generator, steps=train_steps)
         history = torchbearertrial.run(epochs=epochs, verbose=0)
-        self.assertDictEqual(history[0], {'fit_test': 1, 'val_test': 2})
+        self.assertDictEqual(history[0][1], {'fit_test': 1, 'val_test': 2})
 
 
 class TestFitPass(TestCase):
@@ -1558,6 +1558,65 @@ class TestTrialValEvalPred(TestCase):
         self.assertTrue(eval_mock.call_count == 0)
 
 
+class TestReplay(TestCase):
+    @patch('torchbearer.trial.Tqdm')
+    def test_replay_tqdm(self, tq):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback])
+        tq.assert_called_once()
+
+    @patch('torchbearer.trial.Tqdm')
+    def test_replay_no_tqdm(self, tq):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback], verbose=0)
+        tq.assert_not_called()
+
+    def test_replay_callback_calls(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback], verbose=0)
+        callback.on_start.assert_called_once()
+        self.assertTrue(callback.on_sample.call_count == 100)
+        self.assertTrue(callback.on_sample_validation.call_count == 50)
+
+    def test_replay_metrics(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback], verbose=0)
+
+        self.assertTrue(callback.on_sample.call_args_list[0][0][0][tb.METRICS]['test'] == 9)
+        self.assertTrue(callback.on_sample_validation.call_args_list[0][0][0][tb.METRICS]['val_test2'] == 10)
+
+    def test_replay_stop_training(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+
+        @tb.callbacks.on_sample
+        def stop_training(state):
+            state[tb.STOP_TRAINING] = True
+
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback, stop_training], verbose=0)
+
+        self.assertTrue(callback.on_sample.call_count == 10)
+        callback.on_sample_validation.assert_not_called()
+
 class TestTrialMembers(TestCase):
     def test_init_none_criterion(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
@@ -1801,8 +1860,40 @@ class TestTrialMembers(TestCase):
 
 class TestTrialFunctions(TestCase):
     @patch('torchbearer.trial.Tqdm')
+    def test_get_printer_no_tqdm(self, tq):
+        verbose = 0
+        validation_label_letter = 'v'
+
+        printer = tb.trial.get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
+        tq.assert_not_called()
+
+    @patch('torchbearer.trial.Tqdm')
+    def test_get_printer_verbose_1(self, tq):
+        verbose = 1
+        validation_label_letter = 'v'
+
+        printer = tb.trial.get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
+        tq.assert_called_once_with(on_epoch=True, validation_label_letter=validation_label_letter)
+
+    @patch('torchbearer.trial.Tqdm')
+    def test_get_printer_verbose_2(self, tq):
+        verbose = 2
+        validation_label_letter = 'v'
+
+        printer = tb.trial.get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
+        tq.assert_called_once_with(validation_label_letter=validation_label_letter)
+
+    @patch('torchbearer.trial.Tqdm')
+    def test_get_printer_letter(self, tq):
+        verbose = 2
+        validation_label_letter = 'r'
+
+        printer = tb.trial.get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
+        tq.assert_called_once_with(validation_label_letter=validation_label_letter)
+
+    @patch('torchbearer.trial.get_printer')
     @patch('torchbearer.trial.CallbackListInjection')
-    def test_inject_printer_no_tqdm(self, c_inj, tq):
+    def test_inject_printer_no_tqdm(self, c_inj, get_print_mock):
         callback_list = tb.callbacks.CallbackList([])
 
         class SomeClass:
@@ -1814,11 +1905,11 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func(verbose=0)
         c_inj.assert_called_once()
-        self.assertTrue(tq.call_count==0)
+        get_print_mock.assert_called_once_with(validation_label_letter='v', verbose=0)
 
-    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.get_printer')
     @patch('torchbearer.trial.CallbackListInjection')
-    def test_inject_printer_tqdm_on_epoch(self, c_inj, tq):
+    def test_inject_printer_tqdm_on_epoch(self, c_inj, get_print_mock):
         callback_list = tb.callbacks.CallbackList([])
 
         class SomeClass:
@@ -1830,13 +1921,11 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func(verbose=1)
         c_inj.assert_called_once()
-        self.assertTrue(tq.call_count==1)
-        self.assertTrue(tq.call_args[1]['validation_label_letter'] == 't')
-        self.assertTrue(tq.call_args[1]['on_epoch'] == True)
+        get_print_mock.assert_called_once_with(validation_label_letter='t', verbose=1)
 
-    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.get_printer')
     @patch('torchbearer.trial.CallbackListInjection')
-    def test_inject_printer_tqdm_on_batch(self, c_inj, tq):
+    def test_inject_printer_tqdm_on_batch(self, c_inj, get_print_mock):
         callback_list = tb.callbacks.CallbackList([])
 
         class SomeClass:
@@ -1848,13 +1937,11 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func(verbose=2)
         c_inj.assert_called_once()
-        self.assertTrue(tq.call_count==1)
-        self.assertTrue(tq.call_args[1]['validation_label_letter'] == 't')
-        self.assertTrue(len(tq.call_args[1]) == 1)
+        get_print_mock.assert_called_once_with(validation_label_letter='t', verbose=2)
 
-    @patch('torchbearer.trial.Tqdm')
+    @patch('torchbearer.trial.get_printer')
     @patch('torchbearer.trial.CallbackListInjection')
-    def test_inject_printer_tqdm_default(self, c_inj, tq):
+    def test_inject_printer_tqdm_default(self, c_inj, get_print_mock):
         callback_list = tb.callbacks.CallbackList([])
 
         class SomeClass:
@@ -1866,9 +1953,7 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func()
         c_inj.assert_called_once()
-        self.assertTrue(tq.call_count==1)
-        self.assertTrue(tq.call_args[1]['validation_label_letter'] == 't')
-        self.assertTrue(len(tq.call_args[1]) == 1)
+        get_print_mock.assert_called_once_with(validation_label_letter='t', verbose=2)
 
     @patch('torchbearer.trial.Tqdm')
     @patch('torchbearer.trial.CallbackListInjection')
@@ -1911,7 +1996,7 @@ class TestTrialFunctions(TestCase):
         t.test_func()
         self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_none)
 
-    def test_inject_sampler_none(self):
+    def test_inject_sampler_predict(self):
         generator = MagicMock()
 
         class SomeClass:

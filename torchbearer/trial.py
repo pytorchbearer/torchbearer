@@ -82,12 +82,7 @@ def inject_printer(validation_label_letter='v'):
             import inspect
             verbose = kwargs['verbose'] if 'verbose' in kwargs else inspect.signature(func).parameters['verbose'].default  # Populate default value
 
-            if verbose >= 2:
-                printer = Tqdm(validation_label_letter=validation_label_letter)
-            elif verbose >= 1:
-                printer = Tqdm(validation_label_letter=validation_label_letter, on_epoch=True)
-            else:
-                printer = Callback()
+            printer = get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
 
             callback_list_old = self.state[torchbearer.CALLBACK_LIST]
 
@@ -99,6 +94,17 @@ def inject_printer(validation_label_letter='v'):
             return res
         return wrapper
     return decorator
+
+
+def get_printer(verbose, validation_label_letter):
+    if verbose >= 2:
+        printer = Tqdm(validation_label_letter=validation_label_letter)
+    elif verbose >= 1:
+        printer = Tqdm(validation_label_letter=validation_label_letter, on_epoch=True)
+    else:
+        printer = Callback()
+
+    return printer
 
 
 def deep_to(batch, device, dtype):
@@ -555,7 +561,8 @@ class Trial(object):
             final_metrics.update(self._validation_pass(state))
             state[torchbearer.METRICS] = final_metrics
             state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
-            self.state[torchbearer.HISTORY].append(state[torchbearer.METRICS])
+            steps_summary = (state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS])
+            self.state[torchbearer.HISTORY].append((steps_summary, state[torchbearer.METRICS]))
 
             if state[torchbearer.STOP_TRAINING]:
                 break
@@ -722,6 +729,73 @@ class Trial(object):
 
             return self._test_pass(state)[torchbearer.FINAL_PREDICTIONS]
         return []
+
+    @fluent
+    def replay(self, callbacks=[], verbose=2):  # TODO: Should we track if testing passes have happened?
+        """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
+
+        :param callbacks: List of callbacks to be run during the replay
+        :type callbacks: list
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
+        :type verbose: int
+        :return: self
+        :rtype: Trial
+        """
+        history = self.state[torchbearer.HISTORY]
+        callbacks.append(get_printer(verbose=verbose, validation_label_letter='v'))
+        callbacks = CallbackList(callbacks)
+
+        state = State()
+        state.update(self.state)
+        state[torchbearer.STOP_TRAINING] = False
+        state[torchbearer.MAX_EPOCHS] = len(history)
+
+        callbacks.on_start(state)
+        for i in range(len(history)):
+            state[torchbearer.EPOCH] = i
+            state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = history[i][0]
+            state[torchbearer.METRICS] = history[i][1]
+
+            self._replay_pass(state, callbacks)
+        callbacks.on_end(state)
+
+    @fluent
+    def _replay_pass(self, state, callback_list):
+        callback_list.on_start_epoch(state)
+        all_metrics = state[torchbearer.METRICS]
+
+        # Training pass
+        state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
+        state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" not in key}
+        callback_list.on_start_training(state)
+        for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
+            callback_list.on_sample(state)
+            callback_list.on_forward(state)
+            callback_list.on_criterion(state)
+            callback_list.on_backward(state)
+            callback_list.on_step_training(state)
+            if state[torchbearer.STOP_TRAINING]:
+                break
+        callback_list.on_end_training(state)
+
+        # Validation pass
+        if not state[torchbearer.STOP_TRAINING]:
+            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
+            state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" in key}
+            callback_list.on_start_validation(state)
+            for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
+                callback_list.on_sample_validation(state)
+                callback_list.on_forward_validation(state)
+                callback_list.on_criterion_validation(state)
+                callback_list.on_step_validation(state)
+                if state[torchbearer.STOP_TRAINING]:
+                    break
+            callback_list.on_end_validation(state)
+
+        state[torchbearer.METRICS] = all_metrics
+        callback_list.on_end_epoch(state)
+
+
 
     @fluent
     def train(self):
