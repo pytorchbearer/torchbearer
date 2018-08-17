@@ -14,6 +14,26 @@ from torchbearer import metrics
 import torch
 
 
+@metrics.default_for_key('binary_acc')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
+class BinaryAccuracy(metrics.Metric):
+    """Binary accuracy metric. Uses torch.eq to compare predictions to targets. Decorated with a mean, running_mean and
+    std. Default for key: 'binary_acc'.
+    """
+
+    def __init__(self):
+        super().__init__('binary_acc')
+
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+
+        return torch.eq(torch.round(y_pred).type(y_true.type()), y_true).view(-1).float()
+
+
 @metrics.default_for_key('acc')
 @metrics.default_for_key('accuracy')
 @metrics.running_mean
