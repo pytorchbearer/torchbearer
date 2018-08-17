@@ -10,6 +10,33 @@ from torchbearer.metrics import Metric
 from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype
 
 
+class TestMockOptimizer(TestCase):
+    @patch('torchbearer.trial.Optimizer')
+    def test_mock_optimizer(self, mock_opt):
+        mock_opt.add_param_group = Mock()
+        mock_opt.load_state_dict = Mock()
+        mock_opt.state_dict = Mock()
+        mock_opt.step = Mock()
+        mock_opt.zero_grad = Mock()
+
+        opt = tb.trial.MockOptimizer()
+
+        self.assertIsNone(opt.add_param_group({}))
+        mock_opt.add_param_group.assert_not_called()
+
+        self.assertIsNone(opt.load_state_dict({}))
+        mock_opt.load_state_dict.assert_not_called()
+
+        self.assertDictEqual(opt.state_dict(), {})
+        mock_opt.state_dict.assert_not_called()
+
+        self.assertIsNone(opt.step())
+        mock_opt.step.assert_not_called()
+
+        self.assertIsNone(opt.zero_grad())
+        mock_opt.zero_grad.assert_not_called()
+
+
 class TestWithGenerators(TestCase):
     def test_with_train_generator_state_filled(self):
         torchmodel = MagicMock()
@@ -250,6 +277,31 @@ class TestWithGenerators(TestCase):
         torchbearertrial.with_test_generator(generator, None)
 
         self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 2)
+
+    @patch('warnings.warn')
+    def test_for_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+
+        train_steps = 1
+
+        val_steps = 2
+
+        test_steps = 3
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        trainstep = torchbearertrial.for_train_steps = MagicMock()
+        valstep = torchbearertrial.for_val_steps = MagicMock()
+        teststep = torchbearertrial.for_test_steps = MagicMock()
+
+        torchbearertrial.for_steps(train_steps, val_steps, test_steps)
+        trainstep.assert_called_once_with(train_steps)
+        valstep.assert_called_once_with(val_steps)
+        teststep.assert_called_once_with(test_steps)
 
     @patch('warnings.warn')
     def test_with_generators(self, _):
