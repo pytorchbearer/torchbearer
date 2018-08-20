@@ -245,27 +245,6 @@ def add_to_loss(func):
     return add_to_loss_callback
 
 
-def from_state(key_list):
-    """ The :func:`from_state` decorator is used to signal that a callback is to seed selected init member variables from state. \
-    State keys to populate member variable values from are given on init.
-
-    :param key_list: List of member variable names to populate from state
-    :type key_list: list(str)
-    :return: Un-initialised callback with a seed method that populated member variables from state
-    """
-    def from_state_class(klass):
-        klass_seed = klass.seed
-
-        def new_klass_seed(self, state):
-            seed_keys = [key for key in key_list if key in self.__dict__ and isinstance(self.__dict__[key], StateKey)]
-            for k in seed_keys:
-                self.__dict__[k] = state[self.__dict__[k]]
-            klass_seed(klass, state)
-        klass.seed = new_klass_seed
-        return klass
-    return from_state_class
-
-
 def once(fcn):
     """
     Decorator to fire a callback once in the entire fitting procedure.
