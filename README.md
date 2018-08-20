@@ -16,18 +16,19 @@ torchbearer: A model training library for researchers using PyTorch
 
 ## About
 
-Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you. Our design decisions are geared towards flexibility and customisability whilst trying to maintain the simplest possible API. 
+Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you.
 
 <a name="features"/>
 
 ## Key Features
 
-- Keras-like training API using calls to [fit(...)](http://torchbearer.readthedocs.io/en/latest/code/main.html#torchbearer.torchbearer.Model.fit) / [fit_generator(...)](http://torchbearer.readthedocs.io/en/latest/code/main.html#torchbearer.torchbearer.Model.fit_generator)
+- Model fitting API using calls to [run(...)](http://torchbearer.readthedocs.io/en/latest/code/main.html#torchbearer.torchbearer.Trial.run) on Trial instances which are saveable, resumable [**NEW!**] and replayable [**NEW!**]
 - Sophisticated [metric API](http://torchbearer.readthedocs.io/en/latest/code/metrics.html) which supports calculation data (e.g. accuracy) flowing to multiple aggregators which can calculate running values (e.g. mean) and values for the epoch (e.g. std, mean, area under curve)
+- Default accuracy metric which infers the accuracy to use from the criterion [**NEW!**]
 - Simple [callback API](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html) with a persistent model state that supports adding to the loss or accessing the metric values
-- A host of callbacks included from the start that enable: [tensorboard logging](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.tensor_board) (for metrics, images and data), [model checkpointing](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.checkpointers), [weight decay](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.weight_decay), [learning rate schedulers](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.torch_scheduler), [gradient clipping](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.gradient_clipping) and more
-- Decorator APIs for [metrics](http://torchbearer.readthedocs.io/en/latest/code/metrics.html#module-torchbearer.metrics.decorators) and [callbacks](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.decorators) that allow for simple construction of callbacks and metrics
-- An [example library](http://torchbearer.readthedocs.io/en/latest/examples/quickstart.html) (still under construction) with a set of demos showing how complex deep learning models (such as [GANs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) and [VAEs](http://torchbearer.readthedocs.io/en/latest/examples/vae.html)) and differentiable programs (like [SVMs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html)) can be implemented easily with torchbearer
+- A host of callbacks included from the start that enable: [tensorboard and visdom \[**NEW!**\] logging](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.tensor_board) (for metrics, images and data), [model checkpointing](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.checkpointers), [weight decay](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.weight_decay), [learning rate schedulers](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.torch_scheduler), [gradient clipping](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.gradient_clipping) and more
+- Decorator APIs for [metrics](http://torchbearer.readthedocs.io/en/latest/code/metrics.html#module-torchbearer.metrics.decorators) and [callbacks](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.decorators) that allow for simple construction
+- An [example library](http://torchbearer.readthedocs.io/en/latest/examples/quickstart.html) with a set of demos showing how complex deep learning models (such as [GANs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) and [VAEs](http://torchbearer.readthedocs.io/en/latest/examples/vae.html)) and differentiable programs (like [SVMs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html)) can be implemented easily with torchbearer
 - Fully tested; as researchers we want to trust that our metrics and callbacks work properly, we have therefore tested everything thouroughly for peace of mind
 
 <a name="installation"/>
@@ -37,6 +38,10 @@ Torchbearer is a PyTorch model fitting library designed for use by researchers (
 The easiest way to install torchbearer is with pip:
 
 `pip install torchbearer`
+
+Alternatively, build from source with:
+
+`pip install git+https://github.com/ecs-vlc/torchbearer`
 
 <a name="examples"/>
 
@@ -103,18 +108,19 @@ class SimpleModel(nn.Module):
 model = SimpleModel()
 ```
 
-- Now that we have a model we can train it simply by wrapping it in a torchbearer Model instance:
+- Now that we have a model we can train it simply by wrapping it in a torchbearer Trial instance:
 
 ```python
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = nn.CrossEntropyLoss()
 
-from torchbearer import Model
+from torchbearer import Trial
 
-torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=valgen)
+trial = Trial(model, optimizer, criterion=loss, metrics=['acc', 'loss']).to('cuda')
+trial = trial.with_generators(train_generator=traingen, val_generator=valgen)
+trial.run(epochs=10)
 
-torchbearer_model.evaluate_generator(testgen)
+trial.with_val_generator(testgen).evaluate()
 ```
 - Running that code gives output using Tqdm and providing running accuracies and losses during the training phase:
 
@@ -133,13 +139,13 @@ torchbearer_model.evaluate_generator(testgen)
 
 ## Documentation
 
-Our documentation containing the API reference, examples and some notes can be found at [torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
+Our documentation containing the API reference, examples and notes can be found at [torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
 
 <a name="others"/>
 
 ## Other Libraries
 
-Torchbearer isn't the only library for training PyTorch models. Here are a few others that might better suit your needs (this is by no means a complete list, see the [awesome pytorch list](https://github.com/bharathgs/Awesome-pytorch-list) for more):
+Torchbearer isn't the only library for training PyTorch models. Here are a few others that might better suit your needs (this is by no means a complete list, see the [awesome pytorch list](https://github.com/bharathgs/Awesome-pytorch-list) or [the incredible pytorch](https://github.com/ritchieng/the-incredible-pytorch) for more):
 - [skorch](https://github.com/dnouri/skorch), model wrapper that enables use with scikit-learn - crossval etc. can be very useful
 - [PyToune](https://github.com/GRAAL-Research/pytoune), simple Keras style API
 - [ignite](https://github.com/pytorch/ignite), advanced model training from the makers of PyTorch, can need a lot of code for advanced functions (e.g. Tensorboard)
