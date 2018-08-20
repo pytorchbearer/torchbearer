@@ -3,19 +3,29 @@ import unittest
 import torchbearer
 from torchbearer.state import State
 
+
 class TestStateKey(unittest.TestCase):
     def test_key_added(self):
         key = torchbearer.state_key('key')
 
         self.assertTrue('key' in torchbearer.state.__keys__)
 
-    def test_duplicate(self):
+    def test_collision(self):
         _ = torchbearer.state_key('test')
         key_1 = torchbearer.state_key('test')
         key_2 = torchbearer.state_key('test')
 
-        self.assertTrue('test' != key_1)
-        self.assertTrue('test' != key_2)
+        self.assertTrue('test' != str(key_1))
+        self.assertTrue('test' != str(key_2))
+
+    def test_duplicate_string(self):
+        _ = torchbearer.state_key('test')
+        key_1 = torchbearer.state_key('test')
+        key_2 = torchbearer.state_key('test')
+
+        self.assertTrue('test_1' == str(key_1))
+        self.assertTrue('test_2' == str(key_2))
+
 
 class TestState(unittest.TestCase):
     def test_contains(self):
