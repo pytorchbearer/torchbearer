@@ -54,9 +54,11 @@ model = SimpleModel()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = nn.CrossEntropyLoss()
 
-from torchbearer import Model
+from torchbearer import Trial
 
-torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=valgen)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=10)
 
-torchbearer_model.evaluate_generator(testgen)
+torchbearer_trial.with_val_generator(testgen)
+torchbearer_trial.evaluate()

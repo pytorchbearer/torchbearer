@@ -60,12 +60,12 @@ our model:
 
 .. literalinclude:: /_static/examples/svm_linear.py
    :language: python
-   :lines: 90-97
+   :lines: 91-98
 
 Visualizing the Training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You might have noticed some strange things in that call to :meth:`.Model.fit`. Specifically, we use the
+You might have noticed some strange things in the :meth:`.Trial` callbacks list. Specifically, we use the
 :class:`.ExponentialLR` callback to anneal the convergence a little and we have a couple of other callbacks:
 :code:`scatter` and :code:`draw_margin`. These callbacks produce the following live visualisation (note, doesn't work in
 PyCharm, best run from terminal):
@@ -86,13 +86,13 @@ plot of our data:
 
 .. literalinclude:: /_static/examples/svm_linear.py
    :language: python
-   :lines: 59-63
+   :lines: 60-64
 
 Now things get a little strange. We start by evaluating our model over the mesh grid from earlier:
 
 .. literalinclude:: /_static/examples/svm_linear.py
    :language: python
-   :lines: 66-70
+   :lines: 67-71
 
 For our outputs :math:`z \in \textbf{Z}`, we can make some observations about the decision boundary. First, that we are
 outside the margin if :math:`z \lt -1` or :math:`z \gt 1`. Conversely, we are inside the margine where :math:`z \gt -1`
@@ -100,7 +100,7 @@ or :math:`z \lt 1`. This gives us some rules for colouring, which we use here:
 
 .. literalinclude:: /_static/examples/svm_linear.py
    :language: python
-   :lines: 72-76
+   :lines: 73-77
 
 So far it's been relatively straight forward. The next bit is a bit of a hack to get the update of the contour plot
 working. If a reference to the plot is already in state we just remove the old one and add a new one, otherwise we add
@@ -110,7 +110,7 @@ however, it grabs the mouse focus each time it is called which can be annoying. 
 
 .. literalinclude:: /_static/examples/svm_linear.py
    :language: python
-   :lines: 78-87
+   :lines: 79-88
 
 Final Comments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

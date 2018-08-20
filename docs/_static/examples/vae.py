@@ -8,7 +8,7 @@ from torchvision import transforms
 from torchvision.utils import save_image
 
 import torchbearer
-from torchbearer.callbacks import Callback
+from torchbearer.cv_utils import DatasetValidationSplitter
 
 
 class AutoEncoderMNIST(Dataset):
@@ -28,21 +28,25 @@ BATCH_SIZE = 128
 
 transform = transforms.Compose([transforms.ToTensor()])
 
-# Define standard classification mnist dataset
+# Define standard classification mnist dataset with random validation set
 
-basetrainset = torchvision.datasets.MNIST('./data/mnist', train=True, download=True, transform=transform)
-
-basetestset = torchvision.datasets.MNIST('./data/mnist', train=False, download=True, transform=transform)
+dataset = torchvision.datasets.MNIST('./data/mnist', train=True, download=True, transform=transform)
+splitter = DatasetValidationSplitter(len(dataset), 0.1)
+basetrainset = splitter.get_train_dataset(dataset)
+basevalset = splitter.get_val_dataset(dataset)
 
 # Wrap base classification mnist dataset to return the image as the target
 
 trainset = AutoEncoderMNIST(basetrainset)
 
-testset = AutoEncoderMNIST(basetestset)
+valset = AutoEncoderMNIST(basevalset)
 
 traingen = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
 
-testgen = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
+valgen = torch.utils.data.DataLoader(valset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8)
+
+# State keys
+MU, LOGVAR = torchbearer.state_key('mu'), torchbearer.state_key('logvar')
 
 
 class VAE(nn.Module):
@@ -69,18 +73,18 @@ class VAE(nn.Module):
 
     def decode(self, z):
         h3 = F.relu(self.fc3(z))
-        return F.sigmoid(self.fc4(h3))
+        return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x, state):
         mu, logvar = self.encode(x.view(-1, 784))
         z = self.reparameterize(mu, logvar)
-        state['mu'] = mu
-        state['logvar'] = logvar
+        state[MU] = mu
+        state[LOGVAR] = logvar
         return self.decode(z)
 
 
 def bce_loss(y_pred, y_true):
-    BCE = F.binary_cross_entropy(y_pred, y_true.view(-1, 784), size_average=False)
+    BCE = F.binary_cross_entropy(y_pred, y_true.view(-1, 784), reduction='sum')
     return BCE
 
 
@@ -91,7 +95,7 @@ def kld_Loss(mu, logvar):
 
 @torchbearer.callbacks.add_to_loss
 def add_kld_loss_callback(state):
-    KLD = kld_Loss(state['mu'], state['logvar'])
+    KLD = kld_Loss(state[MU], state[LOGVAR])
     return KLD
 
 
@@ -115,8 +119,9 @@ model = VAE()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = bce_loss
 
-from torchbearer import Model
+from torchbearer import Trial
 
-torchbearer_model = Model(model, optimizer, loss, metrics=['loss']).to('cuda')
-torchbearer_model.fit_generator(traingen, epochs=10, validation_generator=testgen,
-                                callbacks=[add_kld_loss_callback, save_reconstruction_callback()], pass_state=True)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['loss'],
+                          callbacks=[add_kld_loss_callback, save_reconstruction_callback()], pass_state=True).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=10)

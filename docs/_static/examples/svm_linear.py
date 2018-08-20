@@ -10,7 +10,7 @@ from sklearn.datasets.samples_generator import make_blobs
 
 import torchbearer
 import torchbearer.callbacks as callbacks
-from torchbearer import Model
+from torchbearer import Trial
 from torchbearer.callbacks import L2WeightDecay, ExponentialLR
 
 
@@ -43,6 +43,7 @@ y = np.arange(X[:, 1].min(), X[:, 1].max(), delta)
 x, y = np.meshgrid(x, y)
 xy = list(map(np.ravel, [x, y]))
 
+CONTOUR = torchbearer.state_key('contour')
 
 def mypause(interval):
     backend = plt.rcParams['backend']
@@ -75,12 +76,12 @@ def draw_margin(state):
         z[np.where((z > -1.) & (z <= 0.))] = 2
         z[np.where(z <= -1.)] = 1
 
-        if 'contour' in state:
-            for coll in state['contour'].collections:
+        if CONTOUR in state:
+            for coll in state[CONTOUR].collections:
                 coll.remove()
-            state['contour'] = plt.contourf(x, y, z, cmap=plt.cm.jet, alpha=0.5)
+            state[CONTOUR] = plt.contourf(x, y, z, cmap=plt.cm.jet, alpha=0.5)
         else:
-            state['contour'] = plt.contourf(x, y, z, cmap=plt.cm.jet, alpha=0.5)
+            state[CONTOUR] = plt.contourf(x, y, z, cmap=plt.cm.jet, alpha=0.5)
             plt.tight_layout()
             plt.show()
 
@@ -88,13 +89,10 @@ def draw_margin(state):
 
 
 svm = LinearSVM()
-model = Model(svm, optim.SGD(svm.parameters(), 0.1), hinge_loss, ['loss']).to('cuda')
-
-model.fit(X, Y, batch_size=32, epochs=50, verbose=1,
-                  callbacks=[scatter,
-                             draw_margin,
-                             ExponentialLR(0.999, step_on_batch=True),
-                             L2WeightDecay(0.01, params=[svm.w])])
+model = Trial(svm, optim.SGD(svm.parameters(), 0.1), hinge_loss, ['loss'],
+              callbacks=[scatter, draw_margin, ExponentialLR(0.999, step_on_batch=True), L2WeightDecay(0.01, params=[svm.w])]).to('cuda')
+model.with_train_data(X, Y, batch_size=32)
+model.run(epochs=50, verbose=1)
 
 plt.ioff()
 plt.show()
