@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added TopKCategoricalAccuracy metric (default for key: top\_5\_acc)
 - Added BinaryAccuracy metric (default for key: binary\_acc)
 - Added MeanSquaredError metric (default for key: mse)
+- Added DefaultAccuracy metric (use with 'acc' or 'accuracy') - infers accuracy from the criterion
 ### Changed
 ### Deprecated
 ### Removed

@@ -1,16 +1,12 @@
 """
-Base metrics are the base classes which represent the metrics supplied with torchbearer. They all use the
-:func:`.default_for_key` decorator so that they can be accessed in the call to :class:`.torchbearer.Model` via the
-following strings:
-
-- '`binary_acc`': The :class:`.BinaryAccuracy` metric
-- '`acc`' or '`accuracy`': The :class:`.CategoricalAccuracy` metric
-- '`top_5_acc`': The :class:`.TopKCategoricalAccuracy` metric
-- '`mse`': The :class:`.MeanSquaredError` metric
-- '`loss`': The :class:`.Loss` metric
-- '`epoch`': The :class:`.Epoch` metric
-- '`roc_auc`' or '`roc_auc_score`': The :class:`.RocAucScore` metric
+    .. autoclass:: BinaryAccuracy()
+    .. autoclass:: CategoricalAccuracy(ignore_index=-100)
+    .. autoclass:: TopKCategoricalAccuracy(k=5, ignore_index=-100)
+    .. autoclass:: MeanSquaredError()
+    .. autoclass:: Loss()
+    .. autoclass:: Epoch()
 """
+
 import torchbearer
 from torchbearer import metrics
 
@@ -36,14 +32,13 @@ class BinaryAccuracy(metrics.Metric):
         return torch.eq(torch.round(y_pred).type(y_true.type()), y_true).view(-1).float()
 
 
-@metrics.default_for_key('acc')
-@metrics.default_for_key('accuracy')
+@metrics.default_for_key('cat_acc')
 @metrics.running_mean
 @metrics.std
 @metrics.mean
 class CategoricalAccuracy(metrics.Metric):
     """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets. Decorated with a
-    mean, running_mean and std. Default for keys: 'acc' and 'accuracy'
+    mean, running_mean and std. Default for key: 'cat_acc'
 
     :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     :type ignore_index: int

@@ -30,6 +30,9 @@ Metric Aggregators
 Base Metrics
 ------------------------------------
 
+..  automodule:: torchbearer.metrics.default
+        :members:
+
 ..  automodule:: torchbearer.metrics.primitives
         :members:
 
@@ -51,3 +54,4 @@ from .decorators import *
 from .roc_auc_score import *
 from .primitives import *
 from .timer import TimerMetric
+from .default import DefaultAccuracy
