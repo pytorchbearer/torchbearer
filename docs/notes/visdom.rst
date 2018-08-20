@@ -1,4 +1,4 @@
-Using Visdom Logging in the Tensorboard Callbacks
+Logging to Visdom
 =================================================
 
 In this note we will cover the use of the :class:`TensorBoard callback <.TensorBoard>` to log to visdom.
@@ -21,7 +21,7 @@ Visdom does not support logging model graphs so we shall start with logging epoc
 The only change we need to make to the tensorboard example is setting :code:`visdom=True` in the :class:`TensorBoard callback <.TensorBoard>` constructor.
 
 .. literalinclude:: /_static/examples/visdom_note.py
-   :lines: 62-66
+   :lines: 60-62
 
 If your visdom server is running then you should see something similar to the figure below:
 
@@ -55,12 +55,12 @@ To do this we need to edit the :class:`.VisdomParams` class.
 We first import the tensorboard file.
 
 .. literalinclude:: /_static/examples/visdom_note.py
-   :lines: 68
+   :lines: 64
 
 We can then edit the visdom client parameters, for example, changing the environment to "Test".
 
 .. literalinclude:: /_static/examples/visdom_note.py
-   :lines: 70
+   :lines: 66
 
 Running another fit call, we can see we are now logging to the "Test" environment.
 
