@@ -64,24 +64,24 @@ def greedy_update(state):
         state[tb.MODEL].x.data.fill_(-1)
 
 
-training_steps = 600000
+training_steps = 6000000
 
 model = Online()
-
 optim = torch.optim.Adam(model.parameters(), lr=0.001, betas=[0.9, 0.99])
 tbtrial = tb.Trial(model, optim, loss, [est()], pass_state=True, callbacks=[greedy_update, TensorBoard(comment='adam', write_graph=False, write_batch_metrics=True, write_epoch_metrics=False)])
 tbtrial.for_train_steps(training_steps).run()
 
+model = Online()
 optim = torch.optim.Adam(model.parameters(), lr=0.001, betas=[0.9, 0.99], amsgrad=True)
 tbtrial = tb.Trial(model, optim, loss, [est()], pass_state=True, callbacks=[greedy_update, TensorBoard(comment='amsgrad', write_graph=False, write_batch_metrics=True, write_epoch_metrics=False)])
 tbtrial.for_train_steps(training_steps).run()
 
 model = Stochastic()
-
 optim = torch.optim.Adam(model.parameters(), lr=0.001, betas=[0.9, 0.99])
 tbtrial = tb.Trial(model, optim, loss, [est()], callbacks=[greedy_update, TensorBoard(comment='adam', write_graph=False, write_batch_metrics=True, write_epoch_metrics=False)])
 tbtrial.for_train_steps(training_steps).run()
 
+model = Stochastic()
 optim = torch.optim.Adam(model.parameters(), lr=0.001, betas=[0.9, 0.99], amsgrad=True)
 tbtrial = tb.Trial(model, optim, loss, [est()], callbacks=[greedy_update, TensorBoard(comment='amsgrad', write_graph=False, write_batch_metrics=True, write_epoch_metrics=False)])
 tbtrial.for_train_steps(training_steps).run()
