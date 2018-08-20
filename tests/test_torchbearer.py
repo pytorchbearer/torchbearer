@@ -10,6 +10,10 @@ from torchbearer.metrics import MetricList, Metric
 
 
 class TestTorchbearer(TestCase):
+    def test_deprecation_warning(self):
+        with self.assertWarns(DeprecationWarning):
+            Model(None, None)
+
     @patch('torchbearer.cv_utils.get_train_valid_sets')
     def test_fit_valid_sets_args(self, gtvs):
         x = torch.rand(1,5)
@@ -557,6 +561,7 @@ class TestTorchbearer(TestCase):
                  torchbearer.CallbackList: callback_List, torchbearer.MODEL: torchmodel, torchbearer.VALIDATION_STEPS: validation_steps,
                  torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
+
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         torchbearerstate[torchbearer.METRIC_LIST].metric_list[0].reset.assert_called_once()
@@ -587,6 +592,7 @@ class TestTorchbearer(TestCase):
                  torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                  torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
+
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 3)
@@ -614,6 +620,7 @@ class TestTorchbearer(TestCase):
         state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
                  torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                  torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
 
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
@@ -644,6 +651,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
+
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, True, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 3)
@@ -672,6 +680,7 @@ class TestTorchbearer(TestCase):
         state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
 
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
@@ -702,6 +711,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
+
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 2)
@@ -729,6 +739,7 @@ class TestTorchbearer(TestCase):
         state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
 
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
@@ -758,6 +769,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
 
+
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 0)
@@ -785,6 +797,7 @@ class TestTorchbearer(TestCase):
         state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
 
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=validation_steps)
 
@@ -814,6 +827,7 @@ class TestTorchbearer(TestCase):
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: True, torchbearer.METRICS: {}})
 
+
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_standard, num_steps=None)
 
         self.assertTrue(torchbearerstate[torchbearer.MODEL].call_count == 1)
@@ -839,6 +853,7 @@ class TestTorchbearer(TestCase):
         state.update({torchbearer.METRIC_LIST: metric_list, torchbearer.VALIDATION_GENERATOR: validation_generator,
                       torchbearer.CallbackList: callback_List, torchbearer.VALIDATION_STEPS: validation_steps,
                       torchbearer.CRITERION: criterion, torchbearer.STOP_TRAINING: False, torchbearer.METRICS: {}})
+
 
         torchbearerstate = torchbearermodel._test_loop(state, callback_List, False, Model._load_batch_none, num_steps=validation_steps)
 
@@ -877,6 +892,7 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
+
         torchbearermodel._test_loop = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
@@ -894,6 +910,7 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
+
         torchbearermodel._test_loop = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
@@ -913,6 +930,7 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
+
         torchbearermodel._test_loop = Mock()
 
         torchbearermodel.evaluate_generator(generator, 1, steps, pass_state)
@@ -928,6 +946,7 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.METRICS] = 1
+
         torchbearermodel._test_loop = Mock()
 
         torchbearermodel.evaluate_generator(generator, 0, steps, pass_state)
@@ -982,6 +1001,7 @@ class TestTorchbearer(TestCase):
 
         torchbearermodel = Model(torchmodel, optimizer, torch.nn.L1Loss(), [])
         torchbearermodel.main_state[torchbearer.FINAL_PREDICTIONS] = 1
+
         torchbearermodel._test_loop = Mock()
 
         torchbearermodel.predict_generator(generator, 0, steps, pass_state)
@@ -1134,7 +1154,8 @@ class TestTorchbearer(TestCase):
         main_state = {}
         dtype = torch.float16
         dev = 'cuda:1'
-        kwargs = {torchbearer.DEVICE: dev, torchbearer.DATA_TYPE: dtype}
+
+        kwargs = {str(torchbearer.DEVICE): dev, str(torchbearer.DATA_TYPE): dtype}
 
         main_state = Model._update_device_and_dtype_from_args(main_state, **kwargs)
 
@@ -1287,25 +1308,27 @@ class TestTorchbearer(TestCase):
     def test_load_batch_standard(self):
         items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
         iterator = iter(items)
-        state = {'training_iterator': iterator, 'device': 'cpu', 'dtype': torch.int}
+
+        state = {'training_iterator': iterator, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.int}
 
         Model._load_batch_standard('training', state)
-        self.assertTrue(state['x'].item() == items[0][0].item())
-        self.assertTrue(state['y_true'].item() == items[0][1].item())
+        self.assertTrue(state[torchbearer.X].item() == items[0][0].item())
+        self.assertTrue(state[torchbearer.Y_TRUE].item() == items[0][1].item())
 
     def test_load_batch_predict_data(self):
         items = [torch.Tensor([1]), torch.Tensor([2])]
         iterator = iter(items)
-        state = {'training_iterator': iterator, 'device': 'cpu', 'dtype': torch.int}
+
+        state = {'training_iterator': iterator, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.int}
         Model._load_batch_predict('training', state)
-        self.assertTrue(state['x'].item() == items[0].item())
+        self.assertTrue(state[torchbearer.X].item() == items[0].item())
 
     def test_load_batch_predict_list(self):
         items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
         iterator = iter(items)
-        state = {'training_iterator': iterator, 'device': 'cpu', 'dtype': torch.int}
+
+        state = {'training_iterator': iterator, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.int}
 
         Model._load_batch_predict('training', state)
-        self.assertTrue(state['x'].item() == items[0][0].item())
-        self.assertTrue(state['y_true'].item() == items[0][1].item())
-
+        self.assertTrue(state[torchbearer.X].item() == items[0][0].item())
+        self.assertTrue(state[torchbearer.Y_TRUE].item() == items[0][1].item())

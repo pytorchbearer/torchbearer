@@ -10,6 +10,33 @@ from torchbearer.callbacks.callbacks import CallbackList
 from torchbearer.callbacks.printer import Tqdm
 
 
+def deprecated(Cls):
+    class NewCls(Cls):
+        def __init__(self, *args, **kwargs):
+            super(NewCls, self).__init__(*args, **kwargs)
+
+        def __getattribute__(self, item):
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                DeprecationWarning)
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                UserWarning)
+            return super(NewCls, self).__getattribute__(item)
+
+        def __setattr__(self, key, value):
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                DeprecationWarning)
+            warnings.warn(
+                'torchbearer.Model and all of its attributes are deprecated as of version 0.2.0. Use torchbearer.Trial instead',
+                UserWarning)
+            return super(NewCls, self).__setattr__(key, value)
+
+    return NewCls
+
+
+@deprecated
 class Model:
     """ Create torchbearermodel which wraps a base torchmodel and provides a training environment surrounding it
 
@@ -23,8 +50,6 @@ class Model:
     :type metrics: list
     """
     def __init__(self, model, optimizer, criterion=None, metrics=[]):
-        import warnings
-        warnings.warn('The Model class and all of its methods will be deprecated in the next version (0.2.0) in favor of the upcoming Trial API')
         super().__init__()
         if criterion is None:
             criterion = lambda y_pred, y_true: torch.zeros(1, device=y_true.device)
@@ -139,6 +164,7 @@ class Model:
         state = {
             torchbearer.MAX_EPOCHS: epochs,
             torchbearer.TRAIN_STEPS: train_steps,
+            torchbearer.STEPS: train_steps,
             torchbearer.BATCH: 0,
             torchbearer.GENERATOR: generator,
             torchbearer.STOP_TRAINING: False
@@ -153,7 +179,9 @@ class Model:
             state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
             if state[torchbearer.GENERATOR] is not None:
+                state[torchbearer.TRAIN_GENERATOR] = state[torchbearer.GENERATOR]
                 state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
+                state[torchbearer.ITERATOR] = state[torchbearer.TRAIN_ITERATOR]
             self.train()
 
             state[torchbearer.CALLBACK_LIST].on_start_training(state)
@@ -204,7 +232,9 @@ class Model:
             # Validate
             if validation_generator is not None or validation_steps is not None:
                 state[torchbearer.VALIDATION_GENERATOR] = validation_generator
+                state[torchbearer.GENERATOR] = validation_generator
                 state[torchbearer.VALIDATION_STEPS] = validation_steps
+                state[torchbearer.STEPS] = validation_steps
                 self.eval()
                 self._validate(state, state[torchbearer.CALLBACK_LIST], pass_state)
 
@@ -247,8 +277,10 @@ class Model:
                 warnings.warn('Num test steps is not an int, converting to int.', Warning)
 
             state[torchbearer.VALIDATION_STEPS] = num_steps
+            state[torchbearer.STEPS] = num_steps
             if state[torchbearer.VALIDATION_GENERATOR] is not None:
                 state[torchbearer.VALIDATION_ITERATOR] = iter(state[torchbearer.VALIDATION_GENERATOR])
+                state[torchbearer.ITERATOR] = state[torchbearer.VALIDATION_ITERATOR]
 
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
@@ -557,10 +589,10 @@ class Model:
         :rtype: dict[str,any]
         """
         for key, _ in kwargs.items():
-            if key == torchbearer.DATA_TYPE:
-                main_state[torchbearer.DATA_TYPE] = kwargs[torchbearer.DATA_TYPE]
-            elif torchbearer.DEVICE in kwargs:
-                main_state[torchbearer.DEVICE] = kwargs[torchbearer.DEVICE]
+            if key == 'device':
+                main_state[torchbearer.DATA_TYPE] = kwargs['dtype']
+            elif 'device' in kwargs:
+                main_state[torchbearer.DEVICE] = kwargs['device']
 
         for arg in args:
             if isinstance(arg, torch.dtype):

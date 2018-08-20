@@ -139,7 +139,7 @@ optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5, 0.999))
 @tb.metrics.mean
 class g_loss(tb.metrics.Metric):
     def __init__(self):
-        super().__init__(G_LOSS)
+        super().__init__('g_loss')
 
     def process(self, state):
         return state[G_LOSS]
@@ -149,12 +149,14 @@ class g_loss(tb.metrics.Metric):
 @tb.metrics.mean
 class d_loss(tb.metrics.Metric):
     def __init__(self):
-        super().__init__(D_LOSS)
+        super().__init__('d_loss')
 
     def process(self, state):
         return state[D_LOSS]
 
 
-torchbearermodel = tb.Model(model, optim, criterion=None, metrics=['loss', g_loss(), d_loss()])
-torchbearermodel.to(device)
-torchbearermodel.fit_generator(dataloader, epochs=200, pass_state=True, callbacks=[loss_callback, saver_callback])
+torchbearertrial = tb.Trial(model, optim, criterion=None, metrics=['loss', g_loss(), d_loss()],
+                            callbacks=[loss_callback, saver_callback], pass_state=True)
+torchbearertrial.with_train_generator(dataloader)
+torchbearertrial.to(device)
+torchbearertrial.run(epochs=200)

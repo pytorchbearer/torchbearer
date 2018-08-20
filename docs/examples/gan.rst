@@ -42,7 +42,7 @@ Note that we have to be careful to remove the gradient information from the disc
 Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since our loss computation in this example is complicated, we shall forgo the basic loss criterion used in normal torchbearer models.
+Since our loss computation in this example is complicated, we shall forgo the basic loss criterion used in normal torchbearer trials.
 Instead we use a callback to provide the loss, in this case we use the :func:`.add_to_loss` callback decorator.
 This decorates a function that returns a loss and automatically adds this to the main loss in training and validation.
 
@@ -65,12 +65,12 @@ We can then create metrics from these by decorating simple state fetcher metrics
 Training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We can then train the torchbearer model on the GPU in the standard way.
+We can then train the torchbearer trial on the GPU in the standard way.
 Note that when torchbearer is passed a ``None`` criterion it automatically sets the base loss to 0.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 158-160
+   :lines: 158-162
 
 Visualising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

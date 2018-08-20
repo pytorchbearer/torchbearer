@@ -7,6 +7,7 @@ running metrics and statistics, without needing to compute the underlying values
 constructions of this kind should be handled using the :mod:`decorator API <.metrics.decorators>`.
 """
 import inspect
+from torch import no_grad
 
 __defaults__ = {}
 
@@ -39,6 +40,7 @@ class Metric(object):
     def __init__(self, name):
         self.name = name
 
+    @no_grad()
     def process(self, *args):
         """Process the state and update the metric for one iteration.
 
@@ -48,6 +50,7 @@ class Metric(object):
         """
         pass
 
+    @no_grad()
     def process_final(self, *args):
         """Process the terminal state and output the final value of the metric.
 

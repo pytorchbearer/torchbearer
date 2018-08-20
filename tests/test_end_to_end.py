@@ -1,3 +1,5 @@
+import unittest
+
 import torch
 from torch.nn import Module
 
@@ -30,21 +32,17 @@ def loss(y_pred, y_true):
     return y_pred
 
 
-@tb.metrics.to_dict
-class est(tb.metrics.Metric):
-    def __init__(self):
-        super().__init__('est')
+class TestEndToEnd(unittest.TestCase):
+    def test_basic_opt(self):
+        p = torch.tensor([2.0, 1.0, 10.0])
+        training_steps = 1000
 
-    def process(self, state):
-        return state[tb.MODEL].pars.data
+        model = Net(p)
+        optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
+        tbmodel = tb.Trial(model, optim, loss, pass_state=True).for_train_steps(training_steps)
+        tbmodel.run()
 
-p = torch.tensor([2.0, 1.0, 10.0])
-training_steps = 50000
-
-model = Net(p)
-optim = torch.optim.SGD(model.parameters(), lr=0.0001)
-
-tbtrial = tb.Trial(model, optim, loss, [est(), 'loss'], pass_state=True).for_train_steps(training_steps).to('cuda')
-tbtrial.run()
-print(list(model.parameters())[0].data)
+        self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
+        self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
+        self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)

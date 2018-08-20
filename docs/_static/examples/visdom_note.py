@@ -54,19 +54,16 @@ model = SimpleModel()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = nn.CrossEntropyLoss()
 
-from torchbearer import Model
+from torchbearer import Trial
 from torchbearer.callbacks import TensorBoard
 
-torchbearer_model = Model(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-
-torchbearer_model.fit_generator(traingen, epochs=5, validation_generator=valgen,
-                                callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)])
-
-torchbearer_model.fit_generator(traingen, epochs=5, validation_generator=valgen,
-                                callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=False, write_epoch_metrics=True)])
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(visdom=True, write_graph=True, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=True)]).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=5)
 
 import torchbearer.callbacks.tensor_board as tensorboard
 
 tensorboard.VisdomParams.ENV = 'Test'
-torchbearer_model.fit_generator(traingen, epochs=5, validation_generator=valgen,
-                                callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)])
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(visdom=True, write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)]).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=5)
