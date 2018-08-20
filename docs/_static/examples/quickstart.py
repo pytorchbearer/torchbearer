@@ -57,7 +57,8 @@ loss = nn.CrossEntropyLoss()
 from torchbearer import Trial
 
 torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen, test_generator=testgen)
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
 torchbearer_trial.run(epochs=10)
 
+torchbearer_trial.with_val_generator(testgen)
 torchbearer_trial.evaluate()
