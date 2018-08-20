@@ -19,12 +19,12 @@ class TestStateKey(unittest.TestCase):
         self.assertTrue('test' != str(key_2))
 
     def test_duplicate_string(self):
-        _ = torchbearer.state_key('test')
-        key_1 = torchbearer.state_key('test')
-        key_2 = torchbearer.state_key('test')
+        _ = torchbearer.state_key('test_dup')
+        key_1 = torchbearer.state_key('test_dup')
+        key_2 = torchbearer.state_key('test_dup')
 
-        self.assertTrue('test_1' == str(key_1))
-        self.assertTrue('test_2' == str(key_2))
+        self.assertTrue('test_dup_1' == str(key_1))
+        self.assertTrue('test_dup_2' == str(key_2))
 
 
 class TestState(unittest.TestCase):
