@@ -57,15 +57,15 @@ loss = nn.CrossEntropyLoss()
 from torchbearer import Trial
 from torchbearer.callbacks import TensorBoard
 
-torchbearer_model = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_graph=True, write_batch_metrics=False, write_epoch_metrics=False)]).to('cuda')
-torchbearer_model.with_generators(train_generator=traingen, val_generator=valgen)
-torchbearer_model.run(epochs=1)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_graph=True, write_batch_metrics=False, write_epoch_metrics=False)]).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=1)
 
-torchbearer_model = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)]).to('cuda')
-torchbearer_model.with_generators(train_generator=traingen, val_generator=valgen)
-torchbearer_model.run(epochs=10)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_graph=False, write_batch_metrics=True, batch_step_size=10, write_epoch_metrics=False)]).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=10)
 
-torchbearer_model = Trial(model, optimizer, loss, metrics=['acc', 'loss'],  callbacks=[TensorBoard(write_graph=False, write_batch_metrics=False, write_epoch_metrics=True)]).to('cuda')
-torchbearer_model.with_generators(train_generator=traingen, val_generator=valgen)
-torchbearer_model.run(epochs=10)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'],  callbacks=[TensorBoard(write_graph=False, write_batch_metrics=False, write_epoch_metrics=True)]).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial.run(epochs=10)
 
