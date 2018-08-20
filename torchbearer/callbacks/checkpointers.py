@@ -25,6 +25,8 @@ class _Checkpointer(Callback):
     def load_state_dict(self, state_dict):
         self.most_recent = state_dict['most_recent']
 
+        return self
+
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
         state = {}
         state.update(model_state)
@@ -148,6 +150,8 @@ class Best(_Checkpointer):
         self.epochs_since_last_save = state_dict['epochs']
         self.best = state_dict['best']
 
+        return self
+
     def on_start(self, state):
         if self.best is None:
             self.best = float('inf') if self.mode == 'min' else -float('inf')
@@ -191,6 +195,8 @@ class Interval(_Checkpointer):
     def load_state_dict(self, state_dict):
         super().load_state_dict(state_dict)
         self.epochs_since_last_save = state_dict['epochs']
+
+        return self
 
     def on_end_epoch(self, state):
         super().on_end_epoch(state)

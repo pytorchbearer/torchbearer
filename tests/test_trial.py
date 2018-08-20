@@ -5,9 +5,10 @@ import torch
 from torch.utils.data import DataLoader
 
 import torchbearer as tb
+import torchbearer.callbacks as callbacks
 from torchbearer import Trial
 from torchbearer.metrics import Metric
-from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype
+from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype, CallbackListInjection
 
 
 class TestMockOptimizer(TestCase):
@@ -35,6 +36,60 @@ class TestMockOptimizer(TestCase):
 
         self.assertIsNone(opt.zero_grad())
         mock_opt.zero_grad.assert_not_called()
+
+
+class TestCallbackListInjection(TestCase):
+    def test_pass_through(self):
+        mock = MagicMock()
+        injection = CallbackListInjection(None, mock)
+
+        # state_dict
+        mock.state_dict.return_value = 'test'
+        self.assertEqual(injection.state_dict(), 'test')
+        mock.state_dict.assert_called_once()
+
+        # load_state_dict
+        injection.load_state_dict('test')
+        mock.load_state_dict.assert_called_once_with('test')
+
+        # iter
+        mock.__iter__.return_value = ['iterator']
+        self.assertEqual(next(injection.__iter__()), 'iterator')
+        mock.__iter__.assert_called_once()
+
+        # copy
+        mock.copy.return_value = 'copy'
+        self.assertEqual(injection.copy(), 'copy')
+
+        # append
+        injection.append('stuff to append')
+        mock.append.assert_called_once_with('stuff to append')
+
+    def test_order(self):
+        my_number = 10
+
+        @callbacks.on_start
+        def set_one(state):
+            nonlocal my_number
+            my_number = 1
+
+        set_one.on_end = Mock()
+
+        @callbacks.on_start
+        def set_two(state):
+            nonlocal my_number
+            my_number = 2
+
+        set_two.on_end = Mock()
+
+        injection = CallbackListInjection(set_one, callbacks.CallbackList([set_two]))
+
+        injection.on_end({})
+        set_one.on_end.assert_called_once()
+        set_two.on_end.assert_called_once()
+
+        injection.on_start({})
+        self.assertEqual(my_number, 2)
 
 
 class TestWithGenerators(TestCase):
@@ -1824,6 +1879,37 @@ class TestTrialMembers(TestCase):
         self.assertTrue(torchbearertrial.state[tb.OPTIMIZER].load_state_dict.call_count == 0)
         self.assertTrue(torchmodel.load_state_dict.call_args[1] == key_words)
 
+    def test_load_state_dict_wrong_version(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1, 1))
+        torchmodel.load_state_dict = Mock()
+
+        optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
+        optimizer.load_state_dict = Mock()
+
+        torchbearertrial = Trial(torchmodel, optimizer, None, [], [], pass_state=False)
+
+        torchbearer_state = torchbearertrial.state_dict()
+        torchbearer_state[tb.VERSION] = '0.1.7'  # Old version
+
+        self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state, resume=True))
+
+    def test_load_state_dict_not_torchbearer(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1, 1))
+        torchmodel.load_state_dict = Mock()
+
+        optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
+        optimizer.load_state_dict = Mock()
+
+        torchbearertrial = Trial(torchmodel, optimizer, None, [], [], pass_state=False)
+
+        torchbearer_state = torchbearertrial.state_dict()
+        torchbearer_state[tb.VERSION] = '0.1.7'  # Old version
+
+        self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state[tb.MODEL]))
+
+        torchmodel.load_state_dict.assert_called_once()
+        optimizer.load_state_dict.assert_not_called()
+
     def test_state_dict(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         torchmodel_state = torchmodel.state_dict()
@@ -1841,6 +1927,7 @@ class TestTrialMembers(TestCase):
         torchbearertrial.state[tb.CALLBACK_LIST] = callback_list
         torchbearer_state = torchbearertrial.state_dict()
 
+        self.assertTrue(torchbearer_state[tb.VERSION] == tb.__version__.replace('.dev', ''))
         self.assertTrue(torchbearer_state[tb.MODEL] == torchmodel_state)
         self.assertTrue(torchbearer_state[tb.OPTIMIZER] == optimizer_state)
         self.assertTrue(torchbearer_state[tb.CALLBACK_LIST] == 1)
