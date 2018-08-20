@@ -132,7 +132,6 @@ class TestDecorators(unittest.TestCase):
         callbacks.add_to_loss(example).on_criterion_validation(state)
         self.assertTrue(state[torchbearer.LOSS] == 2)
 
-
     def test_once(self):
         class Example(callbacks.Callback):
             @callbacks.once
