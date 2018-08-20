@@ -21,17 +21,17 @@ from torchbearer.metrics import default_for_key, Metric, CategoricalAccuracy, Me
 try:
     __loss_map__ = {
         # NN
-        nn.CrossEntropyLoss.__name__: lambda: CategoricalAccuracy(),
-        nn.NLLLoss.__name__: lambda: CategoricalAccuracy(),
-        nn.MSELoss.__name__: lambda: MeanSquaredError(),
-        nn.BCELoss.__name__: lambda: BinaryAccuracy(),
-        nn.BCEWithLogitsLoss.__name__: lambda: BinaryAccuracy(),
+        nn.CrossEntropyLoss.__name__: CategoricalAccuracy,
+        nn.NLLLoss.__name__: CategoricalAccuracy,
+        nn.MSELoss.__name__: MeanSquaredError,
+        nn.BCELoss.__name__: BinaryAccuracy,
+        nn.BCEWithLogitsLoss.__name__:  BinaryAccuracy,
         # Functional
-        F.cross_entropy.__name__: lambda: CategoricalAccuracy(),
-        F.nll_loss.__name__: lambda: CategoricalAccuracy(),
-        F.mse_loss.__name__: lambda: MeanSquaredError(),
-        F.binary_cross_entropy.__name__: lambda: BinaryAccuracy(),
-        F.binary_cross_entropy_with_logits.__name__: lambda: BinaryAccuracy()
+        F.cross_entropy.__name__: CategoricalAccuracy,
+        F.nll_loss.__name__: CategoricalAccuracy,
+        F.mse_loss.__name__: MeanSquaredError,
+        F.binary_cross_entropy.__name__: BinaryAccuracy,
+        F.binary_cross_entropy_with_logits.__name__: BinaryAccuracy
     }
 except AttributeError:  # Thrown when building the docs with mocked pytorch
     __loss_map__ = {}
