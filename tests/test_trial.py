@@ -5,9 +5,10 @@ import torch
 from torch.utils.data import DataLoader
 
 import torchbearer as tb
+import torchbearer.callbacks as callbacks
 from torchbearer import Trial
 from torchbearer.metrics import Metric
-from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype
+from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype, CallbackListInjection
 
 
 class TestMockOptimizer(TestCase):
@@ -35,6 +36,60 @@ class TestMockOptimizer(TestCase):
 
         self.assertIsNone(opt.zero_grad())
         mock_opt.zero_grad.assert_not_called()
+
+
+class TestCallbackListInjection(TestCase):
+    def test_pass_through(self):
+        mock = MagicMock()
+        injection = CallbackListInjection(None, mock)
+
+        # state_dict
+        mock.state_dict.return_value = 'test'
+        self.assertEqual(injection.state_dict(), 'test')
+        mock.state_dict.assert_called_once()
+
+        # load_state_dict
+        injection.load_state_dict('test')
+        mock.load_state_dict.assert_called_once_with('test')
+
+        # iter
+        mock.__iter__.return_value = ['iterator']
+        self.assertEqual(next(injection.__iter__()), 'iterator')
+        mock.__iter__.assert_called_once()
+
+        # copy
+        mock.copy.return_value = 'copy'
+        self.assertEqual(injection.copy(), 'copy')
+
+        # append
+        injection.append('stuff to append')
+        mock.append.assert_called_once_with('stuff to append')
+
+    def test_order(self):
+        my_number = 10
+
+        @callbacks.on_start
+        def set_one(state):
+            nonlocal my_number
+            my_number = 1
+
+        set_one.on_end = Mock()
+
+        @callbacks.on_start
+        def set_two(state):
+            nonlocal my_number
+            my_number = 2
+
+        set_two.on_end = Mock()
+
+        injection = CallbackListInjection(set_one, callbacks.CallbackList([set_two]))
+
+        injection.on_end({})
+        set_one.on_end.assert_called_once()
+        set_two.on_end.assert_called_once()
+
+        injection.on_start({})
+        self.assertEqual(my_number, 2)
 
 
 class TestWithGenerators(TestCase):
