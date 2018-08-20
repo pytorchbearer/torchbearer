@@ -164,6 +164,7 @@ class Model:
         state = {
             torchbearer.MAX_EPOCHS: epochs,
             torchbearer.TRAIN_STEPS: train_steps,
+            torchbearer.STEPS: train_steps,
             torchbearer.BATCH: 0,
             torchbearer.GENERATOR: generator,
             torchbearer.STOP_TRAINING: False
@@ -178,7 +179,9 @@ class Model:
             state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
             if state[torchbearer.GENERATOR] is not None:
+                state[torchbearer.TRAIN_GENERATOR] = state[torchbearer.GENERATOR]
                 state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
+                state[torchbearer.ITERATOR] = state[torchbearer.TRAIN_ITERATOR]
             self.train()
 
             state[torchbearer.CALLBACK_LIST].on_start_training(state)
@@ -229,7 +232,9 @@ class Model:
             # Validate
             if validation_generator is not None or validation_steps is not None:
                 state[torchbearer.VALIDATION_GENERATOR] = validation_generator
+                state[torchbearer.GENERATOR] = validation_generator
                 state[torchbearer.VALIDATION_STEPS] = validation_steps
+                state[torchbearer.STEPS] = validation_steps
                 self.eval()
                 self._validate(state, state[torchbearer.CALLBACK_LIST], pass_state)
 
@@ -272,8 +277,10 @@ class Model:
                 warnings.warn('Num test steps is not an int, converting to int.', Warning)
 
             state[torchbearer.VALIDATION_STEPS] = num_steps
+            state[torchbearer.STEPS] = num_steps
             if state[torchbearer.VALIDATION_GENERATOR] is not None:
                 state[torchbearer.VALIDATION_ITERATOR] = iter(state[torchbearer.VALIDATION_GENERATOR])
+                state[torchbearer.ITERATOR] = state[torchbearer.VALIDATION_ITERATOR]
 
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
