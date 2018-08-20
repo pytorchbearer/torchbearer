@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Callbacks can now implement ``state_dict`` and ``load_state_dict` to allow callbacks to resume with state
 - State dictionary is now accepts StateKey objects which are unique and generated through ``torchbearer.state.get_state``
 - State dictionary now warns when accessed with strings as this allows for collisions
+- Checkpointer callbacks will now resume from a state dict when resume=True in Trial
 ### Deprecated
 - ``torchbearer.Model`` has been deprecated in favour of the new ``torchbearer.Trial`` api
 ### Removed
