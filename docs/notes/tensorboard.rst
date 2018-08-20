@@ -43,7 +43,7 @@ match the size of the data in the dataset / data loader, this means that we need
 the graph to be written. Let's train for one epoch just to see a model graph:
 
 .. literalinclude:: /_static/examples/tensorboard.py
-   :lines: 57-63
+   :lines: 57-62
 
 To see the result, navigate to the project directory and execute the command :code:`tensorboard --logdir logs`, then
 open a web browser and navigate to `localhost:6006 <http://localhost:6006>`_. After a bit of clicking around you should
@@ -64,10 +64,10 @@ if epochs are long and we want to watch them progress. For this we can set :code
 :class:`TensorBoard callback <.TensorBoard>` constructor. Setting this flag will cause the batch metrics to be written
 as graphs to tensorboard. We are also able to change the frequency of updates by choosing the :code:`batch_step_size`.
 This is the number of batches to wait between updates and can help with reducing the size of the logs, 10 seems
-reasonable. We run this for 5 epochs with the following:
+reasonable. We run this for 10 epochs with the following:
 
 .. literalinclude:: /_static/examples/tensorboard.py
-   :lines: 65-66
+   :lines: 64-66
 
 Runnng tensorboard again with :code:`tensorboard --logdir logs`, navigating to
 `localhost:6006 <http://localhost:6006>`_ and selecting 'WALL' for the horizontal axis we can see the following:
@@ -84,7 +84,7 @@ Logging epoch metrics is perhaps the most typical use case of TensorBoard and th
 :code:`write_epoch_metrics=True` we can log epoch metrics with the following:
 
 .. literalinclude:: /_static/examples/tensorboard.py
-   :lines: 68-69
+   :lines: 68-70
 
 Again, runnng tensorboard with :code:`tensorboard --logdir logs` and navigating to
 `localhost:6006 <http://localhost:6006>`_ we see the following:
