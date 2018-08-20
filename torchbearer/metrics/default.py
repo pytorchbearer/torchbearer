@@ -58,16 +58,16 @@ class DefaultAccuracy(Metric):
         self._loaded = False
 
     def train(self):
-        self.metric.train()
+        return self.metric.train()
 
     def eval(self):
-        self.metric.eval()
+        return self.metric.eval()
 
     def process(self, *args):
-        self.metric.process(*args)
+        return self.metric.process(*args)
 
     def process_final(self, *args):
-        self.metric.process_final(*args)
+        return self.metric.process_final(*args)
 
     def reset(self, state):
         if not self._loaded:
@@ -86,4 +86,4 @@ class DefaultAccuracy(Metric):
 
             self._loaded = True
 
-        self.metric.reset(state)
+        return self.metric.reset(state)
