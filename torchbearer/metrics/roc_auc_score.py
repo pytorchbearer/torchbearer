@@ -1,3 +1,7 @@
+"""
+    .. autoclass:: RocAucScore(one_hot_labels=True, one_hot_offset=0, one_hot_classes=10)
+"""
+
 from torchbearer import metrics
 
 import sklearn.metrics

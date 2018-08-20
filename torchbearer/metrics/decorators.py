@@ -84,6 +84,8 @@ def to_dict(clazz):
         class Wrapper(ToDict):
             def __init__(self, *args, **kwargs):
                 super(Wrapper, self).__init__(clazz(*args, **kwargs))
+        Wrapper.__name__ = clazz.__name__
+        Wrapper.__doc__ = clazz.__doc__
         return Wrapper
     else:
         return ToDict(clazz)
@@ -101,6 +103,8 @@ def _wrap_and_add_to_tree(clazz, child_func):
                     super(Wrapper, self).__init__(inner)
 
                 self.add_child(child_func(self.root))
+        Wrapper.__name__ = clazz.__name__
+        Wrapper.__doc__ = clazz.__doc__
         return Wrapper
     else:
         inner = clazz
