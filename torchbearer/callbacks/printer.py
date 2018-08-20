@@ -47,7 +47,7 @@ class Tqdm(Callback):
     :type validation_label_letter: str
     :param on_epoch: If True, output a single progress bar which tracks epochs
     :type on_epoch: bool
-    :param tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `<https://github.com/tqdm/tqdm#parameters>`_ for more details.
+    :param tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
     """
     def __init__(self, tqdm_module=tqdm, validation_label_letter='v', on_epoch=False, **tqdm_args):
         self.tqdm_module = tqdm_module

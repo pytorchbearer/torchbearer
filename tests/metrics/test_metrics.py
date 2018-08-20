@@ -2,14 +2,10 @@ import unittest
 from unittest.mock import Mock
 
 import torch
-import torchbearer
-from torchbearer.metrics import MetricFactory, MetricList, Metric, MetricTree, AdvancedMetric
-from torchbearer.metrics.primitives import CategoricalAccuracy
 
-class TestMetricFactory(unittest.TestCase):
-    def test_empty_build(self):
-        factory = MetricFactory()
-        self.assertTrue(factory.build() is None)
+import torchbearer
+from torchbearer.metrics import MetricList, Metric, MetricTree, AdvancedMetric
+from torchbearer.metrics.primitives import CategoricalAccuracy
 
 
 class TestMetric(unittest.TestCase):
@@ -26,7 +22,7 @@ class TestMetric(unittest.TestCase):
         }
         self._state[torchbearer.Y_PRED].requires_grad = True
         self._targets = [1, 1, 1, 0, 0]
-        self._metric = CategoricalAccuracy()
+        self._metric = CategoricalAccuracy().root
 
     def test_requires_grad(self):
         result = self._metric.process(self._state)

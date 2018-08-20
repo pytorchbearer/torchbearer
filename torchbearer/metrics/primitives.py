@@ -1,28 +1,51 @@
 """
-Base metrics are the base classes which represent the metrics supplied with torchbearer. The all use the
-:func:`.default_for_key` decorator so that they can be accessed in the call to :class:`.torchbearer.Model` via the
-following strings:
-
-- '`acc`' or '`accuracy`': The :class:`.CategoricalAccuracy` metric
-- '`loss`': The :class:`.Loss` metric
-- '`epoch`': The :class:`.Epoch` metric
-- '`roc_auc`' or '`roc_auc_score`': The :class:`.RocAucScore` metric
+    .. autoclass:: BinaryAccuracy()
+    .. autoclass:: CategoricalAccuracy(ignore_index=-100)
+    .. autoclass:: TopKCategoricalAccuracy(k=5, ignore_index=-100)
+    .. autoclass:: MeanSquaredError()
+    .. autoclass:: Loss()
+    .. autoclass:: Epoch()
 """
+
 import torchbearer
 from torchbearer import metrics
 
 import torch
 
 
-class CategoricalAccuracy(metrics.Metric):
-    """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets.
+@metrics.default_for_key('binary_acc')
+@metrics.running_mean
+@metrics.mean
+class BinaryAccuracy(metrics.Metric):
+    """Binary accuracy metric. Uses torch.eq to compare predictions to targets. Decorated with a mean and running_mean.
+    Default for key: 'binary_acc'.
+    """
 
-    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
+    def __init__(self):
+        super().__init__('binary_acc')
+
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+
+        return torch.eq(torch.round(y_pred).type(y_true.type()), y_true).view(-1).float()
+
+
+@metrics.default_for_key('cat_acc')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
+class CategoricalAccuracy(metrics.Metric):
+    """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets. Decorated with a
+    mean, running_mean and std. Default for key: 'cat_acc'
+
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     :type ignore_index: int
     """
 
     def __init__(self, ignore_index=-100):
-        super(CategoricalAccuracy, self).__init__('acc')
+        super().__init__('acc')
 
         self.ignore_index = ignore_index
 
@@ -37,27 +60,61 @@ class CategoricalAccuracy(metrics.Metric):
         return (y_pred == y_true).float()
 
 
-@metrics.default_for_key('acc')
-@metrics.default_for_key('accuracy')
+@metrics.default_for_key('top_5_acc')
 @metrics.running_mean
 @metrics.std
 @metrics.mean
-class CategoricalAccuracyFactory(metrics.MetricFactory):
-    """Categorical accuracy metric factory. Essentially a :class:`.CategoricalAccuracy` with running mean, mean and std.
+class TopKCategoricalAccuracy(metrics.Metric):
+    """Top K Categorical accuracy metric. Uses torch.topk to determine the top k predictions and compares to targets.
+    Decorated with a mean, running_mean and std. Default for key: 'top_5_acc'.
 
-    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `https://pytorch.org/docs/stable/nn.html#crossentropyloss`_
+    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     :type ignore_index: int
     """
 
-    def __init__(self, ignore_index=-100):
+    def __init__(self, k=5, ignore_index=-100):
+        super().__init__('top_' + str(k) + '_acc')
+        self.k = k
         self.ignore_index = ignore_index
 
-    def build(self):
-        return CategoricalAccuracy(ignore_index=self.ignore_index)
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+        mask = y_true.eq(self.ignore_index).eq(0)
+        y_pred = y_pred[mask]
+        y_true = y_true[mask]
+
+        sorted_indices = torch.topk(y_pred, self.k, dim=1)[1]
+        expanded_y = y_true.view(-1, 1).expand(-1, self.k)
+        return torch.sum(torch.eq(sorted_indices, expanded_y), dim=1).float()
 
 
+@metrics.default_for_key('mse')
+@metrics.running_mean
+@metrics.mean
+class MeanSquaredError(metrics.Metric):
+    """Mean squared error metric. Computes the pixelwise squared error which is then averaged with decorators.
+    Decorated with a mean and running_mean. Default for key: 'mse'.
+    """
+
+    def __init__(self):
+        super().__init__('mse')
+
+    def process(self, *args):
+        state = args[0]
+        y_pred = state[torchbearer.Y_PRED]
+        y_true = state[torchbearer.Y_TRUE]
+        return torch.pow(y_pred - y_true.view_as(y_pred), 2)
+
+
+@metrics.default_for_key('loss')
+@metrics.running_mean
+@metrics.std
+@metrics.mean
 class Loss(metrics.Metric):
-    """Simply returns the 'loss' value from the model state.
+    """Simply returns the 'loss' value from the model state. Decorated with a mean, running_mean and std. Default for
+    key: 'loss'.
     """
 
     def __init__(self):
@@ -68,17 +125,10 @@ class Loss(metrics.Metric):
         return state[torchbearer.LOSS]
 
 
-@metrics.default_for_key('loss')
-@metrics.running_mean
-@metrics.std
-@metrics.mean
-class LossFactory(metrics.MetricFactory):
-    def build(self):
-        return Loss()
-
-
+@metrics.default_for_key('epoch')
+@metrics.to_dict
 class Epoch(metrics.Metric):
-    """Returns the 'epoch' from the model state.
+    """Returns the 'epoch' from the model state. Default for key: 'epoch'.
     """
 
     def __init__(self):
@@ -86,19 +136,11 @@ class Epoch(metrics.Metric):
 
     def process_final(self, *args):
         state = args[0]
-        return Epoch._process(state)
+        return self._process(state)
 
     def process(self, *args):
         state = args[0]
-        return Epoch._process(state)
+        return self._process(state)
 
-    @staticmethod
-    def _process(state):
+    def _process(self, state):
         return state[torchbearer.EPOCH]
-
-
-@metrics.default_for_key('epoch')
-@metrics.to_dict
-class EpochFactory(metrics.MetricFactory):
-    def build(self):
-        return Epoch()

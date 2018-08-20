@@ -7,9 +7,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added the ability to pass custom arguments to the tqdm callback
 - Added an ignore_index flag to the categorical accuracy metric, similar to nn.CrossEntropyLoss. Usage: ``metrics=[CategoricalAccuracyFactory(ignore_index=0)]``
+- Added TopKCategoricalAccuracy metric (default for key: top\_5\_acc)
+- Added BinaryAccuracy metric (default for key: binary\_acc)
+- Added MeanSquaredError metric (default for key: mse)
+- Added DefaultAccuracy metric (use with 'acc' or 'accuracy') - infers accuracy from the criterion
 ### Changed
 ### Deprecated
 ### Removed
+- Removed the MetricFactory class. Decorators still work in the same way but the Factory is no longer needed.
 ### Fixed
 
 ## [0.1.7] - 2018-08-14

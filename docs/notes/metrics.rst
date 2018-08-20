@@ -24,14 +24,9 @@ Metric Decorators
 Now that we have explained some of the basic aspects of the metric API, lets have a look at an example:
 
 .. literalinclude:: /../torchbearer/metrics/primitives.py
-   :lines: 28-35
+   :lines: 17-22
 
 This is the definition of the default accuracy metric in torchbearer, let's break it down.
-
-:class:`.CategoricalAccuracyFactory` is a :class:`.MetricFactory` which simply returns a :class:`.CategoricalAccuracy`
-instance on build. We don't need to do this, the decorators can simply take a :class:`.Metric` implementation, however,
-for torchbearer we wanted to keep the :class:`.CategoricalAccuracy` class clean so that it could still be used in cases
-where running means are not desirable.
 
 :func:`.mean`, :func:`.std` and :func:`.running_mean` are all decorators which collect statistics about the underlying
 metric. :class:`.CategoricalAccuracy` simply returns a boolean tensor with an entry for each item in a batch. The
