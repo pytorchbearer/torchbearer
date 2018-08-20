@@ -75,6 +75,8 @@ class State(dict):
         super().update(new_dict)
 
 
+VERSION = state_key('torchbearer_version')
+
 MODEL = state_key('model')
 CRITERION = state_key('criterion')
 OPTIMIZER = state_key('optimizer')

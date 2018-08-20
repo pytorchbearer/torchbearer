@@ -1879,6 +1879,37 @@ class TestTrialMembers(TestCase):
         self.assertTrue(torchbearertrial.state[tb.OPTIMIZER].load_state_dict.call_count == 0)
         self.assertTrue(torchmodel.load_state_dict.call_args[1] == key_words)
 
+    def test_load_state_dict_wrong_version(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1, 1))
+        torchmodel.load_state_dict = Mock()
+
+        optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
+        optimizer.load_state_dict = Mock()
+
+        torchbearertrial = Trial(torchmodel, optimizer, None, [], [], pass_state=False)
+
+        torchbearer_state = torchbearertrial.state_dict()
+        torchbearer_state[tb.VERSION] = '0.1.7'  # Old version
+
+        self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state, resume=True))
+
+    def test_load_state_dict_not_torchbearer(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1, 1))
+        torchmodel.load_state_dict = Mock()
+
+        optimizer = torch.optim.SGD(torchmodel.parameters(), 0.1)
+        optimizer.load_state_dict = Mock()
+
+        torchbearertrial = Trial(torchmodel, optimizer, None, [], [], pass_state=False)
+
+        torchbearer_state = torchbearertrial.state_dict()
+        torchbearer_state[tb.VERSION] = '0.1.7'  # Old version
+
+        self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state[tb.MODEL]))
+
+        torchmodel.load_state_dict.assert_called_once()
+        optimizer.load_state_dict.assert_not_called()
+
     def test_state_dict(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         torchmodel_state = torchmodel.state_dict()
@@ -1896,6 +1927,7 @@ class TestTrialMembers(TestCase):
         torchbearertrial.state[tb.CALLBACK_LIST] = callback_list
         torchbearer_state = torchbearertrial.state_dict()
 
+        self.assertTrue(torchbearer_state[tb.VERSION] == tb.__version__.replace('.dev', ''))
         self.assertTrue(torchbearer_state[tb.MODEL] == torchmodel_state)
         self.assertTrue(torchbearer_state[tb.OPTIMIZER] == optimizer_state)
         self.assertTrue(torchbearer_state[tb.CALLBACK_LIST] == 1)
