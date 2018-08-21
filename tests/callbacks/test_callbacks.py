@@ -48,8 +48,8 @@ class TestCallbackList(TestCase):
 
         state = self.list.state_dict()
 
-        self.callback_1.state_dict.assert_called_once()
-        self.callback_2.state_dict.assert_called_once()
+        self.assertEqual(self.callback_1.state_dict.call_count, 1)
+        self.assertEqual(self.callback_2.state_dict.call_count, 1)
         self.assertEqual(state[CallbackList.CALLBACK_STATES][0], 'test_1')
         self.assertEqual(state[CallbackList.CALLBACK_STATES][1], 'test_2')
         self.assertEqual(state[CallbackList.CALLBACK_TYPES][0], Tqdm().__class__)

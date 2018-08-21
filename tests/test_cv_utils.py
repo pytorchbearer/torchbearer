@@ -153,7 +153,7 @@ class TestCVUtils(unittest.TestCase):
         tvs = torchbearer.cv_utils.train_valid_splitter
 
         trainset, valset = get_train_valid_sets(x, y, None, valid_split, shuffle)
-        tvs.assert_called_once()
+        self.assertEqual(tvs.call_count, 1)
         self.assertTrue(tvs.call_args[0][-1] == valid_split)
         self.assertTrue(list(tvs.call_args[0][0].numpy()) == list(x.numpy()))
         self.assertTrue(list(tvs.call_args[0][1].numpy()) == list(y.numpy()))

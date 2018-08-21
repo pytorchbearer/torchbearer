@@ -1,3 +1,4 @@
+import functools
 import warnings
 
 import torch
@@ -78,6 +79,7 @@ def inject_printer(validation_label_letter='v'):
     :return: A decorator
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             import inspect
             verbose = kwargs['verbose'] if 'verbose' in kwargs else inspect.signature(func).parameters['verbose'].default  # Populate default value
@@ -195,6 +197,7 @@ def inject_sampler(generator, predict=False):
     :return: the decorator
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if self.state[generator] is None:
                 loader = load_batch_none
@@ -220,6 +223,7 @@ def inject_callback(callback):
     :return: the decorator
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             callback_list_old = self.state[torchbearer.CALLBACK_LIST]
 
@@ -236,6 +240,7 @@ def inject_callback(callback):
 def fluent(func):
     """Decorator for class methods which forces return of self.
     """
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         func(self, *args, **kwargs)
         return self
@@ -795,8 +800,6 @@ class Trial(object):
         state[torchbearer.METRICS] = all_metrics
         callback_list.on_end_epoch(state)
 
-
-
     @fluent
     def train(self):
         """Set model and metrics to training mode.
@@ -865,6 +868,7 @@ class Trial(object):
         :rtype: dict
         """
         state_dict = {
+            torchbearer.VERSION: torchbearer.__version__.replace('.dev', ''),
             torchbearer.MODEL: self.state[torchbearer.MODEL].state_dict(**kwargs),
             torchbearer.OPTIMIZER: self.state[torchbearer.OPTIMIZER].state_dict(),
             torchbearer.HISTORY: self.state[torchbearer.HISTORY],
@@ -875,7 +879,7 @@ class Trial(object):
     @fluent
     def load_state_dict(self, state_dict, resume=True, **kwargs):
         """Resume this trial from the given state. Expects that this trial was constructed in the same way. Optionally,
-        just load the model state.
+        just load the model state when resume=False.
 
         :param state_dict: The state dict to reload
         :type state_dict: dict
@@ -884,10 +888,23 @@ class Trial(object):
         :return: self
         :rtype: Trial
         """
-        if resume:
+        if resume and torchbearer.MODEL in state_dict:  # torchbearer dict
+            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] is not torchbearer.__version__.replace('.dev', ''):
+                warnings.warn('This state dict was saved with a different torchbearer version, loading available keys. Consider setting resume=False')
+
+            if torchbearer.MODEL in state_dict:
+                self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
+
+            if torchbearer.OPTIMIZER in state_dict:
+                self.state[torchbearer.OPTIMIZER].load_state_dict(state_dict[torchbearer.OPTIMIZER])
+
+            if torchbearer.HISTORY in state_dict:
+                self.state[torchbearer.HISTORY] = state_dict[torchbearer.HISTORY]
+
+            if torchbearer.CALLBACK_LIST in state_dict:
+                self.state[torchbearer.CALLBACK_LIST].load_state_dict(state_dict[torchbearer.CALLBACK_LIST])
+        elif torchbearer.MODEL in state_dict:
             self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
-            self.state[torchbearer.OPTIMIZER].load_state_dict(state_dict[torchbearer.OPTIMIZER])
-            self.state[torchbearer.HISTORY] = state_dict[torchbearer.HISTORY]
-            self.state[torchbearer.CALLBACK_LIST].load_state_dict(state_dict[torchbearer.CALLBACK_LIST])
-        else:
-            self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
+        else:  # something else
+            warnings.warn('Not a torchbearer state dict, passing to model')
+            self.state[torchbearer.MODEL].load_state_dict(state_dict, **kwargs)

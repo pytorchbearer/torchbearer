@@ -1,5 +1,12 @@
 """
-Model
+Trial
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+..  automodule:: torchbearer.trial
+        :members:
+        :undoc-members:
+
+Model (Deprecated)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  automodule:: torchbearer.torchbearer

@@ -20,7 +20,7 @@ class TestRocAucScore(unittest.TestCase):
                         torchbearer.Y_TRUE: torch.LongTensor([1, 2, 3]),
                         torchbearer.Y_PRED: torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
         self.assertTrue('roc_auc_score' in res)
-        mock_sklearn_metrics.roc_auc_score.assert_called_once()
+        self.assertEqual(mock_sklearn_metrics.roc_auc_score.call_count, 1)
         self.assertTrue(np.array_equal(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]),
                                        mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][0]))
         try:
@@ -38,7 +38,7 @@ class TestRocAucScore(unittest.TestCase):
                         torchbearer.Y_TRUE: torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
                         torchbearer.Y_PRED: torch.FloatTensor([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])})
         self.assertTrue('roc_auc_score' in res)
-        mock_sklearn_metrics.roc_auc_score.assert_called_once()
+        self.assertEqual(mock_sklearn_metrics.roc_auc_score.call_count, 1)
         self.assertTrue(np.array_equal(np.array([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
                                        mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][0]))
         try:
