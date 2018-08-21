@@ -31,7 +31,7 @@ def no_grad():
         def decorator(func):
             @functools.wraps(func)
             def wrap_no_grad(*args, **kwargs):
-                with torch.no_grad:
+                with torch.no_grad():
                     return func(*args, **kwargs)
             return wrap_no_grad
         return decorator
