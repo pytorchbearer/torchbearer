@@ -27,7 +27,7 @@ class TestStd(unittest.TestCase):
         for i in range(5):
             self._std.process(self._metric.process())
         result = self._std.process_final({})
-        self.assertAlmostEqual(self._target, result)
+        self.assertAlmostEqual(self._target, result, places=5)
 
     def test_validate(self):
         self.setUp()
@@ -35,7 +35,7 @@ class TestStd(unittest.TestCase):
         for i in range(5):
             self._std.process(self._metric.process())
         result = self._std.process_final({})
-        self.assertAlmostEqual(self._target, result)
+        self.assertAlmostEqual(self._target, result, places=5)
 
     def test_precision_error(self):
         self.setUp()
@@ -64,7 +64,7 @@ class TestStd(unittest.TestCase):
         for i in range(5):
             self._std.process(self._metric.process())
         result = self._std.process_final({})
-        self.assertAlmostEqual(self._target, result)
+        self.assertAlmostEqual(self._target, result, places=5)
 
 
 class TestMean(unittest.TestCase):
@@ -87,7 +87,7 @@ class TestMean(unittest.TestCase):
         for i in range(5):
             self._mean.process(self._metric.process())
         result = self._mean.process_final({})
-        self.assertAlmostEqual(self._target, result)
+        self.assertAlmostEqual(self._target, result, places=5)
 
     def test_validate_dict(self):
         self.setUp()
@@ -95,7 +95,7 @@ class TestMean(unittest.TestCase):
         for i in range(5):
             self._mean.process(self._metric.process())
         result = self._mean.process_final({})
-        self.assertAlmostEqual(self._target, result)
+        self.assertAlmostEqual(self._target, result, places=5)
 
     def setUpMoreDims(self):
         self._metric = Metric('test')
@@ -114,7 +114,7 @@ class TestMean(unittest.TestCase):
         for i in range(5):
             self._mean.process(self._metric.process())
         result = self._mean.process_final({})
-        self.assertAlmostEqual(self._target, result)
+        self.assertAlmostEqual(self._target, result, places=5)
 
 
 class TestRunningMetric(unittest.TestCase):
