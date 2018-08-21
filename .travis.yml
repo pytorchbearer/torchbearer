@@ -8,8 +8,8 @@ env:
 # command to install dependencies
 install:
   - pip install -q coverage
-  - pip install -Iv -q torch==$TORCH_VERSION
-  - pip install -r -q requirements.txt
+  - pip install -q -I torch==$TORCH_VERSION
+  - pip install -q -r requirements.txt
 # command to run tests
 script:
   - nosetests tests -v --with-coverage --cover-package=torchbearer
