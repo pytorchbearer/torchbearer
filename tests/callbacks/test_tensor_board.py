@@ -32,7 +32,7 @@ class TestTensorBoard(TestCase):
         tboard.on_start(state)
         tboard.on_end(state)
 
-        mock_visdom.assert_called_once()
+        self.assertEqual(mock_visdom.call_count, 1)
         self.assertTrue(mock_visdom.call_args[1]['log_to_filename'] == os.path.join('./logs', 'Sequential_torchbearer',
                                                                                     'log.log'))
 
@@ -78,7 +78,7 @@ class TestTensorBoard(TestCase):
         tboard.on_end(state)
 
         mock_rand.assert_called_once_with(state[torchbearer.X].size(), requires_grad=False)
-        mock_board.return_value.add_graph.assert_called_once()
+        self.assertEqual(mock_board.return_value.add_graph.call_count, 1)
         self.assertEqual(str(state[torchbearer.MODEL]), str(mock_board.return_value.add_graph.call_args_list[0][0][0]))
         self.assertNotEqual(state[torchbearer.MODEL], mock_board.return_value.add_graph.call_args_list[0][0][0])
 
@@ -92,7 +92,7 @@ class TestTensorBoard(TestCase):
         tboard = TensorBoard(write_epoch_metrics=False)
         tboard.on_start(state)
         tboard.on_end({})
-        mock_board.return_value.close.assert_called_once()
+        self.assertEqual(mock_board.return_value.close.call_count, 1)
 
     @patch('os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
@@ -106,7 +106,7 @@ class TestTensorBoard(TestCase):
         tboard = TensorBoard(visdom=True, write_epoch_metrics=False)
         tboard.on_start(state)
         tboard.on_end({})
-        mock_writer.return_value.close.assert_called_once()
+        self.assertEqual(mock_writer.return_value.close.call_count, 1)
 
     @patch('torchbearer.callbacks.tensor_board.SummaryWriter')
     def test_batch_writer_closed_on_end_epoch(self, mock_board):
@@ -119,7 +119,7 @@ class TestTensorBoard(TestCase):
         tboard.on_start(state)
         tboard.on_start_epoch(state)
         tboard.on_end_epoch({})
-        mock_board.return_value.close.assert_called_once()
+        self.assertEqual(mock_board.return_value.close.call_count, 1)
         tboard.on_end(state)
 
     @patch('os.makedirs')
@@ -228,8 +228,8 @@ class TestTensorBoard(TestCase):
             state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3))}
             tboard = TensorBoard(visdom=True, write_epoch_metrics=False)
             tboard.on_start(state)
-            
-            mock_warn.assert_called_once()
+
+            self.assertEqual(mock_warn.call_count, 1)
 
 
 class TestTensorBoardImages(TestCase):
@@ -255,7 +255,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_start(state)
         tboard.on_end(state)
 
-        mock_visdom.assert_called_once()
+        self.assertEqual(mock_visdom.call_count, 1)
         self.assertTrue(mock_visdom.call_args[1]['log_to_filename'] == os.path.join('./test', 'Sequential_torchbearer',
                                                                                     'log.log'))
 
@@ -269,7 +269,7 @@ class TestTensorBoardImages(TestCase):
         tboard = TensorBoardImages()
         tboard.on_start(state)
         tboard.on_end({})
-        mock_board.return_value.close.assert_called_once()
+        self.assertEqual(mock_board.return_value.close.call_count, 1)
 
     @patch('os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
@@ -283,7 +283,7 @@ class TestTensorBoardImages(TestCase):
         tboard = TensorBoard(visdom=True)
         tboard.on_start(state)
         tboard.on_end({})
-        mock_writer.return_value.close.assert_called_once()
+        self.assertEqual(mock_writer.return_value.close.call_count, 1)
 
     @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
     @patch('torchbearer.callbacks.tensor_board.SummaryWriter')
@@ -557,7 +557,7 @@ class TestTensorBoardProjector(TestCase):
         tboard = TensorBoardProjector()
         tboard.on_start(state)
         tboard.on_end({})
-        mock_board.return_value.close.assert_called_once()
+        self.assertEqual(mock_board.return_value.close.call_count, 1)
 
     @patch('torchbearer.callbacks.tensor_board.SummaryWriter')
     def test_simple_case(self, mock_board):

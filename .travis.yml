@@ -1,11 +1,19 @@
 language: python
-python:
-  - "3.6"
+matrix:
+  include:
+    - python: "3.5"
+      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp35-cp35m-linux_x86_64.whl
+    - python: "3.5"
+      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp35-cp35m-linux_x86_64.whl
+    - python: "3.6"
+      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
+    - python: "3.6"
+      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp36-cp36m-linux_x86_64.whl
 # command to install dependencies
 install:
-  - pip install coverage
-  - pip install visdom
-  - python setup.py develop
+  - pip install -q coverage
+  - pip install -q $TORCH_URL
+  - pip install -q -r requirements.txt
 # command to run tests
 script:
   - nosetests tests -v --with-coverage --cover-package=torchbearer

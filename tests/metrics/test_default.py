@@ -83,9 +83,9 @@ class TestDefaultAccuracy(unittest.TestCase):
         metric.eval()
         metric.train()
 
-        cat_acc.assert_called_once()
+        self.assertEqual(cat_acc.call_count, 1)
         mock.reset.assert_called_once_with({torchbearer.CRITERION: None})
         mock.process.assert_called_once_with(1, 2, 3)
         mock.process_final.assert_called_once_with(4, 5, 6)
-        mock.eval.assert_called_once()
-        mock.train.assert_called_once()
+        self.assertEqual(mock.eval.call_count, 1)
+        self.assertEqual(mock.train.call_count, 1)
