@@ -26,8 +26,8 @@ class TestMetric(unittest.TestCase):
 
     def test_requires_grad(self):
         result = self._metric.process(self._state)
-        self.assertTrue(self._state[torchbearer.Y_PRED].requires_grad == True)
-        self.assertTrue(result.requires_grad == False)
+        self.assertTrue(self._state[torchbearer.Y_PRED].requires_grad is True)
+        self.assertTrue(result.requires_grad is False)
 
 
 class TestMetricTree(unittest.TestCase):

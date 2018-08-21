@@ -6,8 +6,11 @@ of :class:`Metric` or :class:`MetricFactory`. These can then be collected in a :
 running metrics and statistics, without needing to compute the underlying values more than once. Typically,
 constructions of this kind should be handled using the :mod:`decorator API <.metrics.decorators>`.
 """
+from distutils.version import LooseVersion
+import functools
+
 import inspect
-from torch import no_grad
+import torch
 
 __defaults__ = {}
 
@@ -21,6 +24,19 @@ def get_default(key):
     if inspect.isclass(metric):
         metric = metric()
     return metric
+
+
+def no_grad():
+    if LooseVersion(torch.__version__) < LooseVersion("0.4.1"):  # No grad isn't a decorator
+        def decorator(func):
+            @functools.wraps(func)
+            def wrap_no_grad(*args, **kwargs):
+                with torch.no_grad:
+                    return func(*args, **kwargs)
+            return wrap_no_grad
+        return decorator
+    else:
+        return torch.no_grad()
 
 
 class Metric(object):
