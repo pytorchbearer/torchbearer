@@ -166,7 +166,7 @@ class Model:
             torchbearer.TRAIN_STEPS: train_steps,
             torchbearer.STEPS: train_steps,
             torchbearer.BATCH: 0,
-            torchbearer.GENERATOR: generator,
+            torchbearer.TRAIN_GENERATOR: generator,
             torchbearer.STOP_TRAINING: False
         }
         state.update(self.main_state)
@@ -178,9 +178,9 @@ class Model:
         for state[torchbearer.EPOCH] in range(initial_epoch, epochs):
             state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            if state[torchbearer.GENERATOR] is not None:
-                state[torchbearer.TRAIN_GENERATOR] = state[torchbearer.GENERATOR]
-                state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.GENERATOR])
+            if state[torchbearer.TRAIN_GENERATOR] is not None:
+                state[torchbearer.GENERATOR] = state[torchbearer.TRAIN_GENERATOR]
+                state[torchbearer.TRAIN_ITERATOR] = iter(state[torchbearer.TRAIN_GENERATOR])
                 state[torchbearer.ITERATOR] = state[torchbearer.TRAIN_ITERATOR]
             self.train()
 
@@ -190,10 +190,10 @@ class Model:
 
             for state[torchbearer.BATCH] in range(0, state[torchbearer.TRAIN_STEPS]):
                 # Extract batch
-                if state[torchbearer.GENERATOR] is None: # TODO: Replace with flag check
-                    self._load_batch_none('train', state)
+                if state[torchbearer.TRAIN_GENERATOR] is None: # TODO: Replace with flag check
+                    self._load_batch_none(torchbearer.TRAIN_ITERATOR, state)
                 else:
-                    self._load_batch_standard('train', state)
+                    self._load_batch_standard(torchbearer.TRAIN_ITERATOR, state)
 
                 state[torchbearer.CALLBACK_LIST].on_sample(state)
 
@@ -286,7 +286,7 @@ class Model:
 
             for state[torchbearer.BATCH] in range(state[torchbearer.VALIDATION_STEPS]):
                 # Load batch
-                batch_loader('validation', state)
+                batch_loader(torchbearer.VALIDATION_ITERATOR, state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward pass
@@ -551,7 +551,7 @@ class Model:
         :param state: The current state dict of the :class:`Model`.
         :type state: dict[str,any]
         """
-        state[torchbearer.X], state[torchbearer.Y_TRUE] = Model._deep_to(next(state[iterator + '_iterator']), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
+        state[torchbearer.X], state[torchbearer.Y_TRUE] = Model._deep_to(next(state[iterator]), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
 
     @staticmethod
     def _load_batch_none(_, state):
@@ -571,7 +571,7 @@ class Model:
         :param state: The current state dict of the :class:`Model`.
         :type state: dict[str,any]
         """
-        data = Model._deep_to(next(state[iterator + '_iterator']), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
+        data = Model._deep_to(next(state[iterator]), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
         if isinstance(data, list) or isinstance(data, tuple):
             state[torchbearer.X], state[torchbearer.Y_TRUE] = data
         else:
