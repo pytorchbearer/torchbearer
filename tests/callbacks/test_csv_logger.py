@@ -21,7 +21,10 @@ class TestCSVLogger(TestCase):
         logger.on_end_epoch(state)
         logger.on_end(state)
 
-        self.assertTrue(mock_open.mock_calls[1][1][0] == 'epoch,test_metric_1,test_metric_2\r\n')
+        header = mock_open.mock_calls[1][1][0]
+        self.assertTrue('epoch' in header)
+        self.assertTrue('test_metric_1' in header)
+        self.assertTrue('test_metric_2' in header)
 
     @patch("builtins.open", new_callable=mock_open)
     def test_write_no_header(self, mock_open):
@@ -37,7 +40,10 @@ class TestCSVLogger(TestCase):
         logger.on_end_epoch(state)
         logger.on_end(state)
 
-        self.assertFalse(mock_open.mock_calls[1][1][0] == 'epoch,test_metric_1,test_metric_2\r\n')
+        header = mock_open.mock_calls[1][1][0]
+        self.assertTrue('epoch' not in header)
+        self.assertTrue('test_metric_1' not in header)
+        self.assertTrue('test_metric_2' not in header)
 
     @patch("builtins.open", new_callable=mock_open)
     def test_csv_closed(self, mock_open):
