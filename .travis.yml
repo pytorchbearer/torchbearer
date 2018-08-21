@@ -1,11 +1,15 @@
 language: python
 python:
+  - "3.5"
   - "3.6"
+env:
+  - TORCH_VERSION=0.4.0
+  - TORCH_VERSION=0.4.1
 # command to install dependencies
 install:
   - pip install coverage
-  - pip install visdom
-  - python setup.py develop
+  - pip install -r requirements.txt
+  - pip install torch==$TORCH_VERSION
 # command to run tests
 script:
   - nosetests tests -v --with-coverage --cover-package=torchbearer
