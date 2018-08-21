@@ -7,9 +7,9 @@ env:
   - TORCH_VERSION=0.4.1
 # command to install dependencies
 install:
-  - pip install coverage
-  - pip install -r requirements.txt
-  - pip install torch==$TORCH_VERSION
+  - pip install -q coverage
+  - pip install -Iv -q torch==$TORCH_VERSION
+  - pip install -r -q requirements.txt
 # command to run tests
 script:
   - nosetests tests -v --with-coverage --cover-package=torchbearer
