@@ -1311,7 +1311,7 @@ class TestTorchbearer(TestCase):
 
         state = {'training_iterator': iterator, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.int}
 
-        Model._load_batch_standard('training', state)
+        Model._load_batch_standard('training_iterator', state)
         self.assertTrue(state[torchbearer.X].item() == items[0][0].item())
         self.assertTrue(state[torchbearer.Y_TRUE].item() == items[0][1].item())
 
@@ -1320,7 +1320,7 @@ class TestTorchbearer(TestCase):
         iterator = iter(items)
 
         state = {'training_iterator': iterator, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.int}
-        Model._load_batch_predict('training', state)
+        Model._load_batch_predict('training_iterator', state)
         self.assertTrue(state[torchbearer.X].item() == items[0].item())
 
     def test_load_batch_predict_list(self):
@@ -1329,6 +1329,6 @@ class TestTorchbearer(TestCase):
 
         state = {'training_iterator': iterator, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.int}
 
-        Model._load_batch_predict('training', state)
+        Model._load_batch_predict('training_iterator', state)
         self.assertTrue(state[torchbearer.X].item() == items[0][0].item())
         self.assertTrue(state[torchbearer.Y_TRUE].item() == items[0][1].item())
