@@ -7,7 +7,7 @@ matrix:
       env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp35-cp35m-linux_x86_64.whl
     - python: "3.6"
       env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp36-cp36m-linux_x86_64.whl
-    - python: "3.5"
+    - python: "3.6"
       env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp36-cp36m-linux_x86_64.whl
 # command to install dependencies
 install:
