@@ -1,3 +1,4 @@
+import functools
 import warnings
 
 import torch
@@ -78,6 +79,7 @@ def inject_printer(validation_label_letter='v'):
     :return: A decorator
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             import inspect
             verbose = kwargs['verbose'] if 'verbose' in kwargs else inspect.signature(func).parameters['verbose'].default  # Populate default value
@@ -195,6 +197,7 @@ def inject_sampler(generator, predict=False):
     :return: the decorator
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if self.state[generator] is None:
                 loader = load_batch_none
@@ -220,6 +223,7 @@ def inject_callback(callback):
     :return: the decorator
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             callback_list_old = self.state[torchbearer.CALLBACK_LIST]
 
@@ -236,6 +240,7 @@ def inject_callback(callback):
 def fluent(func):
     """Decorator for class methods which forces return of self.
     """
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         func(self, *args, **kwargs)
         return self
