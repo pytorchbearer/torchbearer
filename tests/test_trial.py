@@ -46,7 +46,7 @@ class TestCallbackListInjection(TestCase):
         # state_dict
         mock.state_dict.return_value = 'test'
         self.assertEqual(injection.state_dict(), 'test')
-        mock.state_dict.assert_called_once()
+        self.assertEqual(mock.state_dict.call_count, 1)
 
         # load_state_dict
         injection.load_state_dict('test')
@@ -55,7 +55,7 @@ class TestCallbackListInjection(TestCase):
         # iter
         mock.__iter__.return_value = ['iterator']
         self.assertEqual(next(injection.__iter__()), 'iterator')
-        mock.__iter__.assert_called_once()
+        self.assertEqual(mock.__iter__.call_count, 1)
 
         # copy
         mock.copy.return_value = 'copy'
@@ -85,8 +85,8 @@ class TestCallbackListInjection(TestCase):
         injection = CallbackListInjection(set_one, callbacks.CallbackList([set_two]))
 
         injection.on_end({})
-        set_one.on_end.assert_called_once()
-        set_two.on_end.assert_called_once()
+        self.assertEqual(set_one.on_end.call_count, 1)
+        self.assertEqual(set_two.on_end.call_count, 1)
 
         injection.on_start({})
         self.assertEqual(my_number, 2)
@@ -499,10 +499,10 @@ class TestRun(TestCase):
         torchbearertrial.with_train_generator(generator, steps=train_steps)
         torchbearertrial.run(epochs=epochs, verbose=0)
 
-        callback.on_start.assert_called_once()
-        callback.on_start_epoch.assert_called_once()
-        callback.on_end_epoch.assert_called_once()
-        callback.on_end.assert_called_once()
+        self.assertEqual(callback.on_start.call_count, 1)
+        self.assertEqual(callback.on_start_epoch.call_count, 1)
+        self.assertEqual(callback.on_end_epoch.call_count, 1)
+        self.assertEqual(callback.on_end.call_count, 1)
 
     def test_run_epochs_ran_normal(self):
         metric = Metric('test')
@@ -608,7 +608,7 @@ class TestRun(TestCase):
         torchbearertrial.with_train_generator(generator, steps=train_steps)
         torchbearertrial.run(epochs=epochs, verbose=0)
 
-        torchbearertrial._fit_pass.assert_called_once()
+        self.assertEqual(torchbearertrial._fit_pass.call_count, 1)
 
     def test_run_stop_training(self):
         metric = Metric('test')
@@ -637,9 +637,9 @@ class TestRun(TestCase):
         torchbearertrial.state[tb.STOP_TRAINING] = True
         torchbearertrial.run(epochs=epochs, verbose=0)
 
-        callback.on_start_epoch.assert_called_once()
+        self.assertEqual(callback.on_start_epoch.call_count, 1)
         self.assertTrue(callback.on_end_epoch.call_count == 0)
-        callback.on_end.assert_called_once()
+        self.assertEqual(callback.on_end.call_count, 1)
 
     def test_run_stop_training_second(self):
         metric = Metric('test')
@@ -671,9 +671,9 @@ class TestRun(TestCase):
         torchbearertrial.with_train_generator(generator, steps=train_steps)
         torchbearertrial.run(epochs=epochs, verbose=0)
 
-        callback.on_start_epoch.assert_called_once()
-        callback.on_end_epoch.assert_called_once()
-        callback.on_end.assert_called_once()
+        self.assertEqual(callback.on_start_epoch.call_count, 1)
+        self.assertEqual(callback.on_end_epoch.call_count, 1)
+        self.assertEqual(callback.on_end.call_count, 1)
 
     def test_run_history_metrics(self):
         metric = Metric('test')
@@ -730,7 +730,7 @@ class TestFitPass(TestCase):
         torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._fit_pass(state)
-        torchbearertrial.train.assert_called_once()
+        self.assertEqual(torchbearertrial.train.call_count, 1)
 
     def test_fit_metrics_reset(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
@@ -758,7 +758,7 @@ class TestFitPass(TestCase):
         torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._fit_pass(state)
-        metric_list.reset.assert_called_once()
+        self.assertEqual(metric_list.reset.call_count, 1)
 
     def test_fit_callback_calls(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
@@ -788,13 +788,13 @@ class TestFitPass(TestCase):
         torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._fit_pass(state)
-        callback_list.on_start_training.assert_called_once()
+        self.assertEqual(callback_list.on_start_training.call_count, 1)
         self.assertTrue(callback_list.on_sample.call_count == 3)
         self.assertTrue(callback_list.on_forward.call_count == 3)
         self.assertTrue(callback_list.on_criterion.call_count == 3)
         self.assertTrue(callback_list.on_backward.call_count == 3)
         self.assertTrue(callback_list.on_step_training.call_count == 3)
-        callback_list.on_end_training.assert_called_once()
+        self.assertEqual(callback_list.on_end_training.call_count, 1)
 
     def test_fit_optimizer_calls(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
@@ -1033,7 +1033,7 @@ class TestFitPass(TestCase):
         torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         history = torchbearertrial._fit_pass(state)[tb.METRICS]
-        metric_list.process_final.assert_called_once()
+        self.assertEqual(metric_list.process_final.call_count, 1)
         self.assertTrue(history['test'] == 2)
 
     def test_fit_stop_training(self):
@@ -1069,7 +1069,7 @@ class TestFitPass(TestCase):
         torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._fit_pass(state)
-        metric_list.process.assert_called_once()
+        self.assertEqual(metric_list.process.call_count, 1)
 
     def test_fit_iterator_none(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
@@ -1181,7 +1181,7 @@ class TestTestPass(TestCase):
         torchbearertrial.state = {tb.GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._test_pass(state)
-        metric_list.reset.assert_called_once()
+        self.assertEqual(metric_list.reset.call_count, 1)
 
     def test_callback_calls(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
@@ -1216,12 +1216,12 @@ class TestTestPass(TestCase):
         torchbearertrial.state = {tb.GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._test_pass(state)
-        callback_list.on_start_validation.assert_called_once()
+        self.assertEqual(callback_list.on_start_validation.call_count, 1)
         self.assertTrue(callback_list.on_sample_validation.call_count == 3)
         self.assertTrue(callback_list.on_forward_validation.call_count == 3)
         self.assertTrue(callback_list.on_criterion_validation.call_count == 3)
         self.assertTrue(callback_list.on_step_validation.call_count == 3)
-        callback_list.on_end_validation.assert_called_once()
+        self.assertEqual(callback_list.on_end_validation.call_count, 1)
 
     def test_forward_no_state(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
@@ -1400,7 +1400,7 @@ class TestTestPass(TestCase):
         torchbearertrial.state = {tb.GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         history = torchbearertrial._test_pass(state)
-        metric_list.process_final.assert_called_once()
+        self.assertEqual(metric_list.process_final.call_count, 1)
         self.assertTrue(history[tb.METRICS]['test'] == 2)
 
     def test_stop_training(self):
@@ -1436,7 +1436,7 @@ class TestTestPass(TestCase):
         torchbearertrial.state = {tb.GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
 
         torchbearertrial._test_pass(state)
-        metric_list.process.assert_called_once()
+        self.assertEqual(metric_list.process.call_count, 1)
 
     def test_iterator_none(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
@@ -1525,8 +1525,8 @@ class TestTrialValEvalPred(TestCase):
         t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None}
         metrics = t._validation_pass(state)
 
-        eval_mock.assert_called_once()
-        test_pass_mock.assert_called_once()
+        self.assertEqual(eval_mock.call_count, 1)
+        self.assertEqual(test_pass_mock.call_count, 1)
         test_pass_state = test_pass_mock.call_args[0][0]
         self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
         self.assertTrue(test_pass_state[tb.STEPS] == steps)
@@ -1558,8 +1558,8 @@ class TestTrialValEvalPred(TestCase):
         t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.VALIDATION_STEPS: steps}
         metrics = t.evaluate(state)
 
-        eval_mock.assert_called_once()
-        test_pass_mock.assert_called_once()
+        self.assertEqual(eval_mock.call_count, 1)
+        self.assertEqual(test_pass_mock.call_count, 1)
         test_pass_state = test_pass_mock.call_args[0][0]
         self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
         self.assertTrue(test_pass_state[tb.STEPS] == steps)
@@ -1591,8 +1591,8 @@ class TestTrialValEvalPred(TestCase):
         t.state = {tb.TEST_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.TEST_STEPS: steps}
         metrics = t.predict(state)
 
-        eval_mock.assert_called_once()
-        test_pass_mock.assert_called_once()
+        self.assertEqual(eval_mock.call_count, 1)
+        self.assertEqual(test_pass_mock.call_count, 1)
         test_pass_state = test_pass_mock.call_args[0][0]
         self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
         self.assertTrue(test_pass_state[tb.STEPS] == steps)
@@ -1622,7 +1622,7 @@ class TestReplay(TestCase):
 
         t.state[tb.HISTORY] = history
         t.replay(callbacks=[callback])
-        tq.assert_called_once()
+        self.assertEqual(tq.call_count, 1)
 
     @patch('torchbearer.trial.Tqdm')
     def test_replay_no_tqdm(self, tq):
@@ -1641,7 +1641,7 @@ class TestReplay(TestCase):
 
         t.state[tb.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0)
-        callback.on_start.assert_called_once()
+        self.assertEqual(callback.on_start.call_count, 1)
         self.assertTrue(callback.on_sample.call_count == 100)
         self.assertTrue(callback.on_sample_validation.call_count == 50)
 
@@ -1695,7 +1695,7 @@ class TestTrialMembers(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, None, [metric], [], pass_state=False)
         torchbearertrial.train()
         self.assertTrue(torchbearertrial.state[tb.MODEL].training == True)
-        metric.train.assert_called_once()
+        self.assertEqual(metric.train.call_count, 1)
 
     def test_eval(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
@@ -1705,7 +1705,7 @@ class TestTrialMembers(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, None, [metric], [], pass_state=False)
         torchbearertrial.eval()
         self.assertTrue(torchbearertrial.state[tb.MODEL].training == False)
-        metric.eval.assert_called_once()
+        self.assertEqual(metric.eval.call_count, 1)
 
     def test_to_both_args(self):
         dev = 'cuda:1'
@@ -1849,9 +1849,9 @@ class TestTrialMembers(TestCase):
         self.assertTrue(callback_list.load_state_dict.call_args[0][0] == 1)
 
         self.assertTrue(torchbearertrial.state[tb.HISTORY] == history)
-        torchbearertrial.state[tb.MODEL].load_state_dict.assert_called_once()
-        torchbearertrial.state[tb.OPTIMIZER].load_state_dict.assert_called_once()
-        torchbearertrial.state[tb.CALLBACK_LIST].load_state_dict.assert_called_once()
+        self.assertEqual(torchbearertrial.state[tb.MODEL].load_state_dict.call_count, 1)
+        self.assertEqual(torchbearertrial.state[tb.OPTIMIZER].load_state_dict.call_count, 1)
+        self.assertEqual(torchbearertrial.state[tb.CALLBACK_LIST].load_state_dict.call_count, 1)
         self.assertTrue(torchmodel.load_state_dict.call_args[1] == key_words)
 
     def test_load_state_dict_no_resume(self):
@@ -1875,7 +1875,7 @@ class TestTrialMembers(TestCase):
         torchbearertrial.load_state_dict(torchbearer_state, resume=False, **key_words)
 
         self.assertTrue(torchbearertrial.state[tb.HISTORY] is 'Wrong')
-        torchbearertrial.state[tb.MODEL].load_state_dict.assert_called_once()
+        self.assertEqual(torchbearertrial.state[tb.MODEL].load_state_dict.call_count, 1)
         self.assertTrue(torchbearertrial.state[tb.OPTIMIZER].load_state_dict.call_count == 0)
         self.assertTrue(torchmodel.load_state_dict.call_args[1] == key_words)
 
@@ -1907,7 +1907,7 @@ class TestTrialMembers(TestCase):
 
         self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state[tb.MODEL]))
 
-        torchmodel.load_state_dict.assert_called_once()
+        self.assertEqual(torchmodel.load_state_dict.call_count, 1)
         optimizer.load_state_dict.assert_not_called()
 
     def test_state_dict(self):
@@ -1991,7 +1991,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func(verbose=0)
-        c_inj.assert_called_once()
+        self.assertEqual(c_inj.call_count, 1)
         get_print_mock.assert_called_once_with(validation_label_letter='v', verbose=0)
 
     @patch('torchbearer.trial.get_printer')
@@ -2007,7 +2007,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func(verbose=1)
-        c_inj.assert_called_once()
+        self.assertEqual(c_inj.call_count, 1)
         get_print_mock.assert_called_once_with(validation_label_letter='t', verbose=1)
 
     @patch('torchbearer.trial.get_printer')
@@ -2023,7 +2023,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func(verbose=2)
-        c_inj.assert_called_once()
+        self.assertEqual(c_inj.call_count, 1)
         get_print_mock.assert_called_once_with(validation_label_letter='t', verbose=2)
 
     @patch('torchbearer.trial.get_printer')
@@ -2039,7 +2039,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.CALLBACK_LIST: callback_list}
         t.test_func()
-        c_inj.assert_called_once()
+        self.assertEqual(c_inj.call_count, 1)
         get_print_mock.assert_called_once_with(validation_label_letter='t', verbose=2)
 
     @patch('torchbearer.trial.Tqdm')
@@ -2049,8 +2049,8 @@ class TestTrialFunctions(TestCase):
 
         class SomeClass:
             @tb.inject_printer('v')
-            def test_func(self, verbose=0):
-                c_inj.assert_called_once()
+            def test_func(self_inner, verbose=0):
+                self.assertEqual(c_inj.call_count, 1)
 
         t = SomeClass()
         t.state = {tb.CALLBACK_LIST: callback_list}
@@ -2103,8 +2103,8 @@ class TestTrialFunctions(TestCase):
 
         class SomeClass:
             @tb.inject_callback(test_callback)
-            def test_func(self):
-                c_inj.assert_called_once()
+            def test_func(self_inner):
+                self.assertEqual(c_inj.call_count, 1)
 
         t = SomeClass()
         t.state = {tb.CALLBACK_LIST: callback_list}

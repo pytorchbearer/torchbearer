@@ -106,7 +106,7 @@ class TestCSVLogger(TestCase):
         logger.on_end_epoch(state)
         logger.on_end(state)
 
-        mock_write.assert_called_once()
+        self.assertEqual(mock_write.call_count, 1)
 
     @patch('torchbearer.callbacks.CSVLogger._write_to_dict')
     @patch("builtins.open", new_callable=mock_open)

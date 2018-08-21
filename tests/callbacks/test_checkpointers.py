@@ -24,7 +24,7 @@ class TestCheckpointer(TestCase):
         file_format = 'test_file.pt'
         check = _Checkpointer(file_format)
         check.save_checkpoint(state)
-        mock_save.assert_called_once()
+        self.assertEqual(mock_save.call_count, 1)
 
         self.assertTrue(mock_save.call_args[0][1] == 'test_file.pt')
 
@@ -41,7 +41,7 @@ class TestCheckpointer(TestCase):
         file_format = 'test_file_{epoch}.pt'
         check = _Checkpointer(file_format)
         check.save_checkpoint(state)
-        mock_save.assert_called_once()
+        self.assertEqual(mock_save.call_count, 1)
 
         self.assertTrue(mock_save.call_args[0][1] == 'test_file_2.pt')
 
@@ -58,7 +58,7 @@ class TestCheckpointer(TestCase):
         file_format = 'test_file_{test_metric}.pt'
         check = _Checkpointer(file_format)
         check.save_checkpoint(state)
-        mock_save.assert_called_once()
+        self.assertEqual(mock_save.call_count, 1)
 
         self.assertTrue(mock_save.call_args[0][1] == 'test_file_0.001.pt')
 
@@ -75,7 +75,7 @@ class TestCheckpointer(TestCase):
         file_format = 'test_file_{test_metric:.01f}.pt'
         check = _Checkpointer(file_format)
         check.save_checkpoint(state)
-        mock_save.assert_called_once()
+        self.assertEqual(mock_save.call_count, 1)
 
         self.assertTrue(mock_save.call_args[0][1] == 'test_file_0.0.pt')
 

@@ -77,8 +77,9 @@ class TestMetricTree(unittest.TestCase):
         tree.add_child(leaf)
 
         tree.train()
-        root.train.assert_called_once()
-        leaf.train.assert_called_once()
+
+        self.assertEqual(root.train.call_count, 1)
+        self.assertEqual(leaf.train.call_count, 1)
 
     def test_eval(self):
         root = Metric('test')
@@ -90,8 +91,9 @@ class TestMetricTree(unittest.TestCase):
         tree.add_child(leaf)
 
         tree.eval()
-        root.eval.assert_called_once()
-        leaf.eval.assert_called_once()
+
+        self.assertEqual(root.eval.call_count, 1)
+        self.assertEqual(leaf.eval.call_count, 1)
 
     def test_reset(self):
         root = Metric('test')
@@ -146,14 +148,14 @@ class TestMetricList(unittest.TestCase):
         my_mock.train = Mock(return_value=None)
         metric = MetricList([my_mock])
         metric.train()
-        my_mock.train.assert_called_once()
+        self.assertEqual(my_mock.train.call_count, 1)
 
     def test_eval(self):
         my_mock = Metric('test')
         my_mock.eval = Mock(return_value=None)
         metric = MetricList([my_mock])
         metric.eval()
-        my_mock.eval.assert_called_once()
+        self.assertEqual(my_mock.eval.call_count, 1)
 
     def test_reset(self):
         my_mock = Metric('test')

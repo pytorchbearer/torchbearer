@@ -45,7 +45,7 @@ class TestTqdm(TestCase):
 
         tqdm.on_end_training(state)
         mock_tqdm.return_value.set_postfix.assert_called_once_with('test')
-        mock_tqdm.return_value.close.assert_called_once()
+        self.assertEqual(mock_tqdm.return_value.close.call_count, 1)
 
         mock_tqdm.reset_mock()
         mock_tqdm.return_value.set_postfix.reset_mock()
@@ -62,7 +62,7 @@ class TestTqdm(TestCase):
 
         tqdm.on_end_validation(state)
         mock_tqdm.return_value.set_postfix.assert_called_once_with('test')
-        mock_tqdm.return_value.close.assert_called_once()
+        self.assertEqual(mock_tqdm.return_value.close.call_count, 1)
 
     def test_tqdm_custom_args(self):
         state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100,
