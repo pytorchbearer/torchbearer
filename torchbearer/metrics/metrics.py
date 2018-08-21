@@ -27,7 +27,8 @@ def get_default(key):
 
 
 def no_grad():
-    if LooseVersion(torch.__version__) < LooseVersion("0.4.1"):  # No grad isn't a decorator
+    version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
+    if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad isn't a decorator
         def decorator(func):
             @functools.wraps(func)
             def wrap_no_grad(*args, **kwargs):
