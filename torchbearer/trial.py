@@ -509,19 +509,19 @@ class Trial(object):
             self.for_test_steps(test_steps)
 
     @fluent
-    def with_generators(self, train_generator=None, train_steps=None, val_generator=None, val_steps=None, test_generator=None, test_steps=None):
+    def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None, val_steps=None, test_steps=None):
         """Use this trial with the given generators. Returns self so that methods can be chained for convenience.
 
         :param train_generator: The training data generator to use during calls to :meth:`.run`
         :type train_generator: DataLoader
-        :param train_steps: The number of steps per epoch to take when using the training generator
-        :type train_steps: int
         :param val_generator: The validation data generator to use during calls to :meth:`.run` and :meth:`.evaluate`
         :type val_generator: DataLoader
-        :param val_steps: The number of steps per epoch to take when using the validation generator
-        :type val_steps: int
         :param test_generator: The testing data generator to use during calls to :meth:`.predict`
         :type test_generator: DataLoader
+        :param train_steps: The number of steps per epoch to take when using the training generator
+        :type train_steps: int
+        :param val_steps: The number of steps per epoch to take when using the validation generator
+        :type val_steps: int
         :param test_steps: The number of steps per epoch to take when using the testing generator
         :type test_steps: int
         :return: self
