@@ -278,10 +278,10 @@ class Trial(object):
 
     :param model: The base pytorch model
     :type model: torch.nn.Module
-    :param criterion: The final loss criterion that provides a loss value to the optimizer
-    :type criterion: function or None
     :param optimizer: The optimizer used for pytorch model weight updates
     :type optimizer: torch.optim.Optimizer
+    :param criterion: The final loss criterion that provides a loss value to the optimizer
+    :type criterion: function or None
     :param metrics: The list of :class:`torchbearer.Metric <.Metric>` instances to process during fitting
     :type metrics: list
     :param callbacks: The list of :class:`torchbearer.Callback <.Callback>` instances to call during fitting
