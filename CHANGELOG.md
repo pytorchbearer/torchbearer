@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Removed
 ### Fixed
 - Model class setting generator incorrectly leading to stop iterations. 
-- with_generators now has arguments ordered in a fashion consistent with for_steps (generators first, then steps).
+- Argument ordering is consistent in `Trial.with_generators` and `Trial.__init__`
 
 ## [0.2.0] - 2018-08-21
 ### Added
