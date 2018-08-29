@@ -384,7 +384,7 @@ class TestWithGenerators(TestCase):
         valgen = torchbearertrial.with_val_generator = MagicMock()
         testgen = torchbearertrial.with_test_generator = MagicMock()
 
-        torchbearertrial.with_generators(train_generator, train_steps, val_generator, val_steps, test_generator, test_steps)
+        torchbearertrial.with_generators(train_generator, val_generator, test_generator, train_steps, val_steps, test_steps)
         traingen.assert_called_once_with(train_generator, train_steps)
         valgen.assert_called_once_with(val_generator, val_steps)
         testgen.assert_called_once_with(test_generator, test_steps)
