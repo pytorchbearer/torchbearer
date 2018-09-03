@@ -245,6 +245,70 @@ class TensorBoard(AbstractTensorBoard):
             self.close_writer(self.batch_log_dir)
 
 
+class TensorBoardText(AbstractTensorBoard):
+    """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
+
+    :param log_dir: The tensorboard log path for output
+    :type log_dir: str
+    :param write_graph: If True, the model graph will be written using the TensorboardX library
+    :type write_graph: bool
+    :param write_batch_metrics: If True, batch metrics will be written
+    :type write_batch_metrics: bool
+    :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
+    :type batch_step_size: int
+    :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
+    :type write_epoch_metrics: True
+    :param comment: Descriptive comment to append to path
+    :type comment: str
+    :param visdom: If true, log to visdom instead of tensorboard
+    :type visdom: bool
+    """
+
+    def __init__(self, log_dir='./logs',
+                 write_batch_metrics=False,
+                 batch_step_size=10,
+                 write_epoch_metrics=True,
+                 comment='torchbearer',
+                 visdom=False):
+        super(TensorBoardText, self).__init__(log_dir, comment, visdom)
+
+        self.write_batch_metrics = write_batch_metrics
+        self.batch_step_size = batch_step_size
+        self.write_epoch_metrics = write_epoch_metrics
+        self.visdom = visdom
+        self.batch_log_dir = None
+        self.batch_writer = None
+
+    def table_formatter(self, string, time_step_pair=None):
+        table = '<table><th>Metric</th><th>Value</th>'
+        string = string.replace('{', '').replace('}', '').replace("'", "")  # TODO: Replace this with single pass regex
+
+        def cell(string):
+            return '<td>' + string + '</td>'
+
+        def row(string):
+            return '<tr>' + string + '</tr>'
+
+        if time_step_pair is not None:
+            name, t = time_step_pair
+            table = table + row(cell(name) + cell(str(t)))
+
+        metrics = string.split(',')
+        for i, metric in enumerate(metrics):
+            items = metric.split(':')
+            name, value = items[0], items[1]
+            table = table + row(cell(name) + cell(value))
+
+        return table + '</table>'
+
+    def on_end_epoch(self, state):
+        if self.write_epoch_metrics:
+                if self.visdom:
+                    self.writer.add_text('epoch', self.table_formatter(str(state[torchbearer.METRICS]), time_step_pair=('epoch', state[torchbearer.EPOCH])), 1)
+                else:
+                    self.writer.add_text('epoch', self.table_formatter(str(state[torchbearer.METRICS])), state[torchbearer.EPOCH])
+
+
 class TensorBoardImages(AbstractTensorBoard):
     """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
     TensorboardX library and torchvision.utils.make_grid. Images are selected from the given key and saved to the given
