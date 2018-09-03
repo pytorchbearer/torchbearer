@@ -188,7 +188,8 @@ class Sampler:
 
 
 def inject_sampler(data_key, predict=False):
-    """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER] along with the associated generator and number of steps
+    """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER] along with the specified \
+        generator into state[torchbearer.GENERATOR] and number of steps into state[torchbearer.STEPS]
     :param data_key: Key for the data to inject
     :type data_key: StateKey
     :param predict: If true, the prediction batch loader is used, if false the standard data loader is used
