@@ -220,16 +220,6 @@ def inject_sampler(data_key, predict=False):
     return decorator
 
 
-def get_sampler(state, generator, predict=False):
-    if state[generator] is None:
-        loader = load_batch_none
-    elif predict:
-        loader = load_batch_predict
-    else:
-        loader = load_batch_standard
-    return Sampler(loader)
-
-
 def inject_callback(callback):
     """ Decorator to inject a callback into the callback list and remove the callback after the decorated function has executed
     
