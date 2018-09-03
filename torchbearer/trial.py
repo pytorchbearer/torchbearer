@@ -187,7 +187,7 @@ class Sampler:
         self.batch_loader(state)
 
 
-def inject_sampler(generator, predict=False):
+def inject_sampler(data_key, predict=False):
     """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER]
 
     :param generator: The data generator for the sampler to load data from
@@ -199,7 +199,10 @@ def inject_sampler(generator, predict=False):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            if self.state[generator] is None:
+            key = kwargs['data_key'] if 'data_key' in kwargs else data_key  # Populate default value
+            generator, steps = self.state[key] if self.state[key] is not None else (None, None)
+
+            if generator is None:
                 loader = load_batch_none
             elif predict:
                 loader = load_batch_predict
@@ -207,12 +210,24 @@ def inject_sampler(generator, predict=False):
                 loader = load_batch_standard
 
             self.state[torchbearer.SAMPLER] = Sampler(loader)
+            self.state[torchbearer.GENERATOR] = generator
+            self.state[torchbearer.STEPS] = steps
 
             res = func(self, *args, **kwargs)
 
             return res
         return wrapper
     return decorator
+
+
+def get_sampler(state, generator, predict=False):
+    if state[generator] is None:
+        loader = load_batch_none
+    elif predict:
+        loader = load_batch_predict
+    else:
+        loader = load_batch_standard
+    return Sampler(loader)
 
 
 def inject_callback(callback):
@@ -313,7 +328,10 @@ class Trial(object):
             torchbearer.TEST_GENERATOR: None,
             torchbearer.TRAIN_STEPS: None,
             torchbearer.VALIDATION_STEPS: None,
-            torchbearer.TEST_STEPS: None
+            torchbearer.TEST_STEPS: None,
+            torchbearer.TRAIN_DATA: None,
+            torchbearer.VALIDATION_DATA: None,
+            torchbearer.TEST_DATA: None,
         })
 
     @fluent
@@ -335,6 +353,7 @@ class Trial(object):
             warnings.warn("Number of training steps exceeds number of data items, limiting to number of items")
             steps = len(generator)
         self.state[torchbearer.TRAIN_STEPS] = steps
+        self.state[torchbearer.TRAIN_DATA] = (self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
 
     @fluent
     def with_train_generator(self, generator, steps=None):
@@ -393,6 +412,7 @@ class Trial(object):
             warnings.warn("Number of validation steps exceeds number of data items, limiting to number of items")
             steps = len(generator)
         self.state[torchbearer.VALIDATION_STEPS] = steps
+        self.state[torchbearer.VALIDATION_DATA] = (self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
 
     @fluent
     def with_val_generator(self, generator, steps=None):
@@ -452,6 +472,7 @@ class Trial(object):
             warnings.warn("Number of test steps exceeds number of data items, limiting to number of items")
             steps = len(generator)
         self.state[torchbearer.TEST_STEPS] = steps
+        self.state[torchbearer.TEST_DATA] = (self.state[torchbearer.TEST_GENERATOR], self.state[torchbearer.TEST_STEPS])
 
     @fluent
     def with_test_generator(self, generator, steps=None):
@@ -576,14 +597,12 @@ class Trial(object):
 
         return self.state[torchbearer.HISTORY]
 
-    @inject_sampler(torchbearer.TRAIN_GENERATOR)
+    @inject_sampler(torchbearer.TRAIN_DATA)
     def _fit_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
         self.train()
 
-        state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
-        state[torchbearer.GENERATOR] = state[torchbearer.TRAIN_GENERATOR]
         state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
 
         state[torchbearer.METRIC_LIST].reset(state)
@@ -666,22 +685,19 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_end_validation(state)
         return state
 
-    @inject_sampler(torchbearer.VALIDATION_GENERATOR)
+    @inject_sampler(torchbearer.VALIDATION_DATA)
     def _validation_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
         if state[torchbearer.VALIDATION_GENERATOR] is not None or state[torchbearer.VALIDATION_STEPS] is not None:
             self.eval()
 
-            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
-            state[torchbearer.GENERATOR] = state[torchbearer.VALIDATION_GENERATOR]
-
             self._test_pass(state)
         return state[torchbearer.METRICS]
 
-    @inject_sampler(torchbearer.VALIDATION_GENERATOR)
+    @inject_sampler(torchbearer.VALIDATION_DATA)
     @inject_printer(validation_label_letter='e')
-    def evaluate(self, verbose=2):
+    def evaluate(self, verbose=2, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Evaluate this trial on the validation data.
 
         :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
@@ -695,22 +711,18 @@ class Trial(object):
             torchbearer.EPOCH: 0,
             torchbearer.STOP_TRAINING: False
         })
-
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
-        if state[torchbearer.VALIDATION_GENERATOR] is not None or state[torchbearer.VALIDATION_STEPS] is not None:
+        if state[torchbearer.GENERATOR] is not None or state[torchbearer.STEPS] is not None:
             self.eval()
-
-            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
-            state[torchbearer.GENERATOR] = state[torchbearer.VALIDATION_GENERATOR]
 
             return self._test_pass(state)[torchbearer.METRICS]
         return {}
 
     @inject_callback(AggregatePredictions())
-    @inject_sampler(torchbearer.TEST_GENERATOR, predict=True)
+    @inject_sampler(torchbearer.TEST_DATA, predict=True)
     @inject_printer(validation_label_letter='p')
-    def predict(self, verbose=2):
+    def predict(self, verbose=2, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Determine predictions for this trial on the test data.
 
         :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
@@ -726,11 +738,8 @@ class Trial(object):
 
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
-        if state[torchbearer.TEST_GENERATOR] is not None or state[torchbearer.TEST_STEPS] is not None:
+        if state[torchbearer.GENERATOR] is not None or state[torchbearer.STEPS] is not None:
             self.eval()
-
-            state[torchbearer.STEPS] = self.state[torchbearer.TEST_STEPS]
-            state[torchbearer.GENERATOR] = self.state[torchbearer.TEST_GENERATOR]
 
             return self._test_pass(state)[torchbearer.FINAL_PREDICTIONS]
         return []

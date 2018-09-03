@@ -94,12 +94,15 @@ STEPS = state_key('steps')
 
 TRAIN_GENERATOR = state_key('train_generator')
 TRAIN_STEPS = state_key('train_steps')
+TRAIN_DATA = state_key('train_data')
 
 VALIDATION_GENERATOR = state_key('validation_generator')
 VALIDATION_STEPS = state_key('validation_steps')
+VALIDATION_DATA = state_key('validation_data')
 
 TEST_GENERATOR = state_key('test_generator')
 TEST_STEPS = state_key('test_steps')
+TEST_DATA = state_key('test_data')
 
 STOP_TRAINING = state_key('stop_training')
 Y_TRUE = state_key('y_true')
