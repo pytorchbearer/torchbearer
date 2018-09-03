@@ -189,9 +189,8 @@ class Sampler:
 
 def inject_sampler(data_key, predict=False):
     """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER]
-
-    :param generator: The data generator for the sampler to load data from
-    :type generator: DataLoader
+    :param data_key: Key for the data to inject
+    :type data_key: StateKey
     :param predict: If true, the prediction batch loader is used, if false the standard data loader is used
     :type predict: bool
     :return: the decorator
@@ -692,6 +691,8 @@ class Trial(object):
 
         :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
         :type verbose: int
+        :param data_key: Optional key for the data to evaluate on. Default: torchbearer.VALIDATION_DATA
+        :type data_key: StateKey
         :return: The final metric values
         :rtype: dict
         """
@@ -717,6 +718,8 @@ class Trial(object):
 
         :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
         :type verbose: int
+        :param data_key: Optional key for the data to predict on. Default: torchbearer.TEST_DATA
+        :type data_key: StateKey
         :return: Model outputs as a list
         :rtype: list
         """
