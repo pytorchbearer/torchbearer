@@ -291,7 +291,7 @@ class TensorBoardText(AbstractTensorBoard):
             return '<tr>' + string + '</tr>'
 
         metrics = string.split(',')
-        for i, metric in enumerate(metrics):
+        for _, metric in enumerate(metrics):
             items = metric.split(':')
             name, value = items[0], items[1]
             table = table + row(cell(name) + cell(value))
