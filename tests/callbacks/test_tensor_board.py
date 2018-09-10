@@ -709,6 +709,7 @@ class TestTensorbardText(TestCase):
         table = tf(metrics)
 
         correct_table = '<table><th>Metric</th><th>Value</th><tr><td>test_metric_1</td><td> 1</td></tr><tr><td> test_metric_2</td><td> 1</td></tr></table>'
+        print(table)
         self.assertTrue(table == correct_table)
         
     @patch('tensorboardX.SummaryWriter')
