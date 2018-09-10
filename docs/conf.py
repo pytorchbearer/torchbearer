@@ -159,7 +159,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'torchbearer.tex', 'torchbearer Documentation',
-     'Ethan Harris and Matthew Painter', 'manual'),
+     'Ethan Harris, Matthew Painter and Jonathon Hare', 'manual'),
 ]
 
 
@@ -168,7 +168,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pytorchbearer', 'torchbearer Documentation',
+    (master_doc, 'torchbearer', 'torchbearer Documentation',
      [author], 1)
 ]
 
