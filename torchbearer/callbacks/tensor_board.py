@@ -4,11 +4,9 @@ import os
 import torch
 import torch.nn.functional as F
 import torchvision.utils as utils
-from tensorboardX import SummaryWriter
 
 import torchbearer
 from torchbearer.callbacks import Callback
-import warnings
 
 __writers__ = dict()
 
@@ -44,21 +42,20 @@ def get_writer(log_dir, logger, visdom=False):
     :param visdom: if true VisdomWriter is returned instead of tensorboard SummaryWriter
     :return: the `SummaryWriter` or `VisdomWriter` object
     """
+    import tensorboardX
+    from tensorboardX import SummaryWriter
+
     writer_key = 'writer'
     if visdom:
         writer_key = 'writer_visdom'
 
     if log_dir not in __writers__ or writer_key not in __writers__[log_dir]:
         if visdom:
-            from tensorboardX.torchvis import VisdomWriter
-            w = VisdomWriter()
-            try:
-                from visdom import Visdom
-                os.makedirs(log_dir, exist_ok=True)
-                VisdomParams.LOG_TO_FILENAME = os.path.join(log_dir,'log.log')
-                w.vis = Visdom(**VisdomParams.__to_dict__())
-            except Exception as e:
-                warnings.warn('Failed importing visdom or passing custom arguments with error:' + str(e))
+            w = tensorboardX.torchvis.VisdomWriter()
+            from visdom import Visdom
+            os.makedirs(log_dir, exist_ok=True)
+            VisdomParams.LOG_TO_FILENAME = os.path.join(log_dir,'log.log')
+            w.vis = Visdom(**VisdomParams.__to_dict__())
         else:
             w = SummaryWriter(log_dir=log_dir)
         __writers__[log_dir] = {writer_key: w, 'references': set()}

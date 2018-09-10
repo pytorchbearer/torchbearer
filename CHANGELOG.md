@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Evaluation and prediction can now be done on any data using data_key keywork arg
 ### Changed
+- TensorboardX, Numpy, Scikit-learn and Scipy are no longer dependancies and only required if using the tensorboard callbacks or roc metric
 ### Deprecated
 ### Removed
 ### Fixed
