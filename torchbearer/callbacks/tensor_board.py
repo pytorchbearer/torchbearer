@@ -280,7 +280,7 @@ class TensorBoardText(AbstractTensorBoard):
         self.batch_writer = None
 
     @staticmethod
-    def table_formatter(string, additional_rows=None):
+    def table_formatter(string):
         table = '<table><th>Metric</th><th>Value</th>'
         string = string.replace('{', '').replace('}', '').replace("'", "")  # TODO: Replace this with single pass regex
 
@@ -289,15 +289,6 @@ class TensorBoardText(AbstractTensorBoard):
 
         def row(string):
             return '<tr>' + string + '</tr>'
-
-        if additional_rows is not None:
-            if isinstance(additional_rows, list):
-                for pair in additional_rows:
-                    name, t = pair
-                    table = table + row(cell(name) + cell(str(t)))
-            else:
-                name, t = additional_rows
-                table = table + row(cell(name) + cell(str(t)))
 
         metrics = string.split(',')
         for i, metric in enumerate(metrics):
@@ -320,7 +311,6 @@ class TensorBoardText(AbstractTensorBoard):
     def on_step_training(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             if self.visdom:
-                t = state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[torchbearer.BATCH]
                 self.batch_writer.add_text('batch', '<h3>Epoch {} - Batch {}</h3>'.format(state[torchbearer.EPOCH], state[torchbearer.BATCH])+self.table_formatter(str(state[torchbearer.METRICS])), 1)
             else:
                 self.batch_writer.add_text('batch', self.table_formatter(str(state[torchbearer.METRICS])), state[torchbearer.BATCH])
