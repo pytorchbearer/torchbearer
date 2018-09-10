@@ -270,6 +270,8 @@ class TestEarlyStopping(TestCase):
         state = stopper.state_dict()
 
         stopper = EarlyStopping(monitor='test_metric_1')
+        self.assertNotEqual(stopper.wait, 10)
+
         stopper.load_state_dict(state)
         self.assertEqual(stopper.wait, 10)
         self.assertEqual(stopper.best, 20)
