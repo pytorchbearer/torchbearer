@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 import torchbearer
-from torchbearer.callbacks import TensorBoard, TensorBoardImages, TensorBoardProjector
+from torchbearer.callbacks import TensorBoard, TensorBoardImages, TensorBoardProjector, TensorBoardText
 
 
 class TestTensorBoard(TestCase):
@@ -720,3 +720,18 @@ class TestTensorBoardProjector(TestCase):
         self.assertTrue(
             mock_board.return_value.add_embedding.call_args[1]['label_img'].size() == torch.Size([18, 1, 10, 10]))
         tboard.on_end({})
+
+
+class TestTensorbardText(TestCase):
+    def test_table_formatter(self):
+        tf = TensorBoardText.table_formatter
+
+        metrics = str({'test_metric_1': 1, 'test_metric_2': 1})
+        table = tf(metrics, ('epoch', 1))
+
+        correct_table = '<table><th>Metric</th><th>Value</th><tr><td>epoch</td><td>1</td></tr><tr><td>test_metric_1</td><td> 1</td></tr><tr><td> test_metric_2</td><td> 1</td></tr></table>'
+        self.assertTrue(table == correct_table)
+        
+    @patch('torchbearer.callbacks.tensor_board.SummaryWriter')
+    def test_writer(self, mock_writer):
+        pass
