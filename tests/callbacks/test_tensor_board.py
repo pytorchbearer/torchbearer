@@ -709,7 +709,7 @@ class TestTensorbardText(TestCase):
         table = tf(metrics)
 
         correct_table = '<table><th>Metric</th><th>Value</th><tr><td>test_metric_1</td><td>1</td></tr><tr><td>test_metric_2</td><td>1</td></tr></table>'
-        self.assertTrue(table.replace(" ", "") == correct_table)
+        self.assertEqual(table.replace(" ", ""), correct_table)
         
     @patch('tensorboardX.SummaryWriter')
     def test_epoch_writer(self, mock_writer):
