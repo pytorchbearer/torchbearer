@@ -45,6 +45,19 @@ class EarlyStopping(Callback):
             self.min_delta *= 1
             self.monitor_op = lambda x1, x2: x1 > x2
 
+    def state_dict(self):
+        state_dict = {
+            'wait': self.wait,
+            'best': self.best,
+            'stopped_epoch': self.stopped_epoch
+        }
+        return state_dict
+
+    def load_state_dict(self, state_dict):
+        self.wait = state_dict['wait']
+        self.best = state_dict['best']
+        self.stopped_epoch = state_dict['stopped_epoch']
+
     def on_start(self, state):
         self.wait = 0
         self.stopped_epoch = 0
