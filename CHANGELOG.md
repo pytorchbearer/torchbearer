@@ -8,11 +8,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Evaluation and prediction can now be done on any data using data_key keywork arg
 - Text tensorboard/visdom logger that writes epoch/batch metrics to text
 ### Changed
+- TensorboardX, Numpy, Scikit-learn and Scipy are no longer dependancies and only required if using the tensorboard callbacks or roc metric
 ### Deprecated
 ### Removed
 ### Fixed
 - Model class setting generator incorrectly leading to stop iterations. 
 - Argument ordering is consistent in `Trial.with_generators` and `Trial.__init__`
+- Added a state dict for the early stopping callback
 
 ## [0.2.0] - 2018-08-21
 ### Added

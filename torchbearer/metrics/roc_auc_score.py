@@ -4,9 +4,6 @@
 
 from torchbearer import metrics
 
-import sklearn.metrics
-import numpy as np
-
 
 @metrics.default_for_key('roc_auc')
 @metrics.default_for_key('roc_auc_score')
@@ -27,6 +24,8 @@ class RocAucScore(metrics.EpochLambda):
     """
 
     def __init__(self, one_hot_labels=True, one_hot_offset=0, one_hot_classes=10):
+        import sklearn.metrics
+        import numpy as np
 
         def to_categorical(y):
             return np.eye(one_hot_classes, dtype='uint8')[y - one_hot_offset]

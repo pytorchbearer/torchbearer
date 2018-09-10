@@ -261,3 +261,19 @@ class TestEarlyStopping(TestCase):
         stopper.on_end_epoch(state)
 
         self.assertTrue(state[torchbearer.STOP_TRAINING])
+
+    def test_state_dict(self):
+        stopper = EarlyStopping(monitor='test_metric_1')
+        stopper.wait = 10
+        stopper.best = 20
+        stopper.stopped_epoch = 30
+        state = stopper.state_dict()
+
+        stopper = EarlyStopping(monitor='test_metric_1')
+        self.assertNotEqual(stopper.wait, 10)
+
+        stopper.load_state_dict(state)
+        self.assertEqual(stopper.wait, 10)
+        self.assertEqual(stopper.best, 20)
+        self.assertEqual(stopper.stopped_epoch, 30)
+
