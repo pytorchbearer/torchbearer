@@ -7,16 +7,19 @@ torchbearer: A model training library for researchers using PyTorch
 - [About](#about)
 - [Key Features](#features)
 - [Installation](#installation)
-- [Examples](#examples)
 - [Quickstart](#quick)
 - [Documentation](#docs)
 - [Other Libraries](#others)
+
+![SVM fitting](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/svm_fit.gif)![GAN Gif](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/gan.gif)
 
 <a name="about"/>
 
 ## About
 
 Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you.
+
+Above are a linear SVM (differentiable program) visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html) in less than 100 lines of code and a GAN visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) both implemented using torchbearer and pytorch.
 
 <a name="features"/>
 
@@ -42,18 +45,6 @@ The easiest way to install torchbearer is with pip:
 Alternatively, build from source with:
 
 `pip install git+https://github.com/ecs-vlc/torchbearer`
-
-<a name="examples"/>
-
-## Examples
-
-Here's a linear SVM (differentiable program) visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html) implemented using torcbearer and pytorch in less than 100 lines of code:
-
-![SVM fitting](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/svm_fit.gif)
-
-And a GAN visualisation from the [docs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) implemented using torcbearer and pytorch:
-
-![GAN Gif](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/gan.gif)
 
 <a name="quick"/>
 
