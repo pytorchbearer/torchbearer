@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Evaluation and prediction can now be done on any data using data_key keywork arg
+- Text tensorboard/visdom logger that writes epoch/batch metrics to text
 ### Changed
 ### Deprecated
 ### Removed
