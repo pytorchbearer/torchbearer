@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Model class setting generator incorrectly leading to stop iterations. 
 - Argument ordering is consistent in `Trial.with_generators` and `Trial.__init__`
+- Added a state dict for the early stopping callback
 
 ## [0.2.0] - 2018-08-21
 ### Added
