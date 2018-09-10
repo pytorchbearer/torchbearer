@@ -702,14 +702,23 @@ class TestTensorBoardProjector(TestCase):
 
 
 class TestTensorbardText(TestCase):
-    def test_table_formatter(self):
+    def test_table_formatter_one_metric(self):
         tf = TensorBoardText.table_formatter
 
-        metrics = str({'test_metric_1': 1, 'test_metric_2': 1})
-        table = tf(metrics)
+        metrics = str({'test_metric_1': 1})
+        table = tf(metrics).replace(" ", "")
 
-        correct_table = '<table><th>Metric</th><th>Value</th><tr><td>test_metric_1</td><td>1</td></tr><tr><td>test_metric_2</td><td>1</td></tr></table>'
-        self.assertEqual(table.replace(" ", ""), correct_table)
+        correct_table = '<table><th>Metric</th><th>Value</th><tr><td>test_metric_1</td><td>1</td></tr></table>'
+        self.assertEqual(table, correct_table)
+
+    def test_table_formatter_two_metrics(self):
+        tf = TensorBoardText.table_formatter
+
+        metrics = str({'test_metric_1': 1, 'test_metric_2': 2})
+        table = tf(metrics).replace(" ", "")
+
+        self.assertIn('<tr><td>test_metric_1</td><td>1</td></tr>', table)
+        self.assertIn('<tr><td>test_metric_2</td><td>2</td></tr>', table)
         
     @patch('tensorboardX.SummaryWriter')
     def test_epoch_writer(self, mock_writer):
