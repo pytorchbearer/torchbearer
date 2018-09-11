@@ -7,6 +7,7 @@ torchbearer: A model training library for researchers using PyTorch
 - [About](#about)
 - [Key Features](#features)
 - [Installation](#installation)
+- [Citing Torchbearer](#citing)
 - [Quickstart](#quick)
 - [Documentation](#docs)
 - [Other Libraries](#others)
@@ -45,6 +46,21 @@ The easiest way to install torchbearer is with pip:
 Alternatively, build from source with:
 
 `pip install git+https://github.com/ecs-vlc/torchbearer`
+
+<a name="citing"/>
+
+## Citing Torchbearer
+
+If you find that torchbearer is useful to your research then please consider citing our preprint: [Torchbearer: A Model Fitting Library for PyTorch](https://arxiv.org/abs/1809.03363), with the following BibTeX entry:
+
+```
+@misc{torchbearer2018,
+  Author = {Ethan Harris and Matthew Painter and Jonathon Hare},
+  Title = {Torchbearer: A Model Fitting Library for PyTorch},
+  Year = {2018},
+  Eprint = {arXiv:1809.03363},
+}
+```
 
 <a name="quick"/>
 
