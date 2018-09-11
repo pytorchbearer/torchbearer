@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.2.1] - 2018-09-11
 ### Added
 - Evaluation and prediction can now be done on any data using data_key keywork arg
 - Text tensorboard/visdom logger that writes epoch/batch metrics to text
