@@ -26,14 +26,14 @@ Above are a linear SVM (differentiable program) visualisation from the [docs](ht
 
 ## Key Features
 
-- Model fitting API using calls to [run(...)](http://torchbearer.readthedocs.io/en/latest/code/main.html#torchbearer.torchbearer.Trial.run) on Trial instances which are saveable, resumable [**NEW!**] and replayable [**NEW!**]
+- Model fitting API using calls to [run(...)](http://torchbearer.readthedocs.io/en/latest/code/main.html#torchbearer.torchbearer.Trial.run) on Trial instances which are saveable, resumable and replayable
 - Sophisticated [metric API](http://torchbearer.readthedocs.io/en/latest/code/metrics.html) which supports calculation data (e.g. accuracy) flowing to multiple aggregators which can calculate running values (e.g. mean) and values for the epoch (e.g. std, mean, area under curve)
-- Default accuracy metric which infers the accuracy to use from the criterion [**NEW!**]
+- Default accuracy metric which infers the accuracy to use from the criterion
 - Simple [callback API](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html) with a persistent model state that supports adding to the loss or accessing the metric values
-- A host of callbacks included from the start that enable: [tensorboard and visdom \[**NEW!**\] logging](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.tensor_board) (for metrics, images and data), [model checkpointing](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.checkpointers), [weight decay](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.weight_decay), [learning rate schedulers](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.torch_scheduler), [gradient clipping](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.gradient_clipping) and more
+- A host of callbacks included from the start that enable: [tensorboard and visdom logging](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.tensor_board) (for metrics, images and data), [model checkpointing](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.checkpointers), [weight decay](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.weight_decay), [learning rate schedulers](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.torch_scheduler), [gradient clipping](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.gradient_clipping) and more
 - Decorator APIs for [metrics](http://torchbearer.readthedocs.io/en/latest/code/metrics.html#module-torchbearer.metrics.decorators) and [callbacks](http://torchbearer.readthedocs.io/en/latest/code/callbacks.html#module-torchbearer.callbacks.decorators) that allow for simple construction
 - An [example library](http://torchbearer.readthedocs.io/en/latest/examples/quickstart.html) with a set of demos showing how complex deep learning models (such as [GANs](http://torchbearer.readthedocs.io/en/latest/examples/gan.html) and [VAEs](http://torchbearer.readthedocs.io/en/latest/examples/vae.html)) and differentiable programs (like [SVMs](http://torchbearer.readthedocs.io/en/latest/examples/svm_linear.html)) can be implemented easily with torchbearer
-- Fully tested; as researchers we want to trust that our metrics and callbacks work properly, we have therefore tested everything thouroughly for peace of mind
+- Fully tested; as researchers we want to trust that our metrics and callbacks work properly, we have therefore tested everything thoroughly for peace of mind
 
 <a name="installation"/>
 
@@ -124,10 +124,10 @@ loss = nn.CrossEntropyLoss()
 from torchbearer import Trial
 
 trial = Trial(model, optimizer, criterion=loss, metrics=['acc', 'loss']).to('cuda')
-trial = trial.with_generators(train_generator=traingen, val_generator=valgen)
+trial = trial.with_generators(train_generator=traingen, val_generator=valgen, test_generator=testgen)
 trial.run(epochs=10)
 
-trial.with_val_generator(testgen).evaluate()
+trial.evaluate(data_key=torchbearer.TEST_DATA)
 ```
 - Running that code gives output using Tqdm and providing running accuracies and losses during the training phase:
 
