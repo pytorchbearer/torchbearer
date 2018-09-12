@@ -43,6 +43,12 @@ class StateKey:
     def __str__(self):
         return self.key
 
+    def __eq__(self, other):
+        return self.key == str(other)
+        
+    def __hash__(self):
+        return self.key.__hash__()
+
 
 class State(dict):
     """
