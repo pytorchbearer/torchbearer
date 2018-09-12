@@ -18,6 +18,18 @@ class TestDecorators(unittest.TestCase):
         self.assertTrue(metrics.get_default('test').name == 'loss')
         self.assertTrue(metric.name == 'loss')
 
+    def test_default_for_key_args(self):
+        mock = Mock()
+
+        class MyMetric(metrics.Metric):
+            def __init__(self, *args, **kwargs):
+                super().__init__('test')
+                mock(*args, **kwargs)
+
+        default_for_key('test', 10, some_arg='a test')(MyMetric)
+        metrics.get_default('test')
+        mock.assert_called_once_with(10, some_arg='a test')
+
     def test_lambda_metric_epoch(self):
         metric = 'test'
         metric = lambda_metric('test', on_epoch=True)(metric)

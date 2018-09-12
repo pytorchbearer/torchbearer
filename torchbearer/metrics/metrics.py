@@ -15,14 +15,14 @@ import torch
 __defaults__ = {}
 
 
-def add_default(key, metric):
-    __defaults__[key] = metric
+def add_default(key, metric, *args, **kwargs):
+    __defaults__[key] = (metric, args, kwargs)
 
 
 def get_default(key):
-    metric = __defaults__[key]
+    metric, args, kwargs = __defaults__[key]
     if inspect.isclass(metric):
-        metric = metric()
+        metric = metric(*args, **kwargs)
     return metric
 
 
