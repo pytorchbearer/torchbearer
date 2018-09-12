@@ -43,6 +43,12 @@ class StateKey:
     def __str__(self):
         return self.key
 
+    def __eq__(self, other):
+        return self.key == other.key
+
+    def __hash__(self):
+        return self.key.__hash__()
+
 
 class State(dict):
     """
@@ -73,6 +79,7 @@ class State(dict):
         for key in d:
             new_dict[self.get_key(key)] = d[key]
         super().update(new_dict)
+
 
 
 VERSION = state_key('torchbearer_version')
