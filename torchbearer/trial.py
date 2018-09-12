@@ -294,6 +294,8 @@ class Trial(object):
     :type callbacks: list
     :param pass_state: If True, the torchbearer state will be passed to the model during fitting
     :type pass_state: bool
+    :param verbose: Global verbosity .If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress
+    :type verbose: int
     """
     def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
         if criterion is None:
