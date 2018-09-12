@@ -86,7 +86,10 @@ class DefaultAccuracy(Metric):
             if name is not None and name in __loss_map__:
                 self.metric = __loss_map__[name]()
                 self.name = self.metric.name
-                self.metric.train() if self._train else self.metric.eval()
+                if self._train:
+                    self.metric.train()
+                else:
+                    self.metric.eval()
 
             self._loaded = True
 
