@@ -83,6 +83,7 @@ def inject_printer(validation_label_letter='v'):
         def wrapper(self, *args, **kwargs):
             import inspect
             verbose = kwargs['verbose'] if 'verbose' in kwargs else inspect.signature(func).parameters['verbose'].default  # Populate default value
+            verbose = self.verbose if verbose == -1 else verbose
 
             printer = get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
 
@@ -294,12 +295,13 @@ class Trial(object):
     :param pass_state: If True, the torchbearer state will be passed to the model during fitting
     :type pass_state: bool
     """
-    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False):
+    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
         if criterion is None:
             def criterion(_, y_true):
                 return torch.zeros(1, device=y_true.device)
 
         self.pass_state = pass_state
+        self.verbose = verbose
 
         self.state = State()
         self.state.update({
@@ -546,12 +548,12 @@ class Trial(object):
             self.with_test_generator(test_generator, test_steps)
 
     @inject_printer()
-    def run(self, epochs=1, verbose=2):
+    def run(self, epochs=1, verbose=-1):
         """Run this trial for the given number of epochs, starting from the last trained epoch.
 
         :param epochs: The number of epochs to run for
         :type epochs: int
-        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
         :type verbose: int
         :return: The model history (dict of epoch metrics)
         :rtype: dict
@@ -687,10 +689,10 @@ class Trial(object):
 
     @inject_sampler(torchbearer.VALIDATION_DATA)
     @inject_printer(validation_label_letter='e')
-    def evaluate(self, verbose=2, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
+    def evaluate(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Evaluate this trial on the validation data.
 
-        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
         :type verbose: int
         :param data_key: Optional key for the data to evaluate on. Default: torchbearer.VALIDATION_DATA
         :type data_key: StateKey
@@ -714,10 +716,10 @@ class Trial(object):
     @inject_callback(AggregatePredictions())
     @inject_sampler(torchbearer.TEST_DATA, predict=True)
     @inject_printer(validation_label_letter='p')
-    def predict(self, verbose=2, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
+    def predict(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Determine predictions for this trial on the test data.
 
-        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
         :type verbose: int
         :param data_key: Optional key for the data to predict on. Default: torchbearer.TEST_DATA
         :type data_key: StateKey
@@ -744,7 +746,7 @@ class Trial(object):
 
         :param callbacks: List of callbacks to be run during the replay
         :type callbacks: list
-        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, Else: display no training progress
+        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress
         :type verbose: int
         :return: self
         :rtype: Trial
