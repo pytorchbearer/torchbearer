@@ -11,7 +11,7 @@ from torchbearer import metrics
 from torchbearer.metrics import EpochLambda, BatchLambda, ToDict, Mean, MetricTree, Std, RunningMean
 
 
-def default_for_key(key):
+def default_for_key(key, *args, **kwargs):
     """The :func:`default_for_key` decorator will register the given metric in the global metric dict
     (`metrics.DEFAULT_METRICS`) so that it can be referenced by name in instances of :class:`.MetricList` such as in the
     list given to the :class:`.torchbearer.Model`.
@@ -24,10 +24,12 @@ def default_for_key(key):
 
     :param key: The key to use when referencing the metric
     :type key: str
+    :param args: Any args to pass to the underlying metric when constructed
+    :param kwargs: Any keyword args to pass to the underlying metric when constructed
 
     """
     def decorator(arg):
-        metrics.add_default(key, arg)
+        metrics.add_default(key, arg, *args, **kwargs)
         return arg
     return decorator
 

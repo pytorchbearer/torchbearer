@@ -165,6 +165,10 @@ class TestTopKCategoricalAccuracy(unittest.TestCase):
                              msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
                                  + ' in: ' + str(result))
 
+    def test_top_ten_default(self):
+        metric = torchbearer.metrics.get_default('top_10_acc').root
+        self.assertEqual(metric.k, 10)
+
 
 class TestMeanSquaredError(unittest.TestCase):
     def setUp(self):

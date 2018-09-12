@@ -60,13 +60,14 @@ class CategoricalAccuracy(metrics.Metric):
         return (y_pred == y_true).float()
 
 
+@metrics.default_for_key('top_10_acc', k=10)
 @metrics.default_for_key('top_5_acc')
 @metrics.running_mean
 @metrics.std
 @metrics.mean
 class TopKCategoricalAccuracy(metrics.Metric):
     """Top K Categorical accuracy metric. Uses torch.topk to determine the top k predictions and compares to targets.
-    Decorated with a mean, running_mean and std. Default for key: 'top_5_acc'.
+    Decorated with a mean, running_mean and std. Default for keys: 'top_5_acc', 'top_10_acc'.
 
     :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     :type ignore_index: int
