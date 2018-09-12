@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - The default_for_key metric decorator can now be used to pass arguments to the init of the inner metric
 - The default metric for the key 'top_10_acc' is now the TopKCategoricalAccuracy metric with k set to 10
+- Global verbose flag for trial that can be overridden by run, evaluate, predict
 ### Changed
 ### Deprecated
 ### Removed
