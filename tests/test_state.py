@@ -7,7 +7,6 @@ from torchbearer.state import State
 class TestStateKey(unittest.TestCase):
     def test_key_added(self):
         key = torchbearer.state_key('key')
-
         self.assertTrue('key' in torchbearer.state.__keys__)
 
     def test_collision(self):
@@ -25,6 +24,17 @@ class TestStateKey(unittest.TestCase):
 
         self.assertTrue('test_dup_1' == str(key_1))
         self.assertTrue('test_dup_2' == str(key_2))
+
+    def test_compare_to_statekey(self):
+        key_1 = torchbearer.state_key('test')
+        key_2 = torchbearer.state_key('test_2')
+        # Simulates same key in different sessions where the object hash is changed
+        key_2.key = 'test'
+        self.assertTrue(key_1 == key_1)
+
+    def test_compare_to_string(self):
+        key_1 = torchbearer.state_key('test')
+        self.assertTrue(key_1 == 'test')
 
 
 class TestState(unittest.TestCase):
