@@ -111,11 +111,13 @@ def loss_callback(state):
     return state[G_LOSS] + state[D_LOSS]
 
 
+batch = torch.randn(25, latent_dim).to(device)
 @callbacks.on_step_training
 def saver_callback(state):
     batches_done = state[tb.EPOCH] * len(state[tb.GENERATOR]) + state[tb.BATCH]
     if batches_done % sample_interval == 0:
-        save_image(state[GEN_IMGS].data[:25], 'images/%d.png' % batches_done, nrow=5, normalize=True)
+        samples = state[tb.MODEL].generator(batch)
+        save_image(samples, 'images/%d.png' % batches_done, nrow=5, normalize=True)
 
 
 # Configure data loader

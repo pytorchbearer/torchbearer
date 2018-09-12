@@ -26,7 +26,7 @@ We then define the dataset and dataloader - for this example, MNIST.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 123-130
+   :lines: 124-132
 
 Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,7 +60,7 @@ We can then create metrics from these by decorating simple state fetcher metrics
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 139-146
+   :lines: 140-147
 
 Training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,21 +70,22 @@ Note that when torchbearer is passed a ``None`` criterion it automatically sets 
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 158-162
+   :lines: 160-164
 
 Visualising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save :func:`~torchbearer.callbacks.decorators.on_step_training` - again using decorators.
+We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save :func:`~torchbearer.callbacks.decorators.on_step_training`.
+We generate from the same inputs each time to get a better visulisation.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 114-118
+   :lines: 114-120
 
 Here is a Gif created from the saved images.
 
 .. figure:: /_static/img/gan.gif
-   :scale: 200 %
+   :scale: 100 %
    :alt: GAN generated samples
 
 
