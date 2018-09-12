@@ -54,11 +54,11 @@ Alternatively, build from source with:
 If you find that torchbearer is useful to your research then please consider citing our preprint: [Torchbearer: A Model Fitting Library for PyTorch](https://arxiv.org/abs/1809.03363), with the following BibTeX entry:
 
 ```
-@misc{torchbearer2018,
-  Author = {Ethan Harris and Matthew Painter and Jonathon Hare},
-  Title = {Torchbearer: A Model Fitting Library for PyTorch},
-  Year = {2018},
-  Eprint = {arXiv:1809.03363},
+@article{torchbearer2018,
+  author = {Ethan Harris and Matthew Painter and Jonathon Hare},
+  title = {Torchbearer: A Model Fitting Library for PyTorch},
+  journal  = {arXiv preprint arXiv:1809.03363},
+  year = {2018}
 }
 ```
 
