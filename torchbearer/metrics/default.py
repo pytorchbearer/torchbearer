@@ -56,11 +56,14 @@ class DefaultAccuracy(Metric):
         self.metric = CategoricalAccuracy()  # Default to CategoricalAccuracy
         self.name = self.metric.name
         self._loaded = False
+        self._train = True
 
     def train(self):
+        self._train = True
         return self.metric.train()
 
     def eval(self):
+        self._train = False
         return self.metric.eval()
 
     def process(self, *args):
@@ -83,6 +86,7 @@ class DefaultAccuracy(Metric):
             if name is not None and name in __loss_map__:
                 self.metric = __loss_map__[name]()
                 self.name = self.metric.name
+                self.metric.train() if self._train else self.metric.eval()
 
             self._loaded = True
 
