@@ -44,8 +44,8 @@ class StateKey:
         return self.key
 
     def __eq__(self, other):
-        return self.key == other.key
-
+        return self.key == str(other)
+        
     def __hash__(self):
         return self.key.__hash__()
 
