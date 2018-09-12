@@ -30,7 +30,7 @@ class TestStateKey(unittest.TestCase):
         key_2 = torchbearer.state_key('test_2')
         # Simulates same key in different sessions where the object hash is changed
         key_2.key = 'test'
-        self.assertEqual(key_1, key_1)
+        self.assertEqual(key_1, key_2)
 
     def test_compare_to_string(self):
         key_1 = torchbearer.state_key('test')
