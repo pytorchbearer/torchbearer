@@ -299,8 +299,8 @@ class Trial(object):
     """
     def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
         if criterion is None:
-            def criterion(_, y_true):
-                return torch.zeros(1, device=y_true.device)
+            def criterion(_, __):
+                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE])
 
         self.pass_state = pass_state
         self.verbose = verbose
