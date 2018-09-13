@@ -297,7 +297,7 @@ class TensorBoardText(AbstractTensorBoard):
     
     def on_start(self, state):
         super().on_start(state)
-        self.writer.add_text('model', print(state[torchbearer.MODEL]), 1)
+        self.writer.add_text('model', str(state[torchbearer.MODEL]), 1)
 
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
