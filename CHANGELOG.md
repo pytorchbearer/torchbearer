@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed a bug where the DefaultAccuracy metric would not put the inner metric in eval mode if the first call to reset was after the call to eval
 - Fixed a bug where trying to load a state dict in a different session to where it was saved didn't work properly
+- Fixed a bug where the empty criterion would trigger an error if no Y_TRUE was put in state
 
 ## [0.2.1] - 2018-09-11
 ### Added
