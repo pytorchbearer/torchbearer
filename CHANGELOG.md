@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where callbacks weren't handled correctly in the predict and evaluate methods of Trial
+- Fixed a bug where the history wasn't updated when new metrics were calculated with the evaluate method of Trial
+
 ## [0.2.2] - 2018-09-18
 ### Added
 - The default_for_key metric decorator can now be used to pass arguments to the init of the inner metric
