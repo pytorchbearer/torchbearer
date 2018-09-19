@@ -710,9 +710,18 @@ class Trial(object):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
         if state[torchbearer.GENERATOR] is not None or state[torchbearer.STEPS] is not None:
-            self.eval()
+            state[torchbearer.CALLBACK_LIST].on_start(state)
+            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            return self._test_pass(state)[torchbearer.METRICS]
+            self.eval()
+            state = self._test_pass(state)
+
+            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
+
+            self.state[torchbearer.HISTORY][-1][1].update(state[torchbearer.METRICS])
+
+            state[torchbearer.CALLBACK_LIST].on_end(state)
+            return state[torchbearer.METRICS]
         return {}
 
     @inject_callback(AggregatePredictions())
@@ -737,9 +746,15 @@ class Trial(object):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
         if state[torchbearer.GENERATOR] is not None or state[torchbearer.STEPS] is not None:
-            self.eval()
+            state[torchbearer.CALLBACK_LIST].on_start(state)
+            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            return self._test_pass(state)[torchbearer.FINAL_PREDICTIONS]
+            self.eval()
+            res = self._test_pass(state)[torchbearer.FINAL_PREDICTIONS]
+
+            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
+            state[torchbearer.CALLBACK_LIST].on_end(state)
+            return res
         return []
 
     @fluent
