@@ -127,8 +127,7 @@ class AbstractTensorBoard(Callback):
         :return: the `SummaryWriter` or `VisdomWriter`
         """
         if log_dir is None:
-            if self.writer is None:
-                self.writer = get_writer(self.log_dir, self, visdom=visdom, visdom_params=visdom_params)
+            self.writer = get_writer(self.log_dir, self, visdom=visdom, visdom_params=visdom_params)
             return self.writer
         else:
             return get_writer(log_dir, self, visdom=visdom, visdom_params=visdom_params)
@@ -143,7 +142,6 @@ class AbstractTensorBoard(Callback):
         """
         if log_dir is None:
             close_writer(self.log_dir, self)
-            self.writer = None
         else:
             close_writer(log_dir, self)
 
@@ -253,7 +251,6 @@ class TensorBoard(AbstractTensorBoard):
         super().on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
-            self.batch_writer = None
 
 
 class TensorBoardText(AbstractTensorBoard):
@@ -347,7 +344,6 @@ class TensorBoardText(AbstractTensorBoard):
         super().on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
-            self.batch_writer = None
 
 
 class TensorBoardImages(AbstractTensorBoard):
