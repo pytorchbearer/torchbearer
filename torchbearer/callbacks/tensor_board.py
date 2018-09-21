@@ -308,7 +308,7 @@ class TensorBoardText(AbstractTensorBoard):
             table = table + row(cell(name) + cell(value))
 
         return table + '</table>'
-    
+
     def on_start(self, state):
         super().on_start(state)
         if self.log_trial_summary:
