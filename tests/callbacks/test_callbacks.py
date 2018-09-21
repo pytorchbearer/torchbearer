@@ -14,7 +14,7 @@ class TestCallback(TestCase):
 
     def test_str(self):
         callback = Callback()
-        self.assertEqual(str(callback), "<class 'torchbearer.callbacks.callbacks.Callback'>")
+        self.assertEqual(str(callback).strip(), "torchbearer.callbacks.callbacks.Callback")
 
     def test_empty_methods(self):
         callback = Callback()

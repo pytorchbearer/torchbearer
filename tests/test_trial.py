@@ -1705,6 +1705,14 @@ class TestTrialMembers(TestCase):
         correct_string = "--------------------- OPTIMZER ---------------------\nopt\n\n-------------------- CRITERION ---------------------\ncrit\n\n--------------------- METRICS ----------------------\n['met']\n\n-------------------- CALLBACKS ---------------------\n['cb']\n\n---------------------- MODEL -----------------------\nmod\n\n"
         self.assertEqual(str(torchbearertrial), correct_string)
 
+    def test_repr(self):
+        torchmodel = "mod"
+        optimizer = "opt"
+        metric = tb.metrics.Metric('met')
+
+        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], ["cb"], pass_state=False)
+        self.assertEqual(str(torchbearertrial), repr(torchbearertrial))
+
     def test_train(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         optimizer = MagicMock()
