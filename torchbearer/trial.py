@@ -342,6 +342,9 @@ class Trial(object):
 
         return optim_str + crit_str + metrics_str + callbacks_str + model_str
 
+    def __repr__(self):
+        return str(self)
+
     @fluent
     def for_train_steps(self, steps):
         """Run this trial for the given number of training steps. Note that the generator will output (None, None) if it
