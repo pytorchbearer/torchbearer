@@ -16,7 +16,7 @@ class Callback(object):
         return {}
 
     def __str__(self):
-        return str(self.__class__)
+        return str(self.__class__).replace('<class ', '').replace('>', '').replace("'", "")
 
     def load_state_dict(self, state_dict):
         """Resume this callback from the given state. Expects that this callback was constructed in the same way.
