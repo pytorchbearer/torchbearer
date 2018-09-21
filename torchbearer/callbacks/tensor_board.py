@@ -42,6 +42,8 @@ def get_writer(log_dir, logger, visdom=False, visdom_params=None):
     :param log_dir: the log directory
     :param logger: the object requesting the writer. That object should call `close_writer` when its finished
     :param visdom: if true VisdomWriter is returned instead of tensorboard SummaryWriter
+    :param visdom_params: Visdom parameter settings object, uses default if None
+    :type visdom_params: VisdomParams
     :return: the `SummaryWriter` or `VisdomWriter` object
     """
     import tensorboardX
@@ -98,6 +100,8 @@ class AbstractTensorBoard(Callback):
     :type comment: str
     :param visdom: If true, log to visdom instead of tensorboard
     :type visdom: bool
+    :param visdom_params: Visdom parameter settings object, uses default if None
+    :type visdom_params: VisdomParams
     """
 
     def __init__(self, log_dir='./logs',
@@ -167,6 +171,8 @@ class TensorBoard(AbstractTensorBoard):
     :type comment: str
     :param visdom: If true, log to visdom instead of tensorboard
     :type visdom: bool
+    :param visdom_params: Visdom parameter settings object, uses default if None
+    :type visdom_params: VisdomParams
     """
 
     def __init__(self, log_dir='./logs',
@@ -175,8 +181,9 @@ class TensorBoard(AbstractTensorBoard):
                  batch_step_size=10,
                  write_epoch_metrics=True,
                  comment='torchbearer',
-                 visdom=False):
-        super(TensorBoard, self).__init__(log_dir, comment, visdom)
+                 visdom=False,
+                 visdom_params=None):
+        super(TensorBoard, self).__init__(log_dir, comment, visdom, visdom_params)
 
         self.write_graph = write_graph
         self.write_batch_metrics = write_batch_metrics
@@ -254,27 +261,35 @@ class TensorBoardText(AbstractTensorBoard):
     :type log_dir: str
     :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
     :type write_epoch_metrics: True
+    :param log_trial_string: If True logs a string summary of the Trial
+    :type log_trial_summary: bool
+    :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
+    :type batch_step_size: int
     :param comment: Descriptive comment to append to path
     :type comment: str
     :param visdom: If true, log to visdom instead of tensorboard
     :type visdom: bool
+    :param visdom_params: Visdom parameter settings object, uses default if None
+    :type visdom_params: VisdomParams
     """
 
     def __init__(self, log_dir='./logs',
                  write_epoch_metrics=True,
                  write_batch_metrics=False,
+                 log_trial_summary=True,
                  batch_step_size=100,
                  comment='torchbearer',
                  visdom=False,
-                 visdom_params=VisdomParams()):
+                 visdom_params=None):
         super(TensorBoardText, self).__init__(log_dir, comment, visdom, visdom_params)
         self.write_epoch_metrics = write_epoch_metrics
         self.write_batch_metrics = write_batch_metrics
+        self.log_trial_summary = log_trial_summary
         self.batch_step_size = batch_step_size
         self.visdom = visdom
-        self.visdom_params = visdom_params
         self.batch_log_dir = None
         self.batch_writer = None
+        self.logged_summary = False
 
     @staticmethod
     def table_formatter(string):
@@ -295,15 +310,22 @@ class TensorBoardText(AbstractTensorBoard):
 
         return table + '</table>'
 
+    def on_start(self, state):
+        super().on_start(state)
+        if self.log_trial_summary and not self.logged_summary:
+            self.logged_summary = True
+            self.writer.add_text('trial', str(state[torchbearer.SELF]).replace('\n', '\n \n'), 1)
+
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
             if self.visdom:
                 self.batch_log_dir = os.path.join(self.log_dir, 'epoch/')
+                batch_params = self.visdom_params if self.visdom_params is not None else VisdomParams()
+                batch_params.ENV = batch_params.ENV + '-batch'
+                self.batch_writer = self.get_writer(self.batch_log_dir, visdom=self.visdom, visdom_params=batch_params)
             else:
                 self.batch_log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
-            batch_params = self.visdom_params
-            batch_params.ENV = batch_params.ENV + '-batch'
-            self.batch_writer = self.get_writer(self.batch_log_dir, visdom=self.visdom, visdom_params=batch_params)
+                self.batch_writer = self.get_writer(self.batch_log_dir)
 
     def on_step_training(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
@@ -356,6 +378,8 @@ class TensorBoardImages(AbstractTensorBoard):
                       https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
     :param visdom: If true, log to visdom instead of tensorboard
     :type visdom: bool
+    :param visdom_params: Visdom parameter settings object, uses default if None
+    :type visdom_params: VisdomParams
     """
 
     def __init__(self, log_dir='./logs',
@@ -370,8 +394,9 @@ class TensorBoardImages(AbstractTensorBoard):
                  norm_range=None,
                  scale_each=False,
                  pad_value=0,
-                 visdom=False):
-        super(TensorBoardImages, self).__init__(log_dir, comment, visdom=visdom)
+                 visdom=False,
+                 visdom_params=None):
+        super(TensorBoardImages, self).__init__(log_dir, comment, visdom=visdom, visdom_params=visdom_params)
         self.name = name
         self.key = key
         self.write_each_epoch = write_each_epoch

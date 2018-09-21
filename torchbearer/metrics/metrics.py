@@ -57,6 +57,9 @@ class Metric(object):
     def __init__(self, name):
         self.name = name
 
+    def __str__(self):
+        return self.name
+
     @no_grad()
     def process(self, *args):
         """Process the state and update the metric for one iteration.
@@ -107,6 +110,9 @@ class MetricTree(Metric):
         super(MetricTree, self).__init__(metric.name)
         self.root = metric
         self.children = []
+
+    def __str__(self):
+        return str(self.root)
 
     def add_child(self, child):
         """Add a child to this node of the tree
@@ -226,6 +232,9 @@ class MetricList(Metric):
 
         """
         self._for_list(lambda metric: metric.reset(state))
+
+    def __str__(self):
+        return str([str(m) for m in self.metric_list])
 
 
 class AdvancedMetric(Metric):

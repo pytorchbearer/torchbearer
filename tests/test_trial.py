@@ -1681,6 +1681,7 @@ class TestReplay(TestCase):
         self.assertTrue(callback.on_sample.call_count == 10)
         callback.on_sample_validation.assert_not_called()
 
+
 class TestTrialMembers(TestCase):
     def test_init_none_criterion(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
@@ -1694,6 +1695,23 @@ class TestTrialMembers(TestCase):
         self.assertTrue(torch.is_tensor(loss))
         self.assertTrue(loss.shape == torch.Size([1]))
         self.assertTrue(loss.item() == 0)
+
+    def test_str(self):
+        torchmodel = "mod"
+        optimizer = "opt"
+        metric = tb.metrics.Metric('met')
+
+        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], ["cb"], pass_state=False)
+        correct_string = "--------------------- OPTIMZER ---------------------\nopt\n\n-------------------- CRITERION ---------------------\ncrit\n\n--------------------- METRICS ----------------------\n['met']\n\n-------------------- CALLBACKS ---------------------\n['cb']\n\n---------------------- MODEL -----------------------\nmod\n\n"
+        self.assertEqual(str(torchbearertrial), correct_string)
+
+    def test_repr(self):
+        torchmodel = "mod"
+        optimizer = "opt"
+        metric = tb.metrics.Metric('met')
+
+        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], ["cb"], pass_state=False)
+        self.assertEqual(str(torchbearertrial), repr(torchbearertrial))
 
     def test_train(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))

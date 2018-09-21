@@ -1,6 +1,6 @@
 import os
 from unittest import TestCase
-from unittest.mock import patch, Mock, ANY
+from unittest.mock import patch, Mock, ANY, MagicMock
 
 import torch
 import torch.nn as nn
@@ -722,7 +722,7 @@ class TestTensorbardText(TestCase):
         
     @patch('tensorboardX.SummaryWriter')
     def test_epoch_writer(self, mock_writer):
-        tboard = TensorBoardText()
+        tboard = TensorBoardText(log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -739,7 +739,7 @@ class TestTensorbardText(TestCase):
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_epoch_writer_visdom(self, mock_visdom, mock_writer):
-        tboard = TensorBoardText(visdom=True)
+        tboard = TensorBoardText(visdom=True, log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -755,7 +755,7 @@ class TestTensorbardText(TestCase):
 
     @patch('tensorboardX.SummaryWriter')
     def test_batch_writer(self, mock_writer):
-        tboard = TensorBoardText(write_epoch_metrics=False, write_batch_metrics=True)
+        tboard = TensorBoardText(write_epoch_metrics=False, write_batch_metrics=True, log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -773,7 +773,7 @@ class TestTensorbardText(TestCase):
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_batch_writer_visdom(self, mock_visdom, mock_writer):
-        tboard = TensorBoardText(visdom=True, write_epoch_metrics=False, write_batch_metrics=True)
+        tboard = TensorBoardText(visdom=True, write_epoch_metrics=False, write_batch_metrics=True, log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -792,19 +792,17 @@ class TestTensorbardText(TestCase):
     @patch('tensorboardX.SummaryWriter')
     def test_batch_metrics(self, mock_board):
         mock_board.return_value = Mock()
-        mock_board.return_value.add_scalar = Mock()
+        mock_board.return_value.add_text = Mock()
 
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
                  torchbearer.EPOCH: 0, torchbearer.METRICS: {'test': 1}, torchbearer.BATCH: 0}
 
-        tboard = TensorBoard(write_batch_metrics=True, write_epoch_metrics=False)
+        tboard = TensorBoardText(write_batch_metrics=True, write_epoch_metrics=False, log_trial_summary=False)
         tboard.on_start(state)
         tboard.on_start_epoch(state)
         tboard.on_step_training(state)
-        mock_board.return_value.add_scalar.assert_called_once_with('batch/test', 1, 0)
-        mock_board.return_value.add_scalar.reset_mock()
-        tboard.on_step_validation(state)
-        mock_board.return_value.add_scalar.assert_called_once_with('batch/test', 1, 0)
+        mock_board.return_value.add_text.assert_called_once_with('batch', TensorBoardText.table_formatter(str(state[torchbearer.METRICS])), 0)
+        mock_board.return_value.add_text.reset_mock()
         tboard.on_end_epoch(state)
         tboard.on_end(state)
 
@@ -813,19 +811,29 @@ class TestTensorbardText(TestCase):
     @patch('visdom.Visdom')
     def test_batch_metrics_visdom(self, mock_visdom, mock_writer, _):
         mock_writer.return_value = Mock()
-        mock_writer.return_value.add_scalar = Mock()
+        mock_writer.return_value.add_text = Mock()
 
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
                  torchbearer.EPOCH: 0, torchbearer.METRICS: {'test': 1}, torchbearer.BATCH: 0, torchbearer.TRAIN_STEPS: 0}
 
-        tboard = TensorBoard(visdom=True, write_batch_metrics=True, write_epoch_metrics=False)
+        tboard = TensorBoardText(visdom=True, write_batch_metrics=True, write_epoch_metrics=False, log_trial_summary=False)
         tboard.on_start(state)
         tboard.on_start_epoch(state)
         tboard.on_step_training(state)
-        mock_writer.return_value.add_scalar.assert_called_once_with('test', 1, 0, main_tag='batch')
-        mock_writer.return_value.add_scalar.reset_mock()
+        mock_writer.return_value.add_text.assert_called_once_with('batch', '<h3>Epoch {} - Batch {}</h3>'.format(state[torchbearer.EPOCH], state[torchbearer.BATCH])+TensorBoardText.table_formatter(str(state[torchbearer.METRICS])), 1)
+        mock_writer.return_value.add_text.reset_mock()
         tboard.on_step_validation(state)
-        mock_writer.return_value.add_scalar.assert_called_once_with('test', 1, 0, main_tag='batch')
-        tboard.on_end_epoch(state)
         tboard.on_end(state)
 
+    @patch('tensorboardX.SummaryWriter')
+    def test_log_summary(self, mock_board):
+        mock_board.return_value = Mock()
+        mock_board.return_value.add_text = Mock()
+        mock_self = 'test'
+
+        state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
+                 torchbearer.EPOCH: 0, torchbearer.METRICS: {'test': 1}, torchbearer.BATCH: 0, torchbearer.SELF: mock_self}
+        tboard = TensorBoardText(write_batch_metrics=False, write_epoch_metrics=False, log_trial_summary=True)
+        tboard.on_start(state)
+        self.assertEqual(mock_board.return_value.add_text.call_args[0][0], 'trial')
+        self.assertEqual(mock_board.return_value.add_text.call_args[0][1], str(mock_self))
