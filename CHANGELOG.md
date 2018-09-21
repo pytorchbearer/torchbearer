@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - The default_for_key metric decorator can now be used to pass arguments to the init of the inner metric
 - The default metric for the key 'top_10_acc' is now the TopKCategoricalAccuracy metric with k set to 10
 - Added global verbose flag for trial that can be overridden by run, evaluate, predict
+- Added string representation of Trial to give summary
+- Added option to log Trial summary to TensorboardText
 ### Changed
 ### Deprecated
 ### Removed
