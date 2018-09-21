@@ -145,6 +145,7 @@ class AbstractTensorBoard(Callback):
             close_writer(self.log_dir, self)
         else:
             close_writer(log_dir, self)
+        self.writer = None
 
     def on_start(self, state):
         self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
