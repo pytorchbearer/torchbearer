@@ -262,7 +262,7 @@ class TensorBoardText(AbstractTensorBoard):
     :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
     :type write_epoch_metrics: True
     :param log_trial_string: If True logs a string summary of the Trial
-    :type log_trial_string: bool
+    :type log_trial_summary: bool
     :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
     :type batch_step_size: int
     :param comment: Descriptive comment to append to path
@@ -276,7 +276,7 @@ class TensorBoardText(AbstractTensorBoard):
     def __init__(self, log_dir='./logs',
                  write_epoch_metrics=True,
                  write_batch_metrics=False,
-                 log_trial_string=True,
+                 log_trial_summary=True,
                  batch_step_size=100,
                  comment='torchbearer',
                  visdom=False,
@@ -284,10 +284,9 @@ class TensorBoardText(AbstractTensorBoard):
         super(TensorBoardText, self).__init__(log_dir, comment, visdom, visdom_params)
         self.write_epoch_metrics = write_epoch_metrics
         self.write_batch_metrics = write_batch_metrics
-        self.log_trial_string = log_trial_string
+        self.log_trial_summary = log_trial_summary
         self.batch_step_size = batch_step_size
         self.visdom = visdom
-        self.visdom_params = visdom_params
         self.batch_log_dir = None
         self.batch_writer = None
 
@@ -312,18 +311,19 @@ class TensorBoardText(AbstractTensorBoard):
     
     def on_start(self, state):
         super().on_start(state)
-        if self.log_trial_string:
+        if self.log_trial_summary:
             self.writer.add_text('trial', str(state[torchbearer.SELF]).replace('\n', '\n \n'), 1)
 
     def on_start_epoch(self, state):
         if self.write_batch_metrics:
             if self.visdom:
                 self.batch_log_dir = os.path.join(self.log_dir, 'epoch/')
+                batch_params = self.visdom_params if self.visdom_params is not None else VisdomParams()
+                batch_params.ENV = batch_params.ENV + '-batch'
+                self.batch_writer = self.get_writer(self.batch_log_dir, visdom=self.visdom, visdom_params=batch_params)
             else:
                 self.batch_log_dir = os.path.join(self.log_dir, 'epoch-' + str(state[torchbearer.EPOCH]))
-            batch_params = self.visdom_params
-            batch_params.ENV = batch_params.ENV + '-batch'
-            self.batch_writer = self.get_writer(self.batch_log_dir, visdom=self.visdom, visdom_params=batch_params)
+                self.batch_writer = self.get_writer(self.batch_log_dir)
 
     def on_step_training(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
