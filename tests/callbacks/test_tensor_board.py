@@ -722,7 +722,7 @@ class TestTensorbardText(TestCase):
         
     @patch('tensorboardX.SummaryWriter')
     def test_epoch_writer(self, mock_writer):
-        tboard = TensorBoardText()
+        tboard = TensorBoardText(log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -739,7 +739,7 @@ class TestTensorbardText(TestCase):
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_epoch_writer_visdom(self, mock_visdom, mock_writer):
-        tboard = TensorBoardText(visdom=True)
+        tboard = TensorBoardText(visdom=True, log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -755,7 +755,7 @@ class TestTensorbardText(TestCase):
 
     @patch('tensorboardX.SummaryWriter')
     def test_batch_writer(self, mock_writer):
-        tboard = TensorBoardText(write_epoch_metrics=False, write_batch_metrics=True)
+        tboard = TensorBoardText(write_epoch_metrics=False, write_batch_metrics=True, log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
@@ -773,7 +773,7 @@ class TestTensorbardText(TestCase):
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_batch_writer_visdom(self, mock_visdom, mock_writer):
-        tboard = TensorBoardText(visdom=True, write_epoch_metrics=False, write_batch_metrics=True)
+        tboard = TensorBoardText(visdom=True, write_epoch_metrics=False, write_batch_metrics=True, log_trial_summary=False)
 
         metrics = {'test_metric_1': 1, 'test_metric_2': 1}
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
