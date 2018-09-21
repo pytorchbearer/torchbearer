@@ -289,6 +289,7 @@ class TensorBoardText(AbstractTensorBoard):
         self.visdom = visdom
         self.batch_log_dir = None
         self.batch_writer = None
+        self.logged_summary = False
 
     @staticmethod
     def table_formatter(string):
@@ -311,7 +312,8 @@ class TensorBoardText(AbstractTensorBoard):
 
     def on_start(self, state):
         super().on_start(state)
-        if self.log_trial_summary:
+        if self.log_trial_summary and not self.logged_summary:
+            self.logged_summary = True
             self.writer.add_text('trial', str(state[torchbearer.SELF]).replace('\n', '\n \n'), 1)
 
     def on_start_epoch(self, state):
