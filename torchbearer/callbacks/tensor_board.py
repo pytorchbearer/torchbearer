@@ -143,9 +143,9 @@ class AbstractTensorBoard(Callback):
         """
         if log_dir is None:
             close_writer(self.log_dir, self)
+            self.writer = None
         else:
             close_writer(log_dir, self)
-        self.writer = None
 
     def on_start(self, state):
         self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
@@ -253,6 +253,7 @@ class TensorBoard(AbstractTensorBoard):
         super().on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
+            self.batch_writer = None
 
 
 class TensorBoardText(AbstractTensorBoard):
@@ -346,6 +347,7 @@ class TensorBoardText(AbstractTensorBoard):
         super().on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
+            self.batch_writer = None
 
 
 class TensorBoardImages(AbstractTensorBoard):
