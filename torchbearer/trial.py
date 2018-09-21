@@ -328,6 +328,20 @@ class Trial(object):
             torchbearer.TEST_DATA: None,
         })
 
+    def __str__(self):
+        def state_string(name, state_key):
+            import math
+            N = (50-len(name))/2
+            return "-"*math.floor(N) + " " + name.upper()+ " " + "-"*math.ceil(N) + "\n" + str(self.state[state_key]) + "\n\n"
+
+        optim_str = state_string('Optimzer', torchbearer.OPTIMIZER)
+        crit_str = state_string("Criterion", torchbearer.CRITERION)
+        metrics_str = state_string("Metrics", torchbearer.METRIC_LIST)
+        callbacks_str = state_string("Callbacks", torchbearer.CALLBACK_LIST)
+        model_str = state_string("Model", torchbearer.MODEL)
+
+        return optim_str + crit_str + metrics_str + callbacks_str + model_str
+
     @fluent
     def for_train_steps(self, steps):
         """Run this trial for the given number of training steps. Note that the generator will output (None, None) if it

@@ -15,6 +15,9 @@ class Callback(object):
         """
         return {}
 
+    def __str__(self):
+        return str(self.__class__)
+
     def load_state_dict(self, state_dict):
         """Resume this callback from the given state. Expects that this callback was constructed in the same way.
 
@@ -242,6 +245,9 @@ class CallbackList(Callback):
     def _for_list(self, function):
         for callback in self.callback_list:
             function(callback)
+
+    def __str__(self):
+        return str([str(c) for c in self.callback_list])
 
     def __iter__(self):
         return self.callback_list.__iter__()
