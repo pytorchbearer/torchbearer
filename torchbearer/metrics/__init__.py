@@ -55,3 +55,4 @@ from .roc_auc_score import *
 from .primitives import *
 from .timer import TimerMetric
 from .default import DefaultAccuracy
+from .lr import LR

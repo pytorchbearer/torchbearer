@@ -11,6 +11,7 @@ following strings:
 - '`mse`': The :class:`.MeanSquaredError` metric
 - '`loss`': The :class:`.Loss` metric
 - '`epoch`': The :class:`.Epoch` metric
+- '`lr`': The :class:`.LR` metric
 - '`roc_auc`' or '`roc_auc_score`': The :class:`.RocAucScore` metric
 """
 import torch.nn as nn

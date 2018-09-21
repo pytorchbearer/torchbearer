@@ -299,8 +299,8 @@ class Trial(object):
     """
     def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
         if criterion is None:
-            def criterion(_, y_true):
-                return torch.zeros(1, device=y_true.device)
+            def criterion(_, __):
+                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE])
 
         self.pass_state = pass_state
         self.verbose = verbose
@@ -727,9 +727,18 @@ class Trial(object):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
         if state[torchbearer.GENERATOR] is not None or state[torchbearer.STEPS] is not None:
-            self.eval()
+            state[torchbearer.CALLBACK_LIST].on_start(state)
+            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            return self._test_pass(state)[torchbearer.METRICS]
+            self.eval()
+            state = self._test_pass(state)
+
+            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
+
+            self.state[torchbearer.HISTORY][-1][1].update(state[torchbearer.METRICS])
+
+            state[torchbearer.CALLBACK_LIST].on_end(state)
+            return state[torchbearer.METRICS]
         return {}
 
     @inject_callback(AggregatePredictions())
@@ -754,9 +763,15 @@ class Trial(object):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
         if state[torchbearer.GENERATOR] is not None or state[torchbearer.STEPS] is not None:
-            self.eval()
+            state[torchbearer.CALLBACK_LIST].on_start(state)
+            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            return self._test_pass(state)[torchbearer.FINAL_PREDICTIONS]
+            self.eval()
+            res = self._test_pass(state)[torchbearer.FINAL_PREDICTIONS]
+
+            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
+            state[torchbearer.CALLBACK_LIST].on_end(state)
+            return res
         return []
 
     @fluent

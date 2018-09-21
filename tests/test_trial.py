@@ -1550,31 +1550,36 @@ class TestTrialValEvalPred(TestCase):
         steps = 5
         tb.CallbackListInjection = Mock()
 
-        state = {tb.VALIDATION_GENERATOR: generator, tb.VALIDATION_STEPS: steps, tb.METRICS: 1}
         t = Trial(MagicMock())
         eval_mock = t.eval = Mock()
-        test_pass_mock = t._test_pass = Mock(return_value={tb.METRICS: 1})
-        t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.VALIDATION_STEPS: steps, tb.VALIDATION_DATA: (generator, steps)}
-        metrics = t.evaluate(state)
+        clist = MagicMock()
+        state = {tb.HISTORY: [('steps', {'train_metric': 2})], tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: clist, tb.VALIDATION_STEPS: steps, tb.VALIDATION_DATA: (generator, steps), tb.METRICS: {'val_metric': 1}}
+        test_pass_mock = t._test_pass = Mock(return_value=state)
+        t.state = state
+        metrics = t.evaluate()
 
+        self.assertEqual(clist.on_start.call_count, 1)
+        self.assertEqual(clist.on_start_epoch.call_count, 1)
+        self.assertEqual(clist.on_end_epoch.call_count, 1)
+        self.assertEqual(clist.on_end.call_count, 1)
         self.assertEqual(eval_mock.call_count, 1)
         self.assertEqual(test_pass_mock.call_count, 1)
         test_pass_state = test_pass_mock.call_args[0][0]
         self.assertTrue(test_pass_state[tb.GENERATOR] == generator)
         self.assertTrue(test_pass_state[tb.STEPS] == steps)
-        self.assertTrue(metrics == 1)
+        self.assertEqual(metrics['val_metric'], 1)
+        self.assertDictEqual(state[tb.HISTORY][0][1], {'train_metric': 2, 'val_metric': 1})
 
     def test_evaluate_none(self):
         generator = None
         steps = None
         tb.CallbackListInjection = Mock()
 
-        state = {tb.VALIDATION_GENERATOR: generator, tb.VALIDATION_STEPS: steps, tb.METRICS: 1}
         t = Trial(MagicMock())
         eval_mock = t.eval = Mock()
         test_pass_mock = t._test_pass = Mock(return_value={tb.METRICS: 1})
         t.state = {tb.VALIDATION_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.VALIDATION_STEPS: steps, tb.VALIDATION_DATA: (generator, steps)}
-        metrics = t.evaluate(state)
+        metrics = t.evaluate()
 
         self.assertTrue(eval_mock.call_count == 0)
 
@@ -1587,9 +1592,14 @@ class TestTrialValEvalPred(TestCase):
         t = Trial(MagicMock())
         eval_mock = t.eval = Mock()
         test_pass_mock = t._test_pass = Mock(return_value={tb.FINAL_PREDICTIONS: 1})
-        t.state = {tb.TEST_GENERATOR: generator, tb.CALLBACK_LIST: None, tb.TEST_STEPS: steps, tb.TEST_DATA: (generator, steps)}
+        clist = MagicMock()
+        t.state = {tb.TEST_GENERATOR: generator, tb.CALLBACK_LIST: clist, tb.TEST_STEPS: steps, tb.TEST_DATA: (generator, steps)}
         metrics = t.predict(state)
 
+        self.assertEqual(clist.on_start.call_count, 1)
+        self.assertEqual(clist.on_start_epoch.call_count, 1)
+        self.assertEqual(clist.on_end_epoch.call_count, 1)
+        self.assertEqual(clist.on_end.call_count, 1)
         self.assertEqual(eval_mock.call_count, 1)
         self.assertEqual(test_pass_mock.call_count, 1)
         test_pass_state = test_pass_mock.call_args[0][0]
@@ -1676,12 +1686,11 @@ class TestTrialMembers(TestCase):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
         optimizer = MagicMock()
         metric = MagicMock()
-        x = MagicMock()
-        y_true = MagicMock()
-        y_true.device = 'cpu'
 
-        torchbearertrial = Trial(torchmodel, optimizer, None, [metric], [], pass_state=False)
-        loss = torchbearertrial.state[tb.CRITERION](x, y_true)
+        torchbearertrial = Trial(torchmodel, optimizer, None, [metric], [], pass_state=False).to('cpu', torch.float64)
+        loss = torchbearertrial.state[tb.CRITERION](None, None)
+        self.assertTrue(str(loss.device) == 'cpu')
+        self.assertTrue(loss.dtype == torch.float64)
         self.assertTrue(torch.is_tensor(loss))
         self.assertTrue(loss.shape == torch.Size([1]))
         self.assertTrue(loss.item() == 0)
