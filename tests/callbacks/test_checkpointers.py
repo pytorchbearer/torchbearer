@@ -118,17 +118,6 @@ class TestCheckpointer(TestCase):
         check.save_checkpoint(state, True)
         self.assertTrue(check.most_recent == 'test_file_1.pt')
 
-    @patch("torch.save")
-    def test_state_dict(self, _):
-        check = _Checkpointer('test')
-        check.most_recent = 'temp'
-
-        state = check.state_dict()
-
-        check = _Checkpointer('test')
-        check.load_state_dict(state)
-        self.assertEqual(check.most_recent, 'temp')
-
 
 class TestModelCheckpoint(TestCase):
     def test_best_only(self):
@@ -180,7 +169,6 @@ class TestInterval(TestCase):
 
     def test_state_dict(self):
         check = Interval('test')
-        check.most_recent = 'temp'
         check.epochs_since_last_save = 10
 
         state = check.state_dict()
@@ -188,7 +176,6 @@ class TestInterval(TestCase):
         check = Interval('test')
         check.load_state_dict(state)
 
-        self.assertEqual(check.most_recent, 'temp')
         self.assertEqual(check.epochs_since_last_save, 10)
 
 
@@ -307,7 +294,6 @@ class TestBest(TestCase):
 
     def test_state_dict(self):
         check = Best('test')
-        check.most_recent = 'temp'
         check.best = 'temp2'
         check.epochs_since_last_save = 10
 
@@ -316,6 +302,5 @@ class TestBest(TestCase):
         check = Best('test')
         check.load_state_dict(state)
 
-        self.assertEqual(check.most_recent, 'temp')
         self.assertEqual(check.best, 'temp2')
         self.assertEqual(check.epochs_since_last_save, 10)
