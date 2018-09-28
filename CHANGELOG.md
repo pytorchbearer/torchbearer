@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 ### Changed
+- When resuming training checkpoitners no longer delete the state file the trial was loaded from
 ### Deprecated
 ### Removed
 ### Fixed
