@@ -127,8 +127,7 @@ class AbstractTensorBoard(Callback):
         :return: the `SummaryWriter` or `VisdomWriter`
         """
         if log_dir is None:
-            if self.writer is None:
-                self.writer = get_writer(self.log_dir, self, visdom=visdom, visdom_params=visdom_params)
+            self.writer = get_writer(self.log_dir, self, visdom=visdom, visdom_params=visdom_params)
             return self.writer
         else:
             return get_writer(log_dir, self, visdom=visdom, visdom_params=visdom_params)

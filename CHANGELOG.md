@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added string representation of Trial to give summary
+- Added option to log Trial summary to TensorboardText
 ### Changed
 - When resuming training checkpoitners no longer delete the state file the trial was loaded from
 ### Deprecated
@@ -12,14 +14,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed a bug where callbacks weren't handled correctly in the predict and evaluate methods of Trial
 - Fixed a bug where the history wasn't updated when new metrics were calculated with the evaluate method of Trial
+- Fix a bug where tensorboard writers couldn't be reused 
 
 ## [0.2.2] - 2018-09-18
 ### Added
 - The default_for_key metric decorator can now be used to pass arguments to the init of the inner metric
 - The default metric for the key 'top_10_acc' is now the TopKCategoricalAccuracy metric with k set to 10
 - Added global verbose flag for trial that can be overridden by run, evaluate, predict
-- Added string representation of Trial to give summary
-- Added option to log Trial summary to TensorboardText
 - Added an LR metric which retrieves the current learning rate from the optimizer, default for key 'lr'
 ### Changed
 ### Deprecated
