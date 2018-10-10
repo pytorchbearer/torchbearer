@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where callbacks weren't handled correctly in the predict and evaluate methods of Trial
 - Fixed a bug where the history wasn't updated when new metrics were calculated with the evaluate method of Trial
 - Fix a bug where tensorboard writers couldn't be reused 
+- Fix bug where tqdm wouldn't get correct iterator length when evaluating on test generator
 
 ## [0.2.2] - 2018-09-18
 ### Added
