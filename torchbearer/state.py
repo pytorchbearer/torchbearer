@@ -94,6 +94,7 @@ SELF = state_key('self')
 EPOCH = state_key('epoch')
 MAX_EPOCHS = state_key('max_epochs')
 
+DATA = state_key('data')
 GENERATOR = state_key('generator')
 ITERATOR = state_key('iterator')
 STEPS = state_key('steps')

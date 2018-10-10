@@ -56,9 +56,9 @@ class Tqdm(Callback):
         self._on_epoch = on_epoch
         self.tqdm_args = tqdm_args
 
-    def _on_start(self, state, letter, steps):
+    def _on_start(self, state, letter):
         bar_desc = '{:d}/{:d}({:s})'.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
-        self._loader = self.tqdm_module(total=steps, desc=bar_desc, **self.tqdm_args)
+        self._loader = self.tqdm_module(total=state[torchbearer.STEPS], desc=bar_desc, **self.tqdm_args)
 
     def _update(self, state):
         self._loader.update(1)
@@ -87,7 +87,7 @@ class Tqdm(Callback):
         :type state: dict
         """
         if not self._on_epoch:
-            self._on_start(state, 't', state[torchbearer.STEPS])
+            self._on_start(state, 't')
 
     def on_step_training(self, state):
         """Update the bar with the metrics from this step.
@@ -114,7 +114,7 @@ class Tqdm(Callback):
         :type state: dict
         """
         if not self._on_epoch:
-            self._on_start(state, self.validation_label, state[torchbearer.STEPS])
+            self._on_start(state, self.validation_label)
 
     def on_step_validation(self, state):
         """Update the bar with the metrics from this step.
