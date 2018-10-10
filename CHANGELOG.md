@@ -17,7 +17,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where the history wasn't updated when new metrics were calculated with the evaluate method of Trial
 - Fixed a bug where tensorboard writers couldn't be reused 
 - Fixed a bug where the none criterion didn't require gradient
-- Fixed bug where tqdm wouldn't get correct iterator length when evaluating on test generator
+- Fix bug where tqdm wouldn't get correct iterator length when evaluating on test generator
+- Fixed a bug where evaluating before training tried to update history before it existed
 - Fixed a bug where the metrics would output 'val_acc' even if evaluating on test or train data
 
 ## [0.2.2] - 2018-09-18
