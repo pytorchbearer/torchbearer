@@ -64,9 +64,9 @@ class DefaultAccuracy(Metric):
         self._train = True
         return self.metric.train()
 
-    def eval(self):
+    def eval(self, data_key=None):
         self._train = False
-        return self.metric.eval()
+        return self.metric.eval(data_key=data_key)
 
     def process(self, *args):
         return self.metric.process(*args)

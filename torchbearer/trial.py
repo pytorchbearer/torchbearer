@@ -210,6 +210,7 @@ def inject_sampler(data_key, predict=False):
             else:
                 loader = load_batch_standard
 
+            self.state[torchbearer.DATA] = key
             self.state[torchbearer.SAMPLER] = Sampler(loader)
             self.state[torchbearer.GENERATOR] = generator
             self.state[torchbearer.STEPS] = steps
@@ -857,7 +858,10 @@ class Trial(object):
         :rtype: Trial
         """
         self.state[torchbearer.MODEL].eval()
-        self.state[torchbearer.METRIC_LIST].eval()
+        if torchbearer.DATA in self.state:
+            self.state[torchbearer.METRIC_LIST].eval(data_key=self.state[torchbearer.DATA])
+        else:
+            self.state[torchbearer.METRIC_LIST].eval()
 
     @fluent
     def to(self, *args, **kwargs):

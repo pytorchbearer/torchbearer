@@ -36,6 +36,7 @@ class ToDict(metrics.AdvancedMetric):
     def __init__(self, metric):
         super(ToDict, self).__init__(metric.name)
 
+        self.eval_flag = 'val'
         self.metric = metric
 
     def process_train(self, *args):
@@ -46,7 +47,7 @@ class ToDict(metrics.AdvancedMetric):
     def process_validate(self, *args):
         val = self.metric.process(*args)
         if val is not None:
-            return {'val_' + self.metric.name: val}
+            return {self.eval_flag + '_' + self.metric.name: val}
 
     def process_final_train(self, *args):
         val = self.metric.process_final(*args)
@@ -56,11 +57,17 @@ class ToDict(metrics.AdvancedMetric):
     def process_final_validate(self, *args):
         val = self.metric.process_final(*args)
         if val is not None:
-            return {'val_' + self.metric.name: val}
+            return {self.eval_flag + '_' + self.metric.name: val}
 
-    def eval(self):
-        super().eval()
-        self.metric.eval()
+    def eval(self, data_key=None):
+        super().eval(data_key=data_key)
+        if data_key == torchbearer.TEST_DATA:
+            self.eval_flag = 'test'
+        elif data_key == torchbearer.TRAIN_DATA:
+            self.eval_flag = 'train'
+        else:
+            self.eval_flag = 'val'
+        self.metric.eval(data_key=data_key)
 
     def train(self):
         super().train()
