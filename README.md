@@ -132,14 +132,14 @@ trial.evaluate(data_key=torchbearer.TEST_DATA)
 - Running that code gives output using Tqdm and providing running accuracies and losses during the training phase:
 
 ```
-0/10(t): 100%|██████████| 352/352 [00:01<00:00, 233.36it/s, running_acc=0.536, running_loss=1.32, acc=0.459, acc_std=0.498, loss=1.52, loss_std=0.239]
-0/10(v): 100%|██████████| 40/40 [00:00<00:00, 239.40it/s, val_acc=0.536, val_acc_std=0.499, val_loss=1.29, val_loss_std=0.0731]
+0/10(t): 100%|██████████| 352/352 [00:01<00:00, 176.55it/s, running_acc=0.526, running_loss=1.31, acc=0.453, acc_std=0.498, loss=1.53, loss_std=0.25]
+0/10(v): 100%|██████████| 40/40 [00:00<00:00, 201.14it/s, val_acc=0.528, val_acc_std=0.499, val_loss=1.32, val_loss_std=0.0874]
 .
 .
 .
-9/10(t): 100%|██████████| 352/352 [00:01<00:00, 215.76it/s, running_acc=0.741, running_loss=0.735, acc=0.754, acc_std=0.431, loss=0.703, loss_std=0.0897]
-9/10(v): 100%|██████████| 40/40 [00:00<00:00, 222.72it/s, val_acc=0.68, val_acc_std=0.466, val_loss=0.948, val_loss_std=0.181]
-0/1(e): 100%|██████████| 79/79 [00:00<00:00, 268.70it/s, val_acc=0.678, val_acc_std=0.467, val_loss=0.925, val_loss_std=0.109]
+9/10(t): 100%|██████████| 352/352 [00:02<00:00, 171.22it/s, running_acc=0.738, running_loss=0.737, acc=0.749, acc_std=0.434, loss=0.723, loss_std=0.0885]
+9/10(v): 100%|██████████| 40/40 [00:00<00:00, 188.51it/s, val_acc=0.669, val_acc_std=0.471, val_loss=0.97, val_loss_std=0.173]
+0/1(e): 100%|██████████| 79/79 [00:00<00:00, 241.00it/s, test_acc=0.675, test_acc_std=0.468, test_loss=0.952, test_loss_std=0.109]
 ```
 
 <a name="docs"/>

@@ -58,7 +58,7 @@ import torchbearer
 from torchbearer import Trial
 from torchbearer.callbacks import TensorBoard
 
-torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_batch_metrics=True)]).to('cuda:1')
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_batch_metrics=True)]).to('cuda')
 torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen, test_generator=testgen)
-torchbearer_trial.run(epochs=1)
+torchbearer_trial.run(epochs=10)
 torchbearer_trial.evaluate(data_key=torchbearer.TEST_DATA)

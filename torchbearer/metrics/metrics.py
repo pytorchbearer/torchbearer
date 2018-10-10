@@ -80,7 +80,7 @@ class Metric(object):
         """
         pass
 
-    def eval(self):
+    def eval(self, data_key=None):
         """Put the metric in eval mode during model validation.
         """
         pass
@@ -148,11 +148,11 @@ class MetricTree(Metric):
         """
         return self._for_tree(lambda metric, *in_args: metric.process_final(*in_args), *args)
 
-    def eval(self):
-        self.root.eval()
+    def eval(self, data_key=None):
+        self.root.eval(data_key=data_key)
 
         for subtree in self.children:
-            subtree.eval()
+            subtree.eval(data_key=data_key)
 
     def train(self):
         self.root.train()
@@ -220,10 +220,10 @@ class MetricList(Metric):
         """
         self._for_list(lambda metric: metric.train())
 
-    def eval(self):
+    def eval(self, data_key=None):
         """Put each metric in eval mode
         """
-        self._for_list(lambda metric: metric.eval())
+        self._for_list(lambda metric: metric.eval(data_key=data_key))
 
     def reset(self, state):
         """Reset each metric with the given state.
@@ -299,8 +299,12 @@ class AdvancedMetric(Metric):
         """
         return self._process_final(*args)
 
-    def eval(self):
+    def eval(self, data_key=None):
         """Put the metric in eval mode.
+
+        :param data_key: The torchbearer data_key, if used
+        :type data_key: Optional(torchbearer.StateKey)
+
         """
         self._process = self.process_validate
         self._process_final = self.process_final_validate
