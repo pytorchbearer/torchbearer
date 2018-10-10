@@ -19,14 +19,6 @@ class _Checkpointer(Callback):
         if fileformat.__contains__(os.sep) and not os.path.exists(os.path.dirname(fileformat)):
             os.makedirs(os.path.dirname(fileformat))
 
-    def state_dict(self):
-        return {'most_recent': self.most_recent}
-
-    def load_state_dict(self, state_dict):
-        self.most_recent = state_dict['most_recent']
-
-        return self
-
     def save_checkpoint(self, model_state, overwrite_most_recent=False):
         state = {}
         state.update(model_state)

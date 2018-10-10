@@ -8,12 +8,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added string representation of Trial to give summary
 - Added option to log Trial summary to TensorboardText
 ### Changed
+- When resuming training checkpoitners no longer delete the state file the trial was loaded from
 ### Deprecated
 ### Removed
 ### Fixed
 - Fixed a bug where callbacks weren't handled correctly in the predict and evaluate methods of Trial
 - Fixed a bug where the history wasn't updated when new metrics were calculated with the evaluate method of Trial
 - Fix a bug where tensorboard writers couldn't be reused 
+- Fixed a bug where the none criterion didn't require gradient
 
 ## [0.2.2] - 2018-09-18
 ### Added

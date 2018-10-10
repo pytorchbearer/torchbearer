@@ -300,7 +300,7 @@ class Trial(object):
     def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
         if criterion is None:
             def criterion(_, __):
-                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE])
+                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE], requires_grad=True)
 
         self.pass_state = pass_state
         self.verbose = verbose
