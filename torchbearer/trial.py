@@ -735,7 +735,8 @@ class Trial(object):
 
             state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
 
-            self.state[torchbearer.HISTORY][-1][1].update(state[torchbearer.METRICS])
+            if len(self.state[torchbearer.HISTORY]) != 0:
+                self.state[torchbearer.HISTORY][-1][1].update(state[torchbearer.METRICS])
 
             state[torchbearer.CALLBACK_LIST].on_end(state)
             return state[torchbearer.METRICS]
