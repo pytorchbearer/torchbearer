@@ -35,4 +35,4 @@ class RocAucScore(metrics.EpochLambda):
         else:
             process = lambda y: y
 
-        super().__init__('roc_auc_score', lambda y_pred, y_true: sklearn.metrics.roc_auc_score(process(y_true.cpu().numpy()), y_pred.cpu().numpy()))
+        super().__init__('roc_auc_score', lambda y_pred, y_true: sklearn.metrics.roc_auc_score(process(y_true.cpu().numpy()), y_pred.cpu().detach().numpy()))
