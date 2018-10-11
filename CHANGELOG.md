@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fix bug where tqdm wouldn't get correct iterator length when evaluating on test generator
 - Fixed a bug where evaluating before training tried to update history before it existed
 - Fixed a bug where the metrics would output 'val_acc' even if evaluating on test or train data
+- Fixed a bug where roc metric didn't detach y_pred before sending to numpy
 
 ## [0.2.2] - 2018-09-18
 ### Added
