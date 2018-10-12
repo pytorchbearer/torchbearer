@@ -29,6 +29,7 @@ class TestCallback(TestCase):
         self.assertIsNone(callback.on_step_training({}))
         self.assertIsNone(callback.on_end_training({}))
         self.assertIsNone(callback.on_end_epoch({}))
+        self.assertIsNone(callback.on_checkpoint({}))
         self.assertIsNone(callback.on_end({}))
         self.assertIsNone(callback.on_start_validation({}))
         self.assertIsNone(callback.on_sample_validation({}))

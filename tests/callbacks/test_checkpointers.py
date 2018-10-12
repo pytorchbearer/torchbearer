@@ -133,8 +133,8 @@ class TestMostRecent(TestCase):
         state = {}
         check = MostRecent('test_file.pt')
 
-        check.on_end_epoch(state)
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
+        check.on_checkpoint(state)
 
         self.assertTrue(mock_save_check.call_count == 2)
 
@@ -146,8 +146,8 @@ class TestInterval(TestCase):
         state = {}
         check = Interval('test_file', period=1)
 
-        check.on_end_epoch(state)
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
+        check.on_checkpoint(state)
 
         self.assertTrue(mock_save_check.call_count == 2)
 
@@ -157,7 +157,7 @@ class TestInterval(TestCase):
         check = Interval('test_file', period=4)
 
         for i in range(13):
-            check.on_end_epoch(state)
+            check.on_checkpoint(state)
             if i == 3:
                 self.assertTrue(mock_save_check.call_count == 1)
             elif i == 6:
@@ -188,11 +188,11 @@ class TestBest(TestCase):
         check = Best(file_path, mode='min')
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
         state = {torchbearer.METRICS: {'val_loss': 0.2}}
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -203,11 +203,11 @@ class TestBest(TestCase):
         check = Best(file_path, mode='min')
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
         state = {torchbearer.METRICS: {'val_loss': 0.001}}
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 2)
 
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -218,11 +218,11 @@ class TestBest(TestCase):
         check = Best(file_path, mode='max')
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
         state = {torchbearer.METRICS: {'val_loss': 0.2}}
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 2)
 
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -233,11 +233,11 @@ class TestBest(TestCase):
         check = Best(file_path, mode='max')
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
         state = {torchbearer.METRICS: {'val_loss': 0.001}}
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -248,11 +248,11 @@ class TestBest(TestCase):
         check = Best(file_path, mode='min', min_delta=0.1)
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
         state = {torchbearer.METRICS: {'val_loss': 0.001}}
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -263,11 +263,11 @@ class TestBest(TestCase):
         check = Best(file_path, mode='min', min_delta=0.1)
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 1)
 
         state = {torchbearer.METRICS: {'val_loss': -0.001}}
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save.call_count == 2)
         
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -278,7 +278,7 @@ class TestBest(TestCase):
         check = Best(file_path, monitor='val_loss')
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(check.mode == 'min')
 
     @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
@@ -289,7 +289,7 @@ class TestBest(TestCase):
         check = Best(file_path, monitor='acc_loss')
         check.on_start(state)
 
-        check.on_end_epoch(state)
+        check.on_checkpoint(state)
         self.assertTrue(check.mode == 'max')
 
     def test_state_dict(self):

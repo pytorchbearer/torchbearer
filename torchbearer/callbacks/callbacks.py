@@ -118,6 +118,17 @@ class Callback(object):
         """
         pass
 
+    def on_checkpoint(self, state):
+        """Perform some action with the state after all other callbacks have completed at the end of an epoch and the
+        history has been updated. Should only be used for taking checkpoints or snapshots and will only be called by the
+        run method of Trial.
+
+        :param state: The current state dict of the :class:`.Model`.
+        :type state: dict[str,any]
+
+        """
+        pass
+
     def on_end(self, state):
         """Perform some action with the given state as context at the end of the model fitting.
 
@@ -354,6 +365,15 @@ class CallbackList(Callback):
 
         """
         self._for_list(lambda callback: callback.on_end_epoch(state))
+
+    def on_checkpoint(self, state):
+        """Call on_checkpoint on each callback in turn with the given state.
+
+        :param state: The current state dict of the :class:`.Model`.
+        :type state: dict[str,any]
+
+        """
+        self._for_list(lambda callback: callback.on_checkpoint(state))
 
     def on_end(self, state):
         """Call on_end on each callback in turn with the given state.

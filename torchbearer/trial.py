@@ -601,6 +601,7 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
             steps_summary = (state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS])
             self.state[torchbearer.HISTORY].append((steps_summary, state[torchbearer.METRICS]))
+            state[torchbearer.CALLBACK_LIST].on_checkpoint(state)
 
             if state[torchbearer.STOP_TRAINING]:
                 break
