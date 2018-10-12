@@ -82,7 +82,7 @@ class MostRecent(_Checkpointer):
         super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.filepath = filepath
 
-    def on_end_epoch(self, state):
+    def on_checkpoint(self, state):
         super().on_end_epoch(state)
         self.save_checkpoint(state, overwrite_most_recent=True)
 
@@ -148,7 +148,7 @@ class Best(_Checkpointer):
         if self.best is None:
             self.best = float('inf') if self.mode == 'min' else -float('inf')
 
-    def on_end_epoch(self, state):
+    def on_checkpoint(self, state):
         super().on_end_epoch(state)
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.period:
@@ -190,7 +190,7 @@ class Interval(_Checkpointer):
 
         return self
 
-    def on_end_epoch(self, state):
+    def on_checkpoint(self, state):
         super().on_end_epoch(state)
 
         self.epochs_since_last_save += 1

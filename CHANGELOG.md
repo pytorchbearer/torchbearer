@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added string representation of Trial to give summary
 - Added option to log Trial summary to TensorboardText
+- Added a callback point ('on_checkpoint') which can be used for model checkpointing after the history ios updated
 ### Changed
 - When resuming training checkpointers no longer delete the state file the trial was loaded from
 - Changed the metric eval to include a data_key which tells us what data we are evaluating on
@@ -21,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where evaluating before training tried to update history before it existed
 - Fixed a bug where the metrics would output 'val_acc' even if evaluating on test or train data
 - Fixed a bug where roc metric didn't detach y_pred before sending to numpy
+- Fixed a bug where resuming from a checkpoint saved with one of the callbacks didn't populate the epoch number correctly
 
 ## [0.2.2] - 2018-09-18
 ### Added
