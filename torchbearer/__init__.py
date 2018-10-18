@@ -30,9 +30,12 @@ Utilities
 
 from .version import __version__
 
-from .state import *
+# Hack: Tensorboard needs Y_PRED so define it here as a string
+Y_PRED = 'y_pred'
+
 from . import metrics
 from . import callbacks
+from .state import *
 from .trial import *
 from .torchbearer import *
 from . import cv_utils

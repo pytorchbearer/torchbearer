@@ -183,7 +183,7 @@ class MetricList(Metric):
 
         for metric in metric_list:
 
-            if str(metric) == metric:
+            if isinstance(metric, str):
                 metric = get_default(metric)
 
             if isinstance(metric, MetricList):

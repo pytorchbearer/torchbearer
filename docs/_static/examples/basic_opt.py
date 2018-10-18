@@ -1,7 +1,11 @@
 import torch
 from torch.nn import Module
 
+import numpy as np
+
 import torchbearer as tb
+
+ESTIMATE = tb.state_key('est')
 
 
 class Net(Module):
@@ -23,20 +27,12 @@ class Net(Module):
         return torch.sum(out**2)
 
     def forward(self, _, state):
+        state[ESTIMATE] = np.round(self.pars.detach().cpu().numpy(), 4)
         return self.f()
 
 
 def loss(y_pred, y_true):
     return y_pred
-
-
-@tb.metrics.to_dict
-class est(tb.metrics.Metric):
-    def __init__(self):
-        super().__init__('est')
-
-    def process(self, state):
-        return state[tb.MODEL].pars.data
 
 
 p = torch.tensor([2.0, 1.0, 10.0])
@@ -45,6 +41,6 @@ training_steps = 50000
 model = Net(p)
 optim = torch.optim.SGD(model.parameters(), lr=0.0001)
 
-tbtrial = tb.Trial(model, optim, loss, [est(), 'loss'], pass_state=True).for_train_steps(training_steps).to('cuda')
+tbtrial = tb.Trial(model, optim, loss, [ESTIMATE, 'loss'], pass_state=True).for_train_steps(training_steps).to('cuda')
 tbtrial.run()
 print(list(model.parameters())[0].data)

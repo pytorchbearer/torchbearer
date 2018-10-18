@@ -9,7 +9,7 @@ Example: ::
     from torchbearer import state_key
     MY_KEY = state_key('my_test_key')
 """
-
+from torchbearer import metrics as metrics
 import warnings
 
 __keys__ = []
@@ -21,19 +21,27 @@ def state_key(key):
     :param key: The seed key - basis for new state key
     :type key: String
     :return: New state key
-    :rtype: String
+    :rtype: StateKey
     """
     return StateKey(key)
 
 
-class StateKey:
-    """ StateKey class that is a unique state key based of input string key
+class StateKey(metrics.Metric):
+    """ StateKey class that is a unique state key based on the input string key. State keys are also metrics which
+    retrieve themselves from state.
 
     :param key: Base key
+    :type key: String
     """
     def __init__(self, key):
-        super().__init__()
         self.key = self._gen_key_(key)
+        super().__init__(self.key)
+
+    def process(self, state):
+        return {self.name: state[self]}
+
+    def process_final(self, state):
+        return {self.name: state[self]}
 
     def _gen_key_(self, key):
         if key in __keys__:
