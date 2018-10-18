@@ -1,3 +1,15 @@
+"""
+The state is central in torchbearer, storing all of the relevant intermediate values that may be changed or replaced
+during model fitting. This module defines classes for interacting with state and all of the built in state keys used
+throughout torchbearer. The :func:`state_key` function can be used to create custom state keys for use in callbacks or
+metrics.
+
+Example: ::
+
+    from torchbearer import state_key
+    MY_KEY = state_key('my_test_key')
+"""
+
 import warnings
 
 __keys__ = []
@@ -81,47 +93,112 @@ class State(dict):
         super().update(new_dict)
 
 
+#: The torchbearer version
 VERSION = state_key('torchbearer_version')
 
+#: The PyTorch module / model that will be trained
 MODEL = state_key('model')
+
+#: The criterion to use when model fitting
 CRITERION = state_key('criterion')
+
+#: The optimizer to use when model fitting
 OPTIMIZER = state_key('optimizer')
+
+#: The device currently in use by the :class:`.Trial` and PyTorch model
 DEVICE = state_key('device')
+
+#: The data type of tensors in use by the model, match this to avoid type issues
 DATA_TYPE = state_key('dtype')
+
+#: The list of metrics in use by the :class:`.Trial`
 METRIC_LIST = state_key('metric_list')
+
+#: The metric dict from the current batch of data
 METRICS = state_key('metrics')
+
+#: A self refrence to the Trial object for persistence etc.
 SELF = state_key('self')
+
+#: The current epoch number
 EPOCH = state_key('epoch')
+
+#: The total number of epochs to run for
 MAX_EPOCHS = state_key('max_epochs')
 
+#: The string name of the current data
 DATA = state_key('data')
+
+#: The current data generator (DataLoader)
 GENERATOR = state_key('generator')
+
+#: The current iterator
 ITERATOR = state_key('iterator')
+
+#: The current number of steps per epoch
 STEPS = state_key('steps')
 
+#: The train data generator in the Trial object
 TRAIN_GENERATOR = state_key('train_generator')
+
+#: The number of train steps to take
 TRAIN_STEPS = state_key('train_steps')
+
+#: The flag representing train data
 TRAIN_DATA = state_key('train_data')
 
+#: The validation data generator in the Trial object
 VALIDATION_GENERATOR = state_key('validation_generator')
+
+#: The number of validation steps to take
 VALIDATION_STEPS = state_key('validation_steps')
+
+#: The flag representing validation data
 VALIDATION_DATA = state_key('validation_data')
 
+#: The test data generator in the Trial object
 TEST_GENERATOR = state_key('test_generator')
+
+#: The number of test steps to take
 TEST_STEPS = state_key('test_steps')
+
+#: The flag representing test data
 TEST_DATA = state_key('test_data')
 
+#: A flag that can be set to true to stop the current fit call
 STOP_TRAINING = state_key('stop_training')
+
+#: The current batch of ground truth data
 Y_TRUE = state_key('y_true')
+
+#: The current batch of predictions
 Y_PRED = state_key('y_pred')
+
+#: The current batch of inputs
 X = state_key('x')
+
+#: The sampler which loads data from the generator onto the correct device
 SAMPLER = state_key('sampler')
+
+#: The current value for the loss
 LOSS = state_key('loss')
+
+#: The key which maps to the predictions over the dataset when calling predict
 FINAL_PREDICTIONS = state_key('final_predictions')
+
+#: The current batch number
 BATCH = state_key('t')
+
+#: The timings keys used by the timer callback
 TIMINGS = state_key('timings')
+
+#: The :class:`.CallbackList` object which is called by the Trial
 CALLBACK_LIST = state_key('callback_list')
+
+#: The history list of the Trial instance
 HISTORY = state_key('history')
+
+#: The optional arguments which should be passed to the backward call
 BACKWARD_ARGS = state_key('backward_args')
 
 # Legacy

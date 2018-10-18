@@ -73,3 +73,16 @@ class TestEndToEnd(unittest.TestCase):
 
         import os
         os.remove('test.pt')
+
+    def test_only_model(self):
+        p = torch.tensor([2.0, 1.0, 10.0])
+
+        model = Net(p)
+
+        tbmodel = tb.Trial(model)
+        self.assertListEqual(tbmodel.run(), [])
+
+    def test_no_model(self):
+        tbmodel = tb.Trial(None)
+        with self.assertWarns(Warning):
+            tbmodel.run()

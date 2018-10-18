@@ -569,14 +569,18 @@ class Trial(object):
 
     @inject_printer()
     def run(self, epochs=1, verbose=-1):
-        """Run this trial for the given number of epochs, starting from the last trained epoch.
+        r"""Run this trial for the given number of epochs, starting from the last trained epoch.
 
-        :param epochs: The number of epochs to run for
-        :type epochs: int
-        :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
-        :type verbose: int
-        :return: The model history (dict of epoch metrics)
-        :rtype: dict
+        Args:
+            epochs (int, optional): The number of epochs to run for
+            verbose (int, optional): If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training
+            progress, If -1: Automatic
+
+        State Requirements:
+            - :attr:`torchbearer.state.MODEL`: Model should be callable and not none, set on Trial init
+
+        Returns:
+            list: The model history (list of tuple of steps summary and epoch metric dicts)
         """
         state = State()
         state.update({
@@ -586,27 +590,36 @@ class Trial(object):
 
         state.update(self.state)  # TODO: Swap this for something which makes `self.state` still mutable
 
-        state[torchbearer.CALLBACK_LIST].on_start(state)
+        if state[torchbearer.MODEL] is None or not callable(state[torchbearer.MODEL]):
+            warnings.warn('The Model is None or not callable which may cause issues if not deliberate')
+            state[torchbearer.MODEL] = lambda *args, **kwargs: None
 
-        for state[torchbearer.EPOCH] in range(len(state[torchbearer.HISTORY]), state[torchbearer.MAX_EPOCHS]):
-            state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
+        if state[torchbearer.TRAIN_GENERATOR] is not None \
+                or state[torchbearer.TRAIN_STEPS] is not None \
+                or state[torchbearer.VALIDATION_GENERATOR] is not None \
+                or state[torchbearer.VALIDATION_STEPS] is not None:
 
-            final_metrics = self._fit_pass(state)[torchbearer.METRICS]
+            state[torchbearer.CALLBACK_LIST].on_start(state)
 
-            if state[torchbearer.STOP_TRAINING]:
-                break
+            for state[torchbearer.EPOCH] in range(len(state[torchbearer.HISTORY]), state[torchbearer.MAX_EPOCHS]):
+                state[torchbearer.CALLBACK_LIST].on_start_epoch(state)
 
-            final_metrics.update(self._validation_pass(state))
-            state[torchbearer.METRICS] = final_metrics
-            state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
-            steps_summary = (state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS])
-            self.state[torchbearer.HISTORY].append((steps_summary, state[torchbearer.METRICS]))
-            state[torchbearer.CALLBACK_LIST].on_checkpoint(state)
+                final_metrics = self._fit_pass(state)[torchbearer.METRICS]
 
-            if state[torchbearer.STOP_TRAINING]:
-                break
+                if state[torchbearer.STOP_TRAINING]:
+                    break
 
-        state[torchbearer.CALLBACK_LIST].on_end(state)
+                final_metrics.update(self._validation_pass(state))
+                state[torchbearer.METRICS] = final_metrics
+                state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
+                steps_summary = (state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS])
+                self.state[torchbearer.HISTORY].append((steps_summary, state[torchbearer.METRICS]))
+                state[torchbearer.CALLBACK_LIST].on_checkpoint(state)
+
+                if state[torchbearer.STOP_TRAINING]:
+                    break
+
+            state[torchbearer.CALLBACK_LIST].on_end(state)
 
         return self.state[torchbearer.HISTORY]
 
@@ -623,7 +636,7 @@ class Trial(object):
 
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
 
-        for state[torchbearer.BATCH] in range(0, state[torchbearer.STEPS]):
+        for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
             state[torchbearer.SAMPLER].sample(state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
@@ -934,7 +947,7 @@ class Trial(object):
         :rtype: Trial
         """
         if resume and torchbearer.MODEL in state_dict:  # torchbearer dict
-            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] is not torchbearer.__version__.replace('.dev', ''):
+            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] != torchbearer.__version__.replace('.dev', ''):
                 warnings.warn('This state dict was saved with a different torchbearer version, loading available keys. Consider setting resume=False')
 
             if torchbearer.MODEL in state_dict:

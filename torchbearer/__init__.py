@@ -13,12 +13,15 @@ Model (Deprecated)
         :members:
         :undoc-members:
 
-Utilities
+State
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  automodule:: torchbearer.state
         :members:
         :undoc-members:
+
+Utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  automodule:: torchbearer.cv_utils
         :members:
