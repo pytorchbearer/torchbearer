@@ -5,6 +5,18 @@ from torchbearer.state import State
 
 
 class TestStateKey(unittest.TestCase):
+    def test_key_metric(self):
+        key = torchbearer.state_key('test')
+        state = {key: 4}
+
+        self.assertDictEqual(key.process(state), {str(key): 4})
+        self.assertDictEqual(key.process_final(state), {str(key): 4})
+
+    def test_key_repr(self):
+        key = torchbearer.state_key('repr_test')
+        self.assertEqual(str(key), 'repr_test')
+        self.assertEqual(repr(key), 'repr_test')
+
     def test_key_added(self):
         key = torchbearer.state_key('key')
         self.assertTrue('key' in torchbearer.state.__keys__)

@@ -14,7 +14,7 @@ We store the current estimates for the minimum as parameters in the model (so Py
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 7-26
+   :lines: 11-31
 
 The Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -24,7 +24,7 @@ Note that as we are using a base loss, torchbearer passes this the network outpu
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 29-30
+   :lines: 34-35
 
 
 Optimising
@@ -37,20 +37,20 @@ We have set the number of optimisation steps for this example as 50000.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 42-43
+   :lines: 38-39
 
 The learning rate chosen for this example is very low and we could get convergence much faster with a larger rate, however this allows us to view convergence in real time.
 We define the model and optimiser in the standard way.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 45-46
+   :lines: 41-42
 
 Finally we start the optimising on the GPU and print the final minimum estimate.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 48-50
+   :lines: 44-46
 
 Usually torchbearer will infer the number of training steps from the data generator.
 Since for this example we have no data to give the model (which will be passed `None`), we need to tell torchbearer how many steps to run using the ``for_train_steps`` method.
@@ -60,11 +60,17 @@ Viewing Progress
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You might have noticed in the previous snippet that the example uses a metric we've not seen before.
-This simple metric is used to display the estimate throughout the optimisation process - although this is probably only useful for very small optimisation problems.
+The state key that represents our estimate in state can also act as a metric and is created at the beginning of the file with:
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 33-39
+   :lines: 8
+
+Putting all of it together and running provides the following output:
+
+.. code::
+
+    0/1(t): 100%|██████████| 50000/50000 [00:54<00:00, 912.37it/s, est=[4.9988 0.     1.0004], running_loss=1.6e-06, loss=4.55, loss_std=13.7]
 
 The final estimate is very close to the true minimum at [5, 0, 1]:
 
