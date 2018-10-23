@@ -240,7 +240,7 @@ def add_to_loss(func):
     @on_criterion
     @on_criterion_validation
     def add_to_loss_callback(state):
-        state[torchbearer.LOSS] += func(state)
+        state[torchbearer.LOSS] = state[torchbearer.LOSS] + func(state)
 
     return add_to_loss_callback
 
