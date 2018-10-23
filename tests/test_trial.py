@@ -1696,6 +1696,20 @@ class TestTrialMembers(TestCase):
         self.assertTrue(loss.shape == torch.Size([1]))
         self.assertTrue(loss.item() == 0)
 
+    def test_init_none_criterion_add(self):
+        torchmodel = torch.nn.Sequential(torch.nn.Linear(1,1))
+        optimizer = MagicMock()
+        metric = MagicMock()
+
+        torchbearertrial = Trial(torchmodel, optimizer, None, [metric], [], pass_state=False).to('cpu', torch.float64)
+        loss = torchbearertrial.state[tb.CRITERION](None, None)
+        loss = loss + 1
+        self.assertTrue(str(loss.device) == 'cpu')
+        self.assertTrue(loss.dtype == torch.float64)
+        self.assertTrue(torch.is_tensor(loss))
+        self.assertTrue(loss.shape == torch.Size([1]))
+        self.assertTrue(loss.item() == 1)
+
     def test_str(self):
         torchmodel = "mod"
         optimizer = "opt"
