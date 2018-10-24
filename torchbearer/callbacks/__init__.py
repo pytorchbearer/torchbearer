@@ -73,7 +73,7 @@ from .checkpointers import *
 from .csv_logger import *
 from .early_stopping import *
 from .gradient_clipping import *
-from .printer import *
+from .printer import ConsolePrinter, Tqdm
 from .tensor_board import TensorBoard, TensorBoardImages, TensorBoardProjector, TensorBoardText
 from .terminate_on_nan import *
 from .torch_scheduler import *

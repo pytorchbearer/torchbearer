@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added metric functionality to state keys so that they can be used as metrics if desired
+- Added customizable precision to the printer callbacks
 ### Changed
+- Changed the default printer precision to 4s.f.
 ### Deprecated
 ### Removed
 ### Fixed
