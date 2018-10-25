@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Build Status](https://travis-ci.com/ecs-vlc/torchbearer.svg?branch=master)](https://travis-ci.com/ecs-vlc/torchbearer) [![codecov](https://codecov.io/gh/ecs-vlc/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/ecs-vlc/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8c9b136fbcd443fa9135d92321be480d)](https://www.codacy.com/app/ewah1g13/torchbearer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ecs-vlc/torchbearer&amp;utm_campaign=Badge_Grade)
 
-torchbearer: A model training library for researchers using PyTorch
+A model fitting library for PyTorch
 ## Contents
 - [About](#about)
 - [Key Features](#features)
