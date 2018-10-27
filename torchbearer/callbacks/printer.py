@@ -98,6 +98,7 @@ class Tqdm(Callback):
 
     def on_start(self, state):
         if self._on_epoch:
+
             n = len(state[torchbearer.HISTORY])
             self._loader = self.tqdm_module(initial=n, total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
 
