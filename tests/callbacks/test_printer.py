@@ -88,6 +88,7 @@ class TestTqdm(TestCase):
     def test_tqdm_custom_args(self):
         state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100,
                  torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: {'test': 10}}
+        state[torchbearer.HISTORY] = [[[], state[torchbearer.METRICS]]]
         tqdm = Tqdm(ascii=True)
         state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
 
