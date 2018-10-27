@@ -99,11 +99,11 @@ class Tqdm(Callback):
     def on_start(self, state):
         if self._on_epoch:
             n = len(state[torchbearer.HISTORY])
+            self._loader = self.tqdm_module(initial=n, total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
             if n > 0:
                 metrics = state[torchbearer.HISTORY][-1][1]
                 state[torchbearer.METRICS] = metrics
-            self._loader = self.tqdm_module(initial=n, total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
-            self._update(state)
+                self._update(state)
 
     def on_end_epoch(self, state):
         if self._on_epoch:
