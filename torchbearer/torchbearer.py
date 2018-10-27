@@ -42,6 +42,7 @@ class Model:
             torchbearer.CRITERION: criterion,
             torchbearer.OPTIMIZER: optimizer,
             torchbearer.DEVICE: 'cpu',
+            torchbearer.EPOCH: 0,
             torchbearer.DATA_TYPE: torch.float32,
             torchbearer.METRIC_LIST: torchbearer_metrics.MetricList(metrics),
             torchbearer.SELF: self,

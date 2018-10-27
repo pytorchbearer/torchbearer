@@ -103,4 +103,4 @@ class TestTqdm(TestCase):
         mock_tqdm = tqdm.tqdm_module
 
         tqdm.on_start(state)
-        mock_tqdm.assert_called_once_with(total=10, ascii=True)
+        mock_tqdm.assert_called_once_with(initial=1, total=10, ascii=True)
