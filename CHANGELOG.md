@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug which would incorrectly trigger version warnings when loading in models
 - Fixed bugs where the Trial would not fail gracefully if required objects were not in state
 - Fixed a bug where none criterion didn't work with the add_to_loss callback
+- Fixed a bug where tqdm on_epoch always started at 0
 
 ## [0.2.3] - 2018-10-12
 ### Added
