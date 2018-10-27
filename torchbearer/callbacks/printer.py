@@ -100,6 +100,7 @@ class Tqdm(Callback):
         if self._on_epoch:
             n = len(state[torchbearer.HISTORY])
             self._loader = self.tqdm_module(initial=n, total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
+
             if n > 0:
                 metrics = state[torchbearer.HISTORY][-1][1]
                 state[torchbearer.METRICS] = metrics
