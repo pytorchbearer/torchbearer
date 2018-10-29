@@ -317,7 +317,6 @@ class Trial(object):
             torchbearer.DATA_TYPE: torch.float32,
             torchbearer.SELF: self,
             torchbearer.HISTORY: [],
-            torchbearer.EPOCH: 0,
             torchbearer.BACKWARD_ARGS: {},
             torchbearer.TRAIN_GENERATOR: None,
             torchbearer.VALIDATION_GENERATOR: None,
@@ -627,7 +626,6 @@ class Trial(object):
     @inject_sampler(torchbearer.TRAIN_DATA)
     def _fit_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
-
         self.train()
 
         state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
@@ -959,7 +957,6 @@ class Trial(object):
 
             if torchbearer.HISTORY in state_dict:
                 self.state[torchbearer.HISTORY] = state_dict[torchbearer.HISTORY]
-                self.state[torchbearer.EPOCH] = len(self.state[torchbearer.HISTORY])
 
             if torchbearer.CALLBACK_LIST in state_dict:
                 self.state[torchbearer.CALLBACK_LIST].load_state_dict(state_dict[torchbearer.CALLBACK_LIST])
