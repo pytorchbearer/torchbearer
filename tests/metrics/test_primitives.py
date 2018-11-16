@@ -79,6 +79,57 @@ class TestBinaryAccuracy(unittest.TestCase):
                              msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
                                  + ' in: ' + str(result))
 
+    def test_weird_types(self):
+        state = {
+            torchbearer.Y_TRUE: torch.LongTensor([
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1],
+                [0, 0, 1],
+                [0, 1, 0]
+            ]).byte(),
+            torchbearer.Y_PRED: torch.FloatTensor([
+                [0.9, 0.1, 0.1],  # Correct
+                [0.1, 0.9, 0.1],  # Correct
+                [0.1, 0.1, 0.9],  # Correct
+                [0.9, 0.1, 0.1],  # Incorrect
+                [0.9, 0.1, 0.1]  # Incorrect
+            ]).double()
+        }
+
+        self._metric.train()
+        result = self._metric.process(state)
+        for i in range(0, len(self._targets)):
+            self.assertEqual(result[i], self._targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
+                                 + ' in: ' + str(result))
+
+    def test_threshold(self):
+        state = {
+            torchbearer.Y_TRUE: torch.FloatTensor([
+                [0.9, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1],
+                [0, 0.3, 1],
+                [0, 0.6, 0]
+            ]),
+            torchbearer.Y_PRED: torch.FloatTensor([
+                [0.9, 0.1, 0.1],  # Correct
+                [0.1, 0.9, 0.1],  # Correct
+                [0.1, 0.1, 0.9],  # Correct
+                [0.9, 0.1, 0.1],  # Incorrect
+                [0.9, 0.1, 0.1]  # Incorrect
+            ])
+        }
+
+        metric = BinaryAccuracy(threshold=0.4).root  # Get root node of Tree for testing
+        metric.train()
+        result = metric.process(state)
+        for i in range(0, len(self._targets)):
+            self.assertEqual(result[i], self._targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
+                                 + ' in: ' + str(result))
+
 
 class TestCategoricalAccuracy(unittest.TestCase):
     def setUp(self):
