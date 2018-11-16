@@ -19,17 +19,21 @@ import torch
 class BinaryAccuracy(metrics.Metric):
     """Binary accuracy metric. Uses torch.eq to compare predictions to targets. Decorated with a mean and running_mean.
     Default for key: 'binary_acc'.
+
+    :param threshold: value between 0 and 1 to use as a threshold when binarizing predictions and targets
+    :type threshold: float
     """
 
-    def __init__(self):
+    def __init__(self, threshold=0.5):
         super().__init__('binary_acc')
+        self.threshold = threshold
 
     def process(self, *args):
         state = args[0]
-        y_pred = state[torchbearer.Y_PRED]
-        y_true = state[torchbearer.Y_TRUE]
+        y_pred = (state[torchbearer.Y_PRED].float() > self.threshold).long()
+        y_true = (state[torchbearer.Y_TRUE].float() > self.threshold).long()
 
-        return torch.eq(torch.round(y_pred).type(y_true.type()), y_true).view(-1).float()
+        return torch.eq(y_pred, y_true).view(-1).float()
 
 
 @metrics.default_for_key('cat_acc')
