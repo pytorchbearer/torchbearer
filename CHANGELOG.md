@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.2.4] - 2018-11-16
 ### Added
 - Added metric functionality to state keys so that they can be used as metrics if desired
 - Added customizable precision to the printer callbacks
