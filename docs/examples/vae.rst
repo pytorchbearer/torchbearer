@@ -118,13 +118,38 @@ For auto-encoding problems it is often useful to visualise the reconstructions. 
 Training the Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We train the model by creating a torchmodel and a torchbearertrialand calling run_.
+We train the model by creating a torchmodel and a torchbearertrialand calling run_. As our loss is named binary_cross_entropy, we can use the 'acc' metric to get a binary accuracy.
 
 .. _run: https://torchbearer.readthedocs.io/en/latest/code/main.html#torchbearer.trial.Trial.run
 
 
 .. literalinclude:: /_static/examples/vae.py
    :lines: 118-127
+
+This gives the following output:
+
+.. code::
+
+    0/10(t): 100%|██████████| 422/422 [00:01<00:00, 219.71it/s, binary_acc=0.9139, loss=2.139e+4, loss_std=6582, running_binary_acc=0.9416, running_loss=1.685e+4]
+    0/10(v): 100%|██████████| 47/47 [00:00<00:00, 269.77it/s, val_binary_acc=0.9505, val_loss=1.558e+4, val_loss_std=470.8]
+    1/10(t): 100%|██████████| 422/422 [00:01<00:00, 219.80it/s, binary_acc=0.9492, loss=1.573e+4, loss_std=573.6, running_binary_acc=0.9531, running_loss=1.52e+4]
+    1/10(v): 100%|██████████| 47/47 [00:00<00:00, 300.54it/s, val_binary_acc=0.9614, val_loss=1.399e+4, val_loss_std=427.7]
+    2/10(t): 100%|██████████| 422/422 [00:01<00:00, 232.41it/s, binary_acc=0.9558, loss=1.476e+4, loss_std=407.3, running_binary_acc=0.9571, running_loss=1.457e+4]
+    2/10(v): 100%|██████████| 47/47 [00:00<00:00, 296.49it/s, val_binary_acc=0.9652, val_loss=1.336e+4, val_loss_std=338.2]
+    3/10(t): 100%|██████████| 422/422 [00:01<00:00, 213.10it/s, binary_acc=0.9585, loss=1.437e+4, loss_std=339.6, running_binary_acc=0.9595, running_loss=1.423e+4]
+    3/10(v): 100%|██████████| 47/47 [00:00<00:00, 313.42it/s, val_binary_acc=0.9672, val_loss=1.304e+4, val_loss_std=372.3]
+    4/10(t): 100%|██████████| 422/422 [00:01<00:00, 213.43it/s, binary_acc=0.9601, loss=1.413e+4, loss_std=332.5, running_binary_acc=0.9605, running_loss=1.409e+4]
+    4/10(v): 100%|██████████| 47/47 [00:00<00:00, 242.23it/s, val_binary_acc=0.9683, val_loss=1.282e+4, val_loss_std=369.3]
+    5/10(t): 100%|██████████| 422/422 [00:01<00:00, 220.94it/s, binary_acc=0.9611, loss=1.398e+4, loss_std=300.9, running_binary_acc=0.9614, running_loss=1.397e+4]
+    5/10(v): 100%|██████████| 47/47 [00:00<00:00, 316.69it/s, val_binary_acc=0.9689, val_loss=1.281e+4, val_loss_std=423.6]
+    6/10(t): 100%|██████████| 422/422 [00:01<00:00, 230.53it/s, binary_acc=0.9619, loss=1.385e+4, loss_std=292.1, running_binary_acc=0.9621, running_loss=1.38e+4]
+    6/10(v): 100%|██████████| 47/47 [00:00<00:00, 241.06it/s, val_binary_acc=0.9695, val_loss=1.275e+4, val_loss_std=459.9]
+    7/10(t): 100%|██████████| 422/422 [00:01<00:00, 227.49it/s, binary_acc=0.9624, loss=1.377e+4, loss_std=306.9, running_binary_acc=0.9624, running_loss=1.381e+4]
+    7/10(v): 100%|██████████| 47/47 [00:00<00:00, 237.75it/s, val_binary_acc=0.97, val_loss=1.258e+4, val_loss_std=353.8]
+    8/10(t): 100%|██████████| 422/422 [00:01<00:00, 220.68it/s, binary_acc=0.9629, loss=1.37e+4, loss_std=300.8, running_binary_acc=0.9629, running_loss=1.369e+4]
+    8/10(v): 100%|██████████| 47/47 [00:00<00:00, 301.59it/s, val_binary_acc=0.9704, val_loss=1.255e+4, val_loss_std=347.7]
+    9/10(t): 100%|██████████| 422/422 [00:01<00:00, 215.23it/s, binary_acc=0.9633, loss=1.364e+4, loss_std=310, running_binary_acc=0.9633, running_loss=1.366e+4]
+    9/10(v): 100%|██████████| 47/47 [00:00<00:00, 309.51it/s, val_binary_acc=0.9707, val_loss=1.25e+4, val_loss_std=358.9]
 
 The visualised results after ten epochs then look like this:
 
