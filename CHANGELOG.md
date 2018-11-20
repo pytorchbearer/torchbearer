@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added metric functionality to state keys so that they can be used as metrics if desired
 - Added customizable precision to the printer callbacks
 - Added threshold to binary accuracy. Now it will appropriately handle any values in \[0, 1\]
+- Added flag to replay to replay only a single batch per epoch
 ### Changed
 - Changed the default printer precision to 4s.f.
 - Tqdm on_epoch now shows metrics immediately when resuming

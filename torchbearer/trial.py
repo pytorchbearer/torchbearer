@@ -790,13 +790,15 @@ class Trial(object):
         return []
 
     @fluent
-    def replay(self, callbacks=[], verbose=2):  # TODO: Should we track if testing passes have happened?
+    def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
 
         :param callbacks: List of callbacks to be run during the replay
         :type callbacks: list
         :param verbose: If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress
         :type verbose: int
+        :param one_batch: If True, only one batch per epoch is replayed. If False, all batches are replayed
+        :type one_batch: bool
         :return: self
         :rtype: Trial
         """
@@ -812,7 +814,10 @@ class Trial(object):
         callbacks.on_start(state)
         for i in range(len(history)):
             state[torchbearer.EPOCH] = i
-            state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = history[i][0]
+            if not one_batch:
+                state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = history[i][0]
+            else:
+                state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = 1, 1
             state[torchbearer.METRICS] = history[i][1]
 
             self._replay_pass(state, callbacks)
