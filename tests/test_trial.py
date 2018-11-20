@@ -1654,6 +1654,17 @@ class TestReplay(TestCase):
         self.assertTrue(callback.on_sample.call_count == 100)
         self.assertTrue(callback.on_sample_validation.call_count == 50)
 
+    def test_replay_one_batch_true(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(1)]
+
+        t.state[tb.HISTORY] = history
+        t.replay(callbacks=[callback], verbose=0, one_batch=True)
+        self.assertEqual(callback.on_start.call_count, 1)
+        self.assertTrue(callback.on_sample.call_count == 1)
+        self.assertTrue(callback.on_sample_validation.call_count == 1)
+
     def test_replay_metrics(self):
         t = Trial(MagicMock())
         callback = MagicMock()
