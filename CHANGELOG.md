@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added flag to replay to replay only a single batch per epoch
+- Added support for PyTorch 1.0.0 and Python 3.7
 ### Changed
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed a bug with the EpochLambda metric which required y_true / y_pred to have specific forms
 
 ## [0.2.4] - 2018-11-16
 ### Added

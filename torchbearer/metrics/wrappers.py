@@ -127,8 +127,8 @@ class EpochLambda(metrics.AdvancedMetric):
             self._step = lambda y_pred, y_true: ...
 
     def process_train(self, *args):
-        """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension. If this is a running metric,
-        evaluates the function every number of steps.
+        """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension, this must be the batch dimension.
+        If this is a running metric, evaluates the function every number of steps.
 
         :param args: The :class:`.torchbearer.Model` state.
         :type args: dict
@@ -136,8 +136,12 @@ class EpochLambda(metrics.AdvancedMetric):
 
         """
         state = args[0]
-        self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED].float()), dim=0)
+        if (self._y_pred is None) or (self._y_true is None):
+            self._y_true = state[torchbearer.Y_TRUE]
+            self._y_pred = state[torchbearer.Y_PRED]
+        else:
+            self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
+            self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED]), dim=0)
         if state[torchbearer.BATCH] % self._step_size == 0:
             self._result = self._step(self._y_pred, self._y_true)
         return self._result
@@ -158,8 +162,12 @@ class EpochLambda(metrics.AdvancedMetric):
 
         """
         state = args[0]
-        self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
-        self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED].to(self._y_pred.dtype)), dim=0)
+        if (self._y_pred is None) or (self._y_true is None):
+            self._y_true = state[torchbearer.Y_TRUE]
+            self._y_pred = state[torchbearer.Y_PRED]
+        else:
+            self._y_true = torch.cat((self._y_true, state[torchbearer.Y_TRUE]), dim=0)
+            self._y_pred = torch.cat((self._y_pred, state[torchbearer.Y_PRED]), dim=0)
 
     def process_final_validate(self, *args):
         """Evaluate the function with the aggregated outputs.
@@ -177,8 +185,5 @@ class EpochLambda(metrics.AdvancedMetric):
 
         """
         super().reset(state)
-        self._y_true = torch.zeros(0).long()
-        self._y_pred = torch.zeros(0, 0)
-
-        self._y_true = self._y_true.to(state[torchbearer.DEVICE])
-        self._y_pred = self._y_pred.to(state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
+        self._y_true = None
+        self._y_pred = None
