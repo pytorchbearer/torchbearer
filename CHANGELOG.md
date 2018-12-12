@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added flag to replay to replay only a single batch per epoch
 - Added support for PyTorch 1.0.0 and Python 3.7
 ### Changed
+- All error / accuracy metrics can now optionally take state keys for predictions and targets as arguments
 ### Deprecated
 ### Removed
 ### Fixed
