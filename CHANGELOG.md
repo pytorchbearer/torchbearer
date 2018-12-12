@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added flag to replay to replay only a single batch per epoch
 - Added support for PyTorch 1.0.0 and Python 3.7
+- MetricTree can now unpack dictionaries from root, this is useful if you want to get a mean of a metric. However, this should be used with caution as it extracts only the first value in the dict and ignores the rest.
 ### Changed
 ### Deprecated
 ### Removed
