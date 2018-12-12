@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added support for PyTorch 1.0.0 and Python 3.7
 - MetricTree can now unpack dictionaries from root, this is useful if you want to get a mean of a metric. However, this should be used with caution as it extracts only the first value in the dict and ignores the rest.
 ### Changed
+- All error / accuracy metrics can now optionally take state keys for predictions and targets as arguments
 ### Deprecated
 ### Removed
 ### Fixed

@@ -30,8 +30,9 @@ Utilities
 
 from .version import __version__
 
-# Hack: Tensorboard needs Y_PRED so define it here as a string
+# Hack: Tensorboard and metrics need Y_PRED and Y_TRUE so define them here as a string
 Y_PRED = 'y_pred'
+Y_TRUE = 'y_true'
 
 from . import metrics
 from . import callbacks
