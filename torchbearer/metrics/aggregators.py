@@ -81,7 +81,7 @@ class RunningMetric(metrics.AdvancedMetric):
 
 
 class RunningMean(RunningMetric):
-    """A :class:`RunningMetric` which outputs the mean of a sequence of its input over the course of an epoch.
+    """A :class:`RunningMetric` which outputs the running mean of its input tensors over the course of an epoch.
 
     :param name: The name of this running mean.
     :type name: str
@@ -113,7 +113,8 @@ class Std(metrics.Metric):
         super(Std, self).__init__(name)
 
     def process(self, *args):
-        """Compute values required for the std from the input.
+        """Compute values required for the std from the input. The input should be a torch Tensor. The sum and sum of
+        squares will be computed for all elements in the input.
 
         :param args:  The output of some previous call to :meth:`.Metric.process`.
         :type args: torch.Tensor
@@ -162,7 +163,7 @@ class Mean(metrics.Metric):
         super(Mean, self).__init__(name)
 
     def process(self, *args):
-        """Add the input to the rolling sum.
+        """Add the input to the rolling sum. Input must be a torch tensor.
 
         :param args:  The output of some previous call to :meth:`.Metric.process`.
         :type args: torch.Tensor

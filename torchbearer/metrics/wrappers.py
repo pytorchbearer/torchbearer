@@ -93,7 +93,7 @@ class BatchLambda(metrics.Metric):
     def process(self, *args):
         """Return the output of the wrapped function.
 
-        :param args: The :class:`.torchbearer.Model` state.
+        :param args: The :class:`.torchbearer.Trial` state.
         :type args: dict
         :return: The value of the metric function('y_pred', 'y_true').
 
@@ -130,7 +130,7 @@ class EpochLambda(metrics.AdvancedMetric):
         """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension, this must be the batch dimension.
         If this is a running metric, evaluates the function every number of steps.
 
-        :param args: The :class:`.torchbearer.Model` state.
+        :param args: The :class:`.torchbearer.Trial` state.
         :type args: dict
         :return: The current running result.
 
@@ -157,7 +157,7 @@ class EpochLambda(metrics.AdvancedMetric):
     def process_validate(self, *args):
         """During validation, just concatenate 'y_true' and y_pred'.
 
-        :param args: The :class:`.torchbearer.Model` state.
+        :param args: The :class:`.torchbearer.Trial` state.
         :type args: dict
 
         """
@@ -180,7 +180,7 @@ class EpochLambda(metrics.AdvancedMetric):
     def reset(self, state):
         """Reset the 'y_true' and 'y_pred' caches.
 
-        :param state: The :class:`.torchbearer.Model` state.
+        :param state: The :class:`.torchbearer.Trial` state.
         :type state: dict
 
         """

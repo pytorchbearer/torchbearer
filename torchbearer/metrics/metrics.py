@@ -103,6 +103,11 @@ class MetricTree(Metric):
     """A tree structure which has a node :class:`Metric` and some children. Upon execution, the node is called with the
     input and its output is passed to each of the children. A dict is updated with the results.
 
+    .. note::
+
+       If the node output is already a dict (i.e. the node is a standalone metric), this is unwrapped before passing the
+       **first** value to the children.
+
     :param metric: The metric to act as the root node of the tree / subtree
     :type metric: Metric
     """
@@ -126,6 +131,8 @@ class MetricTree(Metric):
     def _for_tree(self, function, *args):
         result = {}
         node_value = function(self.root, *args)
+        if isinstance(node_value, dict):
+            node_value = next(iter(node_value.values()))
 
         for subtree in self.children:
             out = function(subtree, node_value)
