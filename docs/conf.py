@@ -28,7 +28,7 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision', 'torchvision.utils', 'torch.nn', 'torch.nn.functional', 'torch.optim', 'torch.utils', 'torch.utils.data', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX', 'tensorboardX.torchvis']
+MOCK_MODULES = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision', 'torchvision.utils', 'torch.nn', 'torch.nn.functional', 'torch.optim', 'torch.utils', 'torch.utils.data', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX', 'tensorboardX.torchvis', 'livelossplot']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 sys.path.insert(0, os.path.abspath('.'))
