@@ -1,24 +1,20 @@
 import sys
-from contextlib import ContextDecorator
+import os
 
 import torchbearer
 from torchbearer.callbacks import Callback
 
-class no_print(ContextDecorator):
-    def __init__(self):
-        super().__init__()
-        self.null_obj = lambda: None
-        self.null_obj.write = lambda x: ...
-        self.null_obj.flush = lambda: ...
 
+class no_print:
     def __enter__(self):
         self.stdout = sys.stdout
-        sys.stdout = self.null_obj
+        sys.stdout = open(os.devnull, 'w')
         return self
 
     def __exit__(self, *exc):
         sys.stdout = self.stdout
         return False
+
 
 class LiveLossPlot(Callback):
     """
@@ -48,21 +44,20 @@ class LiveLossPlot(Callback):
         if on_epoch:
             self.on_end_epoch = self._on_end_epoch
 
-    @no_print()
-    def draw(self, plt):
-        plt.draw()
-
     def _on_step_training(self, state):
         self.batch_plt.update(state[torchbearer.METRICS])
         if state[torchbearer.BATCH] % self.batch_step_size == 0 and not self.draw_once:
-            self.draw(self.batch_plt)
+            with no_print():
+                self.batch_plt.draw()
 
     def _on_end_epoch(self, state):
         self.plt.update(state[torchbearer.METRICS])
         if not self.draw_once:
-            self.draw(self.plt)
+            with no_print():
+                self.plt.draw()
 
     def on_end(self, state):
         if self.draw_once:
-            self.draw(self.batch_plt)
-            self.draw(self.plt)
+            with no_print():
+                self.batch_plt.draw()
+                self.plt.draw()
