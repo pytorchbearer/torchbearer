@@ -80,3 +80,4 @@ from .torch_scheduler import *
 from .weight_decay import *
 from .aggregate_predictions import *
 from .decorators import *
+from .live_loss_plot import LiveLossPlot
