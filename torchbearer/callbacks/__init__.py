@@ -1,4 +1,7 @@
 """
+Base Classes
+------------------------------------
+
 ..  automodule:: torchbearer.callbacks.callbacks
         :members:
         :undoc-members:
@@ -68,6 +71,7 @@ Decorators
         :undoc-members:
 """
 
+from torchbearer import Callback
 from .callbacks import *
 from .checkpointers import *
 from .csv_logger import *

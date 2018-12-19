@@ -9,7 +9,7 @@ Example: ::
     from torchbearer import state_key
     MY_KEY = state_key('my_test_key')
 """
-from torchbearer import metrics as metrics
+from torchbearer import Metric
 import warnings
 
 __keys__ = []
@@ -26,7 +26,7 @@ def state_key(key):
     return StateKey(key)
 
 
-class StateKey(metrics.Metric):
+class StateKey(Metric):
     """ StateKey class that is a unique state key based on the input string key. State keys are also metrics which
     retrieve themselves from state.
 
@@ -79,7 +79,7 @@ class State(dict):
 
     def get_key(self, statekey):
         if isinstance(statekey, str):
-            warnings.warn("State was accessed with a string: {}, generate keys with StateKey(str).".format(statekey), stacklevel=2)
+            warnings.warn("State was accessed with a string: {}, generate keys with StateKey(str).".format(statekey), stacklevel=3)
         return statekey
 
     def __getitem__(self, key):
@@ -177,13 +177,13 @@ TEST_DATA = state_key('test_data')
 STOP_TRAINING = state_key('stop_training')
 
 #: The current batch of ground truth data
-Y_TRUE = state_key('y_true')
+TARGET = Y_TRUE = state_key('y_true')
 
 #: The current batch of predictions
-Y_PRED = state_key('y_pred')
+PREDICTION = Y_PRED = state_key('y_pred')
 
 #: The current batch of inputs
-X = state_key('x')
+INPUT = X = state_key('x')
 
 #: The sampler which loads data from the generator onto the correct device
 SAMPLER = state_key('sampler')

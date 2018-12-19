@@ -1,16 +1,17 @@
 """
 The base metric classes exist to enable complex data flow requirements between metrics. All metrics are either instances
-of :class:`Metric` or :class:`MetricFactory`. These can then be collected in a :class:`MetricList` or a
+of :class:`.Metric` or :class:`MetricFactory`. These can then be collected in a :class:`MetricList` or a
 :class:`MetricTree`. The :class:`MetricList` simply aggregates calls from a list of metrics, whereas the
 :class:`MetricTree` will pass data from its root metric to each child and collect the outputs. This enables complex
 running metrics and statistics, without needing to compute the underlying values more than once. Typically,
 constructions of this kind should be handled using the :mod:`decorator API <.metrics.decorators>`.
-"""
-from distutils.version import LooseVersion
-import functools
 
+..  autoclass:: torchbearer.bases.Metric
+        :members:
+        :undoc-members:
+"""
 import inspect
-import torch
+from torchbearer import Metric
 
 __defaults__ = {}
 
@@ -26,81 +27,8 @@ def get_default(key):
     return metric
 
 
-def no_grad():
-    version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-    if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad isn't a decorator
-        def decorator(func):
-            @functools.wraps(func)
-            def wrap_no_grad(*args, **kwargs):
-                with torch.no_grad():
-                    return func(*args, **kwargs)
-            return wrap_no_grad
-        return decorator
-    else:
-        return torch.no_grad()
-
-
-class Metric(object):
-    """Base metric class. Process will be called on each batch, process-final at the end of each epoch.
-    The metric contract allows for metrics to take any args but not kwargs. The initial metric call will be given state,
-    however, subsequent metrics can pass any values desired.
-
-    .. note::
-
-        All metrics must extend this class.
-
-    :param name: The name of the metric
-    :type name: str
-
-    """
-
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return self.name
-
-    @no_grad()
-    def process(self, *args):
-        """Process the state and update the metric for one iteration.
-
-        :param args: Arguments given to the metric. If this is a root level metric, will be given state
-        :return: None, or the value of the metric for this batch
-
-        """
-        pass
-
-    @no_grad()
-    def process_final(self, *args):
-        """Process the terminal state and output the final value of the metric.
-
-        :param args: Arguments given to the metric. If this is a root level metric, will be given state
-        :return: None or the value of the metric for this epoch
-
-        """
-        pass
-
-    def eval(self, data_key=None):
-        """Put the metric in eval mode during model validation.
-        """
-        pass
-
-    def train(self):
-        """Put the metric in train mode during model training.
-        """
-        pass
-
-    def reset(self, state):
-        """Reset the metric, called before the start of an epoch.
-
-        :param state: The current state dict of the :class:`.Model`.
-
-        """
-        pass
-
-
 class MetricTree(Metric):
-    """A tree structure which has a node :class:`Metric` and some children. Upon execution, the node is called with the
+    """A tree structure which has a node :class:`.Metric` and some children. Upon execution, the node is called with the
     input and its output is passed to each of the children. A dict is updated with the results.
 
     .. note::

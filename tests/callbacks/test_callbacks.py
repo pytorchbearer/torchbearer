@@ -2,41 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, Mock
 
 import torchbearer
-from torchbearer.callbacks import CallbackList, Callback, Tqdm, TensorBoard
-
-
-class TestCallback(TestCase):
-    def test_state_dict(self):
-        callback = Callback()
-
-        self.assertEqual(callback.state_dict(), {})
-        self.assertEqual(callback.load_state_dict({}), callback)
-
-    def test_str(self):
-        callback = Callback()
-        self.assertEqual(str(callback).strip(), "torchbearer.callbacks.callbacks.Callback")
-
-    def test_empty_methods(self):
-        callback = Callback()
-
-        self.assertIsNone(callback.on_start({}))
-        self.assertIsNone(callback.on_start_epoch({}))
-        self.assertIsNone(callback.on_start_training({}))
-        self.assertIsNone(callback.on_sample({}))
-        self.assertIsNone(callback.on_forward({}))
-        self.assertIsNone(callback.on_criterion({}))
-        self.assertIsNone(callback.on_backward({}))
-        self.assertIsNone(callback.on_step_training({}))
-        self.assertIsNone(callback.on_end_training({}))
-        self.assertIsNone(callback.on_end_epoch({}))
-        self.assertIsNone(callback.on_checkpoint({}))
-        self.assertIsNone(callback.on_end({}))
-        self.assertIsNone(callback.on_start_validation({}))
-        self.assertIsNone(callback.on_sample_validation({}))
-        self.assertIsNone(callback.on_forward_validation({}))
-        self.assertIsNone(callback.on_end_validation({}))
-        self.assertIsNone(callback.on_step_validation({}))
-        self.assertIsNone(callback.on_criterion_validation({}))
+from torchbearer.callbacks import CallbackList, Tqdm, TensorBoard
 
 
 class TestCallbackList(TestCase):

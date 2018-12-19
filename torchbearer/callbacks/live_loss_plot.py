@@ -29,9 +29,7 @@ class LiveLossPlot(Callback):
     def __init__(self, on_batch=False, batch_step_size=10, on_epoch=True, draw_once=False, **kwargs):
 
         super().__init__()
-        from livelossplot import PlotLosses
-        self.plt = PlotLosses(**kwargs)
-        self.batch_plt = PlotLosses(**kwargs)
+        self._kwargs = kwargs
 
         self.on_batch = on_batch
         self.on_epoch = on_epoch
@@ -43,6 +41,11 @@ class LiveLossPlot(Callback):
 
         if on_epoch:
             self.on_end_epoch = self._on_end_epoch
+
+    def on_start(self, state):
+        from livelossplot import PlotLosses
+        self.plt = PlotLosses(**self._kwargs)
+        self.batch_plt = PlotLosses(**self._kwargs)
 
     def _on_step_training(self, state):
         self.batch_plt.update(state[torchbearer.METRICS])
