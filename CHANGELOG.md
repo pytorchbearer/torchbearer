@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 ### Changed
+- Y_PRED, Y_TRUE and X can now equivalently be accessed as PREDICTION, TARGET and INPUT respectively
 ### Deprecated
 ### Removed
 ### Fixed
 - Fixed a bug where the LiveLossPlot callback would trigger an error if run and evaluate were called separately
+- Fixed a bug where state key errors would report to the wrong stack level
 
 ## [0.2.5] - 2018-12-19
 ### Added
