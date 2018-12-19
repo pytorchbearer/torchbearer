@@ -6,6 +6,11 @@ from torchbearer.callbacks import LiveLossPlot
 
 
 class TestLiveLossPlot(TestCase):
+    @patch('livelossplot.PlotLosses')
+    def test_on_start(self, llp_mock):
+        llp = LiveLossPlot(True, 1, True, False)
+        llp.on_start({})
+        self.assertTrue(llp_mock.call_count == 2)
 
     def test_on_batch(self):
         llp = LiveLossPlot(True, 1, False, False)
