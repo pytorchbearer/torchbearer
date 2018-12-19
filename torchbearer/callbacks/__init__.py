@@ -24,10 +24,14 @@ Logging
         :members:
         :undoc-members:
 
-Tensorboard
+Tensorboard, Visdom and Others
 ------------------------------------
 
 ..  automodule:: torchbearer.callbacks.tensor_board
+        :members:
+        :undoc-members:
+
+..  autoclass:: torchbearer.callbacks.live_loss_plot.LiveLossPlot
         :members:
         :undoc-members:
 
