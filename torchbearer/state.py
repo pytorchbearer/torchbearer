@@ -9,7 +9,7 @@ Example: ::
     from torchbearer import state_key
     MY_KEY = state_key('my_test_key')
 """
-from metrics import Metric
+from torchbearer import Metric
 import warnings
 
 __keys__ = []

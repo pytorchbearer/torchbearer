@@ -47,6 +47,7 @@ Timer
         :undoc-members:
 """
 
+from torchbearer import Metric
 from .metrics import *
 from .wrappers import *
 from .aggregators import *
