@@ -1,25 +1,24 @@
 import torch
 import numpy as np
-
-def gaussian_rsample(mu, logvar):
-    std = logvar.div(2).exp_()
-    eps = std.data.new(std.size()).normal_()
-    return mu + std * eps
+from abc import ABC
 
 
-def weibull_rsample():
-    ...
-
-
-def uniform_rsample():
-    ...
-
-
-class DistributionBase(object):
+class DistributionBase(ABC):
+    """
+    Abstract class for a simple distribution which must implement rsample and log_prob
+    """
     def rsample(self, sample_shape=torch.Size()):
+        """
+        Returns a reparameterized sample or batch of reparameterized samples if the distribution parameters are batched.
+        """
         ...
     
     def log_prob(self, value):
+        """
+        Returns the log of the probability density/mass function evaluated at `value`.
+        :param value: Value at which to evaluate log probabilty
+        :type value: Tensor
+        """
         ...
 
 
