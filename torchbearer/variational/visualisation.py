@@ -14,6 +14,8 @@ class LatentWalker(ABC, c.Callback):
         """
         :param same_image: If True, use the same image for all latent dimension walks. Else each dimension has different image
         :type same_image: bool
+        :param row_size: Number of images displayed in each row of the grid. 
+        :type row_size: int
         """
         super(LatentWalker, self).__init__()
         self.data_key = None
@@ -45,6 +47,7 @@ class LatentWalker(ABC, c.Callback):
         """
         Sets the ID for which latent space to vary when model outputs [latent_space_0, latent_space_1, ...]
         :param space_id: ID of the latent space to vary
+        :type space_id: int
         :return:
         """
         self.variable_space = space_id
@@ -69,6 +72,7 @@ class LatentWalker(ABC, c.Callback):
     def to_file(self, file):
         """
         :param file: File to save result to
+        :type file: A filename (string), pathlib.Path object or file object
         """
         self.file = file
 
@@ -98,6 +102,13 @@ class LatentWalker(ABC, c.Callback):
 
 class ReconstructionViewer(LatentWalker):
     def __init__(self, row_size=8, recon_key=tb.Y_PRED):
+        """
+        Latent space walker that just returns the reconstructed images for the batch
+        :param row_size: Number of images displayed in each row of the grid. 
+        :type row_size: int
+        :param recon_key: State key of the reconstructed images
+        :type recon_key: Statekey
+        """
         super(ReconstructionViewer, self).__init__(False, row_size)
         self.recon_key = recon_key
 
@@ -112,11 +123,17 @@ class LinSpaceWalker(LatentWalker):
         """
         Latent space walker that explores each dimension linearly from start to end points
         :param lin_start: Starting point of linspace
+        :type lin_start: float
         :param lin_end: End point of linspace
+        :type lin_end: float
         :param lin_steps: Number of steps to take in linspace
+        :type lin_steps: int
         :param num_dims: Number of dimensions to walk
+        :type num_dims: int
         :param zero_init: If True, dimensions not being walked are 0. Else, they are obtained from encoder
+        :type zero_init: bool
         :param same_image: If True, use same image for each dimension walked. Else, use different images
+        :type same_image: bool
         """
         super(LinSpaceWalker, self).__init__(same_image, lin_steps)
         self.num_dims = num_dims
@@ -157,8 +174,10 @@ class RandomWalker(LatentWalker):
         :param var: Variance of random sample
         :param num_images: Number of random images to sample
         :param uniform: If True, sample uniform distribution [-v, v). If False, sample normal distribution with var v
-        :param same_image:
-        :param row_size:
+        :param same_image: If True, use same image for each dimension walked. Else, use different images
+        :type same_image: bool        
+        :param row_size: Number of images displayed in each row of the grid. 
+        :type row_size: int
         """
         super(RandomWalker, self).__init__(same_image, row_size)
         self.num_images = num_images
