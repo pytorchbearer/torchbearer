@@ -5,21 +5,8 @@ import zipfile
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
-from torchvision.datasets import ImageFolder, DatasetFolder
-from torchvision.datasets.folder import default_loader, IMG_EXTENSIONS
-
-
-class Chairs3D(Dataset):
-    def __init__(self):
-        super().__init__()
-
-    def __getitem__(self, index):
-        pass
-
-    def __len__(self):
-        pass
-
 from torchvision.datasets.folder import has_file_allowed_extension, default_loader, IMG_EXTENSIONS
+
 
 def make_dataset(dir, extensions):
     images = []
@@ -34,6 +21,16 @@ def make_dataset(dir, extensions):
 
 class SimpleImageFolder(Dataset):
     def __init__(self, root, loader=default_loader, extensions=IMG_EXTENSIONS, transform=None, target_transform=None):
+        """
+        Simple image folder dataset that loads all images from inside a folder and returns items in (image, image) tuple
+
+        Args:
+            root (str): Root directory of dataset containing all aligned images
+            loader (function, optional): Image loader function that takes a file or path and returns the loaded image (see torchvision.datasets.folder)
+            extensions (:obj:`list` of :obj:`str`, optional): List of file extensions that can be loaded
+            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            target_transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+        """
         samples = make_dataset(root, extensions)
 
         self.root = root
@@ -69,8 +66,10 @@ class CelebA(SimpleImageFolder):
         """
         `CelebA <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`_ auto-encoding dataset
 
-        :param root: Root directory of dataset containing all aligned images in 'root'
-        :param transform: A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+        Args:
+            root (str): Root directory of dataset containing all aligned images in 'root'
+            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            target_transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         super().__init__(root, transform=transform, target_transform=target_transform)
 
@@ -83,9 +82,11 @@ class CelebA_HQ(SimpleImageFolder):
     def __init__(self, root, as_npy=False, transform=None):
         """
         CelebA_HQ, high quality version of `celebA <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`_ auto-encoding dataset as introduced by `Progressive GAN <https://arxiv.org/abs/1710.10196>`_
-        :param root: Root directory of dataset containing all hq images in 'root'
-        :param as_npy: If True, assume images are stored in numpy arrays. Else assume a standard image format
-        :param transform: A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+
+        Args:
+            root (str): Root directory of dataset containing all hq images in 'root'
+            as_npy (bool, optional): If True, assume images are stored in numpy arrays. Else assume a standard image format
+            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         if as_npy:
             loader = self.npy_loader
@@ -111,9 +112,10 @@ class dSprites(Dataset):
         """
         `dSprites <https://github.com/deepmind/dsprites-dataset>`_ Dataset
 
-        :param root: Root directory of dataset containing 'dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz' or to download it to
-        :param download: If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
-        :param transform: A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+        Args:
+            root (str): Root directory of dataset containing 'dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz' or to download it to
+            download (bool, optional): If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
+            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         super().__init__()
         self.file = root
