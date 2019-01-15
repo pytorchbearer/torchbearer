@@ -148,6 +148,15 @@ class dSprites(Dataset):
         self.metadata = str(np.load(os.path.join(self.file, "metadata.npy"), encoding='latin1'))
 
     def get_img_by_latent(self, latent_code):
+        """
+        Returns the image defined by the latent code
+        
+        Args:
+            latent_code (:obj:`list` of :obj:`int`): Latent code of length 3 defining each generative factor
+
+        Returns:
+
+        """
         def latent_to_index(latents):
             return np.dot(latents, self.latents_bases).astype(int)
         idx = latent_to_index(latent_code)
