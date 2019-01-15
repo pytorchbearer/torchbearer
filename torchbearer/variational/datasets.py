@@ -155,6 +155,7 @@ class dSprites(Dataset):
             latent_code (:obj:`list` of :obj:`int`): Latent code of length 3 defining each generative factor
 
         Returns:
+            Image defined by given code
 
         """
         def latent_to_index(latents):
