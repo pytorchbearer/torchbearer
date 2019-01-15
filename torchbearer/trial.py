@@ -6,9 +6,20 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Optimizer
 
 import torchbearer
+from torchbearer import cite
 from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
+
+
+bibtex = """
+@article{2018torchbearer,
+  title={Torchbearer: A Model Fitting Library for PyTorch},
+  author={Harris, Ethan and Painter, Matthew and Hare, Jonathon},
+  journal={arXiv preprint arXiv:1809.03363},
+  year={2018}
+}
+"""
 
 
 class MockOptimizer(Optimizer):
@@ -279,9 +290,11 @@ def update_device_and_dtype(state, *args, **kwargs):
     return state
 
 
+@cite(bibtex)
 class Trial(object):
     """ The trial class contains all of the required hyper-parameters for model running in torchbearer and presents an
     API for model fitting, evaluating and predicting.
+    :bib:
 
     :param model: The base pytorch model
     :type model: torch.nn.Module

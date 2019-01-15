@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added a decorator which can be used to cite a research article as part of a doc string
 ### Changed
 ### Deprecated
 ### Removed
