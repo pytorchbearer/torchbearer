@@ -29,6 +29,7 @@ Utilities
 """
 
 from .version import __version__
+from .cite import cite
 from .bases import *
 from .state import *
 
