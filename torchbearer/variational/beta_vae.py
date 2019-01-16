@@ -1,5 +1,5 @@
 from .auto_encoder import AutoEncoderBase
-from .distributions import SimpleGaussian
+from .distributions import SimpleNormal
 
 import torch.nn.modules as nn
 
@@ -44,7 +44,7 @@ class BetaVAE2DShapes(AutoEncoderBase):
         x = self.encoder(x.view(x.size(0), -1))
         mu = self.mu(x)
         logvar = self.logvar(x)
-        sample = SimpleGaussian(mu, logvar).rsample()
+        sample = SimpleNormal(mu, logvar).rsample()
 
         if state is not None:
             state[MU] = mu
@@ -106,7 +106,7 @@ class BetaVAECNN(AutoEncoderBase):
         x = self.fc(x.view(x.size(0), -1))
         mu = self.mu(x)
         logvar = self.logvar(x)
-        sample = SimpleGaussian(mu, logvar).rsample()
+        sample = SimpleNormal(mu, logvar).rsample()
 
         if state is not None:
             state[MU] = mu

@@ -2,7 +2,7 @@ import torch
 import torchbearer as tb
 from torchbearer.callbacks import Callback
 from .divergence import DivergenceBase
-from .distributions import SimpleGaussian
+from .distributions import SimpleNormal
 import math
 from numbers import Number
 
