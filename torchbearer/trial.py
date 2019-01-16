@@ -292,7 +292,8 @@ def update_device_and_dtype(state, *args, **kwargs):
 
 @cite(bibtex)
 class Trial(object):
-    """ The trial class contains all of the required hyper-parameters for model running in torchbearer and presents an
+    """
+    The trial class contains all of the required hyper-parameters for model running in torchbearer and presents an
     API for model fitting, evaluating and predicting.
     :bib:
 

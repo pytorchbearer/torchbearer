@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
 
 ## [0.2.6] - 2018-12-19
 ### Added

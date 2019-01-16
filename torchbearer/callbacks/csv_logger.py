@@ -7,16 +7,12 @@ import csv
 class CSVLogger(Callback):
     """Callback to log metrics to a given csv file.
 
-    :param filename: The name of the file to output to
-    :type filename: str
-    :param separator: The delimiter to use (e.g. comma, tab etc.)
-    :type separator: str
-    :param batch_granularity: If True, write on each batch, else on each epoch
-    :type batch_granularity: bool
-    :param write_header: If True, write the CSV header at the beginning of training
-    :type write_header: bool
-    :param append: If True, append to the file instead of replacing it
-    :type append: bool
+    Args:
+        filename (str): The name of the file to output to
+        separator (str): The delimiter to use (e.g. comma, tab etc.)
+        batch_granularity (bool): If True, write on each batch, else on each epoch
+        write_header (bool): If True, write the CSV header at the beginning of training
+        append (bool): If True, append to the file instead of replacing it
     """
 
     def __init__(self, filename, separator=',', batch_granularity=False, write_header=True, append=False):

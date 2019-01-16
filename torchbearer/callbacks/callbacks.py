@@ -8,11 +8,12 @@ from torchbearer import Callback
 
 
 class CallbackList(Callback):
-    """The :class:`CallbackList` class is a wrapper for a list of callbacks which acts as a single :class:`Callback` and internally calls each :class:`Callback` in the given list in turn.
+    """The :class:`CallbackList` class is a wrapper for a list of callbacks which acts as a single :class:`.Callback` and
+    internally calls each :class:`.Callback` in the given list in turn.
 
-    :param callback_list:The list of callbacks to be wrapped. If the list contains a :class:`CallbackList`, this will be unwrapped.
-    :type callback_list:list
-
+    Args:
+        callback_list (list): The list of callbacks to be wrapped. If the list contains a :class:`CallbackList`, this
+            will be unwrapped.
     """
 
     CALLBACK_STATES = 'callback_states'
@@ -26,8 +27,8 @@ class CallbackList(Callback):
     def state_dict(self):
         """Get a dict containing all of the callback states.
 
-        :return: A dict containing parameters and persistent buffers.
-        :rtype: dict
+        Returns:
+            dict: A dict containing parameters and persistent buffers.
         """
         state_dict = {
             CallbackList.CALLBACK_STATES: [],
@@ -45,10 +46,11 @@ class CallbackList(Callback):
     def load_state_dict(self, state_dict):
         """Resume this callback list from the given state. Callbacks must be given in the same order for this to work.
 
-        :param state_dict: The state dict to reload
-        :type state_dict: dict
-        :return: self
-        :rtype: CallbackList
+        Args:
+            state_dict (dict): The state dict to reload
+
+        Returns:
+            CallbackList: self
         """
 
         t_iter = iter(state_dict[CallbackList.CALLBACK_TYPES])
@@ -91,161 +93,143 @@ class CallbackList(Callback):
     def on_start(self, state):
         """Call on_start on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_start(state))
 
     def on_start_epoch(self, state):
         """Call on_start_epoch on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_start_epoch(state))
 
     def on_start_training(self, state):
         """Call on_start_training on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_start_training(state))
 
     def on_sample(self, state):
         """Call on_sample on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_sample(state))
 
     def on_forward(self, state):
         """Call on_forward on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_forward(state))
 
     def on_criterion(self, state):
         """Call on_criterion on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_criterion(state))
 
     def on_backward(self, state):
         """Call on_backward on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_backward(state))
 
     def on_step_training(self, state):
         """Call on_step_training on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_step_training(state))
 
     def on_end_training(self, state):
         """Call on_end_training on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_end_training(state))
 
     def on_end_epoch(self, state):
         """Call on_end_epoch on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_end_epoch(state))
 
     def on_checkpoint(self, state):
         """Call on_checkpoint on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_checkpoint(state))
 
     def on_end(self, state):
         """Call on_end on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_end(state))
 
     def on_start_validation(self, state):
         """Call on_start_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_start_validation(state))
 
     def on_sample_validation(self, state):
         """Call on_sample_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_sample_validation(state))
 
     def on_forward_validation(self, state):
         """Call on_forward_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_forward_validation(state))
 
     def on_criterion_validation(self, state):
         """Call on_criterion_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_criterion_validation(state))
 
     def on_end_validation(self, state):
         """Call on_end_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_end_validation(state))
 
     def on_step_validation(self, state):
         """Call on_step_validation on each callback in turn with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda callback: callback.on_step_validation(state))

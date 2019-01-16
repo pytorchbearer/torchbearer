@@ -38,26 +38,22 @@ class _Checkpointer(Callback):
 
 def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
         monitor='val_loss', save_best_only=False, mode='auto', period=1, min_delta=0):
-    """Save the model after every epoch.
-    `filepath` can contain named formatting options,
-    which will be filled any values from state.
-    For example: if `filepath` is `weights.{epoch:02d}-{val_loss:.2f}`,
-    then the model checkpoints will be saved with the epoch number and
-    the validation loss in the filename. The torch model will be saved to filename.pt
-    and the torchbearermodel state will be saved to filename.torchbearer.
+    """Save the model after every epoch. `filepath` can contain named formatting options, which will be filled any
+    values from state. For example: if `filepath` is `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints
+    will be saved with the epoch number and the validation loss in the filename. The torch :class:`.Trial` will be
+    saved to filename.
 
-    :param filepath: Path to save the model file
-    :type filepath: str
-    :param monitor: Quantity to monitor
-    :type monitor: str
-    :param save_best_only: If `save_best_only=True`, the latest best model according to the quantity monitored will not be overwritten
-    :type save_best_only: bool
-    :param mode: One of {auto, min, max}. If `save_best_only=True`, the decision to overwrite the current save file is made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this should be `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically inferred from the name of the monitored quantity.
-    :type mode: str
-    :param period: Interval (number of epochs) between checkpoints
-    :type period: int
-    :param min_delta: If `save_best_only=True`, this is the minimum improvement required to trigger a save
-    :type min_delta: float
+    Args:
+        filepath (str): Path to save the model file
+        monitor (str): Quantity to monitor
+        save_best_only (bool): If `save_best_only=True`, the latest best model according to the quantity
+            monitored will not be overwritten
+        mode (str): One of {auto, min, max}. If `save_best_only=True`, the decision to overwrite the current
+            save file is made based on either the maximization or the minimization of the monitored quantity. For
+            `val_acc`, this should be `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is
+            automatically inferred from the name of the monitored quantity.
+        period (int): Interval (number of epochs) between checkpoints
+        min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
     """
     if save_best_only:
         check = Best(filepath, monitor, mode, period, min_delta)
@@ -70,10 +66,10 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
 class MostRecent(_Checkpointer):
     """Model checkpointer which saves the most recent model to a given filepath.
 
-    :param filepath: Path to save the model file
-    :type filepath: str
-    :param pickle_module: The pickle module to use, default is 'torch.serialization.pickle'
-    :param pickle_protocol: The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+    Args:
+        filepath (str): Path to save the model file
+        pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
+        pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', pickle_module=torch.serialization.pickle,
@@ -90,18 +86,17 @@ class MostRecent(_Checkpointer):
 class Best(_Checkpointer):
     """Model checkpointer which saves the best model according to the given configurations.
 
-    :param filepath: Path to save the model file
-    :type filepath: str
-    :param monitor: Quantity to monitor
-    :type monitor: str
-    :param mode: One of {auto, min, max}. The decision to overwrite the current save file is made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this should be `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically inferred from the name of the monitored quantity.
-    :type mode: str
-    :param period: Interval (number of epochs) between checkpoints
-    :type period: int
-    :param min_delta: This is the minimum improvement required to trigger a save
-    :type min_delta: float
-    :param pickle_module: The pickle module to use, default is 'torch.serialization.pickle'
-    :param pickle_protocol: The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+    Args:
+        filepath (str): Path to save the model file
+        monitor (str): Quantity to monitor
+        mode (str): One of {auto, min, max}. If `save_best_only=True`, the decision to overwrite the current save file
+            is made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this
+            should be `max`, for `val_loss` this should be `min`, etc. In `auto` mode, the direction is automatically
+            inferred from the name of the monitored quantity.
+        period (int): Interval (number of epochs) between checkpoints
+        min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
+        pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
+        pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', monitor='val_loss', mode='auto', period=1,
@@ -164,12 +159,11 @@ class Best(_Checkpointer):
 class Interval(_Checkpointer):
     """Model checkpointer which which saves the model every 'period' epochs to the given filepath.
 
-    :param filepath: Path to save the model file
-    :type filepath: str
-    :param period: Interval (number of epochs) between checkpoints
-    :type period: int
-    :param pickle_module: The pickle module to use, default is 'torch.serialization.pickle'
-    :param pickle_protocol: The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+    Args:
+        filepath (str): Path to save the model file
+        period (int): Interval (number of epochs) between checkpoints
+        pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
+        pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
@@ -197,6 +191,3 @@ class Interval(_Checkpointer):
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
             self.save_checkpoint(state)
-
-
-
