@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
+- Added SimpleUniform and SimpleExponential distributions
 ### Changed
 ### Deprecated
 ### Removed
