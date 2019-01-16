@@ -38,3 +38,4 @@ from . import callbacks
 from .trial import *
 from .torchbearer import *
 from . import cv_utils
+from . import variational
