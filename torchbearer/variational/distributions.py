@@ -1,17 +1,55 @@
+import math
+from numbers import Number
+
 import torch
-import numpy as np
-from abc import ABC
+from torch.distributions import Distribution
 
 
-class DistributionBase(ABC):
+class SimpleDistribution(Distribution):
     """
-    Abstract class for a simple distribution which must implement rsample and log_prob
+    abstract base class for a simple distribution which only implements rsample and log_prob
     """
+    has_rsample = True
+
+    def __init__(self, batch_shape=torch.Size(), event_shape=torch.Size()):
+        super().__init__(batch_shape, event_shape)
+
+    @property
+    def support(self):
+        pass
+
+    @property
+    def arg_constraints(self):
+        pass
+
+    def expand(self, batch_shape, _instance=None):
+        pass
+
+    @property
+    def mean(self):
+        pass
+
+    @property
+    def variance(self):
+        pass
+
+    def cdf(self, value):
+        pass
+
+    def icdf(self, value):
+        pass
+
+    def enumerate_support(self, expand=True):
+        pass
+
+    def entropy(self):
+        pass
+
     def rsample(self, sample_shape=torch.Size()):
         """
         Returns a reparameterized sample or batch of reparameterized samples if the distribution parameters are batched.
         """
-        ...
+        raise NotImplementedError
     
     def log_prob(self, value):
         """
@@ -19,26 +57,32 @@ class DistributionBase(ABC):
         :param value: Value at which to evaluate log probabilty
         :type value: Tensor
         """
-        ...
+        raise NotImplementedError
 
 
-class SimpleGaussian(DistributionBase):
+class SimpleNormal(SimpleDistribution):
     def __init__(self, mu, logvar):
-        super().__init__()
         self.mu = mu
         self.logvar = logvar
+        if isinstance(mu, Number) and isinstance(logvar, Number):
+            batch_shape = torch.Size()
+        else:
+            batch_shape = mu.size()
+        super().__init__(batch_shape=batch_shape)
 
     def rsample(self, sample_shape=torch.Size()):
-        std = self.logvar.div(2).exp_()
-        eps = std.data.new(std.size()).normal_()
+        shape = self._extended_shape(sample_shape)
+        std = math.exp(self.logvar / 2.0) if isinstance(self.logvar, Number) else self.logvar.div(2).exp_()
+        eps = torch.normal(torch.zeros(shape, dtype=self.mu.dtype, device=self.mu.device),
+                           torch.ones(shape, dtype=self.mu.dtype, device=self.mu.device))
         return self.mu + std * eps
 
     def log_prob(self, value):
-        var = self.logvar.exp()
-        return (value - self.mu)**2/(2*var) - ((2*np.pi*var)**0.5).log()
+        var = math.exp(self.logvar) if isinstance(self.logvar, Number) else self.logvar.exp()
+        return - ((value - self.mu) ** 2) / (2.0 * var) - (self.logvar / 2.0) - math.log(math.sqrt(2.0 * math.pi))
 
 
-class SimpleUniform(DistributionBase):
+class SimpleUniform(SimpleDistribution):
     def __init__(self, low, high):
         super().__init__()
         self.low = low
@@ -54,7 +98,7 @@ class SimpleUniform(DistributionBase):
         return torch.log(lb.mul(ub)) - torch.log(self.high - self.low)
 
 
-class SimpleExponential(DistributionBase):
+class SimpleExponential(SimpleDistribution):
     def __init__(self, rate):
         super().__init__()
         self.rate = rate
