@@ -8,10 +8,13 @@ class EarlyStopping(Callback):
 
     Args:
         monitor (str): Name of quantity in metrics to be monitored
-        min_delta (float): Minimum change in the monitored quantity to qualify as an improvement, i.e. an absolute change of less than min_delta, will count as no improvement.
+        min_delta (float): Minimum change in the monitored quantity to qualify as an improvement, i.e. an absolute
+            change of less than min_delta, will count as no improvement.
         patience (int): Number of epochs with no improvement after which training will be stopped.
         verbose (int): Verbosity mode, will print stopping info if verbose > 0
-        mode (str): One of {auto, min, max}. In `min` mode, training will stop when the quantity monitored has stopped decreasing; in `max` mode it will stop when the quantity monitored has stopped increasing; in `auto` mode, the direction is automatically inferred from the name of the monitored quantity.
+        mode (str): One of {auto, min, max}. In `min` mode, training will stop when the quantity monitored has stopped
+            decreasing; in `max` mode it will stop when the quantity monitored has stopped increasing; in `auto` mode,
+            the direction is automatically inferred from the name of the monitored quantity.
 
     State Requirements:
         - :attr:`torchbearer.state.METRICS`: Metrics should be a dict containing the given monitor key as a minimum

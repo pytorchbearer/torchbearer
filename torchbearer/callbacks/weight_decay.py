@@ -16,7 +16,7 @@ class WeightDecay(Callback):
             single Tensor that will have gradients normalized, otherwise this is retrieved from state
 
     State Requirements:
-        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters' method
+        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters` method
         - :attr:`torchbearer.state.LOSS`: Loss should be a tensor that can be incremented
     """
     def __init__(self, rate=5e-4, p=2, params=None):
@@ -30,7 +30,7 @@ class WeightDecay(Callback):
         """Retrieve params from state['model'] if required.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if self.params is None:
             self.params = state[torchbearer.MODEL].parameters()
@@ -39,7 +39,7 @@ class WeightDecay(Callback):
         """Calculate the decay term and add to state['loss'].
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         for param in self.params:
             state[torchbearer.LOSS] += self.rate * torch.norm(param, self.p)
@@ -55,7 +55,7 @@ class L1WeightDecay(WeightDecay):
             single Tensor that will have gradients normalized, otherwise this is retrieved from state
 
     State Requirements:
-        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters' method
+        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters` method
         - :attr:`torchbearer.state.LOSS`: Loss should be a tensor that can be incremented
     """
     def __init__(self, rate=5e-4, params=None):
@@ -72,7 +72,7 @@ class L2WeightDecay(WeightDecay):
             single Tensor that will have gradients normalized, otherwise this is retrieved from state
 
     State Requirements:
-        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters' method
+        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters` method
         - :attr:`torchbearer.state.LOSS`: Loss should be a tensor that can be incremented
     """
     def __init__(self, rate=5e-4, params=None):

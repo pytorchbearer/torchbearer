@@ -17,7 +17,7 @@ class GradientNormClipping(Callback):
             single Tensor that will have gradients normalized, otherwise this is retrieved from state
 
     State Requirements:
-        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters' method
+        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters` method
     """
     def __init__(self, max_norm, norm_type=2, params=None):
         super(GradientNormClipping, self).__init__()
@@ -30,7 +30,7 @@ class GradientNormClipping(Callback):
         """If params is None then retrieve from the model.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if self.params is None:
             self.params = filter(lambda p: p.requires_grad, state[torchbearer.MODEL].parameters())
@@ -40,7 +40,7 @@ class GradientNormClipping(Callback):
         clip the gradient.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         torch.nn.utils.clip_grad_norm_(self.params, self.max_norm, norm_type=self.norm_type)
 
@@ -56,7 +56,7 @@ class GradientClipping(Callback):
             single Tensor that will have gradients normalized, otherwise this is retrieved from state
 
     State Requirements:
-        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters' method
+        - :attr:`torchbearer.state.MODEL`: Model should have the `parameters` method
     """
     def __init__(self, clip_value, params=None):
 
@@ -69,7 +69,7 @@ class GradientClipping(Callback):
         """If params is None then retrieve from the model.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if self.params is None:
             self.params = filter(lambda p: p.requires_grad, state[torchbearer.MODEL].parameters())
@@ -79,6 +79,6 @@ class GradientClipping(Callback):
         clip the gradient.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         torch.nn.utils.clip_grad_value_(self.params, self.clip_value)

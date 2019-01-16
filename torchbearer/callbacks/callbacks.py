@@ -8,12 +8,12 @@ from torchbearer import Callback
 
 
 class CallbackList(Callback):
-    """The :class:`CallbackList` class is a wrapper for a list of callbacks which acts as a single :class:`Callback` and
-    internally calls each :class:`Callback` in the given list in turn.
+    """The :class:`CallbackList` class is a wrapper for a list of callbacks which acts as a single :class:`.Callback` and
+    internally calls each :class:`.Callback` in the given list in turn.
 
     Args:
         callback_list (list): The list of callbacks to be wrapped. If the list contains a :class:`CallbackList`, this
-        will be unwrapped.
+            will be unwrapped.
     """
 
     CALLBACK_STATES = 'callback_states'

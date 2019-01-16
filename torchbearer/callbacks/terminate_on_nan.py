@@ -12,7 +12,7 @@ class TerminateOnNaN(Callback):
         monitor (str): The name of the metric to monitor
 
     State Requirements:
-        - :attr:`torchbearer.state.METRICS`: Metrics should be a dict containing at least the key `monitor'
+        - :attr:`torchbearer.state.METRICS`: Metrics should be a dict containing at least the key `monitor`
     """
     def __init__(self, monitor='running_loss'):
         super(TerminateOnNaN, self).__init__()

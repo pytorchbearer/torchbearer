@@ -5,7 +5,7 @@ def cite(bibtex):
     :param bibtex: The bibtex string to insert
     :return: The decorator
     """
-    to_insert = '::\n' + ' '*8
+    to_insert = '::\n\n' + ' '*8
     to_insert += bibtex.strip().replace('\n', '\n' + ' '*8).rstrip()
 
     def decorator(inner):

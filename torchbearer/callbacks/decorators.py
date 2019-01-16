@@ -1,8 +1,7 @@
-from torchbearer.callbacks import Callback
-import torchbearer
-from torchbearer.state import StateKey
-
 from inspect import signature
+
+import torchbearer
+from torchbearer.callbacks import Callback
 
 
 class LambdaCallback(Callback):
@@ -32,7 +31,7 @@ def on_start(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_start` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_start` calling func
     """
     return bind_to(Callback.on_start)(func)
 
@@ -45,7 +44,7 @@ def on_start_epoch(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_start_epoch` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_start_epoch` calling func
     """
     return bind_to(Callback.on_start_epoch)(func)
 
@@ -58,7 +57,7 @@ def on_start_training(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_start_training` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_start_training` calling func
     """
     return bind_to(Callback.on_start_training)(func)
 
@@ -71,7 +70,7 @@ def on_sample(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_sample` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_sample` calling func
     """
     return bind_to(Callback.on_sample)(func)
 
@@ -84,7 +83,7 @@ def on_forward(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_forward` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_forward` calling func
     """
     return bind_to(Callback.on_forward)(func)
 
@@ -97,7 +96,7 @@ def on_criterion(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_criterion` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_criterion` calling func
     """
     return bind_to(Callback.on_criterion)(func)
 
@@ -110,7 +109,7 @@ def on_backward(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_backward` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_backward` calling func
     """
     return bind_to(Callback.on_backward)(func)
 
@@ -123,7 +122,7 @@ def on_step_training(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_step_training` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_step_training` calling func
     """
     return bind_to(Callback.on_step_training)(func)
 
@@ -136,7 +135,7 @@ def on_end_training(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_end_training` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_end_training` calling func
     """
     return bind_to(Callback.on_end_training)(func)
 
@@ -149,7 +148,7 @@ def on_end_epoch(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_end_epoch` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_end_epoch` calling func
     """
     return bind_to(Callback.on_end_epoch)(func)
 
@@ -162,7 +161,7 @@ def on_end(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_end` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_end` calling func
     """
     return bind_to(Callback.on_end)(func)
 
@@ -175,7 +174,7 @@ def on_start_validation(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_start_validation` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_start_validation` calling func
     """
     return bind_to(Callback.on_start_validation)(func)
 
@@ -188,7 +187,7 @@ def on_sample_validation(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_sample_validation` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_sample_validation` calling func
     """
     return bind_to(Callback.on_sample_validation)(func)
 
@@ -201,7 +200,7 @@ def on_forward_validation(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_forward_validation` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_forward_validation` calling func
     """
     return bind_to(Callback.on_forward_validation)(func)
 
@@ -214,7 +213,7 @@ def on_criterion_validation(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_criterion_validation` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_criterion_validation` calling func
     """
     return bind_to(Callback.on_criterion_validation)(func)
 
@@ -227,7 +226,7 @@ def on_end_validation(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_end_validation` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_end_validation` calling func
     """
     return bind_to(Callback.on_end_validation)(func)
 
@@ -240,7 +239,7 @@ def on_step_validation(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback with :meth:`~.Callback.on_step_validation` calling func
+        :class:`.Callback`: Initialised callback with :meth:`~.Callback.on_step_validation` calling func
     """
     return bind_to(Callback.on_step_validation)(func)
 
@@ -253,7 +252,7 @@ def add_to_loss(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        :class:`.Callback': Initialised callback which adds the returned value from func to the loss
+        :class:`.Callback`: Initialised callback which adds the returned value from func to the loss
     """
     @on_criterion
     @on_criterion_validation

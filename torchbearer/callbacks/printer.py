@@ -32,7 +32,8 @@ class ConsolePrinter(Callback):
     """The ConsolePrinter callback simply outputs the training metrics to the console.
 
     Args:
-        validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase of training
+        validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase
+            of training
         precision (int): Precision of the number format in significant figures
 
     State Requirements:
@@ -79,14 +80,15 @@ class Tqdm(Callback):
         validation_label_letter (str): The letter to use for validation outputs.
         precision (int): Precision of the number format in significant figures
         on_epoch (bool): If True, output a single progress bar which tracks epochs
-        tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
+        tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor.
+            See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
 
     State Requirements:
         - :attr:`torchbearer.state.EPOCH`: The current epoch number
         - :attr:`torchbearer.state.MAX_EPOCHS`: The total number of epochs for this run
         - :attr:`torchbearer.state.STEPS`: The total number of steps / batches / iterations for this epoch
         - :attr:`torchbearer.state.METRICS`: The metrics dict to print
-        - :attr:`torchbearer.state.HISTORY`: The history of the :class:`.Trial' object
+        - :attr:`torchbearer.state.HISTORY`: The history of the :class:`.Trial` object
     """
     def __init__(self, tqdm_module=tqdm, validation_label_letter='v', precision=4, on_epoch=False, **tqdm_args):
         self.tqdm_module = tqdm_module
@@ -131,7 +133,7 @@ class Tqdm(Callback):
         """Initialise the TQDM bar for this training phase.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._on_start(state, 't')
@@ -140,7 +142,7 @@ class Tqdm(Callback):
         """Update the bar with the metrics from this step.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._update(state)
@@ -149,7 +151,7 @@ class Tqdm(Callback):
         """Update the bar with the terminal training metrics and then close.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._close(state)
@@ -158,7 +160,7 @@ class Tqdm(Callback):
         """Initialise the TQDM bar for this validation phase.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._on_start(state, self.validation_label)
@@ -167,7 +169,7 @@ class Tqdm(Callback):
         """Update the bar with the metrics from this step.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._update(state)
@@ -176,7 +178,7 @@ class Tqdm(Callback):
         """Update the bar with the terminal validation metrics and then close.
 
         Args:
-            state (dict): The :class:`.Trial' state
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._close(state)
