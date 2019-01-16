@@ -31,10 +31,16 @@ def _format_metrics(metrics, precision):
 class ConsolePrinter(Callback):
     """The ConsolePrinter callback simply outputs the training metrics to the console.
 
-    :param validation_label_letter: This is the letter displayed after the epoch number indicating the current phase of training
-    :type validation_label_letter: String
-    :param precision: Precision of the number format in significant figures
-    :type precision: int
+    Args:
+        validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase of training
+        precision (int): Precision of the number format in significant figures
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: The current epoch number
+        - :attr:`torchbearer.state.MAX_EPOCHS`: The total number of epochs for this run
+        - :attr:`torchbearer.state.BATCH`: The current batch / iteration number
+        - :attr:`torchbearer.state.STEPS`: The total number of steps / batches / iterations for this epoch
+        - :attr:`torchbearer.state.METRICS`: The metrics dict to print
     """
     def __init__(self, validation_label_letter='v', precision=4):
         super().__init__()
@@ -66,15 +72,21 @@ class ConsolePrinter(Callback):
 
 
 class Tqdm(Callback):
-    """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM. The given key is used to label validation output.
+    """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM.
+    The given key is used to label validation output.
 
-    :param validation_label_letter: The letter to use for validation outputs.
-    :type validation_label_letter: str
-    :param precision: Precision of the number format in significant figures
-    :type precision: int
-    :param on_epoch: If True, output a single progress bar which tracks epochs
-    :type on_epoch: bool
-    :param tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
+    Args:
+        validation_label_letter (str): The letter to use for validation outputs.
+        precision (int): Precision of the number format in significant figures
+        on_epoch (bool): If True, output a single progress bar which tracks epochs
+        tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: The current epoch number
+        - :attr:`torchbearer.state.MAX_EPOCHS`: The total number of epochs for this run
+        - :attr:`torchbearer.state.STEPS`: The total number of steps / batches / iterations for this epoch
+        - :attr:`torchbearer.state.METRICS`: The metrics dict to print
+        - :attr:`torchbearer.state.HISTORY`: The history of the :class:`.Trial' object
     """
     def __init__(self, tqdm_module=tqdm, validation_label_letter='v', precision=4, on_epoch=False, **tqdm_args):
         self.tqdm_module = tqdm_module
@@ -118,8 +130,8 @@ class Tqdm(Callback):
     def on_start_training(self, state):
         """Initialise the TQDM bar for this training phase.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial' state
         """
         if not self._on_epoch:
             self._on_start(state, 't')
@@ -127,8 +139,8 @@ class Tqdm(Callback):
     def on_step_training(self, state):
         """Update the bar with the metrics from this step.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial' state
         """
         if not self._on_epoch:
             self._update(state)
@@ -136,8 +148,8 @@ class Tqdm(Callback):
     def on_end_training(self, state):
         """Update the bar with the terminal training metrics and then close.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial' state
         """
         if not self._on_epoch:
             self._close(state)
@@ -145,8 +157,8 @@ class Tqdm(Callback):
     def on_start_validation(self, state):
         """Initialise the TQDM bar for this validation phase.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial' state
         """
         if not self._on_epoch:
             self._on_start(state, self.validation_label)
@@ -154,8 +166,8 @@ class Tqdm(Callback):
     def on_step_validation(self, state):
         """Update the bar with the metrics from this step.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial' state
         """
         if not self._on_epoch:
             self._update(state)
@@ -163,8 +175,8 @@ class Tqdm(Callback):
     def on_end_validation(self, state):
         """Update the bar with the terminal validation metrics and then close.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial' state
         """
         if not self._on_epoch:
             self._close(state)
