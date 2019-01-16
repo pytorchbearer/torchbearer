@@ -3,7 +3,7 @@ import unittest
 import torchbearer as tb
 from unittest.mock import Mock
 
-import variational.auto_encoder as ae
+import torchbearer.variational.auto_encoder as ae
 
 
 class SimpleAE(ae.AutoEncoderBase):
