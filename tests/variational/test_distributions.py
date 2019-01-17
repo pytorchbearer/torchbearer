@@ -101,7 +101,8 @@ class TestSimpleUniform(unittest.TestCase):
 
 
 class TestSimpleExponential(unittest.TestCase):
-    def test_rsample_tensor(self):
+    @patch('torchbearer.variational.distributions.broadcast_all')
+    def test_rsample_tensor(self, broadcast_all):
         rate = (torch.ones(2, 2) / 2).log()
 
         def new_mock_tensor(shape):
@@ -110,9 +111,9 @@ class TestSimpleExponential(unittest.TestCase):
             return x
 
         rate.new = Mock(side_effect=new_mock_tensor)
+        broadcast_all.return_value = (rate,)
         dist = SimpleExponential(rate)
 
-        print(dist.rsample(sample_shape=torch.Size([2])))
         self.assertTrue(((dist.rsample(sample_shape=torch.Size([2])) - 2.0).abs() < 0.0001).all())
 
     @patch('torchbearer.variational.distributions.broadcast_all')
