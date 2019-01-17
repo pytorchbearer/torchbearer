@@ -112,6 +112,7 @@ class TestSimpleExponential(unittest.TestCase):
         rate.new = Mock(side_effect=new_mock_tensor)
         dist = SimpleExponential(rate)
 
+        print(dist.rsample(sample_shape=torch.Size([2])))
         self.assertTrue(((dist.rsample(sample_shape=torch.Size([2])) - 2.0).abs() < 0.0001).all())
 
     @patch('torchbearer.variational.distributions.broadcast_all')
