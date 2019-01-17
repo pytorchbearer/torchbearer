@@ -1,3 +1,11 @@
+"""
+The distributions module is an extension of the `torch.distributions` package intended to facilitate implementations
+required for specific variational approaches through the :class:`.SimpleDistribution` class. Generally, using a
+:class:`torch.distributions.Distribution` object should be preferred over a :class:`SimpleDistribution`, for better
+argument validation and more complete implementations. However, if you need to implement something new for a specific
+variational approach, then a :class:`.SimpleDistribution` may be more forgiving. Furthermore, you may find it easier
+to understand the function of the implementations here.
+"""
 import math
 from numbers import Number
 
@@ -7,8 +15,9 @@ from torch.distributions.utils import broadcast_all
 
 
 class SimpleDistribution(Distribution):
-    """
-    abstract base class for a simple distribution which only implements rsample and log_prob
+    """Abstract base class for a simple distribution which only implements rsample and log_prob. If the log_prob
+    function is not differentiable with respect to the distribution parameters or the given value, then this should be
+    mentioned in the documentation.
     """
     has_rsample = True
 
@@ -17,22 +26,22 @@ class SimpleDistribution(Distribution):
 
     @property
     def support(self):
-        pass
+        return None
 
     @property
     def arg_constraints(self):
-        pass
+        return None
 
     def expand(self, batch_shape, _instance=None):
         pass
 
     @property
     def mean(self):
-        pass
+        return None
 
     @property
     def variance(self):
-        pass
+        return None
 
     def cdf(self, value):
         pass
@@ -53,10 +62,10 @@ class SimpleDistribution(Distribution):
         raise NotImplementedError
     
     def log_prob(self, value):
-        """
-        Returns the log of the probability density/mass function evaluated at `value`.
-        :param value: Value at which to evaluate log probabilty
-        :type value: Tensor
+        """Returns the log of the probability density/mass function evaluated at `value`.
+
+        Args:
+            value (torch.Tensor, Number): Value at which to evaluate log probabilty
         """
         raise NotImplementedError
 
@@ -82,7 +91,7 @@ class SimpleNormal(SimpleDistribution):
         """Simple rsample for a Normal distribution.
 
         Args:
-            sample_shape: Shape of the sample (per mean / variance given)
+            sample_shape (torch.Size, tuple): Shape of the sample (per mean / variance given)
 
         Returns:
             A reparameterized sample with gradient with respect to the distribution parameters
@@ -129,7 +138,7 @@ class SimpleUniform(SimpleDistribution):
         """Simple rsample for a Uniform distribution.
 
         Args:
-            sample_shape: Shape of the sample (per low / high given)
+            sample_shape (torch.Size, tuple): Shape of the sample (per low / high given)
 
         Returns:
             A reparameterized sample with gradient with respect to the distribution parameters
@@ -156,14 +165,40 @@ class SimpleUniform(SimpleDistribution):
 
 
 class SimpleExponential(SimpleDistribution):
-    def __init__(self, rate):
+    """The SimpleExponential class is a :class:`SimpleDistribution` which implements a straight forward Exponential
+    distribution with the given lograte. This performs significantly fewer checks than `torch.distributions.Exponential`
+    , but should be sufficient for the purpose of implementing a VAE. By using a lograte, the log_prob can be computed
+    in a stable fashion, without taking a logarithm.
+
+    Args:
+        lograte (torch.Tensor, Number): The natural log of the rate of the distribution, numbers will be cast to tensors
+    """
+    def __init__(self, lograte):
         super().__init__()
-        self.rate = rate
+        self.lograte, = broadcast_all(lograte)
+        batch_shape = torch.Size() if isinstance(lograte, Number) else self.lograte.size()
+        super().__init__(batch_shape=batch_shape)
 
     def rsample(self, sample_shape=torch.Size()):
-        shape = sample_shape
-        return self.rate.new(shape).exponential_() / self.rate
+        """Simple rsample for an Exponential distribution.
+
+        Args:
+            sample_shape (torch.Size, tuple): Shape of the sample (per lograte given)
+
+        Returns:
+            A reparameterized sample with gradient with respect to the distribution parameters
+        """
+        shape = self._extended_shape(sample_shape)
+        return self.lograte.new(shape).exponential_() / self.lograte.exp()
 
     def log_prob(self, value):
-        return self.rate.log() - self.rate * value
+        """Calculates the log probability that the given value was drawn from this distribution. The log_prob for this
+        distribution is fully differentiable and has stable gradient since we use the lograte here.
 
+        Args:
+            value (torch.Tensor, Number): The sampled value
+
+        Returns:
+            The log probability that the given value was drawn from this distribution
+        """
+        return self.lograte - self.lograte.exp() * value
