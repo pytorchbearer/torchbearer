@@ -183,6 +183,8 @@ def std(clazz):
 
     Args:
         clazz: The class to *decorate*
+
+    Returns:
         A :class:`.MetricTree` with a :class:`.Std` appended or a wrapper class that extends :class:`.MetricTree`
     """
     return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Std(metric.name + '_std')))
