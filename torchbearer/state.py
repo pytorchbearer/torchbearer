@@ -18,10 +18,11 @@ __keys__ = []
 def state_key(key):
     """Computes and returns a non-conflicting key for the state dictionary when given a seed key
 
-    :param key: The seed key - basis for new state key
-    :type key: String
-    :return: New state key
-    :rtype: StateKey
+    Args:
+        key (str): The seed key - basis for new state key
+
+    Returns:
+        :class:`.StateKey`: New state key
     """
     return StateKey(key)
 
@@ -30,8 +31,8 @@ class StateKey(Metric):
     """ StateKey class that is a unique state key based on the input string key. State keys are also metrics which
     retrieve themselves from state.
 
-    :param key: Base key
-    :type key: String
+    Args:
+        key (str): Base key
     """
     def __init__(self, key):
         self.key = self._gen_key_(key)
