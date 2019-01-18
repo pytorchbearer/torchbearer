@@ -22,11 +22,10 @@ def default_for_key(key, *args, **kwargs):
         class CategoricalAccuracy(metrics.BatchLambda):
             ...
 
-    :param key: The key to use when referencing the metric
-    :type key: str
-    :param args: Any args to pass to the underlying metric when constructed
-    :param kwargs: Any keyword args to pass to the underlying metric when constructed
-
+    Args:
+        key (str): The key to use when referencing the metric
+        args: Any args to pass to the underlying metric when constructed
+        kwargs: Any keyword args to pass to the underlying metric when constructed
     """
     def decorator(arg):
         metrics.add_default(key, arg, *args, **kwargs)
@@ -44,9 +43,12 @@ def lambda_metric(name, on_epoch=False):
 
         model = Model(metrics=[my_metric])
 
-    :param name: The name of the metric (e.g. 'loss')
-    :param on_epoch: If True the metric will be an instance of :class:`.EpochLambda` instead of :class:`.BatchLambda`
-    :return: A decorator which replaces a function with a :class:`.Metric`
+    Args:
+        name (str): The name of the metric (e.g. 'loss')
+        on_epoch (bool): If True the metric will be an instance of :class:`.EpochLambda` instead of :class:`.BatchLambda`
+
+    Returns:
+        A decorator which replaces a function with a :class:`.Metric`
     """
     def decorator(metric_function):
         if on_epoch:
@@ -79,8 +81,11 @@ def to_dict(clazz):
         >>> my_metric.process({'y_pred':4, 'y_true':5})
         {'my_metric': 9}
 
-    :param clazz: The class to *decorate*
-    :return: A :class:`.ToDict` instance or a :class:`.ToDict` wrapper of the given class
+    Args:
+        clazz: The class to *decorate*
+
+    Returns:
+        A :class:`.ToDict` instance or a :class:`.ToDict` wrapper of the given class
     """
     if inspect.isclass(clazz):
         class Wrapper(ToDict):
@@ -141,8 +146,11 @@ def mean(clazz):
         >>> metric.process_final()
         {'my_metric': 6.0}
 
-    :param clazz: The class to *decorate*
-    :return: A :class:`.MetricTree` with a :class:`.Mean` appended or a wrapper class that extends :class:`.MetricTree`
+    Args:
+        clazz: The class to *decorate*
+
+    Returns:
+        A :class:`.MetricTree` with a :class:`.Mean` appended or a wrapper class that extends :class:`.MetricTree`
     """
     return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Mean(metric.name)))
 
@@ -173,8 +181,9 @@ def std(clazz):
         >>> '%.4f' % metric.process_final()['my_metric_std']
         '1.6330'
 
-    :param clazz: The class to *decorate*
-    :return: A :class:`.MetricTree` with a :class:`.Std` appended or a wrapper class that extends :class:`.MetricTree`
+    Args:
+        clazz: The class to *decorate*
+        A :class:`.MetricTree` with a :class:`.Std` appended or a wrapper class that extends :class:`.MetricTree`
     """
     return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Std(metric.name + '_std')))
 
@@ -206,10 +215,13 @@ def running_mean(clazz=None, batch_size=50, step_size=10):
         >>> metric.process({'y_pred':torch.Tensor([4]), 'y_true':torch.Tensor([4])}) # 8, triggers update
         {'running_my_metric': 6.0}
 
-    :param clazz: The class to *decorate*
-    :param batch_size: See :class:`.RunningMean`
-    :param step_size: See :class:`.RunningMean`
-    :return: decorator or :class:`.MetricTree` instance or wrapper
+    Args:
+        clazz: The class to *decorate*
+        batch_size (int): See :class:`.RunningMean`
+        step_size (int): See :class:`.RunningMean`
+
+    Returns:
+        decorator or :class:`.MetricTree` instance or wrapper
     """
     if clazz is None:
         def decorator(clazz):
