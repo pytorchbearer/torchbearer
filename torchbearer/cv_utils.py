@@ -7,17 +7,15 @@ import random
 
 def train_valid_splitter(x, y, split, shuffle=True):
     """ Generate training and validation tensors from whole dataset data and label tensors
-    
-    :param x: Data tensor for whole dataset
-    :type x: torch.Tensor
-    :param y: Label tensor for whole dataset
-    :type y: torch.Tensor
-    :param split: Fraction of dataset to be used for validation
-    :type split: float
-    :param shuffle: If True randomize tensor order before splitting else do not randomize
-    :type shuffle: bool
-    :return: Training and validation tensors (training data, training labels, validation data, validation labels)
-    :rtype: tuple
+
+    Args:
+        x (:class:`torch.Tensor`): Data tensor for whole dataset
+        y (:class:`torch.Tensor`): Label tensor for whole dataset
+        split (float): Fraction of dataset to be used for validation
+        shuffle (bool): If True randomize tensor order before splitting else do not randomize
+
+    Returns:
+        Training and validation tensors (training data, training labels, validation data, validation labels)
     """
     num_samples_x = x.size()[0]
     num_valid_samples = math.floor(num_samples_x * split)
@@ -34,19 +32,17 @@ def train_valid_splitter(x, y, split, shuffle=True):
 
 def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
     """ Generate validation and training datasets from whole dataset tensors
-    
-    :param x: Data tensor for dataset
-    :type x: torch.Tensor
-    :param y: Label tensor for dataset
-    :type y: torch.Tensor
-    :param validation_data: Optional validation data (x_val, y_val) to be used instead of splitting x and y tensors
-    :type validation_data: (torch.Tensor, torch.Tensor)
-    :param validation_split: Fraction of dataset to be used for validation
-    :type validation_split: float
-    :param shuffle: If True randomize tensor order before splitting else do not randomize 
-    :type shuffle: bool
-    :return: Training and validation datasets
-    :rtype: tuple
+
+    Args:
+        x (:class:`torch.Tensor`): Data tensor for dataset
+        y (:class:`torch.Tensor`): Label tensor for dataset
+        validation_data ((:class:`torch.Tensor`, :class:`torch.Tensor`)): Optional validation data (x_val, y_val) to be
+            used instead of splitting x and y tensors
+        validation_split (float): Fraction of dataset to be used for validation
+        shuffle (bool): If True randomize tensor order before splitting else do not randomize
+
+    Returns:
+        Training and validation datasets
     """
 
     valset = None
@@ -70,9 +66,10 @@ class DatasetValidationSplitter:
         """ Generates training and validation split indicies for a given dataset length and creates training and
         validation datasets using these splits
 
-        :param dataset_len: The length of the dataset to be split into training and validation
-        :param split_fraction: The fraction of the whole dataset to be used for validation
-        :param shuffle_seed: Optional random seed for the shuffling process
+        Args:
+            dataset_len: The length of the dataset to be split into training and validation
+            split_fraction: The fraction of the whole dataset to be used for validation
+            shuffle_seed: Optional random seed for the shuffling process
         """
         super().__init__()
         self.dataset_len = dataset_len
@@ -95,20 +92,22 @@ class DatasetValidationSplitter:
     def get_train_dataset(self, dataset):
         """ Creates a training dataset from existing dataset
 
-        :param dataset: Dataset to be split into a training dataset
-        :type dataset: torch.utils.data.Dataset
-        :return: Training dataset split from whole dataset
-        :rtype: torch.utils.data.Dataset
+        Args:
+            dataset (:class:`torch.utils.data.Dataset`): Dataset to be split into a training dataset
+
+        Returns:
+            :class:`torch.utils.data.Dataset`: Training dataset split from whole dataset
         """
         return SubsetDataset(dataset, self.train_ids)
 
     def get_val_dataset(self, dataset):
         """ Creates a validation dataset from existing dataset
 
-        :param dataset: Dataset to be split into a validation dataset
-        :type dataset: torch.utils.data.Dataset
-        :return: Validation dataset split from whole dataset
-        :rtype: torch.utils.data.Dataset
+        Args:
+        dataset (:class:`torch.utils.data.Dataset`): Dataset to be split into a validation dataset
+
+        Returns:
+            :class:`torch.utils.data.Dataset`: Validation dataset split from whole dataset
         """
         return SubsetDataset(dataset, self.valid_ids)
 
@@ -117,10 +116,9 @@ class SubsetDataset(Dataset):
     def __init__(self, dataset, ids):
         """ Dataset that consists of a subset of a previous dataset
 
-        :param dataset: Complete dataset
-        :type dataset: torch.utils.data.Dataset
-        :param ids: List of subset IDs
-        :type ids: list
+        Args:
+            dataset (:class:`torch.utils.data.Dataset`): Complete dataset
+            ids (list): List of subset IDs
         """
         super().__init__()
         self.dataset = dataset
@@ -131,4 +129,3 @@ class SubsetDataset(Dataset):
 
     def __len__(self):
         return len(self.ids)
-
