@@ -303,7 +303,6 @@ class Trial(object):
     """
     The trial class contains all of the required hyper-parameters for model running in torchbearer and presents an
     API for model fitting, evaluating and predicting.
-    :bib:
 
     Args:
         model (:class:`torch.nn.Module`): The base pytorch model

@@ -33,18 +33,6 @@ Visualisation
 ..  automodule:: torchbearer.variational.visualisation
         :members:
         :undoc-members:
-
-Implementations
-------------------------------------
-
-..  automodule:: torchbearer.variational.beta_vae
-        :members:
-
-..  automodule:: torchbearer.variational.info_vae
-        :members:
-
-..  automodule:: torchbearer.variational.isolating_sources
-        :members:
 """
 
 from .auto_encoder import *
