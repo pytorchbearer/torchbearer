@@ -28,8 +28,8 @@ class SimpleImageFolder(Dataset):
             root (str): Root directory of dataset containing all aligned images
             loader (function, optional): Image loader function that takes a file or path and returns the loaded image (see torchvision.datasets.folder)
             extensions (:obj:`list` of :obj:`str`, optional): List of file extensions that can be loaded
-            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
-            target_transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            target_transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         samples = make_dataset(root, extensions)
 
@@ -71,8 +71,8 @@ class CelebA(SimpleImageFolder):
 
         Args:
             root (str): Root directory of dataset containing all aligned images in 'root'
-            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
-            target_transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            target_transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         super().__init__(root, transform=transform, target_transform=target_transform)
 
@@ -89,7 +89,7 @@ class CelebA_HQ(SimpleImageFolder):
         Args:
             root (str): Root directory of dataset containing all hq images in 'root'
             as_npy (bool, optional): If True, assume images are stored in numpy arrays. Else assume a standard image format
-            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         if as_npy:
             loader = self.npy_loader
@@ -118,7 +118,7 @@ class dSprites(Dataset):
         Args:
             root (str): Root directory of dataset containing 'dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz' or to download it to
             download (bool, optional): If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
-            transform (Transform, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
+            transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
         super().__init__()
         self.file = root
