@@ -114,6 +114,10 @@ class TestLatentWalker(unittest.TestCase):
         self.assertTrue(mock_save_img.call_args[0][0] == "Test")
         self.assertTrue(mock_save_img.call_args[0][1] == "test_file")
 
+    def test_empty_method(self):
+        walker = vis.LatentWalker(False, 0)
+        self.assertRaises(NotImplementedError, lambda: walker.vis({}))
+
 
 class TestReconstructionViewer(unittest.TestCase):
     def test_recon(self):

@@ -1,6 +1,3 @@
-import numpy as np
-from abc import ABC, abstractmethod
-
 import torch
 from torchvision.utils import save_image
 
@@ -9,7 +6,7 @@ import torchbearer.callbacks as c
 from torchbearer.trial import fluent
 
 
-class LatentWalker(ABC, c.Callback):
+class LatentWalker(c.Callback):
     def __init__(self, same_image, row_size):
         """
         Args:
@@ -92,12 +89,11 @@ class LatentWalker(ABC, c.Callback):
         if self.store_key is not None:
             state[self.store_key] = result
 
-    @abstractmethod
     def vis(self, state):
         """
         Create the tensor of images to be displayed
         """
-        return
+        raise NotImplementedError
 
     def _save_walk(self, tensor):
         save_image(tensor, self.file, self.row_size, normalize=True, pad_value=1)
