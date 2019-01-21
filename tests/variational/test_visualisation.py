@@ -16,6 +16,7 @@ class TestLatentWalker(unittest.TestCase):
     @patch('torchbearer.callbacks.once_per_epoch')
     def test_on_train_on_val(self, mock_ope):
         lw = SimpleLatentWalker(False, 8)
+        lw.dev = 'cpu'
         lw.on_train()
         lw.on_val()
 
@@ -25,6 +26,7 @@ class TestLatentWalker(unittest.TestCase):
     def test_for_space(self):
         space_id = 3
         lw = SimpleLatentWalker(False, 8)
+        lw.dev = 'cpu'
         lw.for_space(space_id)
 
         self.assertTrue(lw.variable_space == space_id)
@@ -32,6 +34,7 @@ class TestLatentWalker(unittest.TestCase):
     def test_data_key(self):
         data_key = 3
         lw = SimpleLatentWalker(False, 8)
+        lw.dev = 'cpu'
         lw.for_data(data_key)
 
         self.assertTrue(lw.data_key == data_key)
@@ -40,6 +43,7 @@ class TestLatentWalker(unittest.TestCase):
         out_key = 'test_key'
         out_file = 'test_file'
         lw = SimpleLatentWalker(False, 8)
+        lw.dev = 'cpu'
         lw.to_key(out_key)
         lw.to_file(out_file)
 
@@ -50,6 +54,7 @@ class TestLatentWalker(unittest.TestCase):
         state = {tb.MODEL: Mock(), tb.X: Mock(), tb.DEVICE: 'cpu'}
 
         lw = SimpleLatentWalker(False, 8)
+        lw.dev = 'cpu'
         lw.vis = Mock()
         lw._vis(state)
 
@@ -61,6 +66,7 @@ class TestLatentWalker(unittest.TestCase):
 
         lw = SimpleLatentWalker(False, 8)
         lw.to_file('test_file')
+        lw.dev = 'cpu'
         lw.vis = Mock()
         lw.vis.return_value = "Test"
         lw._save_walk = Mock()
@@ -74,6 +80,7 @@ class TestLatentWalker(unittest.TestCase):
 
         lw = SimpleLatentWalker(False, 8)
         lw.to_key('test_key')
+        lw.dev = 'cpu'
         lw.vis = Mock()
         lw.vis.return_value = "Test"
         lw._vis(state)
@@ -86,6 +93,7 @@ class TestLatentWalker(unittest.TestCase):
 
         lw = SimpleLatentWalker(False, 8)
         lw.for_data(data_key)
+        lw.dev = 'cpu'
         lw.vis = Mock()
         lw.vis.return_value = "Test"
         lw._vis(state)
@@ -98,6 +106,7 @@ class TestLatentWalker(unittest.TestCase):
 
         lw = SimpleLatentWalker(False, 8)
         lw.to_file('test_file')
+        lw.dev = 'cpu'
         lw.vis = Mock()
         lw.vis.return_value = "Test"
         lw._vis(state)
@@ -114,6 +123,7 @@ class TestReconstructionViewer(unittest.TestCase):
 
         rv = vis.ReconstructionViewer(row_size=row_size)
         rv.data = state[tb.X]
+        rv.dev = 'cpu'
         out = rv.vis(state)
 
         self.assertTrue((out == torch.cat([state[tb.X][:row_size], state[tb.Y_PRED][:row_size]])).all())
@@ -137,6 +147,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[1], lin_steps=3)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = self.codes[0].repeat(3, 1)
@@ -147,6 +158,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[0], lin_steps=3)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = self.codes[0].repeat(3, 1)
@@ -157,6 +169,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[1], lin_steps=3, zero_init=True)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = torch.zeros(self.codes[0].shape).repeat(3, 1)
@@ -167,6 +180,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[0, 1], lin_steps=3)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = torch.cat([self.codes[0].repeat(3, 1), self.codes[1].repeat(3, 1)])
@@ -179,6 +193,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[0, 1], lin_steps=3, same_image=True)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = self.codes[0].repeat(6, 1)
@@ -191,6 +206,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[0, 1], lin_steps=3, zero_init=True)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = torch.cat([torch.zeros(self.codes[0].shape).repeat(3, 1), torch.zeros(self.codes[1].shape).repeat(3, 1)])
@@ -203,6 +219,7 @@ class TestLinspaceWalker(unittest.TestCase):
         lw = vis.LinSpaceWalker(dims_to_walk=[0, 1], lin_steps=3, lin_start=-2, same_image=True)
         lw.data = self.state[tb.X]
         lw.model = self.mock_model
+        lw.dev = 'cpu'
         lw.vis(self.state)
 
         correct_lin_sample = self.codes[0].repeat(6, 1)
@@ -230,6 +247,7 @@ class TestRandomWalker(unittest.TestCase):
         rw = vis.RandomWalker()
         rw.data = self.state[tb.X]
         rw.model = self.mock_model
+        rw.dev = 'cpu'
         rw.vis(self.state)
 
         self.assertTrue(list(self.mock_model.decode.call_args[0][0][0].shape) == [32, 2])
@@ -240,6 +258,7 @@ class TestRandomWalker(unittest.TestCase):
         rw = vis.RandomWalker(num_images=10)
         rw.data = self.state[tb.X]
         rw.model = self.mock_model
+        rw.dev = 'cpu'
         rw.vis(self.state)
 
         self.assertTrue(list(self.mock_model.decode.call_args[0][0][0].shape) == [10, 2])
@@ -257,6 +276,7 @@ class TestRandomWalker(unittest.TestCase):
 
         rw = vis.RandomWalker(num_images=10, uniform=True)
         rw.data = self.state[tb.X]
+        rw.dev = 'cpu'
         rw.model = self.mock_model
         rw.vis(self.state)
         self.assertTrue(mock_rand.call_count == 1)
@@ -284,6 +304,7 @@ class TestCodePathWalker(unittest.TestCase):
         pw = vis.CodePathWalker(5, code1, code2)
         pw.data = self.state[tb.X]
         pw.model = self.mock_model
+        pw.dev = 'cpu'
         pw.vis(self.state)
 
         correct_code = torch.zeros(10, 2)
