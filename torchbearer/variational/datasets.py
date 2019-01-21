@@ -45,17 +45,20 @@ class SimpleImageFolder(Dataset):
     def __getitem__(self, index):
         """
         Args:
-            index (int): Index
+            index (int): Index of image
 
         Returns:
-            tuple: (sample, target) where target is class_index of the target class.
+            tuple: (sample, target) where target is target transformed image.
         """
         path = self.samples[index]
         sample = self.loader(path)
+        input_sample, target_sample = sample, sample
         if self.transform is not None:
-            sample = self.transform(sample)
+            input_sample = self.transform(sample)
+        if self.target_transform is not None:
+            target_sample = self.target_transform(sample)
 
-        return sample, sample
+        return input_sample, target_sample
 
     def __len__(self):
         return len(self.samples)
@@ -144,15 +147,12 @@ class dSprites(Dataset):
             zip_ref.extractall(self.file)
             zip_ref.close()
 
-    def _load_metadata(self):
-        self.metadata = str(np.load(os.path.join(self.file, "metadata.npy"), encoding='latin1'))
-
     def get_img_by_latent(self, latent_code):
         """
         Returns the image defined by the latent code
         
         Args:
-            latent_code (:obj:`list` of :obj:`int`): Latent code of length 3 defining each generative factor
+            latent_code (:obj:`list` of :obj:`int`): Latent code of length 6 defining each generative factor
 
         Returns:
             Image defined by given code
