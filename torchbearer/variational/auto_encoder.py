@@ -1,16 +1,13 @@
-from abc import ABC, abstractmethod
-
 import torch.nn.modules as nn
 
 import torchbearer
 
 
-class AutoEncoderBase(ABC, nn.Module):
+class AutoEncoderBase(nn.Module):
     def __init__(self, latent_dims):
         super().__init__()
         self.latent_dims = latent_dims
 
-    @abstractmethod
     def encode(self, x, state=None):
         """Encode the given batch of images and return latent space sample for each.
 
@@ -18,9 +15,8 @@ class AutoEncoderBase(ABC, nn.Module):
         :param state: The trial state
         :return: Encoded samples / tuple of samples for different spaces
         """
-        return
+        raise NotImplementedError
 
-    @abstractmethod
     def decode(self, sample, state=None):
         """Decode the given latent space sample batch to images.
 
@@ -28,7 +24,7 @@ class AutoEncoderBase(ABC, nn.Module):
         :param state: The trial state
         :return: Decoded images
         """
-        return
+        raise NotImplementedError
 
     def forward(self, x, state=None):
         """Encode then decode the inputs, returning the result. Also binds the target as the input images in state.
