@@ -5,6 +5,13 @@ import torch.nn.modules as nn
 
 from torchbearer import state_key
 
+bibtex = """
+@article{higgins2016beta,
+  title={beta-vae: Learning basic visual concepts with a constrained variational framework},
+  author={Higgins, Irina and Matthey, Loic and Pal, Arka and Burgess, Christopher and Glorot, Xavier and Botvinick, Matthew and Mohamed, Shakir and Lerchner, Alexander},
+  year={2016}
+}
+"""
 
 MU = state_key('mu')
 LOGVAR = state_key('logvar')
