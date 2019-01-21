@@ -114,7 +114,6 @@ class DivergenceBase(callbacks.Callback):
     @cite(beta_vae)
     def with_beta(self, beta):
         """Multiply the divergence by the given beta, as introduced by beta-vae.
-        :bib:
 
         Args:
             beta (float): The beta (> 1) to multiply by.
@@ -130,7 +129,6 @@ class DivergenceBase(callbacks.Callback):
     def with_linear_capacity(self, min_c=0, max_c=25, steps=100000, gamma=1000):
         """Limit divergence by capacity, linearly increased from min_c to max_c for steps, as introduced in
         `Understanding disentangling in beta-VAE`.
-        :bib:
 
         Args:
             min_c (float): Minimum capacity
