@@ -15,6 +15,12 @@ class SimpleAE(ae.AutoEncoderBase):
 
 
 class TestAutoEncoder(unittest.TestCase):
+    def test_empty_methods(self):
+        base = ae.AutoEncoderBase(10)
+
+        self.assertRaises(NotImplementedError, lambda: base.encode(0))
+        self.assertRaises(NotImplementedError, lambda: base.decode(0))
+
     def test_forward_call_counts(self):
         latents = 10
         x = torch.rand(1)
