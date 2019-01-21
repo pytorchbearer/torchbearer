@@ -12,10 +12,9 @@ from torchbearer.trial import fluent
 class LatentWalker(ABC, c.Callback):
     def __init__(self, same_image, row_size):
         """
-        :param same_image: If True, use the same image for all latent dimension walks. Else each dimension has different image
-        :type same_image: bool
-        :param row_size: Number of images displayed in each row of the grid. 
-        :type row_size: int
+        Args:
+            same_image (bool): If True, use the same image for all latent dimension walks. Else each dimension has different image
+            row_size (int): Number of images displayed in each row of the grid.
         """
         super(LatentWalker, self).__init__()
         self.data_key = None
@@ -46,33 +45,37 @@ class LatentWalker(ABC, c.Callback):
     def for_space(self, space_id):
         """
         Sets the ID for which latent space to vary when model outputs [latent_space_0, latent_space_1, ...]
-        :param space_id: ID of the latent space to vary
-        :type space_id: int
-        :return:
+
+        Args:
+            space_id (int): ID of the latent space to vary
         """
         self.variable_space = space_id
 
     @fluent
-    def data(self, data_key):
+    def for_data(self, data_key):
         """
-        :param data_key: State key which will contain data to act on
-        :type data_key: tb.StateKey
+        Args:
+            data_key (:class:`.StateKey`): State key which will contain data to act on
         """
         self.data_key = data_key
 
     @fluent
     def to_key(self, state_key):
         """
-        :param state_key: State key under which to store result
-        :type state_key: tb.StateKey
+
+        Args:
+            state_key (:class:`.StateKey`): State key under which to store result
+
+        Returns:
+
         """
         self.store_key = state_key
 
     @fluent
     def to_file(self, file):
         """
-        :param file: File to save result to
-        :type file: A filename (string), pathlib.Path object or file object
+        Args:
+            file (string, pathlib.Path object or file object): File in which result is saved
         """
         self.file = file
 
@@ -104,10 +107,10 @@ class ReconstructionViewer(LatentWalker):
     def __init__(self, row_size=8, recon_key=tb.Y_PRED):
         """
         Latent space walker that just returns the reconstructed images for the batch
-        :param row_size: Number of images displayed in each row of the grid. 
-        :type row_size: int
-        :param recon_key: State key of the reconstructed images
-        :type recon_key: Statekey
+
+        Args:
+            row_size (int): Number of images displayed in each row of the grid.
+            recon_key (:class:`.StateKey`): State key of the reconstructed images
         """
         super(ReconstructionViewer, self).__init__(False, row_size)
         self.recon_key = recon_key
@@ -119,67 +122,67 @@ class ReconstructionViewer(LatentWalker):
 
 
 class LinSpaceWalker(LatentWalker):
-    def __init__(self, lin_start=-1, lin_end=1, lin_steps=8, num_dims=10, zero_init=False, same_image=True):
+    def __init__(self, lin_start=-1, lin_end=1, lin_steps=8, dims_to_walk=[0], zero_init=False, same_image=False):
         """
         Latent space walker that explores each dimension linearly from start to end points
-        :param lin_start: Starting point of linspace
-        :type lin_start: float
-        :param lin_end: End point of linspace
-        :type lin_end: float
-        :param lin_steps: Number of steps to take in linspace
-        :type lin_steps: int
-        :param num_dims: Number of dimensions to walk
-        :type num_dims: int
-        :param zero_init: If True, dimensions not being walked are 0. Else, they are obtained from encoder
-        :type zero_init: bool
-        :param same_image: If True, use same image for each dimension walked. Else, use different images
-        :type same_image: bool
+
+        Args:
+            lin_start (float): Starting point of linspace
+            lin_end (float): End point of linspace
+            lin_steps (int): Number of steps to take in linspace
+            dims_to_walk (:obj:list of int): List of dimensions to walk
+            zero_init (bool): If True, dimensions not being walked are 0. Else, they are obtained from encoder
+            same_image (bool): If True, use same image for each dimension walked. Else, use different images
         """
         super(LinSpaceWalker, self).__init__(same_image, lin_steps)
-        self.num_dims = num_dims
+        self.dims_to_walk = dims_to_walk
         self.zero_init = zero_init
         self.linspace = torch.linspace(lin_start, lin_end, lin_steps)
 
     def vis(self, state):
         self.linspace = self.linspace.to(self.dev)
-        num_images = self.row_size * self.num_dims
+        num_images = self.row_size * len(self.dims_to_walk)
         num_spaces = len(self.model.latent_dims)
 
         if self.zero_init:
             sample = []
             for i in range(num_spaces):
                 sample.append(torch.zeros(num_images, self.model.latent_dims[i], device=self.dev).unsqueeze(1).repeat(1, self.row_size, 1))
+        elif self.same_image:
+            sample = list(self.model.encode(self.data[0], state))
+            for i in range(len(sample)):
+                sample[i] = sample[i][0].unsqueeze(0).unsqueeze(1).repeat(sample[i].shape[0], self.row_size, 1)
         else:
             sample = list(self.model.encode(self.data, state))
             for i in range(len(sample)):
                 sample[i] = sample[i].unsqueeze(1).repeat(1, self.row_size, 1)
 
-        dims = np.random.permutation(sample[self.variable_space].shape[-1])[:self.num_dims]
+        dims = self.dims_to_walk
 
+        i = 0
         for dim in list(dims):
-            sample[self.variable_space][dim, :, dim] = self.linspace
+            sample[self.variable_space][i, :, dim] = self.linspace
+            i += 1
 
         for i in range(num_spaces):
             sample[i] = sample[i].view(-1, self.model.latent_dims[i])[:num_images]
 
-        result = self.model.decode(sample).view(sample[self.variable_space].shape[0], -1, self.data.shape[-2], self.data.shape[-1])
+        result = self.model.decode(sample).view(num_images, -1, self.data.shape[-2], self.data.shape[-1])
         return result
 
 
 class RandomWalker(LatentWalker):
-    def __init__(self, var=1, num_images=32, uniform=False, same_image=True, row_size=8):
+    def __init__(self, var=1, num_images=32, uniform=False, row_size=8):
         """
         Latent space walker that shows random samples from latent space
 
-        :param var: Variance of random sample
-        :param num_images: Number of random images to sample
-        :param uniform: If True, sample uniform distribution [-v, v). If False, sample normal distribution with var v
-        :param same_image: If True, use same image for each dimension walked. Else, use different images
-        :type same_image: bool        
-        :param row_size: Number of images displayed in each row of the grid. 
-        :type row_size: int
+        Args:
+            var (float or :class:`torch.Tensor`): Variance of random sample
+            num_images (int): Number of random images to sample
+            uniform (bool): If True, sample uniform distribution [-v, v). If False, sample normal distribution with var v
+            row_size (int): Number of images displayed in each row of the grid.
         """
-        super(RandomWalker, self).__init__(same_image, row_size)
+        super(RandomWalker, self).__init__(False, row_size)
         self.num_images = num_images
         self.uniform = uniform
         self.var = var
@@ -204,9 +207,11 @@ class CodePathWalker(LatentWalker):
     def __init__(self, num_steps, p1, p2):
         """
         Latent space walker that walks between two specified codes p1 and p2
-        :param num_steps: Number of steps to take between points
-        :param p1: Batch of codes
-        :param p2: Batch of codes
+
+        Args:
+            num_steps (int): Number of steps to take between points
+            p1 (:class:`torch.Tensor`): Batch of codes
+            p2 (:class:`torch.Tensor`): Batch of codes
         """
         super().__init__(True, num_steps)
         self.p1 = p1
@@ -219,27 +224,26 @@ class CodePathWalker(LatentWalker):
         codes = torch.zeros(self.p1.shape[0], self.num_steps, self.p1.shape[1]).to(self.dev)
         for i in range(self.num_steps):
             codes[:, i] = self.p1 - step_sizes*i
+        codes = codes.view(-1, self.p1.shape[1])
 
-        result = self.model.decode(codes).view(codes.shape[0]*self.num_steps, -1, self.data.shape[-2], self.data.shape[-1])
+        result = self.model.decode(codes).view(codes.shape[0], -1, self.data.shape[-2], self.data.shape[-1])
         return result
 
 
 class ImagePathWalker(CodePathWalker):
-    """
-    Latent space walker that walks between two specified images im1 and im2
-    :param num_steps: Number of steps to take between points
-    :param im1: Batch of images
-    :param im2: Batch of images
-    """
     def __init__(self, num_steps, im1, im2):
+        """
+        Latent space walker that walks between two specified images im1 and im2
+
+        Args:
+            num_steps (int): Number of steps to take between points
+            im1 (:class:`torch.Tensor`): Batch of images
+            im2 (:class:`torch.Tensor`): Batch of images
+        """
         super().__init__(num_steps, None, None)
         self.im1, self.im2 = im1, im2
 
     def vis(self, state):
-        if len(self.im1.shape) == 1:
-            self.im1.unsqueeze(0)
-            self.im2.unsqueeze(0)
-
         self.p1 = self.model.encode(self.im1.to(self.dev), state)
         self.p2 = self.model.encode(self.im2.to(self.dev), state)
 
