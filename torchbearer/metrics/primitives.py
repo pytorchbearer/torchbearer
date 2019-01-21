@@ -20,12 +20,10 @@ class BinaryAccuracy(metrics.Metric):
     """Binary accuracy metric. Uses torch.eq to compare predictions to targets. Decorated with a mean and running_mean.
     Default for key: 'binary_acc'.
 
-    :param pred_key: The key in state which holds the predicted values
-    :type pred_key: torchbearer.StateKey
-    :param target_key: The key in state which holds the target values
-    :type target_key: torchbearer.StateKey
-    :param threshold: value between 0 and 1 to use as a threshold when binarizing predictions and targets
-    :type threshold: float
+    Args:
+        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
+        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        threshold (float): value between 0 and 1 to use as a threshold when binarizing predictions and targets
     """
 
     def __init__(self, pred_key=torchbearer.Y_PRED, target_key=torchbearer.Y_TRUE, threshold=0.5):
@@ -51,12 +49,11 @@ class CategoricalAccuracy(metrics.Metric):
     """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets. Decorated with a
     mean, running_mean and std. Default for key: 'cat_acc'
 
-    :param pred_key: The key in state which holds the predicted values
-    :type pred_key: torchbearer.StateKey
-    :param target_key: The key in state which holds the target values
-    :type target_key: torchbearer.StateKey
-    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
-    :type ignore_index: int
+    Args:
+        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
+        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        ignore_index (int): Specifies a target value that is ignored and does not contribute to the metric output.
+            See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     """
 
     def __init__(self, pred_key=torchbearer.Y_PRED, target_key=torchbearer.Y_TRUE, ignore_index=-100):
@@ -86,12 +83,11 @@ class TopKCategoricalAccuracy(metrics.Metric):
     """Top K Categorical accuracy metric. Uses torch.topk to determine the top k predictions and compares to targets.
     Decorated with a mean, running_mean and std. Default for keys: 'top_5_acc', 'top_10_acc'.
 
-    :param pred_key: The key in state which holds the predicted values
-    :type pred_key: torchbearer.StateKey
-    :param target_key: The key in state which holds the target values
-    :type target_key: torchbearer.StateKey
-    :param ignore_index: Specifies a target value that is ignored and does not contribute to the metric output. See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
-    :type ignore_index: int
+    Args:
+        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
+        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        ignore_index (int): Specifies a target value that is ignored and does not contribute to the metric output.
+            See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     """
 
     def __init__(self, pred_key=torchbearer.Y_PRED, target_key=torchbearer.Y_TRUE, k=5, ignore_index=-100):
@@ -122,10 +118,9 @@ class MeanSquaredError(metrics.Metric):
     """Mean squared error metric. Computes the pixelwise squared error which is then averaged with decorators.
     Decorated with a mean and running_mean. Default for key: 'mse'.
 
-    :param pred_key: The key in state which holds the predicted values
-    :type pred_key: torchbearer.StateKey
-    :param target_key: The key in state which holds the target values
-    :type target_key: torchbearer.StateKey
+    Args:
+        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
+        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
     """
 
     def __init__(self, pred_key=torchbearer.Y_PRED, target_key=torchbearer.Y_TRUE):
@@ -147,6 +142,9 @@ class MeanSquaredError(metrics.Metric):
 class Loss(metrics.Metric):
     """Simply returns the 'loss' value from the model state. Decorated with a mean, running_mean and std. Default for
     key: 'loss'.
+
+    State Requirements:
+        - :attr:`torchbearer.state.LOSS`: This key should map to the loss for the current batch
     """
 
     def __init__(self):
@@ -161,6 +159,9 @@ class Loss(metrics.Metric):
 @metrics.to_dict
 class Epoch(metrics.Metric):
     """Returns the 'epoch' from the model state. Default for key: 'epoch'.
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: This key should map to the number of the current epoch
     """
 
     def __init__(self):

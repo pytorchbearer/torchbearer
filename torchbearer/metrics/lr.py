@@ -21,6 +21,9 @@ def _get_lr(optimizer):
 class LR(metrics.AdvancedMetric):
     """Returns the learning rate/s from the optimizer group/s. Use this to log the current LR when using decay.
     Default for key 'lr'
+
+    State Requirements:
+        - :attr:`torchbearer.state.OPTIMIZER`: The optimizer in state will be used to retrieve the learning rate.
     """
 
     def __init__(self):

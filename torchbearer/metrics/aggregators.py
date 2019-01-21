@@ -18,12 +18,10 @@ class RunningMetric(metrics.AdvancedMetric):
 
        Running metrics only provide output during training.
 
-    :param name: The name of the metric.
-    :type name: str
-    :param batch_size: The size of the deque to store of previous results.
-    :type batch_size: int
-    :param step_size: The number of iterations between aggregations.
-    :type step_size: int
+    Args:
+        name (str): The name of the metric.
+        batch_size (int): The size of the deque to store of previous results.
+        step_size (int): The number of iterations between aggregations.
     """
     __metaclass__ = ABCMeta
 
@@ -38,9 +36,11 @@ class RunningMetric(metrics.AdvancedMetric):
     def _process_train(self, *args):
         """Process the metric for a single train step.
 
-        :param args: The output of some :class:`.Metric`
-        :return: The metric value.
+        Args:
+            args: The output of some :class:`.Metric`
 
+        Returns:
+            The metric value.
         """
         pass
 
@@ -48,19 +48,22 @@ class RunningMetric(metrics.AdvancedMetric):
     def _step(self, cache):
         """Aggregate the cache to produce a single metric value.
 
-        :param cache: The current stored metric cache.
-        :type cache: list
-        :return: The new metric value.
+        Args:
+            cache (list): The current stored metric cache.
 
+        Returns:
+            The new metric value.
         """
         pass
 
     def process_train(self, *args):
         """Add the current metric value to the cache and call '_step' is needed.
 
-        :param args: The output of some :class:`.Metric`
-        :return: The current metric value.
+        Args:
+            args: The output of some :class:`.Metric`
 
+        Returns:
+            The current metric value.
         """
         self._cache.append(self._process_train(*args))
         if len(self._cache) > self._batch_size:
@@ -73,9 +76,8 @@ class RunningMetric(metrics.AdvancedMetric):
     def reset(self, state):
         """Reset the step counter. Does not clear the cache.
 
-        :param state: The current model state.
-        :type state: dict
-
+        Args:
+            state (dict): The current model state.
         """
         self._i = 0
 
@@ -83,12 +85,10 @@ class RunningMetric(metrics.AdvancedMetric):
 class RunningMean(RunningMetric):
     """A :class:`RunningMetric` which outputs the running mean of its input tensors over the course of an epoch.
 
-    :param name: The name of this running mean.
-    :type name: str
-    :param batch_size: The size of the deque to store of previous results.
-    :type batch_size: int
-    :param step_size: The number of iterations between aggregations.
-    :type step_size: int
+    Args:
+        name (str): The name of this running mean.
+        batch_size (int): The size of the deque to store of previous results.
+        step_size (int): The number of iterations between aggregations.
     """
 
     def __init__(self, name, batch_size=50, step_size=10):
@@ -105,8 +105,8 @@ class RunningMean(RunningMetric):
 class Std(metrics.Metric):
     """Metric aggregator which calculates the standard deviation of process outputs between calls to reset.
 
-    :param name: The name of this metric.
-    :type name: str
+    Args:
+        name (str): The name of this metric.
     """
 
     def __init__(self, name):
@@ -116,9 +116,8 @@ class Std(metrics.Metric):
         """Compute values required for the std from the input. The input should be a torch Tensor. The sum and sum of
         squares will be computed for all elements in the input.
 
-        :param args:  The output of some previous call to :meth:`.Metric.process`.
-        :type args: torch.Tensor
-
+        Args:
+            args (`torch.Tensor`):  The output of some previous call to :meth:`.Metric.process`.
         """
         data = args[0]
         self._sum += data.sum().item()
@@ -128,8 +127,8 @@ class Std(metrics.Metric):
     def process_final(self, *args):
         """Compute and return the final standard deviation.
 
-        :return: The standard deviation of each observation since the last reset call.
-
+        Returns:
+            The standard deviation of each observation since the last reset call.
         """
         mean = self._sum / self._count
         mean = mean ** 2
@@ -142,9 +141,8 @@ class Std(metrics.Metric):
     def reset(self, state):
         """Reset the statistics to compute the next deviation.
 
-        :param state: The model state.
-        :type state: dict
-
+        Args:
+            state (dict): The model state.
         """
         super().reset(state)
         self._sum = 0.0
@@ -155,8 +153,8 @@ class Std(metrics.Metric):
 class Mean(metrics.Metric):
     """Metric aggregator which calculates the mean of process outputs between calls to reset.
 
-    :param name: The name of this metric.
-    :type name: str
+    Args:
+        name (str): The name of this metric.
     """
 
     def __init__(self, name):
@@ -165,9 +163,8 @@ class Mean(metrics.Metric):
     def process(self, *args):
         """Add the input to the rolling sum. Input must be a torch tensor.
 
-        :param args:  The output of some previous call to :meth:`.Metric.process`.
-        :type args: torch.Tensor
-
+        Args:
+            args:  The output of some previous call to :meth:`.Metric.process`.
         """
         data = args[0]
         self._sum += data.sum().item()
@@ -176,17 +173,16 @@ class Mean(metrics.Metric):
     def process_final(self, *args):
         """Compute and return the mean of all metric values since the last call to reset.
 
-        :return: The mean of the metric values since the last call to reset.
-
+        Returns:
+            The mean of the metric values since the last call to reset.
         """
         return self._sum / self._count
 
     def reset(self, state):
         """Reset the running count and total.
 
-        :param state: The model state.
-        :type state: dict
-
+        Args:
+            state (dict): The model state.
         """
         super().reset(state)
         self._sum = 0.0
