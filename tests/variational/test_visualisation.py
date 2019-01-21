@@ -266,9 +266,13 @@ class TestRandomWalker(unittest.TestCase):
     @patch('torch.randn')
     @patch('torch.rand')
     def test_uniform(self, mock_rand, mock_randn):
+        mock_rand.return_value = torch.ones(2,2)
+        mock_randn.return_value = torch.zeros(2,2)
+
         rw = vis.RandomWalker(num_images=10)
         rw.data = self.state[tb.X]
         rw.model = self.mock_model
+        rw.dev = 'cpu'
         rw.vis(self.state)
 
         self.assertTrue(mock_rand.call_count == 0)
