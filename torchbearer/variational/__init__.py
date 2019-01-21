@@ -52,6 +52,3 @@ from .distributions import *
 from .divergence import *
 from .datasets import *
 from .visualisation import *
-from .beta_vae import *
-from .info_vae import *
-from .isolating_sources import *

@@ -4,8 +4,13 @@ import torchbearer
 from torchbearer import cite
 import torchbearer.callbacks as callbacks
 
-from .beta_vae import bibtex as beta_vae
-
+beta_vae = """
+@article{higgins2016beta,
+  title={beta-vae: Learning basic visual concepts with a constrained variational framework},
+  author={Higgins, Irina and Matthey, Loic and Pal, Arka and Burgess, Christopher and Glorot, Xavier and Botvinick, Matthew and Mohamed, Shakir and Lerchner, Alexander},
+  year={2016}
+}
+"""
 
 understanding_beta_vae = """
 @article{burgess2018understanding,
