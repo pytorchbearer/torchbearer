@@ -141,11 +141,11 @@ class DivergenceBase(callbacks.Callback):
         old_callback = self.on_step_training
 
         @functools.wraps(old_callback)
-        def step_c(self, state):
+        def step_c(state):
             nonlocal c
             if c < max_c:
                 c += inc
-            return old_callback(self, state)
+            return old_callback(state)
         self.on_step_training = step_c
 
         def limit_div(loss):
@@ -153,7 +153,7 @@ class DivergenceBase(callbacks.Callback):
         return self.with_post_function(limit_div)
 
 
-class SimpleNormalUnitNormalKLDivergence(DivergenceBase):
+class SimpleNormalUnitNormalKL(DivergenceBase):
     """A KL divergence between a SimpleNormal (or similar) instance and a fixed unit normal (N[0, 1]) target.
 
     .. note::
@@ -161,18 +161,18 @@ class SimpleNormalUnitNormalKLDivergence(DivergenceBase):
        The distribution object must have mu and logvar attributes
 
     Args:
-        distribution_key: :class:`.StateKey` instance which will be mapped to the distribution object.
+        input_key: :class:`.StateKey` instance which will be mapped to the distribution object.
         state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
     """
-    def __init__(self, distribution_key, state_key=None):
-        super().__init__({'distribution': distribution_key}, state_key=state_key)
+    def __init__(self, input_key, state_key=None):
+        super().__init__({'input': input_key}, state_key=state_key)
 
-    def compute(self, distribution):
-        mu, logvar = distribution.mu, distribution.logvar
-        return -0.5 * (1 + logvar - mu.pow(2) - logvar.exp())
+    def compute(self, input):
+        mu, logvar = input.mu, input.logvar
+        return 0.5 * (mu.pow(2) + logvar.exp() - logvar - 1)
 
 
-class SimpleNormalSimpleNormalKLDivergence(DivergenceBase):
+class SimpleNormalSimpleNormalKL(DivergenceBase):
     """A KL divergence between two SimpleNormal (or similar) distributions.
 
     .. note::
@@ -180,14 +180,14 @@ class SimpleNormalSimpleNormalKLDivergence(DivergenceBase):
        The distribution objects must have mu and logvar attributes
 
     Args:
-        distribution_key_1: :class:`.StateKey` instance which will be mapped to the first distribution object.
-        distribution_key_2: :class:`.StateKey` instance which will be mapped to the second distribution object.
+        input_key: :class:`.StateKey` instance which will be mapped to the input distribution object.
+        target_key: :class:`.StateKey` instance which will be mapped to the target distribution object.
         state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
     """
-    def __init__(self, distribution_key_1, distribution_key_2, state_key=None):
-        super().__init__({'distribution_1': distribution_key_1, 'distribution_2': distribution_key_2}, state_key=state_key)
+    def __init__(self, input_key, target_key, state_key=None):
+        super().__init__({'input': input_key, 'target': target_key}, state_key=state_key)
 
-    def compute(self, distribution_1, distribution_2):
-        mu_1, logvar_1 = distribution_1.mu, distribution_1.logvar
-        mu_2, logvar_2 = distribution_2.mu, distribution_2.logvar
-        return -0.5 * (logvar_1.exp() / logvar_2.exp() + (mu_2 - mu_1).pow(2) / logvar_2.exp() + logvar_2 - logvar_1 - 1)
+    def compute(self, input, target):
+        mu_1, logvar_1 = input.mu, input.logvar
+        mu_2, logvar_2 = target.mu, target.logvar
+        return 0.5 * (logvar_1.exp() / logvar_2.exp() + (mu_2 - mu_1).pow(2) / logvar_2.exp() + logvar_2 - logvar_1 - 1)
