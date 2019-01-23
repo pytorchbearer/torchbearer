@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
 - Added SimpleUniform and SimpleExponential distributions
 - Added a decorator which can be used to cite a research article as part of a doc string
+- Added an optional dimension argument to the mean metric aggregator
 ### Changed
 ### Deprecated
 ### Removed

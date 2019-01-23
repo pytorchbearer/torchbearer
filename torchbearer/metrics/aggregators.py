@@ -4,11 +4,11 @@ As a result, via a :class:`.MetricTree`, a series of aggregators can collect sta
 Deviation without needing to compute the underlying metric multiple times. This can, however, make the aggregators
 complex to use. It is therefore typically better to use the :mod:`decorator API<.metrics.decorators>`.
 """
-from torchbearer import metrics
-from abc import ABCMeta, abstractmethod
 from collections import deque
 
 import torch
+
+from torchbearer import metrics
 
 
 class RunningMetric(metrics.AdvancedMetric):
@@ -23,8 +23,6 @@ class RunningMetric(metrics.AdvancedMetric):
         batch_size (int): The size of the deque to store of previous results.
         step_size (int): The number of iterations between aggregations.
     """
-    __metaclass__ = ABCMeta
-
     def __init__(self, name, batch_size=50, step_size=10):
         super().__init__(name)
         self._batch_size = batch_size
@@ -32,7 +30,6 @@ class RunningMetric(metrics.AdvancedMetric):
         self._cache = deque()
         self._result = {}
 
-    @abstractmethod
     def _process_train(self, *args):
         """Process the metric for a single train step.
 
@@ -42,9 +39,8 @@ class RunningMetric(metrics.AdvancedMetric):
         Returns:
             The metric value.
         """
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _step(self, cache):
         """Aggregate the cache to produce a single metric value.
 
@@ -54,7 +50,7 @@ class RunningMetric(metrics.AdvancedMetric):
         Returns:
             The new metric value.
         """
-        pass
+        raise NotImplementedError
 
     def process_train(self, *args):
         """Add the current metric value to the cache and call '_step' is needed.
@@ -89,14 +85,18 @@ class RunningMean(RunningMetric):
         name (str): The name of this running mean.
         batch_size (int): The size of the deque to store of previous results.
         step_size (int): The number of iterations between aggregations.
+        dim (int, tuple): The dimension(s) on which to perform the mean. If left as None, this will mean over the whole
+            Tensor
     """
 
-    def __init__(self, name, batch_size=50, step_size=10):
+    def __init__(self, name, batch_size=50, step_size=10, dim=None):
         super().__init__(name, batch_size=batch_size, step_size=step_size)
+        self._kwargs = {'dim': dim} if dim is not None else {}
 
     def _process_train(self, *args):
         data = args[0]
-        return data.mean().item()
+        res = data.mean(**self._kwargs)
+        return res
 
     def _step(self, cache):
         return sum(cache) / float(len(cache))

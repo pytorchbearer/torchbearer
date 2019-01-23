@@ -137,8 +137,8 @@ class TestRunningMetric(unittest.TestCase):
 
     def test_empty_methods(self):
         metric = RunningMetric('test')
-        self.assertTrue(metric._step(['test']) is None)
-        self.assertTrue(metric._process_train(['test']) is None)
+        self.assertRaises(NotImplementedError, lambda: metric._step(['test']) is None)
+        self.assertRaises(NotImplementedError, lambda: metric._process_train(['test']) is None)
 
 
 class TestRunningMean(unittest.TestCase):
@@ -155,3 +155,11 @@ class TestRunningMean(unittest.TestCase):
     def test_step(self):
         result = self._mean._step(self._cache)
         self.assertEqual(self._target, result)
+
+    def test_dims(self):
+        mean = RunningMean('test', dim=0)
+        cache = [mean._process_train(torch.Tensor([[1., 2.], [3., 4.]])),
+                 mean._process_train(torch.Tensor([[4., 3.], [2., 1.]])),
+                 mean._process_train(torch.Tensor([[1., 1.], [1., 1.]]))]
+
+        self.assertTrue(((mean._step(cache) - 2.0).abs() < 0.0001).all())
