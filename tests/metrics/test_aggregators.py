@@ -145,7 +145,7 @@ class TestRunningMean(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
         self._mean = RunningMean('test')
-        self._cache = [1.0, 1.5, 2.0]
+        self._cache = [torch.Tensor([1.0]), torch.Tensor([1.5]), torch.Tensor([2.0])]
         self._target = 1.5
 
     def test_train(self):
@@ -162,4 +162,7 @@ class TestRunningMean(unittest.TestCase):
                  mean._process_train(torch.Tensor([[4., 3.], [2., 1.]])),
                  mean._process_train(torch.Tensor([[1., 1.], [1., 1.]]))]
 
-        self.assertTrue(((mean._step(cache) - 2.0).abs() < 0.0001).all())
+        res = mean._step(cache)
+        self.assertTrue(len(res) == 2)
+        for m in res:
+            self.assertTrue(abs(m - 2.0) < 0.0001)

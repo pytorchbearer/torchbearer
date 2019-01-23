@@ -99,7 +99,8 @@ class RunningMean(RunningMetric):
         return res
 
     def _step(self, cache):
-        return sum(cache) / float(len(cache))
+        res = sum(cache) / float(len(cache))
+        return res.item() if res.numel() <= 1 else res.tolist()
 
 
 class Std(metrics.Metric):
@@ -157,8 +158,9 @@ class Mean(metrics.Metric):
         name (str): The name of this metric.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, dim=None):
         super(Mean, self).__init__(name)
+        self._kwargs = {'dim': dim} if dim is not None else {}
 
     def process(self, *args):
         """Add the input to the rolling sum. Input must be a torch tensor.
@@ -167,7 +169,7 @@ class Mean(metrics.Metric):
             args:  The output of some previous call to :meth:`.Metric.process`.
         """
         data = args[0]
-        self._sum += data.sum().item()
+        self._sum += data.sum(**self._kwargs)
         self._count += float(torch.numel(data))
 
     def process_final(self, *args):
