@@ -116,6 +116,17 @@ class TestMean(unittest.TestCase):
         result = self._mean.process_final({})
         self.assertAlmostEqual(self._target, result, places=5)
 
+    def test_mean_dim(self):
+        mean = Mean('test', dim=0)
+        mean.process(torch.Tensor([[1., 2.], [3., 4.]]))
+        mean.process(torch.Tensor([[4., 3.], [2., 1.]]))
+        mean.process(torch.Tensor([[1., 1.], [1., 1.]]))
+
+        res = mean.process_final()
+        self.assertTrue(len(res) == 2)
+        for m in res:
+            self.assertTrue(abs(m - 2.0) < 0.0001)
+
 
 class TestRunningMetric(unittest.TestCase):
     def setUp(self):

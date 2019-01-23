@@ -121,7 +121,7 @@ def _wrap_and_add_to_tree(clazz, child_func):
         return inner
 
 
-def mean(clazz):
+def mean(clazz=None, dim=None):
     """The :func:`mean` decorator is used to add a :class:`.Mean` to the :class:`.MetricTree` which will will output a
     mean value at the end of each epoch. At build time, if the inner class is not a :class:`.MetricTree`, one will be
     created. The :class:`.Mean` will also be wrapped in a :class:`.ToDict` for simplicity.
@@ -148,11 +148,17 @@ def mean(clazz):
 
     Args:
         clazz: The class to *decorate*
+        dim (int, tuple): See :class:`.Mean`
 
     Returns:
         A :class:`.MetricTree` with a :class:`.Mean` appended or a wrapper class that extends :class:`.MetricTree`
     """
-    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Mean(metric.name)))
+    if clazz is None:
+        def decorator(clazz):
+            return mean(clazz, dim=dim)
+        return decorator
+
+    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Mean(metric.name, dim=dim)))
 
 
 def std(clazz):

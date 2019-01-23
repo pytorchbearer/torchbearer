@@ -156,11 +156,15 @@ class Mean(metrics.Metric):
 
     Args:
         name (str): The name of this metric.
+        dim (int, tuple): The dimension(s) on which to perform the mean. If left as None, this will mean over the whole
+            Tensor
     """
 
     def __init__(self, name, dim=None):
         super(Mean, self).__init__(name)
         self._kwargs = {'dim': dim} if dim is not None else {}
+        self._sum = 0.0
+        self._count = 0
 
     def process(self, *args):
         """Add the input to the rolling sum. Input must be a torch tensor.
@@ -169,8 +173,9 @@ class Mean(metrics.Metric):
             args:  The output of some previous call to :meth:`.Metric.process`.
         """
         data = args[0]
-        self._sum += data.sum(**self._kwargs)
-        self._count += float(torch.numel(data))
+        tot = data.sum(**self._kwargs)
+        self._sum += tot
+        self._count += data.numel() / tot.numel()
 
     def process_final(self, *args):
         """Compute and return the mean of all metric values since the last call to reset.
@@ -178,7 +183,8 @@ class Mean(metrics.Metric):
         Returns:
             The mean of the metric values since the last call to reset.
         """
-        return self._sum / self._count
+        res = self._sum / self._count
+        return res.item() if res.numel() <= 1 else res.tolist()
 
     def reset(self, state):
         """Reset the running count and total.
