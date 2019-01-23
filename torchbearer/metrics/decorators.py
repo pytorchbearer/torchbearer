@@ -190,7 +190,7 @@ def std(clazz):
     return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Std(metric.name + '_std')))
 
 
-def running_mean(clazz=None, batch_size=50, step_size=10):
+def running_mean(clazz=None, batch_size=50, step_size=10, dim=None):
     """The :func:`running_mean` decorator is used to add a :class:`.RunningMean` to the :class:`.MetricTree`. If the
     inner class is not a :class:`.MetricTree` then one will be created. The :class:`.RunningMean` will be wrapped in a
     :class:`.ToDict` (with 'running\_' prepended to the name) for simplicity.
@@ -221,13 +221,14 @@ def running_mean(clazz=None, batch_size=50, step_size=10):
         clazz: The class to *decorate*
         batch_size (int): See :class:`.RunningMean`
         step_size (int): See :class:`.RunningMean`
+        dim (int, tuple): See :class:`.RunningMean`
 
     Returns:
         decorator or :class:`.MetricTree` instance or wrapper
     """
     if clazz is None:
         def decorator(clazz):
-            return running_mean(clazz, batch_size=batch_size, step_size=step_size)
+            return running_mean(clazz, batch_size=batch_size, step_size=step_size, dim=dim)
         return decorator
 
-    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(RunningMean('running_' + metric.name, batch_size=batch_size, step_size=step_size)))
+    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(RunningMean('running_' + metric.name, batch_size=batch_size, step_size=step_size, dim=dim)))

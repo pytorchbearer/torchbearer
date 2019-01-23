@@ -103,11 +103,12 @@ class TestDecorators(unittest.TestCase):
 
     def test_running_mean_metric_instance(self):
         metric = metrics.Metric('test')
-        out = metrics.running_mean(batch_size=40, step_size=20)(metric)
+        out = metrics.running_mean(batch_size=40, step_size=20, dim=10)(metric)
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.RunningMean))
         self.assertTrue(out.children[0].metric._batch_size == 40)
         self.assertTrue(out.children[0].metric._step_size == 20)
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
         self.assertTrue(out.children[0].metric.name == 'running_test')
         self.assertTrue(out.root.name == 'test')
