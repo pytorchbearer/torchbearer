@@ -198,7 +198,7 @@ class SimpleExponential(SimpleDistribution):
         """
         return self.lograte - self.lograte.exp() * value
 
-@cite{steve}
+@cite(steve)
 class SimpleWeibull(SimpleDistribution):
     """The SimpleWeibull class is a :class:`SimpleDistribution` which implements a straight forward Weibull
     distribution. This performs significantly fewer checks than `torch.distributions.Weibull`, but should be sufficient
