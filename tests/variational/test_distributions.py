@@ -4,8 +4,7 @@ from unittest.mock import patch, Mock
 
 import torch
 
-from torchbearer.variational import SimpleDistribution, SimpleNormal, SimpleUniform, SimpleExponential
-
+from torchbearer.variational import SimpleDistribution, SimpleNormal, SimpleUniform, SimpleExponential, SimpleWeibull
 
 class TestEmptyMethods(unittest.TestCase):
     def test_methods(self):
@@ -24,7 +23,6 @@ class TestEmptyMethods(unittest.TestCase):
 
         self.assertRaises(NotImplementedError, lambda: dist.rsample())
         self.assertRaises(NotImplementedError, lambda: dist.log_prob(1))
-
 
 class TestSimpleNormal(unittest.TestCase):
     @patch('torchbearer.variational.distributions.torch.normal')
@@ -140,3 +138,37 @@ class TestSimpleExponential(unittest.TestCase):
         dist = SimpleExponential(math.log(0.5))
 
         self.assertTrue(((dist.log_prob(torch.ones(2, 2)) + 1.1931).abs() < 0.0001).all())
+
+class TestSimpleWeibull(unittest.TestCase):
+    @patch('torchbearer.variational.distributions.torch.rand')
+    def test_rsample_tensor(self, rand):
+        l = torch.ones(2, 2)
+        k = torch.ones(2, 2)
+
+        dist = SimpleWeibull(l, k)
+
+        rand.side_effect = lambda shape, dtype, device: torch.ones(shape) / 2
+        self.assertTrue(((dist.rsample(sample_shape=torch.Size([2])) - 0.6931).abs() < 0.0001).all())
+
+    @patch('torchbearer.variational.distributions.torch.rand')
+    def test_rsample_number(self, rand):
+        dist = SimpleWeibull(1, 1)
+
+        rand.side_effect = lambda shape, dtype, device: torch.ones(shape) / 2
+        self.assertTrue(((dist.rsample(sample_shape=torch.Size([2])) - 0.6931).abs() < 0.0001).all())
+
+    def test_log_prob_tensor(self):
+        l = torch.ones(2, 2)
+        k = torch.ones(2, 2)
+
+        dist = SimpleWeibull(l, k)
+        self.assertTrue((dist.log_prob(torch.ones(2, 2)) < 0.0001).all())
+        self.assertTrue((dist.log_prob(torch.ones(2, 2) - 2) == float('-inf')).all())
+
+    def test_log_prob_number(self):
+        dist = SimpleWeibull(1, 1)
+
+        self.assertTrue((dist.log_prob(1) < 0.0001).all())
+        self.assertTrue((dist.log_prob(-1) == float('-inf')).all())
+
+
