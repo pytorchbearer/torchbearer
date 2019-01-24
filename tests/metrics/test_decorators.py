@@ -56,58 +56,88 @@ class TestDecorators(unittest.TestCase):
 
     def test_mean_metric_class(self):
         metric = metrics.Metric
-        out = metrics.mean(metric)('test')
+        out = metrics.mean(dim=10)(metric)('test')
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.Mean))
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
         self.assertTrue(out.children[0].metric.name == 'test')
         self.assertTrue(out.root.name == 'test')
 
     def test_mean_metric_instance(self):
         metric = metrics.Metric('test')
-        out = metrics.mean(metric)
+        out = metrics.mean(metric, dim=10)
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.Mean))
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
         self.assertTrue(out.children[0].metric.name == 'test')
         self.assertTrue(out.root.name == 'test')
 
     def test_std_metric_class(self):
         metric = metrics.Metric
-        out = metrics.std(metric)('test')
+        out = metrics.std(dim=10, unbiased=False)(metric)('test')
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.Std))
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
+        self.assertTrue(not out.children[0].metric._unbiased)
         self.assertTrue(out.children[0].metric.name == 'test_std')
         self.assertTrue(out.root.name == 'test')
 
     def test_std_metric_instance(self):
         metric = metrics.Metric('test')
-        out = metrics.std(metric)
+        out = metrics.std(metric, dim=10, unbiased=False)
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.Std))
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
+        self.assertTrue(not out.children[0].metric._unbiased)
         self.assertTrue(out.children[0].metric.name == 'test_std')
+        self.assertTrue(out.root.name == 'test')
+
+    def test_var_metric_class(self):
+        metric = metrics.Metric
+        out = metrics.var(dim=10, unbiased=False)(metric)('test')
+        self.assertTrue(isinstance(out, metrics.MetricTree))
+        self.assertTrue(isinstance(out.children[0], metrics.ToDict))
+        self.assertTrue(isinstance(out.children[0].metric, metrics.Var))
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
+        self.assertTrue(not out.children[0].metric._unbiased)
+        self.assertTrue(out.children[0].metric.name == 'test_var')
+        self.assertTrue(out.root.name == 'test')
+
+    def test_var_metric_instance(self):
+        metric = metrics.Metric('test')
+        out = metrics.var(metric, dim=10, unbiased=False)
+        self.assertTrue(isinstance(out, metrics.MetricTree))
+        self.assertTrue(isinstance(out.children[0], metrics.ToDict))
+        self.assertTrue(isinstance(out.children[0].metric, metrics.Var))
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
+        self.assertTrue(not out.children[0].metric._unbiased)
+        self.assertTrue(out.children[0].metric.name == 'test_var')
         self.assertTrue(out.root.name == 'test')
 
     def test_running_mean_metric_class(self):
         metric = metrics.Metric
-        out = metrics.running_mean(batch_size=40, step_size=20)(metric)('test')
+        out = metrics.running_mean(batch_size=40, step_size=20, dim=10)(metric)('test')
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.RunningMean))
         self.assertTrue(out.children[0].metric._batch_size == 40)
         self.assertTrue(out.children[0].metric._step_size == 20)
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
         self.assertTrue(out.children[0].metric.name == 'running_test')
         self.assertTrue(out.root.name == 'test')
 
     def test_running_mean_metric_instance(self):
         metric = metrics.Metric('test')
-        out = metrics.running_mean(batch_size=40, step_size=20)(metric)
+        out = metrics.running_mean(batch_size=40, step_size=20, dim=10)(metric)
         self.assertTrue(isinstance(out, metrics.MetricTree))
         self.assertTrue(isinstance(out.children[0], metrics.ToDict))
         self.assertTrue(isinstance(out.children[0].metric, metrics.RunningMean))
         self.assertTrue(out.children[0].metric._batch_size == 40)
         self.assertTrue(out.children[0].metric._step_size == 20)
+        self.assertTrue(out.children[0].metric._kwargs['dim'] == 10)
         self.assertTrue(out.children[0].metric.name == 'running_test')
         self.assertTrue(out.root.name == 'test')
