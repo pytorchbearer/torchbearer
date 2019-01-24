@@ -200,42 +200,42 @@ class SimpleExponential(SimpleDistribution):
 
 @cite{steve}
 class SimpleWeibull(SimpleDistribution):
-	"""The SimpleWeibull class is a :class:`SimpleDistribution` which implements a straight forward Weibull
-	distribution. This performs significantly fewer checks than `torch.distributions.Weibull`, but should be sufficient
-	for the purpose of implementing a VAE.
-	Args:
-		l (torch.Tensor, Number): The scale parameter of the distribution, numbers will be cast to tensors
-		k (torch.Tensor, Number): The shape parameter of the distribution, numbers will be cast to tensors
-	"""
+    """The SimpleWeibull class is a :class:`SimpleDistribution` which implements a straight forward Weibull
+    distribution. This performs significantly fewer checks than `torch.distributions.Weibull`, but should be sufficient
+    for the purpose of implementing a VAE.
+    Args:
+        l (torch.Tensor, Number): The scale parameter of the distribution, numbers will be cast to tensors
+        k (torch.Tensor, Number): The shape parameter of the distribution, numbers will be cast to tensors
+    """
 
-	def __init__(self, l, k):
-		self.l, self.k = broadcast_all(l, k)
-		self.const=1e-8
-		if isinstance(k, Number) and isinstance(l, Number):
-			batch_shape = torch.Size()
-		else:
-			batch_shape = self.k.size()
-		super().__init__(batch_shape=batch_shape)
+    def __init__(self, l, k):
+        self.l, self.k = broadcast_all(l, k)
+        self.const=1e-8
+        if isinstance(k, Number) and isinstance(l, Number):
+            batch_shape = torch.Size()
+        else:
+            batch_shape = self.k.size()
+        super().__init__(batch_shape=batch_shape)
 
-	def rsample(self, sample_shape=torch.Size()):
-		"""Simple rsample for a Weibull distribution.
-		Args:
-			sample_shape (torch.Size, tuple): Shape of the sample (per k / lambda given)
-		Returns:
-			A reparameterized sample with gradient with respect to the distribution parameters
-		"""
-		shape = self._extended_shape(sample_shape)
-		eps = torch.rand(shape, dtype=self.k.dtype, device=self.k.device)
-		return self.l * torch.pow((-torch.log(eps)), (1/self.k))
+    def rsample(self, sample_shape=torch.Size()):
+        """Simple rsample for a Weibull distribution.
+        Args:
+            sample_shape (torch.Size, tuple): Shape of the sample (per k / lambda given)
+        Returns:
+            A reparameterized sample with gradient with respect to the distribution parameters
+        """
+        shape = self._extended_shape(sample_shape)
+        eps = torch.rand(shape, dtype=self.k.dtype, device=self.k.device)
+        return self.l * torch.pow((-torch.log(eps)), (1/self.k))
 
-	def log_prob(self, value):
-		"""Calculates the log probability that the given value was drawn from this distribution.  This function is differentiable
-		and its log probability is -inf for values less than 0.
-		Args:
-			value (torch.Tensor, Number): The sampled value
-		Returns:
-			The log probability that the given value was drawn from this distribution
-		"""
-		value = value if torch.is_tensor(value) else torch.tensor(value, dtype=torch.get_default_dtype())
-		lb=value.ge(torch.zeros(value.shape, dtype=self.k.dtype, device=self.k.device)).float()
-		return torch.log(lb) + torch.log(self.k/self.l) + (self.k - torch.ones(self.k.shape, dtype=self.k.dtype, device=self.k.device))*torch.log((lb*value+self.const)/self.l) - torch.pow(value/self.l, self.k)
+    def log_prob(self, value):
+        """Calculates the log probability that the given value was drawn from this distribution.  This function is differentiable
+        and its log probability is -inf for values less than 0.
+        Args:
+            value (torch.Tensor, Number): The sampled value
+        Returns:
+            The log probability that the given value was drawn from this distribution
+        """
+        value = value if torch.is_tensor(value) else torch.tensor(value, dtype=torch.get_default_dtype())
+        lb=value.ge(torch.zeros(value.shape, dtype=self.k.dtype, device=self.k.device)).float()
+        return torch.log(lb) + torch.log(self.k/self.l) + (self.k - torch.ones(self.k.shape, dtype=self.k.dtype, device=self.k.device))*torch.log((lb*value+self.const)/self.l) - torch.pow(value/self.l, self.k)
