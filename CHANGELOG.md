@@ -8,8 +8,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
 - Added SimpleUniform and SimpleExponential distributions
 - Added a decorator which can be used to cite a research article as part of a doc string
-- Added an optional dimension argument to the mean and running_mean metric aggregators
+- Added an optional dimension argument to the mean, std and running_mean metric aggregators
+- Added a var metric and decorator which can be used to calculate the variance of a metric
+- Added an unbiased flag to the std and var metrics to optionally not apply Bessel's correction (consistent with torch.std / torch.var)
 ### Changed
+- Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
 ### Deprecated
 ### Removed
 ### Fixed
