@@ -8,17 +8,17 @@ from torchbearer.callbacks import Tqdm, ConsolePrinter
 class TestFormatMetrics(TestCase):
     def test_precision(self):
         metrics = {'test': 1.2345}
-        res = torchbearer.callbacks.printer._format_metrics(metrics, 3)
-        self.assertEqual(res, 'test=1.23')
+        res = torchbearer.callbacks.printer._format_metrics(metrics, lambda x: round(x, 3))
+        self.assertEqual('test=1.234', res)
 
     def test_string(self):
         metrics = {'test': '1.2345'}
-        res = torchbearer.callbacks.printer._format_metrics(metrics, 3)
+        res = torchbearer.callbacks.printer._format_metrics(metrics, lambda x: round(x, 3))
         self.assertEqual(res, 'test=1.2345')
 
     def test_not_string(self):
         metrics = {'test': {'hello': 2}}
-        res = torchbearer.callbacks.printer._format_metrics(metrics, 3)
+        res = torchbearer.callbacks.printer._format_metrics(metrics, lambda x: round(x, 3))
         self.assertEqual(res, 'test={\'hello\': 2}')
 
 

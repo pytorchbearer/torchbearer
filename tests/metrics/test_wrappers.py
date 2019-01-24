@@ -49,6 +49,20 @@ class TestToDict(unittest.TestCase):
         self.assertTrue(self._to_dict.process_final('input') == {'val_test': 'process_final'})
         self._metric.process_final.assert_called_once_with('input')
 
+    def test_eval_train(self):
+        self._to_dict.eval(data_key=torchbearer.TRAIN_DATA)
+        self.assertEqual(self._metric.eval.call_count, 1)
+
+        self.assertTrue(self._to_dict.process_final('input') == {'train_test': 'process_final'})
+        self._metric.process_final.assert_called_once_with('input')
+
+    def test_eval_test(self):
+        self._to_dict.eval(data_key=torchbearer.TEST_DATA)
+        self.assertEqual(self._metric.eval.call_count, 1)
+
+        self.assertTrue(self._to_dict.process_final('input') == {'test_test': 'process_final'})
+        self._metric.process_final.assert_called_once_with('input')
+
     def test_reset(self):
         self._to_dict.reset('test')
         self._metric.reset.assert_called_once_with('test')

@@ -1,29 +1,26 @@
-import torchbearer
-
-from torchbearer.callbacks import Callback
-from tqdm import tqdm
 from collections import OrderedDict
-from numbers import Number
+from functools import partial
+
+from tqdm import tqdm
+
+import torchbearer
+from torchbearer.callbacks import Callback
 
 
-def _format_num(n, precision):
-    # Adapted from https://github.com/tqdm/tqdm
-    f = ('{0:.' + str(precision) + 'g}').format(n).replace('+0', '+').replace('-0', '-')
-    n = str(n)
-    return f if len(f) < len(n) else n
-
-
-def _format_metrics(metrics, precision):
+def _format_metrics(metrics, rounder):
     # Adapted from https://github.com/tqdm/tqdm
     postfix = OrderedDict([])
     for key in sorted(metrics.keys()):
         postfix[key] = metrics[key]
 
     for key in postfix.keys():
-        if isinstance(postfix[key], Number):
-            postfix[key] = _format_num(postfix[key], precision)
-        elif not isinstance(postfix[key], str):
-            postfix[key] = str(postfix[key])
+        try:
+            postfix[key] = str(rounder(postfix[key]))
+        except TypeError:
+            try:
+                postfix[key] = str(list(map(rounder, postfix[key])))
+            except TypeError:
+                postfix[key] = str(postfix[key])
     postfix = ', '.join(key + '=' + postfix[key].strip() for key in postfix.keys())
     return postfix
 
@@ -34,7 +31,7 @@ class ConsolePrinter(Callback):
     Args:
         validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase
             of training
-        precision (int): Precision of the number format in significant figures
+        precision (int): Precision of the number format in decimal places
 
     State Requirements:
         - :attr:`torchbearer.state.EPOCH`: The current epoch number
@@ -46,17 +43,17 @@ class ConsolePrinter(Callback):
     def __init__(self, validation_label_letter='v', precision=4):
         super().__init__()
         self.validation_label = validation_label_letter
-        self.precision = precision
+        self.rounder = partial(round, ndigits=precision)
 
     def _step(self, state, letter, steps):
         epoch_str = '{:d}/{:d}({:s}): '.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
         batch_str = '{:d}/{:d} '.format(state[torchbearer.BATCH], steps)
-        stats_str = _format_metrics(state[torchbearer.METRICS], self.precision)
+        stats_str = _format_metrics(state[torchbearer.METRICS], self.rounder)
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
     def _end(self, state, letter):
         epoch_str = '{:d}/{:d}({:s}): '.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
-        stats_str = _format_metrics(state[torchbearer.METRICS], self.precision)
+        stats_str = _format_metrics(state[torchbearer.METRICS], self.rounder)
         print('\r' + epoch_str + stats_str)
 
     def on_step_training(self, state):
@@ -78,7 +75,7 @@ class Tqdm(Callback):
 
     Args:
         validation_label_letter (str): The letter to use for validation outputs.
-        precision (int): Precision of the number format in significant figures
+        precision (int): Precision of the number format in decimal places
         on_epoch (bool): If True, output a single progress bar which tracks epochs
         tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor.
             See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
@@ -94,7 +91,7 @@ class Tqdm(Callback):
         self.tqdm_module = tqdm_module
         self._loader = None
         self.validation_label = validation_label_letter
-        self.precision = precision
+        self.rounder = partial(round, ndigits=precision)
         self._on_epoch = on_epoch
         self.tqdm_args = tqdm_args
 
@@ -104,10 +101,10 @@ class Tqdm(Callback):
 
     def _update(self, state):
         self._loader.update(1)
-        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.precision))
+        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.rounder))
 
     def _close(self, state):
-        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.precision))
+        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.rounder))
         self._loader.close()
 
     def on_start(self, state):

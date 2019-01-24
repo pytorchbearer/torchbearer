@@ -14,7 +14,7 @@ We store the current estimates for the minimum as parameters in the model (so Py
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 11-31
+   :lines: 9-29
 
 The Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -24,7 +24,7 @@ Note that as we are using a base loss, torchbearer passes this the network outpu
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 34-35
+   :lines: 32-33
 
 
 Optimising
@@ -37,20 +37,20 @@ We have set the number of optimisation steps for this example as 50000.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 38-39
+   :lines: 36-37
 
 The learning rate chosen for this example is very low and we could get convergence much faster with a larger rate, however this allows us to view convergence in real time.
 We define the model and optimiser in the standard way.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 41-42
+   :lines: 39-40
 
 Finally we start the optimising on the GPU and print the final minimum estimate.
 
 .. literalinclude:: /_static/examples/basic_opt.py
    :language: python
-   :lines: 44-46
+   :lines: 42-45
 
 Usually torchbearer will infer the number of training steps from the data generator.
 Since for this example we have no data to give the model (which will be passed `None`), we need to tell torchbearer how many steps to run using the ``for_train_steps`` method.
