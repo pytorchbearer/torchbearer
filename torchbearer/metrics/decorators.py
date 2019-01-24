@@ -8,7 +8,7 @@ import inspect
 
 from torchbearer import metrics
 
-from torchbearer.metrics import EpochLambda, BatchLambda, ToDict, Mean, MetricTree, Std, RunningMean
+from torchbearer.metrics import EpochLambda, BatchLambda, ToDict, Mean, MetricTree, Std, Var, RunningMean
 
 
 def default_for_key(key, *args, **kwargs):
@@ -161,9 +161,9 @@ def mean(clazz=None, dim=None):
     return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Mean(metric.name, dim=dim)))
 
 
-def std(clazz):
+def std(clazz=None, unbiased=True, dim=None):
     """The :func:`std` decorator is used to add a :class:`.Std` to the :class:`.MetricTree` which will will output a
-    population standard deviation value at the end of each epoch. At build time, if the inner class is not a
+    sample standard deviation value at the end of each epoch. At build time, if the inner class is not a
     :class:`.MetricTree`, one will be created. The :class:`.Std` will also be wrapped in a :class:`.ToDict` (with '_std'
     appended) for simplicity.
 
@@ -185,15 +185,63 @@ def std(clazz):
         >>> metric.process({'y_pred':torch.Tensor([4]), 'y_true':torch.Tensor([4])}) # 8
         {}
         >>> '%.4f' % metric.process_final()['my_metric_std']
-        '1.6330'
+        '2.0000'
 
     Args:
         clazz: The class to *decorate*
+        unbiased (bool): See :class:`.Std`
+        dim (int, tuple): See :class:`.Std`
 
     Returns:
         A :class:`.MetricTree` with a :class:`.Std` appended or a wrapper class that extends :class:`.MetricTree`
     """
-    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Std(metric.name + '_std')))
+    if clazz is None:
+        def decorator(clazz):
+            return std(clazz, unbiased=unbiased, dim=dim)
+        return decorator
+
+    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Std(metric.name + '_std', unbiased=unbiased, dim=dim)))
+
+
+def var(clazz=None, unbiased=True, dim=None):
+    """The :func:`var` decorator is used to add a :class:`.Var` to the :class:`.MetricTree` which will will output a
+    sample variance value at the end of each epoch. At build time, if the inner class is not a :class:`.MetricTree`, one
+    will be created. The :class:`.Var` will also be wrapped in a :class:`.ToDict` (with '_var' appended) for simplicity.
+
+    Example: ::
+
+        >>> import torch
+        >>> from torchbearer import metrics
+
+        >>> @metrics.var
+        ... @metrics.lambda_metric('my_metric')
+        ... def metric(y_pred, y_true):
+        ...     return y_pred + y_true
+        ...
+        >>> metric.reset({})
+        >>> metric.process({'y_pred':torch.Tensor([2]), 'y_true':torch.Tensor([2])}) # 4
+        {}
+        >>> metric.process({'y_pred':torch.Tensor([3]), 'y_true':torch.Tensor([3])}) # 6
+        {}
+        >>> metric.process({'y_pred':torch.Tensor([4]), 'y_true':torch.Tensor([4])}) # 8
+        {}
+        >>> '%.4f' % metric.process_final()['my_metric_var']
+        '4.0000'
+
+    Args:
+        clazz: The class to *decorate*
+        unbiased (bool): See :class:`.Var`
+        dim (int, tuple): See :class:`.Var`
+
+    Returns:
+        A :class:`.MetricTree` with a :class:`.Var` appended or a wrapper class that extends :class:`.MetricTree`
+    """
+    if clazz is None:
+        def decorator(clazz):
+            return var(clazz, unbiased=unbiased, dim=dim)
+        return decorator
+
+    return _wrap_and_add_to_tree(clazz, lambda metric: ToDict(Var(metric.name + '_var', unbiased=unbiased, dim=dim)))
 
 
 def running_mean(clazz=None, batch_size=50, step_size=10, dim=None):

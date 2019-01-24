@@ -103,44 +103,57 @@ class RunningMean(RunningMetric):
         return res.item() if res.numel() <= 1 else res.tolist()
 
 
-class Std(metrics.Metric):
-    """Metric aggregator which calculates the standard deviation of process outputs between calls to reset.
+class Var(metrics.Metric):
+    """Metric aggregator which calculates the **sample** variance of process outputs between calls to reset.
+    Optionally calculate the population variance if ``unbiased = False``.
 
     Args:
         name (str): The name of this metric.
+        unbiased (bool): If True (default), calculates the sample variance, else, the population variance
+        dim (int, tuple): The dimension(s) on which to compute the std. If left as None, this will operate over the
+            whole Tensor
     """
 
-    def __init__(self, name):
-        super(Std, self).__init__(name)
+    def __init__(self, name, unbiased=True, dim=None):
+        super(Var, self).__init__(name)
+        self._unbiased = unbiased
+        self._kwargs = {'dim': dim} if dim is not None else {}
+        self._sum = 0.0
+        self._sum_sq = 0.0
+        self._count = 0
 
     def process(self, *args):
-        """Compute values required for the std from the input. The input should be a torch Tensor. The sum and sum of
-        squares will be computed for all elements in the input.
+        """Compute values required for the variance from the input. The input should be a torch Tensor. The sum and sum
+        of squares will be computed over the provided dimension.
 
         Args:
             args (`torch.Tensor`):  The output of some previous call to :meth:`.Metric.process`.
         """
         data = args[0]
-        self._sum += data.sum().item()
-        self._sum_sq += data.pow(2).sum().item()
-        self._count += float(torch.numel(data))
+        tot = data.sum(**self._kwargs)
+        self._sum += tot
+        self._sum_sq += data.pow(2).sum(**self._kwargs)
+        self._count += data.numel() / tot.numel()
+
+    def _process_final(self):
+        mean = self._sum / self._count
+        mean = mean.pow(2)
+        variance = ((self._sum_sq / self._count) - mean).clamp(min=0)
+        if self._unbiased:
+            variance = variance * (self._count / (self._count - 1.0))
+        return variance
 
     def process_final(self, *args):
-        """Compute and return the final standard deviation.
+        """Compute and return the final variance.
 
         Returns:
-            The standard deviation of each observation since the last reset call.
+            The variance of each observation since the last reset call.
         """
-        mean = self._sum / self._count
-        mean = mean ** 2
-        variance = (self._sum_sq / self._count) - mean
-        if variance < 0:
-            return 0
-        else: 
-            return variance ** 0.5
+        res = self._process_final()
+        return res.item() if res.numel() <= 1 else res.tolist()
 
     def reset(self, state):
-        """Reset the statistics to compute the next deviation.
+        """Reset the statistics to compute the next variance.
 
         Args:
             state (dict): The model state.
@@ -149,6 +162,31 @@ class Std(metrics.Metric):
         self._sum = 0.0
         self._sum_sq = 0.0
         self._count = 0
+
+
+class Std(Var):
+    """Metric aggregator which calculates the **sample** standard deviation of process outputs between calls to reset.
+    Optionally calculate the population std if ``unbiased = False``.
+
+    Args:
+        name (str): The name of this metric.
+        unbiased (bool): If True (default), calculates the sample standard deviation, else, the population standard
+            deviation
+        dim (int, tuple): The dimension(s) on which to compute the std. If left as None, this will operate over the
+            whole Tensor
+    """
+
+    def __init__(self, name, unbiased=True, dim=None):
+        super(Std, self).__init__(name, unbiased=unbiased, dim=dim)
+
+    def process_final(self, *args):
+        """Compute and return the final standard deviation.
+
+        Returns:
+            The standard deviation of each observation since the last reset call.
+        """
+        res = super()._process_final().sqrt()
+        return res.item() if res.numel() <= 1 else res.tolist()
 
 
 class Mean(metrics.Metric):
