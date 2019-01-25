@@ -8,7 +8,7 @@ import torchbearer as tb
 
 class Net(Module):
     def __init__(self, x):
-        super().__init__()
+        super(Net, self).__init__()
         self.pars = torch.nn.Parameter(x)
 
     def f(self):
@@ -84,5 +84,8 @@ class TestEndToEnd(unittest.TestCase):
 
     def test_no_model(self):
         tbmodel = tb.Trial(None)
-        with self.assertWarns(Warning):
+
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
             tbmodel.run()
+            self.assertTrue(len(w) == 1)

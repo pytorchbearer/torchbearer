@@ -1,9 +1,9 @@
 import os
 from unittest import TestCase
-from unittest.mock import patch, Mock, ANY, MagicMock
 
 import torch
 import torch.nn as nn
+from mock import patch, Mock, ANY
 
 import torchbearer
 from torchbearer.callbacks import TensorBoard, TensorBoardImages, TensorBoardProjector, TensorBoardText
@@ -20,7 +20,7 @@ class TestTensorBoard(TestCase):
 
         mock_board.assert_called_once_with(log_dir=os.path.join('./logs', 'Sequential_torchbearer'))
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_log_dir_visdom(self, mock_visdom, mock_writer, _):
@@ -48,10 +48,10 @@ class TestTensorBoard(TestCase):
 
         mock_board.assert_called_with(log_dir=os.path.join('./logs', 'Sequential_torchbearer', 'epoch-0'))
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
-    def test_batch_log_dir_visdom(self, mock_visdom,mock_writer, _):
+    def test_batch_log_dir_visdom(self, mock_visdom, mock_writer, _):
         state = {torchbearer.MODEL: nn.Sequential(nn.Conv2d(3, 3, 3)),
                  torchbearer.EPOCH: 0, torchbearer.METRICS: {'test': 1}, torchbearer.BATCH: 0}
 
@@ -94,7 +94,7 @@ class TestTensorBoard(TestCase):
         tboard.on_end({})
         self.assertEqual(mock_board.return_value.close.call_count, 1)
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_writer_closed_on_end_visdom(self, mock_visdom, mock_writer, _):
@@ -122,7 +122,7 @@ class TestTensorBoard(TestCase):
         self.assertEqual(mock_board.return_value.close.call_count, 1)
         tboard.on_end(state)
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_batch_writer_closed_on_end_epoch_visdom(self, mock_visdom, mock_writer, _):
@@ -157,7 +157,7 @@ class TestTensorBoard(TestCase):
         tboard.on_end_epoch(state)
         tboard.on_end(state)
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_batch_metrics_visdom(self, mock_visdom, mock_writer, _):
@@ -193,7 +193,7 @@ class TestTensorBoard(TestCase):
         mock_board.return_value.add_scalar.assert_called_once_with('epoch/test', 1, 0)
         tboard.on_end(state)
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_epoch_metrics_visdom(self, mock_visdom, mock_writer, _):
@@ -222,7 +222,7 @@ class TestTensorBoardImages(TestCase):
 
         mock_board.assert_called_once_with(log_dir=os.path.join('./test', 'Sequential_torchbearer'))
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_log_dir_visdom(self, mock_visdom, mock_writer, _):
@@ -250,7 +250,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
         self.assertEqual(mock_board.return_value.close.call_count, 1)
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_writer_closed_on_end_visdom_visdom(self, mock_visdom, mock_writer, _):
@@ -288,7 +288,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_simple_case_visdom(self, mock_visdom, mock_writer, _, mock_grid):
@@ -337,7 +337,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_multi_batch_visdom(self, mock_visdom, mock_writer, _, mock_grid):
@@ -388,7 +388,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_multi_epoch_visdom(self, mock_visdom, mock_writer, _, mock_grid):
@@ -438,7 +438,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_single_channel_visdom(self, mock_visdom, mock_writer, _, mock_grid):
@@ -488,7 +488,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_odd_batches_visdom(self, mock_visdom, mock_writer, _, mock_grid):
@@ -806,7 +806,7 @@ class TestTensorbardText(TestCase):
         tboard.on_end_epoch(state)
         tboard.on_end(state)
 
-    @patch('os.makedirs')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
     def test_batch_metrics_visdom(self, mock_visdom, mock_writer, _):

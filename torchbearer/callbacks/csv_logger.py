@@ -1,7 +1,10 @@
+import sys
+
 import torchbearer
 
 from torchbearer.callbacks import Callback
 import csv
+from future.builtins import open
 
 
 class CSVLogger(Callback):
@@ -17,28 +20,33 @@ class CSVLogger(Callback):
 
     def __init__(self, filename, separator=',', batch_granularity=False, write_header=True, append=False):
 
-        super().__init__()
+        super(CSVLogger, self).__init__()
         self.batch_granularity = batch_granularity
         self.filename = filename
         self.separator = separator
         if append:
-            filemode = 'a+'
+            filemode = 'a'
         else:
-            filemode = 'w+'
-        self.csvfile = open(self.filename, filemode, newline='')
+            filemode = 'w'
+
+        if sys.version_info[0] < 3:
+            filemode += 'b'
+            self.csvfile = open(self.filename, filemode)
+        else:
+            self.csvfile = open(self.filename, filemode, newline='')
         self.write_header = write_header
 
     def on_step_training(self, state):
-        super().on_step_training(state)
+        super(CSVLogger, self).on_step_training(state)
         if self.batch_granularity:
             self._write_to_dict(state)
 
     def on_end_epoch(self, state):
-        super().on_end_training(state)
+        super(CSVLogger, self).on_end_training(state)
         self._write_to_dict(state)
 
     def on_end(self, state):
-        super().on_end(state)
+        super(CSVLogger, self).on_end(state)
         self.csvfile.close()
 
     def _write_to_dict(self, state):

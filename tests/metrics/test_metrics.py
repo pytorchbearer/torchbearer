@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from mock import Mock
 
 from torchbearer.metrics import MetricList, Metric, MetricTree, AdvancedMetric
 

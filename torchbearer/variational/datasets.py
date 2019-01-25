@@ -74,10 +74,10 @@ class CelebA(SimpleImageFolder):
             transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
             target_transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
-        super().__init__(root, transform=transform, target_transform=target_transform)
+        super(CelebA, self).__init__(root, transform=transform, target_transform=target_transform)
 
     def __getitem__(self, index):
-        item = super().__getitem__(index)
+        item = super(CelebA, self).__getitem__(index)
         return item
 
 
@@ -97,7 +97,7 @@ class CelebA_HQ(SimpleImageFolder):
         else:
             loader = default_loader
             extensions = IMG_EXTENSIONS
-        super().__init__(root, loader, extensions, transform)
+        super(CelebA_HQ, self).__init__(root, loader, extensions, transform)
 
     @staticmethod
     def npy_loader(path):
@@ -106,7 +106,7 @@ class CelebA_HQ(SimpleImageFolder):
         return pil_image
 
     def __getitem__(self, index):
-        item = super().__getitem__(index)
+        item = super(CelebA_HQ, self).__getitem__(index)
         return item
 
 
@@ -120,7 +120,7 @@ class dSprites(Dataset):
             download (bool, optional): If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
             transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
-        super().__init__()
+        super(dSprites, self).__init__()
         self.file = root
         self.transform = transform
 
@@ -136,11 +136,15 @@ class dSprites(Dataset):
     def download(self):
         if not os.path.exists(os.path.join(self.file, "imgs.npy")):
             data_url = 'https://github.com/deepmind/dsprites-dataset/blob/master/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz?raw=true'
-            import urllib.request
+            import sys
+            if sys.version_info[0] < 3:
+                import urllib2 as request
+            else:
+                import urllib.request as request
             file = os.path.join(self.file, "dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz")
 
             os.makedirs(self.file, exist_ok=True)
-            with urllib.request.urlopen(data_url) as response, open(file, 'wb+') as out_file:
+            with request.urlopen(data_url) as response, open(file, 'wb+') as out_file:
                 shutil.copyfileobj(response, out_file)
 
             zip_ref = zipfile.ZipFile(file, 'r')
@@ -179,6 +183,3 @@ class dSprites(Dataset):
 
     def __len__(self):
         return self.data.shape[0]
-
-
-

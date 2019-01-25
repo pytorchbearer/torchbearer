@@ -36,7 +36,7 @@ class StateKey(Metric):
     """
     def __init__(self, key):
         self.key = self._gen_key_(key)
-        super().__init__(self.key)
+        super(StateKey, self).__init__(self.key)
 
     def process(self, state):
         return {self.name: state[self]}
@@ -76,7 +76,7 @@ class State(dict):
     State dictionary that behaves like a python dict but accepts StateKeys
     """
     def __init__(self):
-        super().__init__()
+        super(State, self).__init__()
 
     def get_key(self, statekey):
         if isinstance(statekey, str):
@@ -84,22 +84,22 @@ class State(dict):
         return statekey
 
     def __getitem__(self, key):
-        return super().__getitem__(self.get_key(key))
+        return super(State, self).__getitem__(self.get_key(key))
 
     def __setitem__(self, key, val):
-        super().__setitem__(self.get_key(key), val)
+        super(State, self).__setitem__(self.get_key(key), val)
 
     def __delitem__(self, val):
-        super().__delitem__(val)
+        super(State, self).__delitem__(val)
 
-    def __contains__(self, o: object) -> bool:
-        return super().__contains__(self.get_key(o))
+    def __contains__(self, o):
+        return super(State, self).__contains__(self.get_key(o))
 
     def update(self, d):
         new_dict = {}
         for key in d:
             new_dict[self.get_key(key)] = d[key]
-        super().update(new_dict)
+        super(State, self).update(new_dict)
 
 
 #: The torchbearer version

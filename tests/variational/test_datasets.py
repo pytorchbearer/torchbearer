@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
 import torchbearer.variational.datasets as ds
 
@@ -255,7 +255,6 @@ class TestdSprites(unittest.TestCase):
         self.assertTrue(mock_fromarray.call_args[1] == {'mode':'L'})
         self.assertTrue(len(out) == 2)
 
-
     @patch('PIL.Image.fromarray')
     @patch.object(ds.dSprites, 'load_data')
     @patch('numpy.load')
@@ -271,15 +270,15 @@ class TestdSprites(unittest.TestCase):
 
         self.assertTrue(transform.call_args[0][0] == 'test')
 
-    @patch('builtins.open')
     @patch('zipfile.ZipFile')
     @patch('shutil.copyfileobj')
-    @patch('urllib.request.urlopen')
     @patch('os.makedirs')
     @patch.object(ds.dSprites, 'load_data')
     @patch('numpy.load')
-    def test_download(self, mock_load, mock_load_data, mock_mkdirs, mock_urlopen, mock_copyfileobj, mock_zip, mock_open):
+    def test_download(self, mock_load, mock_load_data, mock_mkdirs, mock_copyfileobj, mock_zip, mock_open, mock_urlopen):
         mock_return = Mock()
+        # mock_urlopen = Mock()
+        # mock_url.return_value = mock_urlopen
         mock_urlopen.return_value.__enter__.return_value = mock_return
 
         root = 'root'
@@ -294,3 +293,9 @@ class TestdSprites(unittest.TestCase):
         self.assertTrue(mock_open.call_args[0][0] == 'root/' + filename)
 
         self.assertTrue(mock_copyfileobj.call_args[0][0] == mock_return)
+
+    import sys
+    if sys.version_info[0] < 3:
+        test_download = patch('urllib2.urlopen')(patch('__builtin__.open')(test_download))
+    else:
+        test_download = patch('urllib.request.urlopen')(patch('builtins.open')(test_download))

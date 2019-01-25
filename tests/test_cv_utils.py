@@ -1,8 +1,8 @@
 import unittest
-from unittest.mock import patch, Mock
-import torch
-import torchbearer
 
+from mock import Mock
+
+import torchbearer
 from torchbearer.cv_utils import *
 
 

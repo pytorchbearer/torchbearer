@@ -8,10 +8,11 @@ from collections import deque
 
 import torch
 
-from torchbearer import metrics
+from torchbearer.bases import Metric
+from .metrics import AdvancedMetric
 
 
-class RunningMetric(metrics.AdvancedMetric):
+class RunningMetric(AdvancedMetric):
     """A metric which aggregates batches of results and presents a method to periodically process these into a value.
 
     .. note::
@@ -24,7 +25,7 @@ class RunningMetric(metrics.AdvancedMetric):
         step_size (int): The number of iterations between aggregations.
     """
     def __init__(self, name, batch_size=50, step_size=10):
-        super().__init__(name)
+        super(RunningMetric, self).__init__(name)
         self._batch_size = batch_size
         self._step_size = step_size
         self._cache = deque()
@@ -90,7 +91,7 @@ class RunningMean(RunningMetric):
     """
 
     def __init__(self, name, batch_size=50, step_size=10, dim=None):
-        super().__init__(name, batch_size=batch_size, step_size=step_size)
+        super(RunningMean, self).__init__(name, batch_size=batch_size, step_size=step_size)
         self._kwargs = {'dim': dim} if dim is not None else {}
 
     def _process_train(self, *args):
@@ -103,7 +104,7 @@ class RunningMean(RunningMetric):
         return res.item() if res.numel() <= 1 else res.tolist()
 
 
-class Var(metrics.Metric):
+class Var(Metric):
     """Metric aggregator which calculates the **sample** variance of process outputs between calls to reset.
     Optionally calculate the population variance if ``unbiased = False``.
 
@@ -158,7 +159,7 @@ class Var(metrics.Metric):
         Args:
             state (dict): The model state.
         """
-        super().reset(state)
+        super(Var, self).reset(state)
         self._sum = 0.0
         self._sum_sq = 0.0
         self._count = 0
@@ -185,11 +186,11 @@ class Std(Var):
         Returns:
             The standard deviation of each observation since the last reset call.
         """
-        res = super()._process_final().sqrt()
+        res = super(Std, self)._process_final().sqrt()
         return res.item() if res.numel() <= 1 else res.tolist()
 
 
-class Mean(metrics.Metric):
+class Mean(Metric):
     """Metric aggregator which calculates the mean of process outputs between calls to reset.
 
     Args:
@@ -230,6 +231,6 @@ class Mean(metrics.Metric):
         Args:
             state (dict): The model state.
         """
-        super().reset(state)
+        super(Mean, self).reset(state)
         self._sum = 0.0
         self._count = 0

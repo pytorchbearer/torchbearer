@@ -1,3 +1,16 @@
+import sys
+if sys.version_info[0] < 3:
+    import inspect
+
+    def get_default(fcn, arg):
+        a = inspect.getargspec(fcn)
+        return dict(zip(a.args[-len(a.defaults):], a.defaults))[arg]
+else:
+    from inspect import signature
+
+    def get_default(fcn, arg):
+        return signature(fcn).parameters[arg].default
+
 import functools
 import warnings
 
@@ -95,8 +108,7 @@ def inject_printer(validation_label_letter='v'):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            import inspect
-            verbose = kwargs['verbose'] if 'verbose' in kwargs else inspect.signature(func).parameters['verbose'].default  # Populate default value
+            verbose = kwargs['verbose'] if 'verbose' in kwargs else get_default(func, 'verbose')  # Populate default value
             verbose = self.verbose if verbose == -1 else verbose
 
             printer = get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
@@ -195,7 +207,6 @@ class Sampler:
         batch_loader (func): The batch loader to execute
     """
     def __init__(self, batch_loader):
-        super().__init__()
         self.batch_loader = batch_loader
 
     def sample(self, state):
@@ -349,7 +360,9 @@ class Trial(object):
         def state_string(name, state_key):
             import math
             N = (50-len(name))/2
-            return "-"*math.floor(N) + " " + name.upper()+ " " + "-"*math.ceil(N) + "\n" + str(self.state[state_key]) + "\n\n"
+            res = "-" * int(math.floor(N)) + " " + name.upper() + " " + "-" * int(math.ceil(N))
+            res = res + "-" if len(res) < 52 else res
+            return res + "\n" + str(self.state[state_key]) + "\n\n"
 
         optim_str = state_string('Optimzer', torchbearer.OPTIMIZER)
         crit_str = state_string("Criterion", torchbearer.CRITERION)

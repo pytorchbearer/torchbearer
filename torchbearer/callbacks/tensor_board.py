@@ -51,6 +51,11 @@ def get_writer(log_dir, logger, visdom=False, visdom_params=None):
     """
     import tensorboardX
     from tensorboardX import SummaryWriter
+    import sys
+    import errno
+    kwargs = {}
+    if sys.version_info[0] >= 3:
+        kwargs['exist_ok'] = True
 
     writer_key = 'writer'
     if visdom:
@@ -60,10 +65,16 @@ def get_writer(log_dir, logger, visdom=False, visdom_params=None):
         if visdom:
             w = tensorboardX.torchvis.VisdomWriter()
             from visdom import Visdom
-            os.makedirs(log_dir, exist_ok=True)
+            try:
+                os.makedirs(log_dir, **kwargs)
+            except OSError as exc:  # Python >2.5
+                if exc.errno == errno.EEXIST and os.path.isdir(log_dir):
+                    pass
+                else:
+                    raise
             if visdom_params is None:
                 visdom_params = VisdomParams()
-                visdom_params.LOG_TO_FILENAME = os.path.join(log_dir,'log.log')
+                visdom_params.LOG_TO_FILENAME = os.path.join(log_dir, 'log.log')
             w.vis = Visdom(**visdom_params.__to_dict__())
         else:
             w = SummaryWriter(log_dir=log_dir)
@@ -193,11 +204,11 @@ class TensorBoard(AbstractTensorBoard):
                 dummy = torch.rand(state[torchbearer.X].size(), requires_grad=False)
                 model = copy.deepcopy(state[torchbearer.MODEL]).to('cpu')
                 self.writer.add_graph(model, (dummy,))
-                self._handle_graph = lambda _: ...
+                self._handle_graph = lambda _: None
 
             self._handle_graph = handle_graph
         else:
-            self._handle_graph = lambda _: ...
+            self._handle_graph = lambda _: None
 
         self.batch_log_dir = None
         self.batch_writer = None
@@ -246,7 +257,7 @@ class TensorBoard(AbstractTensorBoard):
                     self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
     def on_end(self, state):
-        super().on_end(state)
+        super(TensorBoard, self).on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
 
@@ -304,7 +315,7 @@ class TensorBoardText(AbstractTensorBoard):
         return table + '</table>'
 
     def on_start(self, state):
-        super().on_start(state)
+        super(TensorBoardText, self).on_start(state)
         if self.log_trial_summary and not self.logged_summary:
             self.logged_summary = True
             self.writer.add_text('trial', str(state[torchbearer.SELF]).replace('\n', '\n \n'), 1)
@@ -335,7 +346,7 @@ class TensorBoardText(AbstractTensorBoard):
                 self.writer.add_text('epoch', self.table_formatter(str(state[torchbearer.METRICS])), state[torchbearer.EPOCH])
 
     def on_end(self, state):
-        super().on_end(state)
+        super(TensorBoardText, self).on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
 

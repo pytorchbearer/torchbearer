@@ -6,6 +6,9 @@ from torchbearer.callbacks import Callback
 
 
 class no_print:
+    def __init__(self):
+        pass
+
     def __enter__(self):
         self.stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
@@ -32,8 +35,7 @@ class LiveLossPlot(Callback):
         - :attr:`torchbearer.state.BATCH`: Batch should be the current batch or iteration number in the epoch
     """
     def __init__(self, on_batch=False, batch_step_size=10, on_epoch=True, draw_once=False, **kwargs):
-
-        super().__init__()
+        super(LiveLossPlot, self).__init__()
         self._kwargs = kwargs
 
         self.on_batch = on_batch

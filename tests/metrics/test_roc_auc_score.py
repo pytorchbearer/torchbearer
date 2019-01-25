@@ -1,6 +1,6 @@
 import unittest
 
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
 import torchbearer
 from torchbearer.metrics import RocAucScore, MetricList

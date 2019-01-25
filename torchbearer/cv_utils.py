@@ -18,7 +18,7 @@ def train_valid_splitter(x, y, split, shuffle=True):
         Training and validation tensors (training data, training labels, validation data, validation labels)
     """
     num_samples_x = x.size()[0]
-    num_valid_samples = math.floor(num_samples_x * split)
+    num_valid_samples = int(math.floor(num_samples_x * split))
 
     if shuffle:
         indicies = torch.randperm(num_samples_x)
@@ -71,7 +71,6 @@ class DatasetValidationSplitter:
             split_fraction: The fraction of the whole dataset to be used for validation
             shuffle_seed: Optional random seed for the shuffling process
         """
-        super().__init__()
         self.dataset_len = dataset_len
         self.split_fraction = split_fraction
         self.valid_ids = None
@@ -85,7 +84,7 @@ class DatasetValidationSplitter:
             random.seed(seed)
         random.shuffle(all_ids)
 
-        num_valid_ids = math.floor(self.dataset_len*self.split_fraction)
+        num_valid_ids = int(math.floor(self.dataset_len*self.split_fraction))
         self.valid_ids = all_ids[:num_valid_ids]
         self.train_ids = all_ids[num_valid_ids:]
 
@@ -120,7 +119,7 @@ class SubsetDataset(Dataset):
             dataset (:class:`torch.utils.data.Dataset`): Complete dataset
             ids (list): List of subset IDs
         """
-        super().__init__()
+        super(SubsetDataset, self).__init__()
         self.dataset = dataset
         self.ids = ids
 

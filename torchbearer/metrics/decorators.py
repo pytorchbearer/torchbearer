@@ -6,9 +6,8 @@ instances of :class:`.Mean`, :class:`.RunningMean`, :class:`.Std` etc.
 """
 import inspect
 
-from torchbearer import metrics
-
 from torchbearer.metrics import EpochLambda, BatchLambda, ToDict, Mean, MetricTree, Std, Var, RunningMean
+from .metrics import add_default
 
 
 def default_for_key(key, *args, **kwargs):
@@ -28,7 +27,7 @@ def default_for_key(key, *args, **kwargs):
         kwargs: Any keyword args to pass to the underlying metric when constructed
     """
     def decorator(arg):
-        metrics.add_default(key, arg, *args, **kwargs)
+        add_default(key, arg, *args, **kwargs)
         return arg
     return decorator
 
@@ -89,10 +88,11 @@ def to_dict(clazz):
     """
     if inspect.isclass(clazz):
         class Wrapper(ToDict):
+            __doc__ = clazz.__doc__
+
             def __init__(self, *args, **kwargs):
                 super(Wrapper, self).__init__(clazz(*args, **kwargs))
         Wrapper.__name__ = clazz.__name__
-        Wrapper.__doc__ = clazz.__doc__
         return Wrapper
     else:
         return ToDict(clazz)
@@ -101,6 +101,8 @@ def to_dict(clazz):
 def _wrap_and_add_to_tree(clazz, child_func):
     if inspect.isclass(clazz):
         class Wrapper(MetricTree):
+            __doc__ = clazz.__doc__
+
             def __init__(self, *args, **kwargs):
                 inner = clazz(*args, **kwargs)
                 if isinstance(inner, MetricTree):
@@ -111,7 +113,6 @@ def _wrap_and_add_to_tree(clazz, child_func):
 
                 self.add_child(child_func(self.root))
         Wrapper.__name__ = clazz.__name__
-        Wrapper.__doc__ = clazz.__doc__
         return Wrapper
     else:
         inner = clazz

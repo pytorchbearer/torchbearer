@@ -9,7 +9,7 @@ class AggregatePredictions(Callback):
         self.predictions_list = []
 
     def on_step_validation(self, state):
-        super().on_step_validation(state)
+        super(AggregatePredictions, self).on_step_validation(state)
         self.predictions_list.append(state[torchbearer.Y_PRED])
 
     def on_end_validation(self, state):

@@ -1,5 +1,6 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock, MagicMock
+
+from mock import patch, MagicMock
 
 import torchbearer
 from torchbearer.callbacks import Tqdm, ConsolePrinter
@@ -23,7 +24,7 @@ class TestFormatMetrics(TestCase):
 
 
 class TestConsolePrinter(TestCase):
-    @patch('builtins.print')
+    @patch('torchbearer.callbacks.printer.print')
     def test_console_printer(self, mock_print):
         state = {torchbearer.BATCH: 5, torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100, torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: {'test': 0.99456}}
         printer = ConsolePrinter(validation_label_letter='e')
@@ -49,7 +50,7 @@ class TestConsolePrinter(TestCase):
 
 class TestTqdm(TestCase):
     def test_tqdm(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100, torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: {'test': 10}}
+        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100, torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: {'test': 0.99456}}
         tqdm = Tqdm(validation_label_letter='e')
         tqdm.tqdm_module = MagicMock()
         mock_tqdm = tqdm.tqdm_module
@@ -59,12 +60,12 @@ class TestTqdm(TestCase):
         mock_tqdm.assert_called_once_with(total=100, desc='1/10(t)')
 
         tqdm.on_step_training(state)
-        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=10')
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
         mock_tqdm.return_value.update.assert_called_once_with(1)
         mock_tqdm.return_value.set_postfix_str.reset_mock()
 
         tqdm.on_end_training(state)
-        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=10')
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
         self.assertEqual(mock_tqdm.return_value.close.call_count, 1)
 
         mock_tqdm.reset_mock()
@@ -77,12 +78,12 @@ class TestTqdm(TestCase):
         mock_tqdm.assert_called_once_with(total=101, desc='1/10(e)')
 
         tqdm.on_step_validation(state)
-        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=10')
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
         mock_tqdm.return_value.update.assert_called_once_with(1)
         mock_tqdm.return_value.set_postfix_str.reset_mock()
 
         tqdm.on_end_validation(state)
-        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=10')
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
         self.assertEqual(mock_tqdm.return_value.close.call_count, 1)
 
     def test_tqdm_custom_args(self):

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, Mock
+from mock import MagicMock, Mock
 
 import torchbearer
 from torchbearer.callbacks import CallbackList, Tqdm, TensorBoard
@@ -7,7 +7,7 @@ from torchbearer.callbacks import CallbackList, Tqdm, TensorBoard
 
 class TestCallbackList(TestCase):
     def __init__(self, methodName='runTest'):
-        super().__init__(methodName)
+        super(TestCallbackList, self).__init__(methodName)
         self.callback_1 = MagicMock(spec=torchbearer.callbacks.printer.Tqdm())
         self.callback_2 = MagicMock(spec=torchbearer.callbacks.tensor_board.TensorBoard())
         callbacks = [self.callback_1, self.callback_2]
@@ -42,8 +42,12 @@ class TestCallbackList(TestCase):
         state = self.list.state_dict()
         state[CallbackList.CALLBACK_TYPES] = list(reversed(state[CallbackList.CALLBACK_TYPES]))
 
-        with self.assertWarns(UserWarning, msg='Callback classes did not match, expected: {\'TensorBoard\', \'Tqdm\'}'):
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
             self.list.load_state_dict(state)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
+            self.assertTrue('Callback classes did not match, expected: [\'TensorBoard\', \'Tqdm\']' in str(w[-1].message))
 
     def test_for_list(self):
         self.list.on_start({})
