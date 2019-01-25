@@ -4,7 +4,6 @@ import torchbearer
 
 from torchbearer.callbacks import Callback
 import csv
-from future.builtins import open
 
 
 class CSVLogger(Callback):

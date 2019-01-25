@@ -20,6 +20,6 @@ setup(
     description='A model training library for pytorch',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['torch>=0.4', 'torchvision', 'tqdm', 'future'],
+    install_requires=['torch>=0.4', 'torchvision', 'tqdm'],
     python_requires='>=3.5',
 )
