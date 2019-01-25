@@ -67,11 +67,11 @@ def get_writer(log_dir, logger, visdom=False, visdom_params=None):
             from visdom import Visdom
             try:
                 os.makedirs(log_dir, **kwargs)
-            except OSError as exc:  # Python >2.5
+            except OSError as exc:
                 if exc.errno == errno.EEXIST and os.path.isdir(log_dir):
                     pass
                 else:
-                    raise
+                    raise exc
             if visdom_params is None:
                 visdom_params = VisdomParams()
                 visdom_params.LOG_TO_FILENAME = os.path.join(log_dir, 'log.log')
