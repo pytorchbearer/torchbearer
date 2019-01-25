@@ -106,3 +106,26 @@ class TestTqdm(TestCase):
 
         tqdm.on_start(state)
         mock_tqdm.assert_called_once_with(initial=1, total=10, ascii=True)
+
+    def test_tqdm_on_epoch(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.HISTORY: [0, (1, {'test': 0.99456})],
+                 torchbearer.METRICS: {'test': 0.99456}}
+        tqdm = Tqdm(validation_label_letter='e', on_epoch=True)
+        tqdm.tqdm_module = MagicMock()
+        mock_tqdm = tqdm.tqdm_module
+
+        tqdm.on_start(state)
+        mock_tqdm.assert_called_once_with(initial=2, total=10)
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
+        mock_tqdm.return_value.update.assert_called_once_with(1)
+        mock_tqdm.return_value.set_postfix_str.reset_mock()
+        mock_tqdm.return_value.update.reset_mock()
+
+        tqdm.on_end_epoch(state)
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
+        mock_tqdm.return_value.update.assert_called_once_with(1)
+        mock_tqdm.return_value.set_postfix_str.reset_mock()
+
+        tqdm.on_end(state)
+        mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
+        self.assertEqual(mock_tqdm.return_value.close.call_count, 1)
