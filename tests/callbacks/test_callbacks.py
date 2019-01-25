@@ -59,3 +59,15 @@ class TestCallbackList(TestCase):
         clist = CallbackList([callback])
         clist2 = CallbackList([clist])
         self.assertTrue(clist2.callback_list[0] == 'test')
+
+    def test_iter_copy(self):
+        callback = 'test'
+        clist = CallbackList([callback])
+        cpy = clist.__copy__()
+        self.assertTrue(cpy.callback_list[0] == 'test')
+        self.assertTrue(cpy is not clist)
+        cpy = clist.copy()
+        self.assertTrue(cpy.callback_list[0] == 'test')
+        self.assertTrue(cpy is not clist)
+        for cback in clist:
+            self.assertTrue(cback == 'test')
