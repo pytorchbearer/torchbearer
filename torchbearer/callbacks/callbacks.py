@@ -20,7 +20,7 @@ class CallbackList(Callback):
     CALLBACK_TYPES = 'callback_types'
 
     def __init__(self, callback_list):
-        super().__init__()
+        super(CallbackList, self).__init__()
         self.callback_list = []
         self.append(callback_list)
 
@@ -61,7 +61,7 @@ class CallbackList(Callback):
                 callback.load_state_dict(next(s_iter))
             else:
                 import warnings
-                warnings.warn('Callback classes did not match, expected: ' + str({c.__name__ for c in state_dict[CallbackList.CALLBACK_TYPES]}))
+                warnings.warn('Callback classes did not match, expected: ' + str([c.__name__ for c in state_dict[CallbackList.CALLBACK_TYPES]]))
 
         self._for_list(from_state)
 

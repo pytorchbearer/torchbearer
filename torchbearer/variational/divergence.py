@@ -42,7 +42,7 @@ class DivergenceBase(callbacks.Callback):
         def store(state, val):
             state[state_key] = val.detach()
 
-        self._store = store if state_key is not None else (lambda state, val: ...)
+        self._store = store if state_key is not None else (lambda state, val: None)
 
     def with_post_function(self, post_fcn):
         """Register the given post function, to be applied after to loss after reduction.
@@ -140,19 +140,18 @@ class DivergenceBase(callbacks.Callback):
             :class:`.Divergence`: self
         """
         inc = steps / (max_c - min_c)
-        c = min_c
+        d = {'c': min_c}
         old_callback = self.on_step_training
 
         @functools.wraps(old_callback)
         def step_c(state):
-            nonlocal c
-            if c < max_c:
-                c += inc
+            if d['c'] < max_c:
+                d['c'] += inc
             return old_callback(state)
         self.on_step_training = step_c
 
         def limit_div(loss):
-            return gamma * (loss - c).abs()
+            return gamma * (loss - d['c']).abs()
         return self.with_post_function(limit_div)
 
 
@@ -168,7 +167,7 @@ class SimpleNormalUnitNormalKL(DivergenceBase):
         state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
     """
     def __init__(self, input_key, state_key=None):
-        super().__init__({'input': input_key}, state_key=state_key)
+        super(SimpleNormalUnitNormalKL, self).__init__({'input': input_key}, state_key=state_key)
 
     def compute(self, input):
         mu, logvar = input.mu, input.logvar
@@ -188,7 +187,7 @@ class SimpleNormalSimpleNormalKL(DivergenceBase):
         state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
     """
     def __init__(self, input_key, target_key, state_key=None):
-        super().__init__({'input': input_key, 'target': target_key}, state_key=state_key)
+        super(SimpleNormalSimpleNormalKL, self).__init__({'input': input_key, 'target': target_key}, state_key=state_key)
 
     def compute(self, input, target):
         mu_1, logvar_1 = input.mu, input.logvar

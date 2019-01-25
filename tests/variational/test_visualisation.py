@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, Mock
+from mock import patch, Mock
 
 import torch
 
@@ -87,7 +87,7 @@ class TestLatentWalker(unittest.TestCase):
 
         self.assertTrue(state['test_key'] == "Test")
 
-    def test_data_key(self):
+    def test_data_key_str(self):
         data_key = 'test_key'
         state = {tb.MODEL: Mock(), tb.X: Mock(), tb.DEVICE: 'cpu', data_key: 3}
 
@@ -118,6 +118,7 @@ class TestLatentWalker(unittest.TestCase):
         walker = vis.LatentWalker(False, 0)
         self.assertRaises(NotImplementedError, lambda: walker.vis({}))
 
+
 class TestReconstructionViewer(unittest.TestCase):
     def test_recon(self):
         import torch
@@ -134,7 +135,7 @@ class TestReconstructionViewer(unittest.TestCase):
 
 class TestLinspaceWalker(unittest.TestCase):
     def __init__(self, methodName):
-        super().__init__(methodName)
+        super(TestLinspaceWalker, self).__init__(methodName)
         import torch
         self.state = {tb.X: torch.rand(12,1,2,2), tb.Y_PRED: torch.rand(2)}
 
@@ -234,7 +235,7 @@ class TestLinspaceWalker(unittest.TestCase):
 
 class TestRandomWalker(unittest.TestCase):
     def __init__(self, methodName):
-        super().__init__(methodName)
+        super(TestRandomWalker, self).__init__(methodName)
         import torch
         self.state = {tb.X: torch.rand(12,1,2,2), tb.Y_PRED: torch.rand(2)}
 
@@ -292,7 +293,7 @@ class TestRandomWalker(unittest.TestCase):
 
 class TestCodePathWalker(unittest.TestCase):
     def __init__(self, methodName):
-        super().__init__(methodName)
+        super(TestCodePathWalker, self).__init__(methodName)
         import torch
         self.state = {tb.X: torch.rand(12,1,2,2), tb.Y_PRED: torch.rand(2)}
 
@@ -325,7 +326,7 @@ class TestCodePathWalker(unittest.TestCase):
 
 class TestImagePathWalker(unittest.TestCase):
     def __init__(self, methodName):
-        super().__init__(methodName)
+        super(TestImagePathWalker, self).__init__(methodName)
         import torch
         self.state = {tb.X: torch.rand(12,1,2,2), tb.Y_PRED: torch.rand(2)}
 
@@ -337,10 +338,8 @@ class TestImagePathWalker(unittest.TestCase):
         self.mock_model.encode.return_value = [self.codes]
         self.mock_model.decode.return_value = self.outputs
 
-    @patch('builtins.super')
-    def test_vis(self, mock_super):
-        mock_super.return_value.vis = Mock()
-
+    @patch('torchbearer.variational.CodePathWalker.vis')
+    def test_vis(self, _):
         im1 = torch.rand(2, 5, 5)
         im2 = torch.rand(2, 5, 5)
         ipw = vis.ImagePathWalker(4, im1, im2)
@@ -351,4 +350,3 @@ class TestImagePathWalker(unittest.TestCase):
 
         self.assertTrue((self.mock_model.encode.call_args_list[0][0][0] == im1).all())
         self.assertTrue((self.mock_model.encode.call_args_list[1][0][0] == im2).all())
-

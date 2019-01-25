@@ -4,12 +4,13 @@ Metric wrappers are classes which wrap instances of :class:`.Metric` or, in the 
 but via the :mod:`decorator API<.metrics.decorators>`.
 """
 import torchbearer
-from torchbearer import metrics
+from torchbearer.bases import Metric
+from .metrics import AdvancedMetric
 
 import torch
 
 
-class ToDict(metrics.AdvancedMetric):
+class ToDict(AdvancedMetric):
     """The :class:`ToDict` class is an :class:`.AdvancedMetric` which will put output from the inner :class:`.Metric` in
     a dict (mapping metric name to value) before returning. When in `eval` mode, 'val\_' will be prepended to the metric
     name.
@@ -60,7 +61,7 @@ class ToDict(metrics.AdvancedMetric):
             return {self.eval_flag + '_' + self.metric.name: val}
 
     def eval(self, data_key=None):
-        super().eval(data_key=data_key)
+        super(ToDict, self).eval(data_key=data_key)
         if data_key == torchbearer.TEST_DATA:
             self.eval_flag = 'test'
         elif data_key == torchbearer.TRAIN_DATA:
@@ -70,15 +71,15 @@ class ToDict(metrics.AdvancedMetric):
         self.metric.eval(data_key=data_key)
 
     def train(self):
-        super().train()
+        super(ToDict, self).train()
         self.metric.train()
 
     def reset(self, state):
-        super().reset(state)
+        super(ToDict, self).reset(state)
         self.metric.reset(state)
 
 
-class BatchLambda(metrics.Metric):
+class BatchLambda(Metric):
     """A metric which returns the output of the given function on each batch.
 
     Args:
@@ -103,7 +104,7 @@ class BatchLambda(metrics.Metric):
         return self._metric_function(state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
 
 
-class EpochLambda(metrics.AdvancedMetric):
+class EpochLambda(AdvancedMetric):
     """A metric wrapper which computes the given function for concatenated values of 'y_true' and 'y_pred' each epoch.
     Can be used as a running metric which computes the function for batches of outputs with a given step size during
     training.
@@ -123,7 +124,7 @@ class EpochLambda(metrics.AdvancedMetric):
         self._result = 0.0
 
         if not running:
-            self._step = lambda y_pred, y_true: ...
+            self._step = lambda y_pred, y_true: None
 
     def process_train(self, *args):
         """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension, this must be the batch dimension.
@@ -182,6 +183,6 @@ class EpochLambda(metrics.AdvancedMetric):
         Args:
             state (dict): The :class:`.torchbearer.Trial` state.
         """
-        super().reset(state)
+        super(EpochLambda, self).reset(state)
         self._y_true = None
         self._y_pred = None

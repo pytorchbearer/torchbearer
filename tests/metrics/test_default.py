@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
 import torch.nn as nn
 import torch.nn.functional as F

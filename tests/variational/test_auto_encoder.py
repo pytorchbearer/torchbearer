@@ -1,7 +1,7 @@
 import torch
 import unittest
 import torchbearer as tb
-from unittest.mock import Mock
+from mock import Mock
 
 import torchbearer.variational.auto_encoder as ae
 
