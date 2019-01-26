@@ -177,12 +177,8 @@ def load_batch_infinite(loader):
         try:
             loader(state)
         except StopIteration:
-            if state[torchbearer.GENERATOR] is not None:
-                state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR])
-                loader(state)
-            else:
-                # TODO: We dont really want to stop training, but stop iterations. Find better way
-                state[torchbearer.STOP_TRAINING] = True
+            state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR])
+            loader(state)
 
     return call
 
