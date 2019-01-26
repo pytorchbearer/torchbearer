@@ -8,7 +8,7 @@ import torchbearer as tb
 import torchbearer.callbacks as callbacks
 from torchbearer import Trial
 from torchbearer.metrics import Metric
-from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype, CallbackListInjection
+from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, load_batch_infinite, update_device_and_dtype, CallbackListInjection
 
 
 class TestMockOptimizer(TestCase):
@@ -2242,6 +2242,32 @@ class TestTrialFunctions(TestCase):
         load_batch_standard(state)
         self.assertTrue(state[tb.X].item() == items[0][0].item())
         self.assertTrue(state[tb.Y_TRUE].item() == items[0][1].item())
+
+    def test_load_batch_inf_standard_normal(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        iterator = iter(items)
+        state = {tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        loader = load_batch_infinite(load_batch_standard)
+
+        for i in range(2):
+            loader(state)
+        self.assertTrue(state[tb.X].item() == items[1][0].item())
+        self.assertTrue(state[tb.Y_TRUE].item() == items[1][1].item())
+
+    def test_load_batch_inf_standard_too_many(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        iterator = iter(items)
+
+        state = {tb.GENERATOR: items, tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        loader = load_batch_infinite(load_batch_standard)
+
+        for i in range(12):
+            loader(state)
+
+        self.assertTrue(state[tb.X].item() == items[2][0].item())
+        self.assertTrue(state[tb.Y_TRUE].item() == items[2][1].item())
 
     def test_load_batch_none(self):
         items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
