@@ -167,6 +167,22 @@ class TestInterval(TestCase):
 
         self.assertTrue(mock_save_check.call_count == 3)
 
+    @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_interval_on_batch(self, mock_save_check):
+        state = {}
+        check = Interval('test_file', period=4, on_batch=True)
+
+        for i in range(13):
+            check.on_step_training(state)
+            if i == 3:
+                self.assertTrue(mock_save_check.call_count == 1)
+            elif i == 6:
+                self.assertFalse(mock_save_check.call_count == 2)
+            elif i == 7:
+                self.assertTrue(mock_save_check.call_count == 2)
+        check.on_checkpoint(state)
+        self.assertTrue(mock_save_check.call_count == 3)
+
     def test_state_dict(self):
         check = Interval('test')
         check.epochs_since_last_save = 10

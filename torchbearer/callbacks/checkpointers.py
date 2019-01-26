@@ -161,16 +161,21 @@ class Interval(_Checkpointer):
 
     Args:
         filepath (str): Path to save the model file
-        period (int): Interval (number of epochs) between checkpoints
+        period (int): Interval (number of steps) between checkpoints
+        on_batch (bool): If true step each batch, if false step each epoch.
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1, on_batch=False, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
         super(Interval, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.period = period
         self.epochs_since_last_save = 0
+
+        if on_batch:
+            self.on_step_training = self.on_checkpoint
+            self.on_checkpoint = lambda _: None
 
     def state_dict(self):
         state_dict = super(Interval, self).state_dict()
