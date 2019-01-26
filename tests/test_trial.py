@@ -124,6 +124,22 @@ class TestWithGenerators(TestCase):
         self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 10)
 
     @patch('warnings.warn')
+    def test_with_train_generator_ing_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.with_train_generator(generator, -1)
+
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+
+    @patch('warnings.warn')
     def test_with_train_generator_fractional_steps(self, _):
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -2155,6 +2171,38 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.GENERATOR: (generator, steps)}
         t.test_func()
         self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_predict)
+
+    @patch('torchbearer.trial.load_batch_infinite')
+    def test_inject_sampler_infinite(self, mock_lbi):
+        generator = MagicMock()
+        steps = -1
+
+        class SomeClass:
+            @tb.inject_sampler(tb.GENERATOR, predict=True)
+            def test_func(self):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.GENERATOR: (generator, steps)}
+        t.test_func()
+        self.assertTrue(mock_lbi.call_args[0][0] == load_batch_predict)
+        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_infinite(load_batch_predict))
+
+    @patch('torchbearer.trial.load_batch_infinite')
+    def test_inject_sampler_infinite_standard(self, mock_lbi):
+        generator = MagicMock()
+        steps = -1
+
+        class SomeClass:
+            @tb.inject_sampler(tb.GENERATOR, predict=False)
+            def test_func(self):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.GENERATOR: (generator, steps)}
+        t.test_func()
+        self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
+        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_infinite(load_batch_standard))
 
     def test_inject_sampler_data_key(self):
         generator = MagicMock()
