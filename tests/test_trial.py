@@ -121,7 +121,7 @@ class TestWithGenerators(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
         torchbearertrial.with_train_generator(generator, 10)
 
-        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 2)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 10)
 
     @patch('warnings.warn')
     def test_with_train_generator_fractional_steps(self, _):
@@ -201,7 +201,7 @@ class TestWithGenerators(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
         torchbearertrial.with_val_generator(generator, 10)
 
-        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == 2)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == 10)
 
     @patch('warnings.warn')
     def test_with_val_generator_fractional_steps(self, _):
@@ -281,7 +281,7 @@ class TestWithGenerators(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
         torchbearertrial.with_test_generator(generator, 10)
 
-        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 2)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 10)
 
     @patch('warnings.warn')
     def test_with_test_generator_fractional_steps(self, _):

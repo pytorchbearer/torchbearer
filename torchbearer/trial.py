@@ -13,6 +13,7 @@ else:
 
 import functools
 import warnings
+import itertools
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -165,6 +166,25 @@ def deep_to(batch, device, dtype):
 
     return batch
 
+def load_batch_infinite(loader):
+    """ Wraps a batch loader and refreshes the iterator once it has been completed.
+
+    Args:
+        loader: batch loader to wrap
+    """
+
+    def call(state):
+        try:
+            loader(state)
+        except StopIteration:
+            if state[torchbearer.GENERATOR] is not None:
+                state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR])
+                loader(state)
+            else:
+                # TODO: We dont really want to stop training, but stop iterations. Find better way
+                state[torchbearer.STOP_TRAINING] = True
+
+    return call
 
 def load_batch_standard(state):
     """ Load a standard (input data, target) tuple mini-batch from iterator into state
@@ -175,7 +195,6 @@ def load_batch_standard(state):
     state[torchbearer.X], state[torchbearer.Y_TRUE] = deep_to(next(state[torchbearer.ITERATOR]),
                                                               state[torchbearer.DEVICE],
                                                               state[torchbearer.DATA_TYPE])
-
 
 def load_batch_none(state):
     """ Load a none (none, none) tuple mini-batch into state
@@ -236,6 +255,11 @@ def inject_sampler(data_key, predict=False):
                 loader = load_batch_predict
             else:
                 loader = load_batch_standard
+
+            if generator is not None and steps is not None and (steps > len(generator) or steps == -1):
+                if steps == -1: warnings.warn("Trial is set to run indefinitely. "
+                                              "Make sure you have some method to terminate safely.")
+                loader = load_batch_infinite(loader)
 
             self.state[torchbearer.DATA] = key
             self.state[torchbearer.SAMPLER] = Sampler(loader)
@@ -379,10 +403,11 @@ class Trial(object):
     def for_train_steps(self, steps):
         """Run this trial for the given number of training steps. Note that the generator will output (None, None) if it
         has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
-        convenience.
+        convenience. If steps is larger than dataset size then loader will be refreshed like if it was a new epoch. If
+        steps is -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
         Args:
-            steps (int): The number of training steps per epoch to run
+            steps (int): The number of training steps per epoch to run.
 
         Returns:
             :class:`.Trial`: self
@@ -390,10 +415,6 @@ class Trial(object):
         if not isinstance(steps, int):
             warnings.warn("Number of training steps is not an int, casting to int")
             steps = int(steps)
-        generator = self.state[torchbearer.TRAIN_GENERATOR]
-        if generator is not None and steps > len(generator):
-            warnings.warn("Number of training steps exceeds number of data items, limiting to number of items")
-            steps = len(generator)
         self.state[torchbearer.TRAIN_STEPS] = steps
         self.state[torchbearer.TRAIN_DATA] = (self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
 
@@ -403,7 +424,7 @@ class Trial(object):
 
         Args:
             generator: The train data generator to use during calls to :meth:`.run`
-            steps (int): The number of steps per epoch to take when using this generator
+            steps (int): The number of steps per epoch to take when using this generator.
 
         Returns:
             :class:`.Trial`: self
@@ -435,7 +456,8 @@ class Trial(object):
     def for_val_steps(self, steps):
         """Run this trial for the given number of validation steps. Note that the generator will output (None, None) if
         it has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
-        convenience.
+        convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
+        steps -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
         Args:
             steps (int): The number of validation steps per epoch to run
@@ -446,10 +468,6 @@ class Trial(object):
         if not isinstance(steps, int):
             warnings.warn("Number of validation steps is not an int, casting to int")
             steps = int(steps)
-        generator = self.state[torchbearer.VALIDATION_GENERATOR]
-        if generator is not None and steps > len(generator):
-            warnings.warn("Number of validation steps exceeds number of data items, limiting to number of items")
-            steps = len(generator)
         self.state[torchbearer.VALIDATION_STEPS] = steps
         self.state[torchbearer.VALIDATION_DATA] = (self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
 
@@ -492,7 +510,8 @@ class Trial(object):
     def for_test_steps(self, steps):
         """Run this trial for the given number of test steps. Note that the generator will output (None, None) if
         it has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
-        convenience.
+        convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
+        steps -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
         Args:
             steps (int): The number of test steps per epoch to run (when using :meth:`.predict`)
@@ -503,10 +522,6 @@ class Trial(object):
         if not isinstance(steps, int):
             warnings.warn("Number of test steps is not an int, casting to int")
             steps = int(steps)
-        generator = self.state[torchbearer.TEST_GENERATOR]
-        if generator is not None and steps > len(generator):
-            warnings.warn("Number of test steps exceeds number of data items, limiting to number of items")
-            steps = len(generator)
         self.state[torchbearer.TEST_STEPS] = steps
         self.state[torchbearer.TEST_DATA] = (self.state[torchbearer.TEST_GENERATOR], self.state[torchbearer.TEST_STEPS])
 
@@ -545,7 +560,8 @@ class Trial(object):
     @fluent
     def for_steps(self, train_steps=None, val_steps=None, test_steps=None):
         """Use this trial for the given number of train, val and test steps. Returns self so that methods can be chained
-        for convenience.
+        for convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
+        steps -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
         Args:
             train_steps (int): The number of training steps per epoch to run
@@ -651,8 +667,7 @@ class Trial(object):
         state[torchbearer.METRICS] = {}
 
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
-
-        for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
+        for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()) :
             state[torchbearer.SAMPLER].sample(state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
