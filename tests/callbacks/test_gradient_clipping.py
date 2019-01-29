@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from mock import patch, Mock
 
 import torchbearer
 from torchbearer.callbacks import GradientNormClipping, GradientClipping
@@ -20,7 +20,7 @@ class TestGradientNormClipping(TestCase):
         clipper.on_start(state)
         clipper.on_backward(state)
 
-        self.assertTrue(next(mock_clip.mock_calls[0][1][0])() == -1)
+        self.assertTrue(next(iter(mock_clip.mock_calls[0][1][0]))() == -1)
 
     @patch('torch.nn.utils.clip_grad_norm_')
     def test_given_params(self, mock_clip):
@@ -78,7 +78,7 @@ class TestGradientClipping(TestCase):
         clipper.on_start(state)
         clipper.on_backward(state)
 
-        self.assertTrue(next(mock_clip.mock_calls[0][1][0])() == -1)
+        self.assertTrue(next(iter(mock_clip.mock_calls[0][1][0]))() == -1)
 
     @patch('torch.nn.utils.clip_grad_value_')
     def test_given_params(self, mock_clip):

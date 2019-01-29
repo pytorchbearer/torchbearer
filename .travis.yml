@@ -1,6 +1,12 @@
 language: python
 matrix:
   include:
+    - python: "2.7"
+      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp27-cp27mu-linux_x86_64.whl
+    - python: "2.7"
+      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp27-cp27mu-linux_x86_64.whl
+    - python: "2.7"
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp27-cp27mu-linux_x86_64.whl
     - python: "3.5"
       env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp35-cp35m-linux_x86_64.whl
     - python: "3.5"

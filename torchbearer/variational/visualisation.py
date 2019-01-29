@@ -209,7 +209,7 @@ class CodePathWalker(LatentWalker):
             p1 (:class:`torch.Tensor`): Batch of codes
             p2 (:class:`torch.Tensor`): Batch of codes
         """
-        super().__init__(True, num_steps)
+        super(CodePathWalker, self).__init__(True, num_steps)
         self.p1 = p1
         self.p2 = p2
         self.num_steps = num_steps
@@ -236,11 +236,11 @@ class ImagePathWalker(CodePathWalker):
             im1 (:class:`torch.Tensor`): Batch of images
             im2 (:class:`torch.Tensor`): Batch of images
         """
-        super().__init__(num_steps, None, None)
+        super(ImagePathWalker, self).__init__(num_steps, None, None)
         self.im1, self.im2 = im1, im2
 
     def vis(self, state):
         self.p1 = self.model.encode(self.im1.to(self.dev), state)
         self.p2 = self.model.encode(self.im2.to(self.dev), state)
 
-        return super().vis(state)
+        return super(ImagePathWalker, self).vis(state)

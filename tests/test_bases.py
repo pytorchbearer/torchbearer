@@ -3,7 +3,7 @@ import unittest
 import torch
 
 import torchbearer
-from torchbearer.callbacks import Callback
+from torchbearer.bases import Metric, Callback
 from torchbearer.metrics.primitives import CategoricalAccuracy
 
 
@@ -27,6 +27,11 @@ class TestMetric(unittest.TestCase):
         result = self._metric.process(self._state)
         self.assertTrue(self._state[torchbearer.Y_PRED].requires_grad is True)
         self.assertTrue(result.requires_grad is False)
+
+    def test_empty_methods(self):
+        metric = Metric(name='test')
+        self.assertTrue(metric.process() is None)
+        self.assertTrue(metric.process_final() is None)
 
 
 class TestCallback(unittest.TestCase):

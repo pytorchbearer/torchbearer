@@ -1,13 +1,11 @@
 import unittest
 
-from unittest.mock import Mock, call
-
+import torch
+from mock import Mock, call
 from torch.autograd import Variable
 
 import torchbearer
-from torchbearer.metrics import Std, Metric, Mean, BatchLambda, EpochLambda, ToDict
-
-import torch
+from torchbearer.metrics import Metric, BatchLambda, EpochLambda, ToDict
 
 
 class TestToDict(unittest.TestCase):

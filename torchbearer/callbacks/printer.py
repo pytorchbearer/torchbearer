@@ -1,3 +1,4 @@
+from __future__ import print_function
 from collections import OrderedDict
 from functools import partial
 
@@ -41,7 +42,7 @@ class ConsolePrinter(Callback):
         - :attr:`torchbearer.state.METRICS`: The metrics dict to print
     """
     def __init__(self, validation_label_letter='v', precision=4):
-        super().__init__()
+        super(ConsolePrinter, self).__init__()
         self.validation_label = validation_label_letter
         self.rounder = partial(round, ndigits=precision)
 

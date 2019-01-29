@@ -1,4 +1,16 @@
-from inspect import signature
+import sys
+if sys.version_info[0] < 3:
+    import inspect
+
+    def count_args(fcn):
+        return len(inspect.getargspec(fcn).args)
+else:
+    from inspect import signature
+
+    def count_args(fcn):
+        return len(signature(fcn).parameters)
+
+import types
 
 import torchbearer
 from torchbearer.callbacks import Callback
@@ -18,7 +30,7 @@ def bind_to(target):
             callback = func
         else:
             callback = LambdaCallback(func)
-        setattr(callback, target.__name__, lambda state: callback.on_lambda(state))
+        setattr(callback, target.__name__, types.MethodType(lambda self, state: self.on_lambda(state), callback))
         return callback
     return decorator
 
@@ -272,12 +284,11 @@ def once(fcn):
     Returns:
         the decorator
     """
-    done = False
+    d = {'done': False}
 
     def _once(_):
-        nonlocal done
-        if not done:
-            done = True
+        if not d['done']:
+            d['done'] = True
             return True
         return False
 
@@ -294,12 +305,11 @@ def once_per_epoch(fcn):
     Returns:
         the decorator
     """
-    last_epoch = None
+    d = {'last_epoch': None}
 
     def ope(state):
-        nonlocal last_epoch
-        if state[torchbearer.EPOCH] != last_epoch:
-            last_epoch = state[torchbearer.EPOCH]
+        if state[torchbearer.EPOCH] != d['last_epoch']:
+            d['last_epoch'] = state[torchbearer.EPOCH]
             return True
         return False
 
@@ -321,11 +331,11 @@ def only_if(condition_expr):
     """
     def condition_decorator(fcn):
         if isinstance(fcn, LambdaCallback):
-            fcn.on_lambda = condition_decorator(fcn.on_lambda)
+            fcn.func = condition_decorator(fcn.func)
             return fcn
         else:
-            params = signature(fcn).parameters
-            if len(params) == 2:  # Assume Class method
+            count = count_args(fcn)
+            if count == 2:  # Assume Class method
                 def decfcn(o, state):
                     if condition_expr(state):
                         fcn(o, state)

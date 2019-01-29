@@ -1,6 +1,6 @@
 import unittest
 
-from unittest.mock import Mock, call
+from mock import Mock, call
 
 from torchbearer.metrics import RunningMean, Metric, RunningMetric, Mean, Std, Var
 
