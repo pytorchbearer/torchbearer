@@ -72,7 +72,6 @@ class SimpleDistribution(Distribution):
 
     def log_prob(self, value):
         """Returns the log of the probability density/mass function evaluated at `value`.
-
         Args:
             value (torch.Tensor, Number): Value at which to evaluate log probabilty
         """
