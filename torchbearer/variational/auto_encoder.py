@@ -5,7 +5,7 @@ import torchbearer
 
 class AutoEncoderBase(nn.Module):
     def __init__(self, latent_dims):
-        super().__init__()
+        super(AutoEncoderBase, self).__init__()
         self.latent_dims = latent_dims
 
     def encode(self, x, state=None):

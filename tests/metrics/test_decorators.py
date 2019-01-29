@@ -1,5 +1,6 @@
 import unittest
-from unittest.mock import patch, Mock
+
+from mock import Mock
 
 import torchbearer.metrics as metrics
 from torchbearer.metrics import default_for_key, lambda_metric, EpochLambda, BatchLambda
@@ -23,7 +24,7 @@ class TestDecorators(unittest.TestCase):
 
         class MyMetric(metrics.Metric):
             def __init__(self, *args, **kwargs):
-                super().__init__('test')
+                super(MyMetric, self).__init__('test')
                 mock(*args, **kwargs)
 
         default_for_key('test', 10, some_arg='a test')(MyMetric)

@@ -1,3 +1,12 @@
+import sys
+if sys.version_info[0] < 3:
+    def set_doc(inner, doc):
+        return None  # Not simple to do in Python 2.7 so we can leave it for now, just build docs with Python 3+
+else:
+    def set_doc(inner, doc):
+        inner.__doc__ = doc
+
+
 def cite(bibtex):
     """A decorator which adds a reference to the **Google style** docstring of the given object. The ``Args:`` or
     ``Returns:`` line is then prepended with the given bibtex string at runtime. Otherwise, the last line is used.
@@ -27,6 +36,6 @@ def cite(bibtex):
 
         doc.insert(i, '')
         doc.insert(i, to_insert)
-        inner.__doc__ = '\n'.join(doc)
+        set_doc(inner, '\n'.join(doc))
         return inner
     return decorator

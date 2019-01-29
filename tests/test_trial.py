@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, Mock, patch, ANY
+from mock import MagicMock, Mock, patch, ANY
 
 import torch
 from torch.utils.data import DataLoader
@@ -66,19 +66,17 @@ class TestCallbackListInjection(TestCase):
         mock.append.assert_called_once_with('stuff to append')
 
     def test_order(self):
-        my_number = 10
+        d = {'my_number': 10}
 
         @callbacks.on_start
         def set_one(state):
-            nonlocal my_number
-            my_number = 1
+            d['my_number'] = 1
 
         set_one.on_end = Mock()
 
         @callbacks.on_start
         def set_two(state):
-            nonlocal my_number
-            my_number = 2
+            d['my_number'] = 2
 
         set_two.on_end = Mock()
 
@@ -89,7 +87,7 @@ class TestCallbackListInjection(TestCase):
         self.assertEqual(set_two.on_end.call_count, 1)
 
         injection.on_start({})
-        self.assertEqual(my_number, 2)
+        self.assertEqual(d['my_number'], 2)
 
 
 class TestWithGenerators(TestCase):
@@ -1942,7 +1940,11 @@ class TestTrialMembers(TestCase):
         torchbearer_state = torchbearertrial.state_dict()
         torchbearer_state[tb.VERSION] = '0.1.7'  # Old version
 
-        self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state, resume=True))
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            torchbearertrial.load_state_dict(torchbearer_state, resume=True)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
 
     def test_load_state_dict_not_torchbearer(self):
         torchmodel = torch.nn.Sequential(torch.nn.Linear(1, 1))
@@ -1956,7 +1958,11 @@ class TestTrialMembers(TestCase):
         torchbearer_state = torchbearertrial.state_dict()
         torchbearer_state[tb.VERSION] = '0.1.7'  # Old version
 
-        self.assertWarns(UserWarning, lambda: torchbearertrial.load_state_dict(torchbearer_state[tb.MODEL]))
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            torchbearertrial.load_state_dict(torchbearer_state[tb.MODEL])
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
 
         self.assertEqual(torchmodel.load_state_dict.call_count, 1)
         optimizer.load_state_dict.assert_not_called()

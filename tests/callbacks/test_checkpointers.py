@@ -1,8 +1,8 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from mock import patch, Mock
 
 import torchbearer
-from torchbearer import Model
+from torchbearer import Trial
 from torchbearer.callbacks.checkpointers import _Checkpointer, ModelCheckpoint, MostRecent, Interval, Best
 
 
@@ -17,7 +17,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {}
         }
 
@@ -33,7 +33,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {},
             torchbearer.EPOCH: 2
         }
@@ -50,7 +50,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {'test_metric': 0.001},
             torchbearer.EPOCH: 2
         }
@@ -67,7 +67,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {'test_metric': 0.001},
             torchbearer.EPOCH: 2
         }
@@ -84,7 +84,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {'test_metric': 0.001},
             torchbearer.EPOCH: 2
         }
@@ -104,7 +104,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.EPOCH: 0,
             torchbearer.METRICS: {}
         }

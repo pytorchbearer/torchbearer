@@ -1,10 +1,14 @@
 import math
 import unittest
-from unittest.mock import patch, Mock
+from mock import patch, Mock
 
 import torch
 
 from torchbearer.variational import SimpleDistribution, SimpleNormal, SimpleUniform, SimpleExponential, SimpleWeibull
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 
 class TestEmptyMethods(unittest.TestCase):
     def test_methods(self):
@@ -139,6 +143,10 @@ class TestSimpleExponential(unittest.TestCase):
 
         self.assertTrue(((dist.log_prob(torch.ones(2, 2)) + 1.1931).abs() < 0.0001).all())
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 class TestSimpleWeibull(unittest.TestCase):
     @patch('torchbearer.variational.distributions.torch.rand')
     def test_rsample_tensor(self, rand):
@@ -170,5 +178,8 @@ class TestSimpleWeibull(unittest.TestCase):
 
         self.assertTrue((dist.log_prob(1) < 0.0001).all())
         self.assertTrue((dist.log_prob(-1) == float('-inf')).all())
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> master

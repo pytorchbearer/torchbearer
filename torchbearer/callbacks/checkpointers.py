@@ -8,7 +8,7 @@ import os
 
 class _Checkpointer(Callback):
     def __init__(self, fileformat, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
-        super().__init__()
+        super(_Checkpointer, self).__init__()
         self.fileformat = fileformat
 
         self.pickle_module = pickle_module
@@ -75,11 +75,11 @@ class MostRecent(_Checkpointer):
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', pickle_module=torch.serialization.pickle,
                  pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
-        super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
+        super(MostRecent, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.filepath = filepath
 
     def on_checkpoint(self, state):
-        super().on_end_epoch(state)
+        super(MostRecent, self).on_end_epoch(state)
         self.save_checkpoint(state, overwrite_most_recent=True)
 
 
@@ -103,7 +103,7 @@ class Best(_Checkpointer):
                  min_delta=0, pickle_module=torch.serialization.pickle,
                  pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
-        super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
+        super(Best, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.min_delta = min_delta
         self.mode = mode
         self.monitor = monitor
@@ -126,14 +126,14 @@ class Best(_Checkpointer):
         self.best = None
 
     def state_dict(self):
-        state_dict = super().state_dict()
+        state_dict = super(Best, self).state_dict()
         state_dict['epochs'] = self.epochs_since_last_save
         state_dict['best'] = self.best
 
         return state_dict
 
     def load_state_dict(self, state_dict):
-        super().load_state_dict(state_dict)
+        super(Best, self).load_state_dict(state_dict)
         self.epochs_since_last_save = state_dict['epochs']
         self.best = state_dict['best']
 
@@ -144,7 +144,7 @@ class Best(_Checkpointer):
             self.best = float('inf') if self.mode == 'min' else -float('inf')
 
     def on_checkpoint(self, state):
-        super().on_end_epoch(state)
+        super(Best, self).on_end_epoch(state)
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
@@ -168,24 +168,24 @@ class Interval(_Checkpointer):
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
-        super().__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
+        super(Interval, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.period = period
         self.epochs_since_last_save = 0
 
     def state_dict(self):
-        state_dict = super().state_dict()
+        state_dict = super(Interval, self).state_dict()
         state_dict['epochs'] = self.epochs_since_last_save
 
         return state_dict
 
     def load_state_dict(self, state_dict):
-        super().load_state_dict(state_dict)
+        super(Interval, self).load_state_dict(state_dict)
         self.epochs_since_last_save = state_dict['epochs']
 
         return self
 
     def on_checkpoint(self, state):
-        super().on_end_epoch(state)
+        super(Interval, self).on_end_epoch(state)
 
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.period:

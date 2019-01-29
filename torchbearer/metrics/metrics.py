@@ -113,7 +113,7 @@ class MetricList(Metric):
     """
 
     def __init__(self, metric_list):
-        super().__init__('metric_list')
+        super(MetricList, self).__init__('metric_list')
 
         self.metric_list = []
 
