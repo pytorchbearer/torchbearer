@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import torch
 
 import torchbearer
-from torchbearer.variational import DivergenceBase, SimpleNormalUnitNormalKL, SimpleNormalSimpleNormalKL, SimpleNormal
+from torchbearer.variational import DivergenceBase, SimpleNormalUnitNormalKL, SimpleNormalSimpleNormalKL, SimpleNormal, SimpleWeibull, SimpleWeibullSimpleWeibullKL
 
 key = torchbearer.state_key('divergence_test')
 
@@ -156,3 +156,11 @@ class TestSimpleNormalSimpleNormalKL(unittest.TestCase):
         input = SimpleNormal(torch.zeros(2, 2), torch.ones(2, 2) * -1.3863)
         target = SimpleNormal(torch.ones(2, 2), torch.ones(2, 2) * 1.3863)
         self.assertTrue(((callback.compute(input, target) - 1.0425).abs() < 0.0001).all())
+
+class TestSimpleWeibullSimpleWeibullKL(unittest.TestCase):
+    def test_divergence(self):
+        callback = SimpleWeibullSimpleWeibullKL(key, key)
+        input = SimpleWeibull(torch.ones(2, 2), torch.zeros(2, 2) + 0.5)
+        target = SimpleWeibull(torch.ones(2, 2), torch.ones(2, 2) * 5)
+        self.assertTrue(((callback.compute(input, target) - 3628803.7500).abs() < 0.0001).all())
+

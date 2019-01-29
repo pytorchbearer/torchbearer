@@ -1,5 +1,6 @@
 import functools
 
+import torch
 import torchbearer
 from torchbearer import cite
 import torchbearer.callbacks as callbacks
@@ -18,6 +19,17 @@ understanding_beta_vae = """
   author={Burgess, Christopher P and Higgins, Irina and Pal, Arka and Matthey, Loic and Watters, Nick and Desjardins, Guillaume and Lerchner, Alexander},
   journal={arXiv preprint arXiv:1804.03599},
   year={2018}
+}
+"""
+
+weibullKL="""
+@article{DBLP:journals/corr/Bauckhage14,
+  author    = {Christian Bauckhage},
+  title     = {Computing the Kullback-Leibler Divergence between two Generalized
+               Gamma Distributions},
+  journal   = {CoRR},
+  volume    = {abs/1401.6853},
+  year      = {2014}
 }
 """
 
@@ -194,3 +206,33 @@ class SimpleNormalSimpleNormalKL(DivergenceBase):
         mu_1, logvar_1 = input.mu, input.logvar
         mu_2, logvar_2 = target.mu, target.logvar
         return 0.5 * (logvar_1.exp() / logvar_2.exp() + (mu_2 - mu_1).pow(2) / logvar_2.exp() + logvar_2 - logvar_1 - 1)
+
+@cite(weibullKL)
+class SimpleWeibullSimpleWeibullKL(DivergenceBase):
+    """A KL divergence between two SimpleWeibull (or similar) distributions.
+
+    .. note::
+
+       The distribution object must have lambda (scale) and k (shape) attributes
+
+     Args:
+        input_key: :class:`.StateKey` instance which will be mapped to the input distribution object.
+        target_key: :class:`.StateKey` instance which will be mapped to the target distribution object.
+        state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
+    """
+    def __init__(self, input_key, target_key, state_key=None):
+        super().__init__({'input': input_key, 'target': target_key}, state_key=state_key)
+        self.gamma=0.5772
+
+    def compute(self, input, target):
+        lambda_1, k_1 = input.l, input.k
+        lambda_2, k_2 = target.l, target.k
+        a = torch.log(k_1 / torch.pow(lambda_1, k_1))
+        b = torch.log(k_2 / torch.pow(lambda_2, k_2))
+        c = torch.mul((k_1 - k_2), (torch.log(lambda_1) - self.gamma / k_1))
+        n = k_2 / k_1 + 1
+        gammaf = torch.exp(torch.lgamma(n))
+        d = torch.mul(torch.pow(torch.div(lambda_1, lambda_2), k_2), gammaf)
+        loss = torch.mean(a - b + c + d - 1)
+        return loss
+
