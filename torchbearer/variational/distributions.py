@@ -21,10 +21,7 @@ author={Steven Squires and Adam Prugel-Bennett and Mahesan Niranjan},
 year={2019}
 }
 """
-<<<<<<< HEAD
-=======
 
->>>>>>> master
 
 class SimpleDistribution(Distribution):
     """Abstract base class for a simple distribution which only implements rsample and log_prob. If the log_prob
@@ -85,6 +82,7 @@ class SimpleNormal(SimpleDistribution):
     """The SimpleNormal class is a :class:`SimpleDistribution` which implements a straight forward Normal / Gaussian
     distribution. This performs significantly fewer checks than `torch.distributions.Normal`, but should be sufficient
     for the purpose of implementing a VAE.
+
     Args:
         mu (torch.Tensor, Number): The mean of the distribution, numbers will be cast to tensors
         logvar (torch.Tensor, Number): The log variance of the distribution, numbers will be cast to tensors
@@ -100,6 +98,7 @@ class SimpleNormal(SimpleDistribution):
 
     def rsample(self, sample_shape=torch.Size()):
         """Simple rsample for a Normal distribution.
+
         Args:
             sample_shape (torch.Size, tuple): Shape of the sample (per mean / variance given)
         Returns:
@@ -114,6 +113,7 @@ class SimpleNormal(SimpleDistribution):
     def log_prob(self, value):
         """Calculates the log probability that the given value was drawn from this distribution. Since the density of a
         Gaussian is differentiable, this function is differentiable.
+
         Args:
             value (torch.Tensor, Number): The sampled value
         Returns:
@@ -127,6 +127,7 @@ class SimpleUniform(SimpleDistribution):
     """The SimpleUniform class is a :class:`SimpleDistribution` which implements a straight forward Uniform distribution
     in the interval ``[low, high)``. This performs significantly fewer checks than `torch.distributions.Uniform`, but
     should be sufficient for the purpose of implementing a VAE.
+
     Args:
         low (torch.Tensor, Number): The lower range of the distribution (inclusive), numbers will be cast to tensors
         high (torch.Tensor, Number): The upper range of the distribution (exclusive), numbers will be cast to tensors
@@ -142,6 +143,7 @@ class SimpleUniform(SimpleDistribution):
 
     def rsample(self, sample_shape=torch.Size()):
         """Simple rsample for a Uniform distribution.
+
         Args:
             sample_shape (torch.Size, tuple): Shape of the sample (per low / high given)
         Returns:
@@ -155,6 +157,7 @@ class SimpleUniform(SimpleDistribution):
         """Calculates the log probability that the given value was drawn from this distribution. Since this distribution
         is uniform, the log probability is zero for all values in the range ``[low, high)`` and -inf elsewhere. This
         function is therefore non-differentiable.
+
         Args:
             value (torch.Tensor, Number): The sampled value
         Returns:
@@ -171,6 +174,7 @@ class SimpleExponential(SimpleDistribution):
     distribution with the given lograte. This performs significantly fewer checks than `torch.distributions.Exponential`
     , but should be sufficient for the purpose of implementing a VAE. By using a lograte, the log_prob can be computed
     in a stable fashion, without taking a logarithm.
+
     Args:
         lograte (torch.Tensor, Number): The natural log of the rate of the distribution, numbers will be cast to tensors
     """
@@ -182,6 +186,7 @@ class SimpleExponential(SimpleDistribution):
 
     def rsample(self, sample_shape=torch.Size()):
         """Simple rsample for an Exponential distribution.
+
         Args:
             sample_shape (torch.Size, tuple): Shape of the sample (per lograte given)
         Returns:
@@ -193,6 +198,7 @@ class SimpleExponential(SimpleDistribution):
     def log_prob(self, value):
         """Calculates the log probability that the given value was drawn from this distribution. The log_prob for this
         distribution is fully differentiable and has stable gradient since we use the lograte here.
+
         Args:
             value (torch.Tensor, Number): The sampled value
         Returns:
@@ -200,19 +206,13 @@ class SimpleExponential(SimpleDistribution):
         """
         return self.lograte - self.lograte.exp() * value
 
-<<<<<<< HEAD
-=======
 
->>>>>>> master
 @cite(steve)
 class SimpleWeibull(SimpleDistribution):
     """The SimpleWeibull class is a :class:`SimpleDistribution` which implements a straight forward Weibull
     distribution. This performs significantly fewer checks than `torch.distributions.Weibull`, but should be sufficient
     for the purpose of implementing a VAE.
-<<<<<<< HEAD
-=======
 
->>>>>>> master
     Args:
         l (torch.Tensor, Number): The scale parameter of the distribution, numbers will be cast to tensors
         k (torch.Tensor, Number): The shape parameter of the distribution, numbers will be cast to tensors
@@ -225,18 +225,12 @@ class SimpleWeibull(SimpleDistribution):
             batch_shape = torch.Size()
         else:
             batch_shape = self.k.size()
-<<<<<<< HEAD
-        super().__init__(batch_shape=batch_shape)
 
-    def rsample(self, sample_shape=torch.Size()):
-        """Simple rsample for a Weibull distribution.
-=======
         super(SimpleWeibull, self).__init__(batch_shape=batch_shape)
 
     def rsample(self, sample_shape=torch.Size()):
         """Simple rsample for a Weibull distribution.
 
->>>>>>> master
         Args:
             sample_shape (torch.Size, tuple): Shape of the sample (per k / lambda given)
         Returns:
@@ -249,10 +243,7 @@ class SimpleWeibull(SimpleDistribution):
     def log_prob(self, value):
         """Calculates the log probability that the given value was drawn from this distribution.  This function is differentiable
         and its log probability is -inf for values less than 0.
-<<<<<<< HEAD
-=======
 
->>>>>>> master
         Args:
             value (torch.Tensor, Number): The sampled value
         Returns:

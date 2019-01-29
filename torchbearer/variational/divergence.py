@@ -220,7 +220,7 @@ class SimpleWeibullSimpleWeibullKL(DivergenceBase):
         state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
     """
     def __init__(self, input_key, target_key, state_key=None):
-        super().__init__({'input': input_key, 'target': target_key}, state_key=state_key)
+        super(SimpleWeibullSimpleWeibullKL, self).__init__({'input': input_key, 'target': target_key}, state_key=state_key)
         self.gamma=0.5772
 
     def compute(self, input, target):
