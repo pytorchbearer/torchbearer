@@ -403,6 +403,105 @@ class TestWithGenerators(TestCase):
         valgen.assert_called_once_with(val_generator, val_steps)
         testgen.assert_called_once_with(test_generator, test_steps)
 
+    @patch('warnings.warn')
+    def test_for_inf_train_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_train_steps()
+
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+
+    @patch('warnings.warn')
+    def test_for_inf_val_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_val_steps()
+
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == -1)
+
+
+    @patch('warnings.warn')
+    def test_for_inf_test_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_test_steps()
+
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == -1)
+
+    @patch('warnings.warn')
+    def test_for_inf_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(True, True, True)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == -1)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(True, False, True)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == -1)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(True, False, False)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] != -1)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(False, False, False)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] != -1)
+
+    @patch('warnings.warn')
+    def test_with_inf_train_loader(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.with_inf_train_loader()
+
+        self.assertTrue(torchbearertrial.state[tb.INF_TRAIN_LOADING])
 
 class TestWithData(TestCase):
     @patch('torchbearer.trial.TensorDataset')
@@ -2198,7 +2297,6 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.GENERATOR: (generator, steps)}
         t.test_func()
         self.assertTrue(mock_lbi.call_args[0][0] == load_batch_predict)
-        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_infinite(load_batch_predict))
 
     @patch('torchbearer.trial.load_batch_infinite')
     def test_inject_sampler_infinite_standard(self, mock_lbi):
@@ -2214,7 +2312,22 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.GENERATOR: (generator, steps)}
         t.test_func()
         self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
-        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_infinite(load_batch_standard))
+
+    @patch('torchbearer.trial.load_batch_infinite')
+    def test_inject_sampler_infinite_train_loading(self, mock_lbi):
+        generator = MagicMock()
+        generator.__len__.return_value = 10
+        steps = 5
+
+        class SomeClass:
+            @tb.inject_sampler(tb.TRAIN_DATA, predict=False)
+            def test_func(self):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.TRAIN_DATA: (generator, steps), tb.INF_TRAIN_LOADING: True}
+        t.test_func()
+        self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
 
     def test_inject_sampler_data_key(self):
         generator = MagicMock()

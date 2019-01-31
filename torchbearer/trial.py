@@ -632,7 +632,7 @@ class Trial(object):
         self.state[torchbearer.TEST_STEPS] = -1
 
     @fluent
-    def for_inf_steps(self, train=False, val=False, test=False):
+    def for_inf_steps(self, train=True, val=True, test=True):
         """
         Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
 
