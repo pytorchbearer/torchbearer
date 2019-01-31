@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added support for Python 2.7
 - Added support for infinite data loading 
 - Added support for batch intervals in interval checkpointer
+- Added SimpleWeibullSimpleWeibullKL
 ### Changed
 - Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
 - Tqdm precision argument now rounds to decimal places rather than significant figures
