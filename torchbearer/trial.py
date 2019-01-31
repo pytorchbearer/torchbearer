@@ -603,24 +603,59 @@ class Trial(object):
 
     @fluent
     def for_inf_train_steps(self):
+        """
+        Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
+
+        Returns:
+            :class:`.Trial`: self
+        """
         self.state[torchbearer.TRAIN_STEPS] = -1
 
     @fluent
     def for_inf_val_steps(self):
+        """
+        Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
+
+        Returns:
+            :class:`.Trial`: self
+        """
         self.state[torchbearer.VALIDATION_STEPS] = -1
 
     @fluent
     def for_inf_test_steps(self):
+        """
+        Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
+
+        Returns:
+            :class:`.Trial`: self
+        """
         self.state[torchbearer.TEST_STEPS] = -1
 
     @fluent
     def for_inf_steps(self, train=False, val=False, test=False):
+        """
+        Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
+
+        Args:
+            train (bool): Use an infinite number of training steps
+            val (bool): Use an infinite number of validation steps
+            test (bool): Use an infinite number of test steps
+
+        Returns:
+            :class:`.Trial`: self
+        """
         if train: self.for_inf_train_steps()
         if val: self.for_inf_val_steps()
         if test: self.for_inf_test_steps()
 
     @fluent
     def with_inf_train_loader(self):
+        """
+        Use this trial with a training iterator that refreshes when it finishes instead of each epoch. This allows for setting training steps less than the size of the generator and model will still see all training examples available if enough epochs are ran.
+
+        Returns:
+            :class:`.Trial`: self:
+        """
         self.state[torchbearer.INF_TRAIN_LOADING] = True
 
     @inject_printer()
