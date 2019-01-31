@@ -252,10 +252,14 @@ def inject_sampler(data_key, predict=False):
             else:
                 loader = load_batch_standard
 
-            if generator is not None and steps is not None and (steps > len(generator) or steps == -1):
-                if steps == -1: warnings.warn("Trial is set to run indefinitely. "
+            if generator is not None and steps is not None:
+                over_steps = steps > len(generator)
+                inf_steps = steps == -1
+                inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
+                if over_steps or inf_steps or inf_train_loader:
+                    if steps == -1: warnings.warn("Trial is set to run indefinitely. "
                                               "Make sure you have some method to terminate safely.")
-                loader = load_batch_infinite(loader)
+                    loader = load_batch_infinite(loader)
 
             self.state[torchbearer.DATA] = key
             self.state[torchbearer.SAMPLER] = Sampler(loader)
@@ -374,6 +378,7 @@ class Trial(object):
             torchbearer.TRAIN_DATA: None,
             torchbearer.VALIDATION_DATA: None,
             torchbearer.TEST_DATA: None,
+            torchbearer.INF_TRAIN_LOADING: False,
         })
 
     def __str__(self):
@@ -595,6 +600,28 @@ class Trial(object):
             self.with_val_generator(val_generator, val_steps)
         if test_generator is not None:
             self.with_test_generator(test_generator, test_steps)
+
+    @fluent
+    def for_inf_train_steps(self):
+        self.state[torchbearer.TRAIN_STEPS] = -1
+
+    @fluent
+    def for_inf_val_steps(self):
+        self.state[torchbearer.VALIDATION_STEPS] = -1
+
+    @fluent
+    def for_inf_test_steps(self):
+        self.state[torchbearer.TEST_STEPS] = -1
+
+    @fluent
+    def for_inf_steps(self, train=False, val=False, test=False):
+        if train: self.for_inf_train_steps()
+        if val: self.for_inf_val_steps()
+        if test: self.for_inf_test_steps()
+
+    @fluent
+    def with_inf_train_loader(self):
+        self.state[torchbearer.INF_TRAIN_LOADING] = True
 
     @inject_printer()
     def run(self, epochs=1, verbose=-1):

@@ -156,6 +156,9 @@ TRAIN_STEPS = state_key('train_steps')
 #: The flag representing train data
 TRAIN_DATA = state_key('train_data')
 
+#: Flag for refreshing of iterator when finished instead of each epoch
+INF_TRAIN_LOADING = state_key('inf_train_loading')
+
 #: The validation data generator in the Trial object
 VALIDATION_GENERATOR = state_key('validation_generator')
 
