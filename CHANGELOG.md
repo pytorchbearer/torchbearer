@@ -18,9 +18,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
 - Tqdm precision argument now rounds to decimal places rather than significant figures
+- Trial will now simply infer if the model has an argument called 'state'
 ### Deprecated
 ### Removed
 - Removed the old Model API (deprecated since version 0.2.0)
+- Removed the 'pass_state' argument from Trial, this will now be inferred
 ### Fixed
 - Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
 - Fixed a bug in the cite decorator causing the citation to not show up correctly
