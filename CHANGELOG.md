@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
 - Fixed a bug in the cite decorator causing the citation to not show up correctly
+- Fixed a memory leak with the mse primitive metric
 
 ## [0.2.6] - 2018-12-19
 ### Added
