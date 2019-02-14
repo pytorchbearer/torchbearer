@@ -7,12 +7,14 @@ import os
 
 
 class _Checkpointer(Callback):
-    def __init__(self, fileformat, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+    def __init__(self, fileformat, save_model_params_only=False, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
         super(_Checkpointer, self).__init__()
         self.fileformat = fileformat
 
         self.pickle_module = pickle_module
         self.pickle_protocol = pickle_protocol
+
+        self.save_model_params_only = save_model_params_only
 
         self.most_recent = None
 
@@ -30,13 +32,17 @@ class _Checkpointer(Callback):
         if self.most_recent is not None and overwrite_most_recent:
             os.remove(self.most_recent)
 
-        torch.save(model_state[torchbearer.SELF].state_dict(), filepath, pickle_module=self.pickle_module,
-                   pickle_protocol=self.pickle_protocol)
+        if self.save_model_params_only:
+            torch.save(model_state[torchbearer.MODEL].state_dict(), filepath, pickle_module=self.pickle_module,
+                       pickle_protocol=self.pickle_protocol)
+        else:
+            torch.save(model_state[torchbearer.SELF].state_dict(), filepath, pickle_module=self.pickle_module,
+                       pickle_protocol=self.pickle_protocol)
 
         self.most_recent = filepath
 
 
-def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
+def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False,
         monitor='val_loss', save_best_only=False, mode='auto', period=1, min_delta=0):
     """Save the model after every epoch. `filepath` can contain named formatting options, which will be filled any
     values from state. For example: if `filepath` is `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints
@@ -45,6 +51,9 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
 
     Args:
         filepath (str): Path to save the model file
+        save_model_params_only (bool): If `save_model_params_only=True`, only model parameters will be saved so that
+            the results can be loaded into a PyTorch nn.Module. The other option, `save_model_params_only=False`,
+            should be used only if the results will be loaded into a Torchbearer Trial object later.
         monitor (str): Quantity to monitor
         save_best_only (bool): If `save_best_only=True`, the latest best model according to the quantity
             monitored will not be overwritten
@@ -56,9 +65,9 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt',
         min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
     """
     if save_best_only:
-        check = Best(filepath, monitor, mode, period, min_delta)
+        check = Best(filepath, save_model_params_only, monitor, mode, period, min_delta)
     else:
-        check = Interval(filepath, period)
+        check = Interval(filepath, save_model_params_only, period)
 
     return check
 
@@ -68,14 +77,18 @@ class MostRecent(_Checkpointer):
 
     Args:
         filepath (str): Path to save the model file
+        save_model_params_only (bool): If `save_model_params_only=True`, only model parameters will be saved so that
+            the results can be loaded into a PyTorch nn.Module. The other option, `save_model_params_only=False`,
+            should be used only if the results will be loaded into a Torchbearer Trial object later.
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', pickle_module=torch.serialization.pickle,
-                 pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False,
+                 pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
-        super(MostRecent, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
+        super(MostRecent, self).__init__(filepath, save_model_params_only=save_model_params_only,
+                                         pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.filepath = filepath
 
     def on_checkpoint(self, state):
@@ -88,6 +101,9 @@ class Best(_Checkpointer):
 
     Args:
         filepath (str): Path to save the model file
+        save_model_params_only (bool): If `save_model_params_only=True`, only model parameters will be saved so that
+            the results can be loaded into a PyTorch nn.Module. The other option, `save_model_params_only=False`,
+            should be used only if the results will be loaded into a Torchbearer Trial object later.
         monitor (str): Quantity to monitor
         mode (str): One of {auto, min, max}. If `save_best_only=True`, the decision to overwrite the current save file
             is made based on either the maximization or the minimization of the monitored quantity. For `val_acc`, this
@@ -99,11 +115,12 @@ class Best(_Checkpointer):
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', monitor='val_loss', mode='auto', period=1,
-                 min_delta=0, pickle_module=torch.serialization.pickle,
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False, monitor='val_loss',
+                 mode='auto', period=1, min_delta=0, pickle_module=torch.serialization.pickle,
                  pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
-        super(Best, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
+        super(Best, self).__init__(filepath, save_model_params_only=save_model_params_only,
+                                   pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.min_delta = min_delta
         self.mode = mode
         self.monitor = monitor
@@ -161,14 +178,19 @@ class Interval(_Checkpointer):
 
     Args:
         filepath (str): Path to save the model file
+        save_model_params_only (bool): If `save_model_params_only=True`, only model parameters will be saved so that
+            the results can be loaded into a PyTorch nn.Module. The other option, `save_model_params_only=False`,
+            should be used only if the results will be loaded into a Torchbearer Trial object later.
         period (int): Interval (number of epochs) between checkpoints
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
     """
 
-    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', period=1, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
+    def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False, period=1,
+                 pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):
 
-        super(Interval, self).__init__(filepath, pickle_module=pickle_module, pickle_protocol=pickle_protocol)
+        super(Interval, self).__init__(filepath, save_model_params_only=save_model_params_only,
+                                       pickle_module=pickle_module, pickle_protocol=pickle_protocol)
         self.period = period
         self.epochs_since_last_save = 0
 
