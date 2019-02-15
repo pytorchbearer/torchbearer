@@ -225,6 +225,7 @@ class SimpleWeibull(SimpleDistribution):
             batch_shape = torch.Size()
         else:
             batch_shape = self.k.size()
+
         super(SimpleWeibull, self).__init__(batch_shape=batch_shape)
 
     def rsample(self, sample_shape=torch.Size()):
