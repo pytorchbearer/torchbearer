@@ -155,8 +155,8 @@ class SimpleUniform(SimpleDistribution):
 
     def log_prob(self, value):
         """Calculates the log probability that the given value was drawn from this distribution. Since this distribution
-        is uniform, the log probability is zero for all values in the range ``[low, high)`` and -inf elsewhere. This
-        function is therefore non-differentiable.
+        is uniform, the log probability is ``-log(high - low)`` for all values in the range ``[low, high)`` and -inf
+        elsewhere. This function is therefore only piecewise differentiable.
 
         Args:
             value (torch.Tensor, Number): The sampled value

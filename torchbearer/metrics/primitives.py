@@ -138,7 +138,7 @@ class MeanSquaredError(Metric):
         state = args[0]
         y_pred = state[self.pred_key]
         y_true = state[self.target_key]
-        return torch.pow(y_pred - y_true.view_as(y_pred), 2)
+        return torch.pow(y_pred - y_true.view_as(y_pred), 2).data
 
 
 @default_for_key('loss')

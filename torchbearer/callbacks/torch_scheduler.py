@@ -34,6 +34,9 @@ class TorchScheduler(Callback):
 
 class LambdaLR(TorchScheduler):
     """
+    Args:
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
+
     See:
         `PyTorch LambdaLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.LambdaLR>`_
     """
@@ -45,6 +48,9 @@ class LambdaLR(TorchScheduler):
 
 class StepLR(TorchScheduler):
     """
+    Args:
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
+
     See:
         `PyTorch StepLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.StepLR>`_
     """
@@ -57,6 +63,9 @@ class StepLR(TorchScheduler):
 
 class MultiStepLR(TorchScheduler):
     """
+    Args:
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
+
     See:
         `PyTorch MultiStepLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.MultiStepLR>`_
     """
@@ -69,6 +78,9 @@ class MultiStepLR(TorchScheduler):
 
 class ExponentialLR(TorchScheduler):
     """
+    Args:
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
+
     See:
         `PyTorch ExponentialLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.ExponentialLR>`_
     """
@@ -80,6 +92,9 @@ class ExponentialLR(TorchScheduler):
 
 class CosineAnnealingLR(TorchScheduler):
     """
+    Args:
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
+
     See:
         `PyTorch CosineAnnealingLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.CosineAnnealingLR>`_
     """
@@ -94,6 +109,7 @@ class ReduceLROnPlateau(TorchScheduler):
     """
     Args:
         monitor (str): The name of the quantity in metrics to monitor. (Default value = 'val_loss')
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
 
     See:
         `PyTorch ReduceLROnPlateau <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.ReduceLROnPlateau>`_
