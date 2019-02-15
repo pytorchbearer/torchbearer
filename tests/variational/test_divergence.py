@@ -4,7 +4,7 @@ from mock import Mock
 import torch
 
 import torchbearer
-from torchbearer.variational import DivergenceBase, SimpleNormalUnitNormalKL, SimpleNormalSimpleNormalKL, SimpleNormal, SimpleWeibull, SimpleWeibullSimpleWeibullKL
+from torchbearer.variational import DivergenceBase, SimpleNormalUnitNormalKL, SimpleNormalSimpleNormalKL, SimpleNormal, SimpleWeibull, SimpleWeibullSimpleWeibullKL, SimpleExponentialSimpleExponentialKL, SimpleExponential
 
 key = torchbearer.state_key('divergence_test')
 
@@ -164,3 +164,10 @@ class TestSimpleWeibullSimpleWeibullKL(unittest.TestCase):
         target = SimpleWeibull(torch.ones(2, 2), torch.ones(2, 2) * 5)
         self.assertTrue(((callback.compute(input, target) - 3628803.7500).abs() < 0.0001).all())
 
+
+class TestSimpleExponentialSimpleExponentialKL(unittest.TestCase):
+    def test_divergence(self):
+        callback = SimpleExponentialSimpleExponentialKL(key, key)
+        input = SimpleExponential(torch.ones(2, 2) - 1.6931)
+        target = SimpleExponential(torch.zeros(2, 2))
+        self.assertTrue(((callback.compute(input, target) - 0.3068).abs() < 0.0001).all())

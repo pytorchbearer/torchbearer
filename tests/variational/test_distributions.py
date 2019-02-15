@@ -6,7 +6,6 @@ import torch
 
 from torchbearer.variational import SimpleDistribution, SimpleNormal, SimpleUniform, SimpleExponential, SimpleWeibull
 
-
 class TestEmptyMethods(unittest.TestCase):
     def test_methods(self):
         dist = SimpleDistribution()
@@ -173,3 +172,4 @@ class TestSimpleWeibull(unittest.TestCase):
 
         self.assertTrue((dist.log_prob(1) < 0.0001).all())
         self.assertTrue((dist.log_prob(-1) == float('-inf')).all())
+

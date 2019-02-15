@@ -235,3 +235,24 @@ class SimpleWeibullSimpleWeibullKL(DivergenceBase):
         loss = torch.mean(a - b + c + d - 1)
         return loss
 
+class SimpleExponentialSimpleExponentialKL(DivergenceBase):
+    """A KL divergence between two SimpleExponential (or similar) distributions.
+
+    .. note::
+
+       The distribution object must have lograte attribute
+
+     Args:
+        input_key: :class:`.StateKey` instance which will be mapped to the input distribution object.
+        target_key: :class:`.StateKey` instance which will be mapped to the target distribution object.
+        state_key: If not None, the value outputted by :meth:`compute` is stored in state with the given key.
+    """
+    def __init__(self, input_key, target_key, state_key=None):
+        super(SimpleExponentialSimpleExponentialKL, self).__init__({'input': input_key, 'target': target_key}, state_key=state_key)
+
+    def compute(self, input, target):
+        lograte_1 = input.lograte
+        lograte_2 = target.lograte
+        loss = lograte_1 - lograte_2 + lograte_2.exp()/lograte_1.exp() - 1
+        return loss
+
