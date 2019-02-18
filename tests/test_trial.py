@@ -124,7 +124,7 @@ class TestWithGenerators(TestCase):
         self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 10)
 
     @patch('warnings.warn')
-    def test_with_train_generator_ing_steps(self, _):
+    def test_with_train_generator_inf_steps(self, _):
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
 
