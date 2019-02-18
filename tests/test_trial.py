@@ -702,7 +702,8 @@ class TestRun(TestCase):
 
         self.assertTrue(torchbearertrial._fit_pass.call_count == 5)
 
-    def test_run_fit_pass_Args(self):
+    @patch('warnings.warn')
+    def test_run_fit_pass_Args(self, _):
         metric = Metric('test')
         metric.process = Mock(return_value={'test': 0})
         metric.process_final = Mock(return_value={'test': 0})
@@ -2283,8 +2284,9 @@ class TestTrialFunctions(TestCase):
         t.test_func()
         self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_predict)
 
+    @patch('warnings.warn')
     @patch('torchbearer.trial.load_batch_infinite')
-    def test_inject_sampler_infinite(self, mock_lbi):
+    def test_inject_sampler_infinite(self, mock_lbi, _):
         generator = MagicMock()
         steps = -1
 
@@ -2305,7 +2307,10 @@ class TestTrialFunctions(TestCase):
                 return 100
 
             def __iter__(self):
-                return MagicMock()
+                return self
+
+            def __next__(self):
+                return None
 
         generator = EmptyObj()
         steps = 10
@@ -2510,7 +2515,7 @@ class TestTrialFunctions(TestCase):
     def test_new_iter_standard(self):
         class EmptyObj:
             def __init__(self):
-                super().__init__()
+                super(EmptyObj, self).__init__()
                 self.count = 0
 
             def __iter__(self):
@@ -2526,7 +2531,7 @@ class TestTrialFunctions(TestCase):
     def test_new_iter_inf(self):
         class EmptyObj:
             def __init__(self):
-                super().__init__()
+                super(EmptyObj, self).__init__()
                 self.count = 0
                 self.tb_iter = Mock()
                 self.inf = True
