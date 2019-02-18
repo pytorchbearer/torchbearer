@@ -2513,7 +2513,7 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(out is None)
 
     def test_new_iter_standard(self):
-        class EmptyObj:
+        class EmptyObj(object):
             def __init__(self):
                 super(self.__class__, self).__init__()
                 self.count = 0
@@ -2529,7 +2529,7 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(not hasattr(generator, 'inf'))
 
     def test_new_iter_inf(self):
-        class EmptyObj:
+        class EmptyObj(object):
             def __init__(self):
                 super(self.__class__, self).__init__()
                 self.count = 0
