@@ -2299,19 +2299,27 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(mock_lbi.call_args[0][0] == load_batch_predict)
 
     @patch('torchbearer.trial.load_batch_infinite')
-    def test_inject_sampler_infinite_standard(self, mock_lbi):
-        generator = MagicMock()
-        steps = -1
+    def test_inject_sampler_infinite_standard_loader(self, mock_lbi):
+        class EmptyObj: # Mocks don't play well with hasattr so need an empty object
+            def __len__(self):
+                return 100
+
+            def __iter__(self):
+                return MagicMock()
+
+        generator = EmptyObj()
+        steps = 10
 
         class SomeClass:
-            @tb.inject_sampler(tb.GENERATOR, predict=False)
+            @tb.inject_sampler(tb.TRAIN_DATA, predict=False)
             def test_func(self):
                 pass
 
         t = SomeClass()
-        t.state = {tb.GENERATOR: (generator, steps)}
+        t.state = {tb.TRAIN_DATA: (generator, steps), tb.INF_TRAIN_LOADING: True}
         t.test_func()
         self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
+        self.assertTrue(generator.inf)
 
     @patch('torchbearer.trial.load_batch_infinite')
     def test_inject_sampler_infinite_train_loading(self, mock_lbi):
@@ -2492,3 +2500,42 @@ class TestTrialFunctions(TestCase):
 
         self.assertTrue(main_state[tb.DATA_TYPE] == dtype)
         self.assertTrue(main_state[tb.DEVICE] == dev)
+
+    def test_new_iter_none(self):
+        generator = None
+        t = Trial(None)
+        out = t._new_iter(generator)
+        self.assertTrue(out is None)
+
+    def test_new_iter_standard(self):
+        class EmptyObj:
+            def __init__(self):
+                super().__init__()
+                self.count = 0
+
+            def __iter__(self):
+                self.count += 1
+                return MagicMock()
+
+        generator = EmptyObj()
+        t = Trial(None)
+        _ = t._new_iter(generator)
+        self.assertTrue(generator.count == 1)
+        self.assertTrue(not hasattr(generator, 'inf'))
+
+    def test_new_iter_inf(self):
+        class EmptyObj:
+            def __init__(self):
+                super().__init__()
+                self.count = 0
+                self.tb_iter = Mock()
+                self.inf = True
+
+            def __iter__(self):
+                self.count += 1
+                return MagicMock()
+
+        generator = EmptyObj()
+        t = Trial(None)
+        out = t._new_iter(generator)
+        self.assertTrue(out == generator.tb_iter)

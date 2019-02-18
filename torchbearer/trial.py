@@ -166,6 +166,7 @@ def deep_to(batch, device, dtype):
 
     return batch
 
+
 def load_batch_infinite(loader):
     """ Wraps a batch loader and refreshes the iterator once it has been completed.
 
@@ -182,6 +183,7 @@ def load_batch_infinite(loader):
 
     return call
 
+
 def load_batch_standard(state):
     """ Load a standard (input data, target) tuple mini-batch from iterator into state
 
@@ -191,6 +193,7 @@ def load_batch_standard(state):
     state[torchbearer.X], state[torchbearer.Y_TRUE] = deep_to(next(state[torchbearer.ITERATOR]),
                                                               state[torchbearer.DEVICE],
                                                               state[torchbearer.DATA_TYPE])
+
 
 def load_batch_none(state):
     """ Load a none (none, none) tuple mini-batch into state
@@ -256,10 +259,14 @@ def inject_sampler(data_key, predict=False):
                 over_steps = steps > len(generator)
                 inf_steps = steps == -1
                 inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
-                if over_steps or inf_steps or inf_train_loader:
+                if over_steps or inf_steps or inf_train_loader: # Want iterator to refresh at end
                     if steps == -1: warnings.warn("Trial is set to run indefinitely. "
                                               "Make sure you have some method to terminate safely.")
                     loader = load_batch_infinite(loader)
+
+                if inf_train_loader and not hasattr(generator, 'inf'): # First run and infinite iterator
+                    generator.inf = True
+                    generator.tb_iter = iter(generator)
 
             self.state[torchbearer.DATA] = key
             self.state[torchbearer.SAMPLER] = Sampler(loader)
@@ -609,7 +616,7 @@ class Trial(object):
         Returns:
             :class:`.Trial`: self
         """
-        self.state[torchbearer.TRAIN_STEPS] = -1
+        self.for_train_steps(-1)
 
     @fluent
     def for_inf_val_steps(self):
@@ -619,7 +626,7 @@ class Trial(object):
         Returns:
             :class:`.Trial`: self
         """
-        self.state[torchbearer.VALIDATION_STEPS] = -1
+        self.for_val_steps(-1)
 
     @fluent
     def for_inf_test_steps(self):
@@ -629,7 +636,7 @@ class Trial(object):
         Returns:
             :class:`.Trial`: self
         """
-        self.state[torchbearer.TEST_STEPS] = -1
+        self.for_test_steps(-1)
 
     @fluent
     def for_inf_steps(self, train=True, val=True, test=True):
@@ -651,7 +658,7 @@ class Trial(object):
     @fluent
     def with_inf_train_loader(self):
         """
-        Use this trial with a training iterator that refreshes when it finishes instead of each epoch. This allows for setting training steps less than the size of the generator and model will still see all training examples available if enough epochs are ran.
+        Use this trial with a training iterator that refreshes when it finishes instead of each epoch. This allows for setting training steps less than the size of the generator and model will still be trained on all training samples if enough "epochs" are run.
 
         Returns:
             :class:`.Trial`: self:
@@ -714,12 +721,21 @@ class Trial(object):
 
         return self.state[torchbearer.HISTORY]
 
+    @staticmethod
+    def _new_iter(generator):
+        if generator is None:
+            return None
+        if hasattr(generator, 'inf') and generator.inf: # Inf train loader deals with the iterator itself
+            return generator.tb_iter
+        else:
+            return iter(generator)
+
     @inject_sampler(torchbearer.TRAIN_DATA)
     def _fit_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
         self.train()
 
-        state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
+        state[torchbearer.ITERATOR] = Trial._new_iter(state[torchbearer.GENERATOR])
 
         state[torchbearer.METRIC_LIST].reset(state)
         state[torchbearer.METRICS] = {}
