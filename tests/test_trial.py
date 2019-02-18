@@ -2544,3 +2544,4 @@ class TestTrialFunctions(TestCase):
         t = Trial(None)
         out = t._new_iter(generator)
         self.assertTrue(out == generator.tb_iter)
+        self.assertTrue(generator.count == 0)
