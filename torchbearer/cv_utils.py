@@ -67,9 +67,9 @@ class DatasetValidationSplitter:
         validation datasets using these splits
 
         Args:
-            dataset_len: The length of the dataset to be split into training and validation
-            split_fraction: The fraction of the whole dataset to be used for validation
-            shuffle_seed: Optional random seed for the shuffling process
+            dataset_len (int): The length of the dataset to be split into training and validation
+            split_fraction (float): The fraction of the whole dataset to be used for validation
+            shuffle_seed: Optional random seed for the shuffling process. See `random.seed <https://docs.python.org/2/library/random.html#random.seed>`_
         """
         self.dataset_len = dataset_len
         self.split_fraction = split_fraction
@@ -109,6 +109,32 @@ class DatasetValidationSplitter:
             :class:`torch.utils.data.Dataset`: Validation dataset split from whole dataset
         """
         return SubsetDataset(dataset, self.valid_ids)
+
+    def get_sets(self, dataset):
+        """ Gets a training and validation set tuple
+
+        Args:
+            dataset (:class:`torch.utils.data.Dataset`): Dataset to be split into a training and validation datasets
+
+        Returns:
+            tuple (:class:`torch.utils.data.Dataset`): Tuple of returned training and val datasets
+        """
+        return self.get_train_dataset(dataset), self.get_val_dataset(dataset)
+
+    def state_dict(self):
+        """
+        Returns: state dict containing dataset ids
+        """
+        return {'train_ids': self.train_ids, 'valid_ids': self.valid_ids}
+
+    def load_state_dict(self, state_dict):
+        """ Loads a state dict so that previously generated dataset splits can be reused
+
+        Args:
+            state_dict: state dictionary
+
+        """
+        self.train_ids, self.valid_ids = state_dict['train_ids'], state_dict['valid_ids']
 
 
 class SubsetDataset(Dataset):
