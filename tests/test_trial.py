@@ -2520,7 +2520,10 @@ class TestTrialFunctions(TestCase):
 
             def __iter__(self):
                 self.count += 1
-                return MagicMock()
+                return self
+            
+            def __next__(self):
+                return None
 
         generator = EmptyObj()
         t = Trial(None)
@@ -2538,7 +2541,10 @@ class TestTrialFunctions(TestCase):
 
             def __iter__(self):
                 self.count += 1
-                return MagicMock()
+                return self
+
+            def __next__(self):
+                return None
 
         generator = EmptyObj()
         t = Trial(None)
