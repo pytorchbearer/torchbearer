@@ -18,6 +18,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added SimpleExponentialSimpleExponentialKL
 - Added the option for model parameters only saving to Checkpointers.
 - Added documentation about serialization.
+- Added support for indefinite data loading. Iterators can now be run until complete independent of epochs or iterators can be refreshed during an epoch if complete. 
+- Added support for batch intervals in interval checkpointer
+
 ### Changed
 - Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
 - Tqdm precision argument now rounds to decimal places rather than significant figures

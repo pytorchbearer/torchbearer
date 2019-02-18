@@ -8,7 +8,7 @@ import torchbearer as tb
 import torchbearer.callbacks as callbacks
 from torchbearer import Trial
 from torchbearer.metrics import Metric
-from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, update_device_and_dtype, CallbackListInjection
+from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, load_batch_infinite, update_device_and_dtype, CallbackListInjection
 
 
 class TestMockOptimizer(TestCase):
@@ -121,7 +121,23 @@ class TestWithGenerators(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
         torchbearertrial.with_train_generator(generator, 10)
 
-        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 2)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 10)
+
+    @patch('warnings.warn')
+    def test_with_train_generator_inf_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.with_train_generator(generator, -1)
+
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
 
     @patch('warnings.warn')
     def test_with_train_generator_fractional_steps(self, _):
@@ -201,7 +217,7 @@ class TestWithGenerators(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
         torchbearertrial.with_val_generator(generator, 10)
 
-        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == 2)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == 10)
 
     @patch('warnings.warn')
     def test_with_val_generator_fractional_steps(self, _):
@@ -281,7 +297,7 @@ class TestWithGenerators(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
         torchbearertrial.with_test_generator(generator, 10)
 
-        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 2)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 10)
 
     @patch('warnings.warn')
     def test_with_test_generator_fractional_steps(self, _):
@@ -387,6 +403,105 @@ class TestWithGenerators(TestCase):
         valgen.assert_called_once_with(val_generator, val_steps)
         testgen.assert_called_once_with(test_generator, test_steps)
 
+    @patch('warnings.warn')
+    def test_for_inf_train_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_train_steps()
+
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+
+    @patch('warnings.warn')
+    def test_for_inf_val_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_val_steps()
+
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == -1)
+
+
+    @patch('warnings.warn')
+    def test_for_inf_test_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_test_steps()
+
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == -1)
+
+    @patch('warnings.warn')
+    def test_for_inf_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(True, True, True)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == -1)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(True, False, True)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == -1)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(True, False, False)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] != -1)
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_inf_steps(False, False, False)
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] != -1)
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] != -1)
+
+    @patch('warnings.warn')
+    def test_with_inf_train_loader(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.with_inf_train_loader()
+
+        self.assertTrue(torchbearertrial.state[tb.INF_TRAIN_LOADING])
 
 class TestWithData(TestCase):
     @patch('torchbearer.trial.TensorDataset')
@@ -587,7 +702,8 @@ class TestRun(TestCase):
 
         self.assertTrue(torchbearertrial._fit_pass.call_count == 5)
 
-    def test_run_fit_pass_Args(self):
+    @patch('warnings.warn')
+    def test_run_fit_pass_Args(self, _):
         metric = Metric('test')
         metric.process = Mock(return_value={'test': 0})
         metric.process_final = Mock(return_value={'test': 0})
@@ -720,12 +836,13 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertEqual(torchbearertrial.train.call_count, 1)
@@ -748,12 +865,13 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertEqual(metric_list.reset.call_count, 1)
@@ -777,13 +895,14 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertEqual(callback_list.on_start_training.call_count, 1)
@@ -813,13 +932,14 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertTrue(optimizer.zero_grad.call_count == 3)
@@ -844,14 +964,15 @@ class TestFitPass(TestCase):
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
-            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = False
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertTrue(torchmodel.call_count == 3)
@@ -886,7 +1007,8 @@ class TestFitPass(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = True
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertTrue(torchmodel.call_count == 3)
@@ -912,7 +1034,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
@@ -922,7 +1044,8 @@ class TestFitPass(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = True
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertTrue(criterion.call_count == 3)
@@ -949,7 +1072,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
@@ -959,7 +1082,8 @@ class TestFitPass(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = True
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.INF_TRAIN_LOADING: False, tb.TRAIN_DATA: (generator, train_steps)}
 
         torchbearertrial._fit_pass(state)
         self.assertTrue(loss.backward.call_count == 3)
@@ -983,7 +1107,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
@@ -992,7 +1116,8 @@ class TestFitPass(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = True
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertTrue(metric_list.process.call_count == 3)
@@ -1018,7 +1143,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
@@ -1027,7 +1152,8 @@ class TestFitPass(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = True
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         history = torchbearertrial._fit_pass(state)[tb.METRICS]
         self.assertEqual(metric_list.process_final.call_count, 1)
@@ -1054,7 +1180,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
@@ -1063,7 +1189,8 @@ class TestFitPass(TestCase):
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = True
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, train_steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
 
         torchbearertrial._fit_pass(state)
         self.assertEqual(metric_list.process.call_count, 1)
@@ -1128,14 +1255,15 @@ class TestFitPass(TestCase):
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1],
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
         torchbearertrial.pass_state = False
-        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list, tb.TRAIN_DATA: (generator, steps)}
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, steps), tb.INF_TRAIN_LOADING: False,}
 
         state = torchbearertrial._fit_pass(state)
         self.assertTrue(state[tb.ITERATOR] is not None)
@@ -2156,6 +2284,64 @@ class TestTrialFunctions(TestCase):
         t.test_func()
         self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_predict)
 
+    @patch('warnings.warn')
+    @patch('torchbearer.trial.load_batch_infinite')
+    def test_inject_sampler_infinite(self, mock_lbi, _):
+        generator = MagicMock()
+        steps = -1
+
+        class SomeClass:
+            @tb.inject_sampler(tb.GENERATOR, predict=True)
+            def test_func(self):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.GENERATOR: (generator, steps)}
+        t.test_func()
+        self.assertTrue(mock_lbi.call_args[0][0] == load_batch_predict)
+
+    @patch('torchbearer.trial.load_batch_infinite')
+    def test_inject_sampler_infinite_standard_loader(self, mock_lbi):
+        class EmptyObj: # Mocks don't play well with hasattr so need an empty object
+            def __len__(self):
+                return 100
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                return None
+
+        generator = EmptyObj()
+        steps = 10
+
+        class SomeClass:
+            @tb.inject_sampler(tb.TRAIN_DATA, predict=False)
+            def test_func(self):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.TRAIN_DATA: (generator, steps), tb.INF_TRAIN_LOADING: True}
+        t.test_func()
+        self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
+        self.assertTrue(generator.inf)
+
+    @patch('torchbearer.trial.load_batch_infinite')
+    def test_inject_sampler_infinite_train_loading(self, mock_lbi):
+        generator = MagicMock()
+        generator.__len__.return_value = 10
+        steps = 5
+
+        class SomeClass:
+            @tb.inject_sampler(tb.TRAIN_DATA, predict=False)
+            def test_func(self):
+                pass
+
+        t = SomeClass()
+        t.state = {tb.TRAIN_DATA: (generator, steps), tb.INF_TRAIN_LOADING: True}
+        t.test_func()
+        self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
+
     def test_inject_sampler_data_key(self):
         generator = MagicMock()
         test_generator = 'test'
@@ -2243,6 +2429,32 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(state[tb.X].item() == items[0][0].item())
         self.assertTrue(state[tb.Y_TRUE].item() == items[0][1].item())
 
+    def test_load_batch_inf_standard_normal(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        iterator = iter(items)
+        state = {tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        loader = load_batch_infinite(load_batch_standard)
+
+        for i in range(2):
+            loader(state)
+        self.assertTrue(state[tb.X].item() == items[1][0].item())
+        self.assertTrue(state[tb.Y_TRUE].item() == items[1][1].item())
+
+    def test_load_batch_inf_standard_too_many(self):
+        items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])), (torch.Tensor([3]), torch.Tensor([3]))]
+        iterator = iter(items)
+
+        state = {tb.GENERATOR: items, tb.ITERATOR: iterator, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.int}
+
+        loader = load_batch_infinite(load_batch_standard)
+
+        for i in range(12):
+            loader(state)
+
+        self.assertTrue(state[tb.X].item() == items[2][0].item())
+        self.assertTrue(state[tb.Y_TRUE].item() == items[2][1].item())
+
     def test_load_batch_none(self):
         items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
         iterator = iter(items)
@@ -2293,3 +2505,43 @@ class TestTrialFunctions(TestCase):
 
         self.assertTrue(main_state[tb.DATA_TYPE] == dtype)
         self.assertTrue(main_state[tb.DEVICE] == dev)
+
+    def test_new_iter_none(self):
+        generator = None
+        t = Trial(None)
+        out = t._new_iter(generator)
+        self.assertTrue(out is None)
+
+    def test_new_iter_standard(self):
+        class EmptyObj(object):
+            def __init__(self):
+                super(self.__class__, self).__init__()
+                self.count = 0
+
+            def __iter__(self):
+                self.count += 1
+                return iter([1,2,3])
+
+        generator = EmptyObj()
+        t = Trial(None)
+        _ = t._new_iter(generator)
+        self.assertTrue(generator.count == 1)
+        self.assertTrue(not hasattr(generator, 'inf'))
+
+    def test_new_iter_inf(self):
+        class EmptyObj(object):
+            def __init__(self):
+                super(self.__class__, self).__init__()
+                self.count = 0
+                self.tb_iter = Mock()
+                self.inf = True
+
+            def __iter__(self):
+                self.count += 1
+                return iter([1,2,3])
+
+        generator = EmptyObj()
+        t = Trial(None)
+        out = t._new_iter(generator)
+        self.assertTrue(out == generator.tb_iter)
+        self.assertTrue(generator.count == 0)
