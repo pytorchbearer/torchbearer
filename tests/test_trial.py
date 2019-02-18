@@ -2515,7 +2515,7 @@ class TestTrialFunctions(TestCase):
     def test_new_iter_standard(self):
         class EmptyObj:
             def __init__(self):
-                super(EmptyObj, self).__init__()
+                super(self.__class__, self).__init__()
                 self.count = 0
 
             def __iter__(self):
@@ -2531,7 +2531,7 @@ class TestTrialFunctions(TestCase):
     def test_new_iter_inf(self):
         class EmptyObj:
             def __init__(self):
-                super(EmptyObj, self).__init__()
+                super(self.__class__, self).__init__()
                 self.count = 0
                 self.tb_iter = Mock()
                 self.inf = True
