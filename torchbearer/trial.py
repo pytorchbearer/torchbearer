@@ -352,16 +352,14 @@ class Trial(object):
         criterion (func / None): The final loss criterion that provides a loss value to the optimizer
         metrics (list): The list of :class:`torchbearer.Metric <.Metric>` instances to process during fitting
         callbacks (list): The list of :class:`torchbearer.Callback <.Callback>` instances to call during fitting
-        pass_state (bool): If True, the torchbearer state will be passed to the model during fitting
         verbose (int): Global verbosity .If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training
             progress
     """
-    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
+    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], verbose=2):
         if criterion is None:
             def criterion(_, __):
                 return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE], requires_grad=True)
 
-        self.pass_state = pass_state
         self.verbose = verbose
 
         self.state = State()
@@ -750,9 +748,9 @@ class Trial(object):
                 state[torchbearer.OPTIMIZER].zero_grad()
 
                 # Forward Pass
-                if self.pass_state:
+                try:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                else:
+                except TypeError:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
 
                 state[torchbearer.CALLBACK_LIST].on_forward(state)
@@ -793,9 +791,9 @@ class Trial(object):
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward Pass
-                if self.pass_state:
+                try:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                else:
+                except TypeError:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
 
                 state[torchbearer.CALLBACK_LIST].on_forward_validation(state)
