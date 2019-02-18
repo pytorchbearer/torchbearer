@@ -2520,10 +2520,7 @@ class TestTrialFunctions(TestCase):
 
             def __iter__(self):
                 self.count += 1
-                return self
-            
-            def __next__(self):
-                return None
+                return iter([1,2,3])
 
         generator = EmptyObj()
         t = Trial(None)
@@ -2541,10 +2538,7 @@ class TestTrialFunctions(TestCase):
 
             def __iter__(self):
                 self.count += 1
-                return self
-
-            def __next__(self):
-                return None
+                return iter([1,2,3])
 
         generator = EmptyObj()
         t = Trial(None)
