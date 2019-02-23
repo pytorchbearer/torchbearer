@@ -1,12 +1,15 @@
 import sys
+
 if sys.version_info[0] < 3:
     import inspect
+
 
     def get_default(fcn, arg):
         a = inspect.getargspec(fcn)
         return dict(zip(a.args[-len(a.defaults):], a.defaults))[arg]
 else:
     from inspect import signature
+
 
     def get_default(fcn, arg):
         return signature(fcn).parameters[arg].default
@@ -25,7 +28,6 @@ from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
 
-
 bibtex = """
 @article{2018torchbearer,
   title={Torchbearer: A Model Fitting Library for PyTorch},
@@ -39,6 +41,7 @@ bibtex = """
 class MockOptimizer(Optimizer):
     """The Mock Optimizer will be used inplace of an optimizer in the event that none is passed to the Trial class.
     """
+
     def __init__(self):
         super(MockOptimizer, self).__init__([torch.zeros(1)], [])
 
@@ -67,6 +70,7 @@ class CallbackListInjection(CallbackList):
         callback: The callback to inject
         callback_list (:class:`.CallbackList`): The underlying callback list
     """
+
     def __init__(self, callback, callback_list):
         super(CallbackListInjection, self).__init__([])
 
@@ -106,10 +110,12 @@ def inject_printer(validation_label_letter='v'):
     Returns:
         A decorator
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            verbose = kwargs['verbose'] if 'verbose' in kwargs else get_default(func, 'verbose')  # Populate default value
+            verbose = kwargs['verbose'] if 'verbose' in kwargs else get_default(func,
+                                                                                'verbose')  # Populate default value
             verbose = self.verbose if verbose == -1 else verbose
 
             printer = get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
@@ -122,7 +128,9 @@ def inject_printer(validation_label_letter='v'):
 
             self.state[torchbearer.CALLBACK_LIST] = callback_list_old
             return res
+
         return wrapper
+
     return decorator
 
 
@@ -215,8 +223,8 @@ def load_batch_predict(state):
         state[torchbearer.X], state[torchbearer.Y_TRUE] = data
     else:
         state[torchbearer.X] = data
-        
-        
+
+
 class Sampler:
     """
     Sampler wraps a batch loader function and executes it when :meth:`Sampler.sample` is called
@@ -224,6 +232,7 @@ class Sampler:
     Args:
         batch_loader (func): The batch loader to execute
     """
+
     def __init__(self, batch_loader):
         self.batch_loader = batch_loader
 
@@ -242,6 +251,7 @@ def inject_sampler(data_key, predict=False):
     Returns:
         The decorator
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -259,12 +269,13 @@ def inject_sampler(data_key, predict=False):
                 over_steps = steps > len(generator)
                 inf_steps = steps == -1
                 inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
-                if over_steps or inf_steps or inf_train_loader: # Want iterator to refresh at end
+                if over_steps or inf_steps or inf_train_loader:  # Want iterator to refresh at end
                     if steps == -1: warnings.warn("Trial is set to run indefinitely. "
-                                              "Make sure you have some method to terminate safely.")
+                                                  "Make sure you have some method to terminate safely.")
                     loader = load_batch_infinite(loader)
 
-                if inf_train_loader and not hasattr(generator, 'inf'): # First run and infinite iterator
+                if inf_train_loader and not hasattr(generator,
+                                                    'inf'):  # First run and want iterator to not refresh each epoch but on end
                     generator.inf = True
                     generator.tb_iter = iter(generator)
 
@@ -276,7 +287,9 @@ def inject_sampler(data_key, predict=False):
             res = func(self, *args, **kwargs)
 
             return res
+
         return wrapper
+
     return decorator
 
 
@@ -289,6 +302,7 @@ def inject_callback(callback):
     Returns:
         The decorator
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -300,17 +314,21 @@ def inject_callback(callback):
 
             self.state[torchbearer.CALLBACK_LIST] = callback_list_old
             return res
+
         return wrapper
+
     return decorator
 
 
 def fluent(func):
     """Decorator for class methods which forces return of self.
     """
+
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         func(self, *args, **kwargs)
         return self
+
     return wrapper
 
 
@@ -352,16 +370,21 @@ class Trial(object):
         criterion (func / None): The final loss criterion that provides a loss value to the optimizer
         metrics (list): The list of :class:`torchbearer.Metric <.Metric>` instances to process during fitting
         callbacks (list): The list of :class:`torchbearer.Callback <.Callback>` instances to call during fitting
+        pass_state (bool): If True, the torchbearer state will be passed to the model during fitting
         verbose (int): Global verbosity .If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training
             progress
     """
-    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], verbose=2):
+
+    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
         if criterion is None:
             def criterion(_, __):
-                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE], requires_grad=True)
+                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE],
+                                   requires_grad=True)
 
+        self.pass_state = pass_state
         self.verbose = verbose
 
+        self.closure = self.default_closure
         self.state = State()
         self.state.update({
             torchbearer.MODEL: model,
@@ -389,7 +412,7 @@ class Trial(object):
     def __str__(self):
         def state_string(name, state_key):
             import math
-            N = (50-len(name))/2
+            N = (50 - len(name)) / 2
             res = "-" * int(math.floor(N)) + " " + name.upper() + " " + "-" * int(math.ceil(N))
             res = res + "-" if len(res) < 52 else res
             return res + "\n" + str(self.state[state_key]) + "\n\n"
@@ -422,7 +445,8 @@ class Trial(object):
             warnings.warn("Number of training steps is not an int, casting to int")
             steps = int(steps)
         self.state[torchbearer.TRAIN_STEPS] = steps
-        self.state[torchbearer.TRAIN_DATA] = (self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
+        self.state[torchbearer.TRAIN_DATA] = (
+        self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
 
     @fluent
     def with_train_generator(self, generator, steps=None):
@@ -475,7 +499,8 @@ class Trial(object):
             warnings.warn("Number of validation steps is not an int, casting to int")
             steps = int(steps)
         self.state[torchbearer.VALIDATION_STEPS] = steps
-        self.state[torchbearer.VALIDATION_DATA] = (self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
+        self.state[torchbearer.VALIDATION_DATA] = (
+        self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
 
     @fluent
     def with_val_generator(self, generator, steps=None):
@@ -585,7 +610,8 @@ class Trial(object):
             self.for_test_steps(test_steps)
 
     @fluent
-    def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None, val_steps=None, test_steps=None):
+    def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None,
+                        val_steps=None, test_steps=None):
         """Use this trial with the given generators. Returns self so that methods can be chained for convenience.
 
         Args:
@@ -663,6 +689,16 @@ class Trial(object):
         """
         self.state[torchbearer.INF_TRAIN_LOADING] = True
 
+    @fluent
+    def with_closure(self, closure):
+        self._closure_checker(closure)
+        self.closure = closure
+
+    def _closure_checker(self, closure):  # TODO: Better closure check
+        if closure is None:
+            warnings.warn("Bad closure")
+        return True
+
     @inject_printer()
     def run(self, epochs=1, verbose=-1):
         r"""Run this trial for the given number of epochs, starting from the last trained epoch.
@@ -719,50 +755,52 @@ class Trial(object):
 
         return self.state[torchbearer.HISTORY]
 
-    @staticmethod
-    def _new_iter(generator):
+    def _new_iter(self, generator):
         if generator is None:
             return None
-        if hasattr(generator, 'inf') and generator.inf: # Inf train loader deals with the iterator itself
+        if hasattr(generator, 'inf') and generator.inf:  # Inf train loader deals with the iterator itself
             return generator.tb_iter
         else:
             return iter(generator)
+
+    def default_closure(self, state):
+        # Zero grads
+        state[torchbearer.OPTIMIZER].zero_grad()
+
+        # Forward Pass
+        if self.pass_state:
+            state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
+        else:
+            state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
+
+        state[torchbearer.CALLBACK_LIST].on_forward(state)
+
+        # Loss Calculation
+        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
+
+        state[torchbearer.CALLBACK_LIST].on_criterion(state)
+
+        # Backwards pass
+        state[torchbearer.LOSS].backward(**state[torchbearer.BACKWARD_ARGS])
+        state[torchbearer.CALLBACK_LIST].on_backward(state)
 
     @inject_sampler(torchbearer.TRAIN_DATA)
     def _fit_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
         self.train()
 
-        state[torchbearer.ITERATOR] = Trial._new_iter(state[torchbearer.GENERATOR])
+        state[torchbearer.ITERATOR] = self._new_iter(state[torchbearer.GENERATOR])
 
         state[torchbearer.METRIC_LIST].reset(state)
         state[torchbearer.METRICS] = {}
 
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
-        for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()) :
+        for state[torchbearer.BATCH] in (
+        range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()):
             state[torchbearer.SAMPLER].sample(state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
-            def closure():
-                # Zero grads
-                state[torchbearer.OPTIMIZER].zero_grad()
-
-                # Forward Pass
-                try:
-                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                except TypeError:
-                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-
-                state[torchbearer.CALLBACK_LIST].on_forward(state)
-
-                # Loss Calculation
-                state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
-
-                state[torchbearer.CALLBACK_LIST].on_criterion(state)
-
-                # Backwards pass
-                state[torchbearer.LOSS].backward(**state[torchbearer.BACKWARD_ARGS])
-                state[torchbearer.CALLBACK_LIST].on_backward(state)
+            self.closure(state)
 
             # Update parameters
             state[torchbearer.OPTIMIZER].step(closure)
@@ -779,7 +817,8 @@ class Trial(object):
 
     def _test_pass(self, state):
         with torch.no_grad():
-            state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
+            state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[
+                                                                                    torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
 
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
@@ -791,9 +830,9 @@ class Trial(object):
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward Pass
-                try:
+                if self.pass_state:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                except TypeError:
+                else:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
 
                 state[torchbearer.CALLBACK_LIST].on_forward_validation(state)
@@ -894,7 +933,8 @@ class Trial(object):
         return []
 
     @fluent
-    def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
+    def replay(self, callbacks=[], verbose=2,
+               one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
 
         Args:
@@ -1060,8 +1100,10 @@ class Trial(object):
             :class:`.Trial`: self
         """
         if resume and torchbearer.MODEL in state_dict:  # torchbearer dict
-            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] != torchbearer.__version__.replace('.dev', ''):
-                warnings.warn('This state dict was saved with a different torchbearer version, loading available keys. Consider setting resume=False')
+            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] != torchbearer.__version__.replace(
+                    '.dev', ''):
+                warnings.warn(
+                    'This state dict was saved with a different torchbearer version, loading available keys. Consider setting resume=False')
 
             if torchbearer.MODEL in state_dict:
                 self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
