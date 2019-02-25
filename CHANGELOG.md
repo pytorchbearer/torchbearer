@@ -3,16 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [0.2.6.1] - 2019-02-25
-### Added
-### Changed
-### Deprecated
-### Removed
-### Fixed
-- Fixed a bug where predictions would multiply when predict was called more than once
-
-
-## [0.2.6] - 2018-12-19
+## [Unreleased]
 ### Added
 - Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
 - Added SimpleUniform and SimpleExponential distributions
@@ -29,7 +20,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added documentation about serialization.
 - Added support for indefinite data loading. Iterators can now be run until complete independent of epochs or iterators can be refreshed during an epoch if complete. 
 - Added support for batch intervals in interval checkpointer
-
 ### Changed
 - Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
 - Tqdm precision argument now rounds to decimal places rather than significant figures
@@ -42,6 +32,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
 - Fixed a bug in the cite decorator causing the citation to not show up correctly
 - Fixed a memory leak in the mse primitive metric
+
+## [0.2.6.1] - 2019-02-25
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where predictions would multiply when predict was called more than once
 
 ## [0.2.6] - 2018-12-19
 ### Added
