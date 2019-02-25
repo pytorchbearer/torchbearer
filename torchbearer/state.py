@@ -18,10 +18,11 @@ __keys__ = []
 def state_key(key):
     """Computes and returns a non-conflicting key for the state dictionary when given a seed key
 
-    :param key: The seed key - basis for new state key
-    :type key: String
-    :return: New state key
-    :rtype: StateKey
+    Args:
+        key (str): The seed key - basis for new state key
+
+    Returns:
+        :class:`.StateKey`: New state key
     """
     return StateKey(key)
 
@@ -30,12 +31,12 @@ class StateKey(Metric):
     """ StateKey class that is a unique state key based on the input string key. State keys are also metrics which
     retrieve themselves from state.
 
-    :param key: Base key
-    :type key: String
+    Args:
+        key (str): Base key
     """
     def __init__(self, key):
         self.key = self._gen_key_(key)
-        super().__init__(self.key)
+        super(StateKey, self).__init__(self.key)
 
     def process(self, state):
         return {self.name: state[self]}
@@ -75,7 +76,7 @@ class State(dict):
     State dictionary that behaves like a python dict but accepts StateKeys
     """
     def __init__(self):
-        super().__init__()
+        super(State, self).__init__()
 
     def get_key(self, statekey):
         if isinstance(statekey, str):
@@ -83,22 +84,22 @@ class State(dict):
         return statekey
 
     def __getitem__(self, key):
-        return super().__getitem__(self.get_key(key))
+        return super(State, self).__getitem__(self.get_key(key))
 
     def __setitem__(self, key, val):
-        super().__setitem__(self.get_key(key), val)
+        super(State, self).__setitem__(self.get_key(key), val)
 
     def __delitem__(self, val):
-        super().__delitem__(val)
+        super(State, self).__delitem__(val)
 
-    def __contains__(self, o: object) -> bool:
-        return super().__contains__(self.get_key(o))
+    def __contains__(self, o):
+        return super(State, self).__contains__(self.get_key(o))
 
     def update(self, d):
         new_dict = {}
         for key in d:
             new_dict[self.get_key(key)] = d[key]
-        super().update(new_dict)
+        super(State, self).update(new_dict)
 
 
 #: The torchbearer version
@@ -154,6 +155,9 @@ TRAIN_STEPS = state_key('train_steps')
 
 #: The flag representing train data
 TRAIN_DATA = state_key('train_data')
+
+#: Flag for refreshing of training iterator when finished instead of each epoch
+INF_TRAIN_LOADING = state_key('inf_train_loading')
 
 #: The validation data generator in the Trial object
 VALIDATION_GENERATOR = state_key('validation_generator')

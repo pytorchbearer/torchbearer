@@ -1,5 +1,6 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock, MagicMock
+
+from mock import patch, MagicMock
 
 import torchbearer as tb
 from torchbearer.callbacks import LiveLossPlot

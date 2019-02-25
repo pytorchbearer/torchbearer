@@ -1,13 +1,10 @@
 import unittest
-from unittest.mock import Mock, patch
 
 import torch.nn as nn
-import torch.nn.functional as F
+import torch.optim as optim
 
 import torchbearer
 from torchbearer.metrics import LR
-
-import torch.optim as optim
 
 
 class TestLR(unittest.TestCase):

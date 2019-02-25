@@ -13,7 +13,8 @@ __writers__ = dict()
 
 class VisdomParams:
     """
-    Class to hold visdom client arguments. Modify member variables before initialising tensorboard callbacks for custom arguments. See: `visdom <https://github.com/facebookresearch/visdom#visdom-arguments-python-only>`_
+    Class to hold visdom client arguments. Modify member variables before initialising tensorboard callbacks for custom
+    arguments. See: `visdom <https://github.com/facebookresearch/visdom#visdom-arguments-python-only>`_
     """
     SERVER = 'http://localhost'
     ENDPOINT = 'events'
@@ -39,15 +40,22 @@ def get_writer(log_dir, logger, visdom=False, visdom_params=None):
     Get the writer assigned to the given log directory.
     If the writer doesn't exist it will be created, and a reference to the logger added.
 
-    :param log_dir: the log directory
-    :param logger: the object requesting the writer. That object should call `close_writer` when its finished
-    :param visdom: if true VisdomWriter is returned instead of tensorboard SummaryWriter
-    :param visdom_params: Visdom parameter settings object, uses default if None
-    :type visdom_params: VisdomParams
-    :return: the `SummaryWriter` or `VisdomWriter` object
+    Args:
+        log_dir (str): the log directory
+        logger: the object requesting the writer. That object should call `close_writer` when its finished
+        visdom (bool): if true VisdomWriter is returned instead of tensorboard SummaryWriter
+        visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
+
+    Returns:
+        the `SummaryWriter` or `VisdomWriter` object
     """
     import tensorboardX
     from tensorboardX import SummaryWriter
+    import sys
+    import errno
+    kwargs = {}
+    if sys.version_info[0] >= 3:
+        kwargs['exist_ok'] = True
 
     writer_key = 'writer'
     if visdom:
@@ -57,10 +65,16 @@ def get_writer(log_dir, logger, visdom=False, visdom_params=None):
         if visdom:
             w = tensorboardX.torchvis.VisdomWriter()
             from visdom import Visdom
-            os.makedirs(log_dir, exist_ok=True)
+            try:
+                os.makedirs(log_dir, **kwargs)
+            except OSError as exc:
+                if exc.errno == errno.EEXIST and os.path.isdir(log_dir):
+                    pass
+                else:
+                    raise exc
             if visdom_params is None:
                 visdom_params = VisdomParams()
-                visdom_params.LOG_TO_FILENAME = os.path.join(log_dir,'log.log')
+                visdom_params.LOG_TO_FILENAME = os.path.join(log_dir, 'log.log')
             w.vis = Visdom(**visdom_params.__to_dict__())
         else:
             w = SummaryWriter(log_dir=log_dir)
@@ -75,8 +89,9 @@ def close_writer(log_dir, logger):
     Decrement the reference count for a writer belonging to a specific log directory.
     If the reference count gets to zero, the writer will be closed and removed.
 
-    :param log_dir: the log directory
-    :param logger: the object releasing the writer
+    Args:
+        log_dir (str): the log directory
+        logger: the object releasing the writer
     """
     if log_dir in __writers__:
         __writers__[log_dir]['references'].discard(logger)
@@ -94,14 +109,11 @@ def close_writer(log_dir, logger):
 class AbstractTensorBoard(Callback):
     """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
 
-    :param log_dir: The tensorboard log path for output
-    :type log_dir: str
-    :param comment: Descriptive comment to append to path
-    :type comment: str
-    :param visdom: If true, log to visdom instead of tensorboard
-    :type visdom: bool
-    :param visdom_params: Visdom parameter settings object, uses default if None
-    :type visdom_params: VisdomParams
+    Args:
+        log_dir (str): The tensorboard log path for output
+        comment (str): Descriptive comment to append to path
+        visdom (bool): If true, log to visdom instead of tensorboard
+        visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
     """
 
     def __init__(self, log_dir='./logs',
@@ -120,11 +132,14 @@ class AbstractTensorBoard(Callback):
         Get a SummaryWriter for the given directory (or the default writer if the directory is not given).
         If you are getting a `SummaryWriter` for a custom directory, it is your responsibility to close
         it using `close_writer`.
-        :param log_dir: the (optional) directory
-        :type log_dir: str
-        :param visdom: If true, return VisdomWriter, if false return tensorboard SummaryWriter
-        :type visdom: bool
-        :return: the `SummaryWriter` or `VisdomWriter`
+
+        Args:
+            log_dir (str): the (optional) directory
+            visdom (bool): If true, return VisdomWriter, if false return tensorboard SummaryWriter
+            visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
+
+        Returns:
+            the `SummaryWriter` or `VisdomWriter`
         """
         if log_dir is None:
             self.writer = get_writer(self.log_dir, self, visdom=visdom, visdom_params=visdom_params)
@@ -137,8 +152,9 @@ class AbstractTensorBoard(Callback):
         Decrement the reference count for a writer belonging to the given log directory
         (or the default writer if the directory is not given). If the reference count gets to zero,
         the writer will be closed and removed.
-        :param log_dir: the (optional) directory
-        :type log_dir: str
+
+        Args:
+            log_dir (str): the (optional) directory
         """
         if log_dir is None:
             close_writer(self.log_dir, self)
@@ -156,22 +172,15 @@ class AbstractTensorBoard(Callback):
 class TensorBoard(AbstractTensorBoard):
     """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
 
-    :param log_dir: The tensorboard log path for output
-    :type log_dir: str
-    :param write_graph: If True, the model graph will be written using the TensorboardX library
-    :type write_graph: bool
-    :param write_batch_metrics: If True, batch metrics will be written
-    :type write_batch_metrics: bool
-    :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
-    :type batch_step_size: int
-    :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
-    :type write_epoch_metrics: True
-    :param comment: Descriptive comment to append to path
-    :type comment: str
-    :param visdom: If true, log to visdom instead of tensorboard
-    :type visdom: bool
-    :param visdom_params: Visdom parameter settings object, uses default if None
-    :type visdom_params: VisdomParams
+    Args:
+        log_dir (str): The tensorboard log path for output
+        write_graph (bool): If True, the model graph will be written using the TensorboardX library
+        write_batch_metrics (bool): If True, batch metrics will be written
+        batch_step_size (int): The step size to use when writing batch metrics, make this larger to reduce latency
+        write_epoch_metrics (bool): If True, metrics from the end of the epoch will be written
+        comment (str): Descriptive comment to append to path
+        visdom (bool): If true, log to visdom instead of tensorboard
+        visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
     """
 
     def __init__(self, log_dir='./logs',
@@ -195,11 +204,11 @@ class TensorBoard(AbstractTensorBoard):
                 dummy = torch.rand(state[torchbearer.X].size(), requires_grad=False)
                 model = copy.deepcopy(state[torchbearer.MODEL]).to('cpu')
                 self.writer.add_graph(model, (dummy,))
-                self._handle_graph = lambda _: ...
+                self._handle_graph = lambda _: None
 
             self._handle_graph = handle_graph
         else:
-            self._handle_graph = lambda _: ...
+            self._handle_graph = lambda _: None
 
         self.batch_log_dir = None
         self.batch_writer = None
@@ -248,28 +257,24 @@ class TensorBoard(AbstractTensorBoard):
                     self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
     def on_end(self, state):
-        super().on_end(state)
+        super(TensorBoard, self).on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
 
 
 class TensorBoardText(AbstractTensorBoard):
-    """TensorBoard callback which writes metrics as text to the given log directory. Requires the TensorboardX library for python.
+    """TensorBoard callback which writes metrics as text to the given log directory. Requires the TensorboardX library
+    for python.
 
-    :param log_dir: The tensorboard log path for output
-    :type log_dir: str
-    :param write_epoch_metrics: If True, metrics from the end of the epoch will be written
-    :type write_epoch_metrics: True
-    :param log_trial_string: If True logs a string summary of the Trial
-    :type log_trial_summary: bool
-    :param batch_step_size: The step size to use when writing batch metrics, make this larger to reduce latency
-    :type batch_step_size: int
-    :param comment: Descriptive comment to append to path
-    :type comment: str
-    :param visdom: If true, log to visdom instead of tensorboard
-    :type visdom: bool
-    :param visdom_params: Visdom parameter settings object, uses default if None
-    :type visdom_params: VisdomParams
+
+    Args:
+        log_dir (str): The tensorboard log path for output
+        write_epoch_metrics (bool): If True, metrics from the end of the epoch will be written
+        log_trial_summary (bool): If True logs a string summary of the Trial
+        batch_step_size (int): The step size to use when writing batch metrics, make this larger to reduce latency
+        comment (str): Descriptive comment to append to path
+        visdom (bool): If true, log to visdom instead of tensorboard
+        visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
     """
 
     def __init__(self, log_dir='./logs',
@@ -310,7 +315,7 @@ class TensorBoardText(AbstractTensorBoard):
         return table + '</table>'
 
     def on_start(self, state):
-        super().on_start(state)
+        super(TensorBoardText, self).on_start(state)
         if self.log_trial_summary and not self.logged_summary:
             self.logged_summary = True
             self.writer.add_text('trial', str(state[torchbearer.SELF]).replace('\n', '\n \n'), 1)
@@ -341,7 +346,7 @@ class TensorBoardText(AbstractTensorBoard):
                 self.writer.add_text('epoch', self.table_formatter(str(state[torchbearer.METRICS])), state[torchbearer.EPOCH])
 
     def on_end(self, state):
-        super().on_end(state)
+        super(TensorBoardText, self).on_end(state)
         if self.write_batch_metrics and self.visdom:
             self.close_writer(self.batch_log_dir)
 
@@ -351,34 +356,21 @@ class TensorBoardImages(AbstractTensorBoard):
     TensorboardX library and torchvision.utils.make_grid. Images are selected from the given key and saved to the given
     path. Full name of image sub directory will be model name + _ + comment.
 
-    :param log_dir: The tensorboard log path for output
-    :type log_dir: str
-    :param comment: Descriptive comment to append to path
-    :type comment: str
-    :param name: The name of the image
-    :type name: str
-    :param key: The key in state containing image data (tensor of size [c, w, h] or [b, c, w, h])
-    :type key: str
-    :param write_each_epoch: If True, write data on every epoch, else write only for the first epoch.
-    :type write_each_epoch: bool
-    :param num_images: The number of images to write
-    :type num_images: int
-    :param nrow: See `torchvision.utils.make_grid
-                 https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param padding: See `torchvision.utils.make_grid
-                    https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param normalize: See `torchvision.utils.make_grid
-                      https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param norm_range: See `torchvision.utils.make_grid
-                       https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param scale_each: See `torchvision.utils.make_grid
-                       https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param pad_value: See `torchvision.utils.make_grid
-                      https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid`
-    :param visdom: If true, log to visdom instead of tensorboard
-    :type visdom: bool
-    :param visdom_params: Visdom parameter settings object, uses default if None
-    :type visdom_params: VisdomParams
+    Args:
+        log_dir (str): The tensorboard log path for output
+        comment (str): Descriptive comment to append to path
+        name (str): The name of the image
+        key (str): The key in state containing image data (tensor of size [c, w, h] or [b, c, w, h])
+        write_each_epoch (bool): If True, write data on every epoch, else write only for the first epoch.
+        num_images (int): The number of images to write
+        nrow: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+        padding: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+        normalize: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+        norm_range: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+        scale_each: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+        pad_value: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+        visdom (bool): If true, log to visdom instead of tensorboard
+        visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
     """
 
     def __init__(self, log_dir='./logs',
@@ -456,24 +448,17 @@ class TensorBoardProjector(AbstractTensorBoard):
     """The TensorBoardProjector callback is used to write images from the validation pass to Tensorboard using the
     TensorboardX library. Images are written to the given directory and, if required, so are associated features.
 
-    :param log_dir: The tensorboard log path for output
-    :type log_dir: str
-    :param comment: Descriptive comment to append to path
-    :type comment: str
-    :param num_images: The number of images to write
-    :type num_images: int
-    :param avg_pool_size: Size of the average pool to perform on the image. This is recommended to reduce the overall
-                          image sizes and improve latency
-    :type avg_pool_size: int
-    :param avg_data_channels: If True, the image data will be averaged in the channel dimension
-    :type avg_data_channels: bool
-    :param write_data: If True, the raw data will be written as an embedding
-    :type write_data: bool
-    :param write_features: If True, the image features will be written as an embedding
-    :type write_features: bool
-    :param features_key: The key in state to use for the embedding. Typically model output but can be used to show
-                         features from any layer of the model.
-    :type features_key: str
+    Args:
+        log_dir (str): The tensorboard log path for output
+        comment (str): Descriptive comment to append to path
+        num_images (int): The number of images to write
+        avg_pool_size (int): Size of the average pool to perform on the image. This is recommended to reduce the overall
+            image sizes and improve latency
+        avg_data_channels (bool): If True, the image data will be averaged in the channel dimension
+        write_data (bool): If True, the raw data will be written as an embedding
+        write_features (bool): If True, the image features will be written as an embedding
+        features_key (str): The key in state to use for the embedding. Typically model output but can be used to show
+            features from any layer of the model.
     """
 
     def __init__(self, log_dir='./logs',

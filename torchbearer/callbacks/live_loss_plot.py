@@ -6,6 +6,9 @@ from torchbearer.callbacks import Callback
 
 
 class no_print:
+    def __init__(self):
+        pass
+
     def __enter__(self):
         self.stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
@@ -20,15 +23,19 @@ class LiveLossPlot(Callback):
     """
     Callback to write metrics to `LiveLossPlot <https://github.com/stared/livelossplot>`_, a library for visualisation in notebooks
 
-    :param on_batch: If True, batch metrics will be logged. Else batch metrics will not be logged
-    :param batch_step_size: The number of batches between logging metrics
-    :param on_epoch: If True, epoch metrics will be logged every epoch. Else epoch metrics will not be logged
-    :param draw_once: If True, draw the plot only at the end of training. Else draw every time metrics are logged
-    :param kwargs: Keyword arguments for livelossplot.PlotLosses
+    Args:
+        on_batch (bool): If True, batch metrics will be logged. Else batch metrics will not be logged
+        batch_step_size (int): The number of batches between logging metrics
+        on_epoch (bool): If True, epoch metrics will be logged every epoch. Else epoch metrics will not be logged
+        draw_once (bool): If True, draw the plot only at the end of training. Else draw every time metrics are logged
+        kwargs: Keyword arguments for livelossplot.PlotLosses
+
+    State Requirements:
+        - :attr:`torchbearer.state.METRICS`: Metrics should be a dict containing the metrics to be plotted
+        - :attr:`torchbearer.state.BATCH`: Batch should be the current batch or iteration number in the epoch
     """
     def __init__(self, on_batch=False, batch_step_size=10, on_epoch=True, draw_once=False, **kwargs):
-
-        super().__init__()
+        super(LiveLossPlot, self).__init__()
         self._kwargs = kwargs
 
         self.on_batch = on_batch

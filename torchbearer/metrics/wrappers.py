@@ -4,12 +4,13 @@ Metric wrappers are classes which wrap instances of :class:`.Metric` or, in the 
 but via the :mod:`decorator API<.metrics.decorators>`.
 """
 import torchbearer
-from torchbearer import metrics
+from torchbearer.bases import Metric
+from .metrics import AdvancedMetric
 
 import torch
 
 
-class ToDict(metrics.AdvancedMetric):
+class ToDict(AdvancedMetric):
     """The :class:`ToDict` class is an :class:`.AdvancedMetric` which will put output from the inner :class:`.Metric` in
     a dict (mapping metric name to value) before returning. When in `eval` mode, 'val\_' will be prepended to the metric
     name.
@@ -29,8 +30,8 @@ class ToDict(metrics.AdvancedMetric):
         >>> metric.process({'y_pred': 4, 'y_true': 5})
         {'val_my_metric': 9}
 
-    :param metric: The :class:`.Metric` instance to *wrap*.
-    :type metric: metrics.Metric
+    Args:
+        metric (:class:`.Metric`): The :class:`.Metric` instance to *wrap*.
     """
 
     def __init__(self, metric):
@@ -60,7 +61,7 @@ class ToDict(metrics.AdvancedMetric):
             return {self.eval_flag + '_' + self.metric.name: val}
 
     def eval(self, data_key=None):
-        super().eval(data_key=data_key)
+        super(ToDict, self).eval(data_key=data_key)
         if data_key == torchbearer.TEST_DATA:
             self.eval_flag = 'test'
         elif data_key == torchbearer.TRAIN_DATA:
@@ -70,20 +71,20 @@ class ToDict(metrics.AdvancedMetric):
         self.metric.eval(data_key=data_key)
 
     def train(self):
-        super().train()
+        super(ToDict, self).train()
         self.metric.train()
 
     def reset(self, state):
-        super().reset(state)
+        super(ToDict, self).reset(state)
         self.metric.reset(state)
 
 
-class BatchLambda(metrics.Metric):
+class BatchLambda(Metric):
     """A metric which returns the output of the given function on each batch.
 
-    :param name: The name of the metric.
-    :type name: str
-    :param metric_function: A metric function('y_pred', 'y_true') to wrap.
+    Args:
+        name (str): The name of the metric.
+        metric_function (func): A metric function('y_pred', 'y_true') to wrap.
     """
 
     def __init__(self, name, metric_function):
@@ -93,27 +94,26 @@ class BatchLambda(metrics.Metric):
     def process(self, *args):
         """Return the output of the wrapped function.
 
-        :param args: The :class:`.torchbearer.Trial` state.
-        :type args: dict
-        :return: The value of the metric function('y_pred', 'y_true').
+        Args:
+            args: The :class:`.torchbearer.Trial` state.
 
+        Returns:
+            The value of the metric function('y_pred', 'y_true').
         """
         state = args[0]
         return self._metric_function(state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
 
 
-class EpochLambda(metrics.AdvancedMetric):
+class EpochLambda(AdvancedMetric):
     """A metric wrapper which computes the given function for concatenated values of 'y_true' and 'y_pred' each epoch.
     Can be used as a running metric which computes the function for batches of outputs with a given step size during
     training.
 
-    :param name: The name of the metric.
-    :type name: str
-    :param metric_function: The function('y_pred', 'y_true') to use as the metric.
-    :param running: True if this should act as a running metric.
-    :type running: bool
-    :param step_size: Step size to use between calls if running=True.
-    :type step_size: int
+    Args:
+        name (str): The name of the metric.
+        metric_function (func): The function('y_pred', 'y_true') to use as the metric.
+        running (bool): True if this should act as a running metric.
+        step_size (int): Step size to use between calls if running=True.
     """
 
     def __init__(self, name, metric_function, running=True, step_size=50):
@@ -124,16 +124,17 @@ class EpochLambda(metrics.AdvancedMetric):
         self._result = 0.0
 
         if not running:
-            self._step = lambda y_pred, y_true: ...
+            self._step = lambda y_pred, y_true: None
 
     def process_train(self, *args):
         """Concatenate the 'y_true' and 'y_pred' from the state along the 0 dimension, this must be the batch dimension.
         If this is a running metric, evaluates the function every number of steps.
 
-        :param args: The :class:`.torchbearer.Trial` state.
-        :type args: dict
-        :return: The current running result.
+        Args:
+            args: The :class:`.torchbearer.Trial` state.
 
+        Returns:
+            The current running result.
         """
         state = args[0]
         if (self._y_pred is None) or (self._y_true is None):
@@ -149,17 +150,16 @@ class EpochLambda(metrics.AdvancedMetric):
     def process_final_train(self, *args):
         """Evaluate the function with the aggregated outputs.
 
-        :return: The result of the function.
-
+        Returns:
+            The result of the function.
         """
         return self._final(self._y_pred, self._y_true)
 
     def process_validate(self, *args):
         """During validation, just concatenate 'y_true' and y_pred'.
 
-        :param args: The :class:`.torchbearer.Trial` state.
-        :type args: dict
-
+        Args:
+            args: The :class:`.torchbearer.Trial` state.
         """
         state = args[0]
         if (self._y_pred is None) or (self._y_true is None):
@@ -172,18 +172,17 @@ class EpochLambda(metrics.AdvancedMetric):
     def process_final_validate(self, *args):
         """Evaluate the function with the aggregated outputs.
 
-        :return: The result of the function.
-
+        Returns:
+            The result of the function.
         """
         return self._final(self._y_pred, self._y_true)
 
     def reset(self, state):
         """Reset the 'y_true' and 'y_pred' caches.
 
-        :param state: The :class:`.torchbearer.Trial` state.
-        :type state: dict
-
+        Args:
+            state (dict): The :class:`.torchbearer.Trial` state.
         """
-        super().reset(state)
+        super(EpochLambda, self).reset(state)
         self._y_true = None
         self._y_pred = None

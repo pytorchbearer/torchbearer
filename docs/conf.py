@@ -21,15 +21,7 @@ import os
 import sys
 from unittest.mock import MagicMock
 
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-
-MOCK_MODULES = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision', 'torchvision.utils', 'torch.nn', 'torch.nn.functional', 'torch.optim', 'torch.utils', 'torch.utils.data', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX', 'tensorboardX.torchvis', 'livelossplot']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+autodoc_mock_imports = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision', 'torchvision.utils', 'torchvision.datasets', 'torchvision.datasets.folder', 'torch.nn', 'torch.nn.functional', 'torch.nn.modules', 'torch.optim', 'torch.distributions.utils', 'torch.distributions', 'torch.utils', 'torch.utils.data', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX', 'tensorboardX.torchvis', 'livelossplot']
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))

@@ -27,9 +27,8 @@ class Metric(object):
 
         All metrics must extend this class.
 
-    :param name: The name of the metric
-    :type name: str
-
+    Args:
+        name (str): The name of the metric
     """
 
     def __init__(self, name):
@@ -42,9 +41,11 @@ class Metric(object):
     def process(self, *args):
         """Process the state and update the metric for one iteration.
 
-        :param args: Arguments given to the metric. If this is a root level metric, will be given state
-        :return: None, or the value of the metric for this batch
+        Args:
+            args: Arguments given to the metric. If this is a root level metric, will be given state
 
+        Returns:
+            None, or the value of the metric for this batch
         """
         pass
 
@@ -52,9 +53,11 @@ class Metric(object):
     def process_final(self, *args):
         """Process the terminal state and output the final value of the metric.
 
-        :param args: Arguments given to the metric. If this is a root level metric, will be given state
-        :return: None or the value of the metric for this epoch
+        Args:
+            args: Arguments given to the metric. If this is a root level metric, will be given state
 
+        Returns:
+            None or the value of the metric for this epoch
         """
         pass
 
@@ -71,8 +74,8 @@ class Metric(object):
     def reset(self, state):
         """Reset the metric, called before the start of an epoch.
 
-        :param state: The current state dict of the :class:`.Model`.
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
@@ -89,8 +92,8 @@ class Callback(object):
     def state_dict(self):
         """Get a dict containing the callback state.
 
-        :return: A dict containing parameters and persistent buffers.
-        :rtype: dict
+        Returns:
+            dict: A dict containing parameters and persistent buffers.
         """
         return {}
 
@@ -100,100 +103,91 @@ class Callback(object):
     def load_state_dict(self, state_dict):
         """Resume this callback from the given state. Expects that this callback was constructed in the same way.
 
-        :param state_dict: The state dict to reload
-        :type state_dict: dict
-        :return: self
-        :rtype: Callback
+        Args:
+            state_dict (dict): The state dict to reload
+
+        Returns:
+            :class:`.Callback`: self
         """
         return self
 
     def on_start(self, state):
         """Perform some action with the given state as context at the start of a model fit.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_start_epoch(self, state):
         """Perform some action with the given state as context at the start of each epoch.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_start_training(self, state):
         """Perform some action with the given state as context at the start of the training loop.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_sample(self, state):
         """Perform some action with the given state as context after data has been sampled from the generator.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_forward(self, state):
         """Perform some action with the given state as context after the forward pass (model output) has been completed.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_criterion(self, state):
         """Perform some action with the given state as context after the criterion has been evaluated.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_backward(self, state):
         """Perform some action with the given state as context after backward has been called on the loss.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_step_training(self, state):
         """Perform some action with the given state as context after step has been called on the optimiser.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_end_training(self, state):
         """Perform some action with the given state as context after the training loop has completed.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_end_epoch(self, state):
         """Perform some action with the given state as context at the end of each epoch.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
@@ -202,36 +196,32 @@ class Callback(object):
         history has been updated. Should only be used for taking checkpoints or snapshots and will only be called by the
         run method of Trial.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_end(self, state):
         """Perform some action with the given state as context at the end of the model fitting.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_start_validation(self, state):
         """Perform some action with the given state as context at the start of the validation loop.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_sample_validation(self, state):
         """Perform some action with the given state as context after data has been sampled from the validation generator.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
@@ -239,9 +229,8 @@ class Callback(object):
         """Perform some action with the given state as context after the forward pass (model output) has been completed
         with the validation data.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
@@ -249,26 +238,23 @@ class Callback(object):
         """Perform some action with the given state as context after the criterion evaluation has been completed
         with the validation data.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_end_validation(self, state):
         """Perform some action with the given state as context at the end of the validation loop.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
 
     def on_step_validation(self, state):
         """Perform some action with the given state as context at the end of each validation step.
 
-        :param state: The current state dict of the :class:`.Model`.
-        :type state: dict[str,any]
-
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
         """
         pass

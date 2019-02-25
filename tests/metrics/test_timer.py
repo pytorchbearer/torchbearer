@@ -1,9 +1,9 @@
-from io import StringIO
 from unittest import TestCase
-from unittest.mock import Mock, MagicMock, patch
 
-from torchbearer.metrics.timer import TimerMetric, _TimerMetric
+from mock import Mock, MagicMock, patch
+
 import torchbearer
+from torchbearer.metrics.timer import TimerMetric, _TimerMetric
 
 
 class TestTimer(TestCase):
@@ -18,8 +18,7 @@ class TestTimer(TestCase):
         timer.update_time('test_2', timerMetric, {})
         self.assertTrue(timer.get_timings()['test_2'] == 2)
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_calls(self, _):
+    def test_calls(self):
         timer = TimerMetric('test')
         timer.batch_timer = MagicMock()
         timer.epoch_timer = MagicMock()

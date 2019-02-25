@@ -1,8 +1,8 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from mock import patch, Mock
 
 import torchbearer
-from torchbearer import Model
+from torchbearer import Trial
 from torchbearer.callbacks.checkpointers import _Checkpointer, ModelCheckpoint, MostRecent, Interval, Best
 
 
@@ -17,7 +17,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {}
         }
 
@@ -33,7 +33,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {},
             torchbearer.EPOCH: 2
         }
@@ -50,7 +50,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {'test_metric': 0.001},
             torchbearer.EPOCH: 2
         }
@@ -67,7 +67,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {'test_metric': 0.001},
             torchbearer.EPOCH: 2
         }
@@ -84,7 +84,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.METRICS: {'test_metric': 0.001},
             torchbearer.EPOCH: 2
         }
@@ -104,7 +104,7 @@ class TestCheckpointer(TestCase):
         torchmodel = Mock()
         optim = Mock()
         state = {
-            torchbearer.SELF: Model(torchmodel, optim, None, []),
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
             torchbearer.EPOCH: 0,
             torchbearer.METRICS: {}
         }
@@ -165,6 +165,22 @@ class TestInterval(TestCase):
             elif i == 7:
                 self.assertTrue(mock_save_check.call_count == 2)
 
+        self.assertTrue(mock_save_check.call_count == 3)
+
+    @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_interval_on_batch(self, mock_save_check):
+        state = {}
+        check = Interval('test_file', period=4, on_batch=True)
+
+        for i in range(13):
+            check.on_step_training(state)
+            if i == 3:
+                self.assertTrue(mock_save_check.call_count == 1)
+            elif i == 6:
+                self.assertFalse(mock_save_check.call_count == 2)
+            elif i == 7:
+                self.assertTrue(mock_save_check.call_count == 2)
+        check.on_checkpoint(state)
         self.assertTrue(mock_save_check.call_count == 3)
 
     def test_state_dict(self):

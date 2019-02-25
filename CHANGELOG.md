@@ -14,6 +14,37 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [0.2.6] - 2018-12-19
 ### Added
+- Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
+- Added SimpleUniform and SimpleExponential distributions
+- Added a decorator which can be used to cite a research article as part of a doc string
+- Added an optional dimension argument to the mean, std and running_mean metric aggregators
+- Added a var metric and decorator which can be used to calculate the variance of a metric
+- Added an unbiased flag to the std and var metrics to optionally not apply Bessel's correction (consistent with torch.std / torch.var)
+- Added support for rounding 1D lists to the Tqdm callback
+- Added SimpleWeibull distribution
+- Added support for Python 2.7
+- Added SimpleWeibullSimpleWeibullKL
+- Added SimpleExponentialSimpleExponentialKL
+- Added the option for model parameters only saving to Checkpointers.
+- Added documentation about serialization.
+- Added support for indefinite data loading. Iterators can now be run until complete independent of epochs or iterators can be refreshed during an epoch if complete. 
+- Added support for batch intervals in interval checkpointer
+
+### Changed
+- Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
+- Tqdm precision argument now rounds to decimal places rather than significant figures
+- Trial will now simply infer if the model has an argument called 'state'
+### Deprecated
+### Removed
+- Removed the old Model API (deprecated since version 0.2.0)
+- Removed the 'pass_state' argument from Trial, this will now be inferred
+### Fixed
+- Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
+- Fixed a bug in the cite decorator causing the citation to not show up correctly
+- Fixed a memory leak in the mse primitive metric
+
+## [0.2.6] - 2018-12-19
+### Added
 ### Changed
 - Y_PRED, Y_TRUE and X can now equivalently be accessed as PREDICTION, TARGET and INPUT respectively
 ### Deprecated

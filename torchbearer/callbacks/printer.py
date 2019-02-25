@@ -1,29 +1,27 @@
-import torchbearer
-
-from torchbearer.callbacks import Callback
-from tqdm import tqdm
+from __future__ import print_function
 from collections import OrderedDict
-from numbers import Number
+from functools import partial
+
+from tqdm import tqdm
+
+import torchbearer
+from torchbearer.callbacks import Callback
 
 
-def _format_num(n, precision):
-    # Adapted from https://github.com/tqdm/tqdm
-    f = ('{0:.' + str(precision) + 'g}').format(n).replace('+0', '+').replace('-0', '-')
-    n = str(n)
-    return f if len(f) < len(n) else n
-
-
-def _format_metrics(metrics, precision):
+def _format_metrics(metrics, rounder):
     # Adapted from https://github.com/tqdm/tqdm
     postfix = OrderedDict([])
     for key in sorted(metrics.keys()):
         postfix[key] = metrics[key]
 
     for key in postfix.keys():
-        if isinstance(postfix[key], Number):
-            postfix[key] = _format_num(postfix[key], precision)
-        elif not isinstance(postfix[key], str):
-            postfix[key] = str(postfix[key])
+        try:
+            postfix[key] = str(rounder(postfix[key]))
+        except TypeError:
+            try:
+                postfix[key] = str(list(map(rounder, postfix[key])))
+            except TypeError:
+                postfix[key] = str(postfix[key])
     postfix = ', '.join(key + '=' + postfix[key].strip() for key in postfix.keys())
     return postfix
 
@@ -31,25 +29,32 @@ def _format_metrics(metrics, precision):
 class ConsolePrinter(Callback):
     """The ConsolePrinter callback simply outputs the training metrics to the console.
 
-    :param validation_label_letter: This is the letter displayed after the epoch number indicating the current phase of training
-    :type validation_label_letter: String
-    :param precision: Precision of the number format in significant figures
-    :type precision: int
+    Args:
+        validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase
+            of training
+        precision (int): Precision of the number format in decimal places
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: The current epoch number
+        - :attr:`torchbearer.state.MAX_EPOCHS`: The total number of epochs for this run
+        - :attr:`torchbearer.state.BATCH`: The current batch / iteration number
+        - :attr:`torchbearer.state.STEPS`: The total number of steps / batches / iterations for this epoch
+        - :attr:`torchbearer.state.METRICS`: The metrics dict to print
     """
     def __init__(self, validation_label_letter='v', precision=4):
-        super().__init__()
+        super(ConsolePrinter, self).__init__()
         self.validation_label = validation_label_letter
-        self.precision = precision
+        self.rounder = partial(round, ndigits=precision)
 
     def _step(self, state, letter, steps):
         epoch_str = '{:d}/{:d}({:s}): '.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
         batch_str = '{:d}/{:d} '.format(state[torchbearer.BATCH], steps)
-        stats_str = _format_metrics(state[torchbearer.METRICS], self.precision)
+        stats_str = _format_metrics(state[torchbearer.METRICS], self.rounder)
         print('\r' + epoch_str + batch_str + stats_str, end='')
 
     def _end(self, state, letter):
         epoch_str = '{:d}/{:d}({:s}): '.format(state[torchbearer.EPOCH], state[torchbearer.MAX_EPOCHS], letter)
-        stats_str = _format_metrics(state[torchbearer.METRICS], self.precision)
+        stats_str = _format_metrics(state[torchbearer.METRICS], self.rounder)
         print('\r' + epoch_str + stats_str)
 
     def on_step_training(self, state):
@@ -66,21 +71,28 @@ class ConsolePrinter(Callback):
 
 
 class Tqdm(Callback):
-    """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM. The given key is used to label validation output.
+    """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM.
+    The given key is used to label validation output.
 
-    :param validation_label_letter: The letter to use for validation outputs.
-    :type validation_label_letter: str
-    :param precision: Precision of the number format in significant figures
-    :type precision: int
-    :param on_epoch: If True, output a single progress bar which tracks epochs
-    :type on_epoch: bool
-    :param tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor. See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
+    Args:
+        validation_label_letter (str): The letter to use for validation outputs.
+        precision (int): Precision of the number format in decimal places
+        on_epoch (bool): If True, output a single progress bar which tracks epochs
+        tqdm_args: Any extra keyword args provided here will be passed through to the tqdm module constructor.
+            See `github.com/tqdm/tqdm#parameters <https://github.com/tqdm/tqdm#parameters>`_ for more details.
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: The current epoch number
+        - :attr:`torchbearer.state.MAX_EPOCHS`: The total number of epochs for this run
+        - :attr:`torchbearer.state.STEPS`: The total number of steps / batches / iterations for this epoch
+        - :attr:`torchbearer.state.METRICS`: The metrics dict to print
+        - :attr:`torchbearer.state.HISTORY`: The history of the :class:`.Trial` object
     """
     def __init__(self, tqdm_module=tqdm, validation_label_letter='v', precision=4, on_epoch=False, **tqdm_args):
         self.tqdm_module = tqdm_module
         self._loader = None
         self.validation_label = validation_label_letter
-        self.precision = precision
+        self.rounder = partial(round, ndigits=precision)
         self._on_epoch = on_epoch
         self.tqdm_args = tqdm_args
 
@@ -90,10 +102,10 @@ class Tqdm(Callback):
 
     def _update(self, state):
         self._loader.update(1)
-        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.precision))
+        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.rounder))
 
     def _close(self, state):
-        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.precision))
+        self._loader.set_postfix_str(_format_metrics(state[torchbearer.METRICS], self.rounder))
         self._loader.close()
 
     def on_start(self, state):
@@ -118,8 +130,8 @@ class Tqdm(Callback):
     def on_start_training(self, state):
         """Initialise the TQDM bar for this training phase.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._on_start(state, 't')
@@ -127,8 +139,8 @@ class Tqdm(Callback):
     def on_step_training(self, state):
         """Update the bar with the metrics from this step.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._update(state)
@@ -136,8 +148,8 @@ class Tqdm(Callback):
     def on_end_training(self, state):
         """Update the bar with the terminal training metrics and then close.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._close(state)
@@ -145,8 +157,8 @@ class Tqdm(Callback):
     def on_start_validation(self, state):
         """Initialise the TQDM bar for this validation phase.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._on_start(state, self.validation_label)
@@ -154,8 +166,8 @@ class Tqdm(Callback):
     def on_step_validation(self, state):
         """Update the bar with the metrics from this step.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._update(state)
@@ -163,8 +175,8 @@ class Tqdm(Callback):
     def on_end_validation(self, state):
         """Update the bar with the terminal validation metrics and then close.
 
-        :param state: The Model state
-        :type state: dict
+        Args:
+            state (dict): The :class:`.Trial` state
         """
         if not self._on_epoch:
             self._close(state)

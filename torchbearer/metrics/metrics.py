@@ -36,8 +36,8 @@ class MetricTree(Metric):
        If the node output is already a dict (i.e. the node is a standalone metric), this is unwrapped before passing the
        **first** value to the children.
 
-    :param metric: The metric to act as the root node of the tree / subtree
-    :type metric: Metric
+    Args:
+        metric (:class:`.Metric`): The metric to act as the root node of the tree / subtree
     """
     def __init__(self, metric):
         super(MetricTree, self).__init__(metric.name)
@@ -50,9 +50,8 @@ class MetricTree(Metric):
     def add_child(self, child):
         """Add a child to this node of the tree
 
-        :param child: The child to add
-        :type child: Metric
-        :return: None
+        Args:
+            child (:class:`.Metric`): The child to add
         """
         self.children.append(child)
 
@@ -72,14 +71,16 @@ class MetricTree(Metric):
     def process(self, *args):
         """Process this node and then pass the output to each child.
 
-        :return: A dict containing all results from the children
+        Returns:
+            A dict containing all results from the children
         """
         return self._for_tree(lambda metric, *in_args: metric.process(*in_args), *args)
 
     def process_final(self, *args):
         """Process this node and then pass the output to each child.
 
-        :return: A dict containing all results from the children
+        Returns:
+            A dict containing all results from the children
         """
         return self._for_tree(lambda metric, *in_args: metric.process_final(*in_args), *args)
 
@@ -106,13 +107,13 @@ class MetricList(Metric):
     """The :class:`MetricList` class is a wrapper for a list of metrics which acts as a single metric and produces a
     dictionary of outputs.
 
-    :param metric_list: The list of metrics to be wrapped. If the list contains a :class:`MetricList`, this will be\
-    unwrapped. Any strings in the list will be retrieved from metrics.DEFAULT_METRICS.
-    :type metric_list: list
+    Args:
+        metric_list (list): The list of metrics to be wrapped. If the list contains a :class:`MetricList`, this will be
+            unwrapped. Any strings in the list will be retrieved from metrics.DEFAULT_METRICS.
     """
 
     def __init__(self, metric_list):
-        super().__init__('metric_list')
+        super(MetricList, self).__init__('metric_list')
 
         self.metric_list = []
 
@@ -137,15 +138,16 @@ class MetricList(Metric):
     def process(self, *args):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
-        :return: dict[str,any] -- A dictionary which maps metric names to values.
-
+        Returns:
+            dict[str,any]: A dictionary which maps metric names to values.
         """
         return self._for_list(lambda metric: metric.process(*args))
 
     def process_final(self, *args):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
-        :return: dict[str,any] -- A dictionary which maps metric names to values.
+        Returns:
+            dict[str,any]: A dictionary which maps metric names to values.
 
         """
         return self._for_list(lambda metric: metric.process_final(*args))
@@ -163,8 +165,8 @@ class MetricList(Metric):
     def reset(self, state):
         """Reset each metric with the given state.
 
-        :param state: The current state dict of the :class:`.Model`.
-
+        Args:
+            state: The current state dict of the :class:`.Trial`.
         """
         self._for_list(lambda metric: metric.reset(state))
 
@@ -176,9 +178,8 @@ class AdvancedMetric(Metric):
     """The :class:`AdvancedMetric` class is a metric which provides different process methods for training and
     validation. This enables running metrics which do not output intermediate steps during validation.
 
-    :param name: The name of the metric.
-    :type name: str
-
+    Args:
+        name (str): The name of the metric.
     """
 
     def __init__(self, name):
@@ -189,57 +190,56 @@ class AdvancedMetric(Metric):
     def process_train(self, *args):
         """Process the given state and return the metric value for a training iteration.
 
-        :return: The metric value for a training iteration.
-
+        Returns:
+            The metric value for a training iteration.
         """
         pass
 
     def process_validate(self, *args):
         """Process the given state and return the metric value for a validation iteration.
 
-        :return: The metric value for a validation iteration.
-
+        Returns:
+            The metric value for a validation iteration.
         """
         pass
 
     def process_final_train(self, *args):
         """Process the given state and return the final metric value for a training iteration.
 
-        :return: The final metric value for a training iteration.
-
+        Returns:
+            The final metric value for a training iteration.
         """
         pass
 
     def process_final_validate(self, *args):
         """Process the given state and return the final metric value for a validation iteration.
 
-        :return: The final metric value for a validation iteration.
-
+        Returns:
+            The final metric value for a validation iteration.
         """
         pass
 
     def process(self, *args):
         """Depending on the current mode, return the result of either 'process_train' or 'process_validate'.
 
-        :return: The metric value.
-
+        Returns:
+            The metric value.
         """
         return self._process(*args)
 
     def process_final(self, *args):
         """Depending on the current mode, return the result of either 'process_final_train' or 'process_final_validate'.
 
-        :return: The final metric value.
-
+        Returns:
+            The final metric value.
         """
         return self._process_final(*args)
 
     def eval(self, data_key=None):
         """Put the metric in eval mode.
 
-        :param data_key: The torchbearer data_key, if used
-        :type data_key: Optional(torchbearer.StateKey)
-
+        Args:
+            data_key (:class:`torchbearer.StateKey`): The torchbearer data_key, if used
         """
         self._process = self.process_validate
         self._process_final = self.process_final_validate
