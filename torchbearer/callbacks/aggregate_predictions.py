@@ -14,3 +14,7 @@ class AggregatePredictions(Callback):
 
     def on_end_validation(self, state):
         state[torchbearer.FINAL_PREDICTIONS] = torch.cat(self.predictions_list, 0)
+
+    def on_end_epoch(self, state):
+        super(AggregatePredictions, self).on_end_epoch(state)
+        self.predictions_list = []
