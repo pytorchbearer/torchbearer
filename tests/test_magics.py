@@ -11,7 +11,7 @@ class TestMagics(unittest.TestCase):
             stored_fn['fn'] = fn
 
         mock_magic.side_effect = my_func
-        import magics
+        import torchbearer.magics as magics
         self.assertTrue(magics.is_notebook())
         stored_fn['fn']('normal')
         self.assertFalse(magics.is_notebook())
@@ -20,4 +20,4 @@ class TestMagics(unittest.TestCase):
         del magics
 
         mock_magic.side_effect = NameError
-        import magics
+        import torchbearer.magics as magics
