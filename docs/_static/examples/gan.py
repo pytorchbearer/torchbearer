@@ -158,7 +158,7 @@ class d_loss(tb.metrics.Metric):
 
 
 torchbearertrial = tb.Trial(model, optim, criterion=None, metrics=['loss', g_loss(), d_loss()],
-                            callbacks=[loss_callback, saver_callback], pass_state=True)
+                            callbacks=[loss_callback, saver_callback])
 torchbearertrial.with_train_generator(dataloader)
 torchbearertrial.to(device)
 torchbearertrial.run(epochs=200)

@@ -122,6 +122,6 @@ loss = binary_cross_entropy
 from torchbearer import Trial
 
 torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'],
-                          callbacks=[add_kld_loss_callback, save_reconstruction_callback()], pass_state=True).to('cuda')
+                          callbacks=[add_kld_loss_callback, save_reconstruction_callback()]).to('cuda')
 torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
 torchbearer_trial.run(epochs=10)

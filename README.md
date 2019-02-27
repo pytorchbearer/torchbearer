@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/logo_dark_text.svg?sanitize=true" width="100%"/>
 
-[![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Python 2.7 | 3.5 | 3.6 | 3.7](https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7-brightgreen.svg)](https://www.python.org/) [![PyTorch 0.4.0 | 0.4.1 | 1.0.0](https://img.shields.io/badge/pytorch-0.4.0%20%7C%200.4.1%20%7C%201.0.0-brightgreen.svg)](https://pytorch.org/) [![Build Status](https://travis-ci.com/ecs-vlc/torchbearer.svg?branch=master)](https://travis-ci.com/ecs-vlc/torchbearer) [![codecov](https://codecov.io/gh/ecs-vlc/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/ecs-vlc/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8c9b136fbcd443fa9135d92321be480d)](https://www.codacy.com/app/ewah1g13/torchbearer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ecs-vlc/torchbearer&amp;utm_campaign=Badge_Grade)
+[![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Python 2.7 | 3.5 | 3.6 | 3.7](https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7-brightgreen.svg)](https://www.python.org/) [![PyTorch 0.4.0 | 0.4.1 | 1.0.0](https://img.shields.io/badge/pytorch-0.4.0%20%7C%200.4.1%20%7C%201.0.0-brightgreen.svg)](https://pytorch.org/) [![Build Status](https://travis-ci.com/ecs-vlc/torchbearer.svg?branch=master)](https://travis-ci.com/ecs-vlc/torchbearer) [![codecov](https://codecov.io/gh/ecs-vlc/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/ecs-vlc/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest)
 
 A model fitting library for PyTorch
 ## Contents
@@ -132,14 +132,14 @@ trial.evaluate(data_key=torchbearer.TEST_DATA)
 - Running that code gives output using Tqdm and providing running accuracies and losses during the training phase:
 
 ```
-0/10(t): 100%|██████████| 352/352 [00:01<00:00, 176.55it/s, running_acc=0.526, running_loss=1.31, acc=0.453, acc_std=0.498, loss=1.53, loss_std=0.25]
-0/10(v): 100%|██████████| 40/40 [00:00<00:00, 201.14it/s, val_acc=0.528, val_acc_std=0.499, val_loss=1.32, val_loss_std=0.0874]
+0/10(t): 100%|██████████| 352/352 [00:02<00:00, 163.98it/s, acc=0.4339, loss=1.5776, running_acc=0.5202, running_loss=1.3494]
+0/10(v): 100%|██████████| 40/40 [00:00<00:00, 365.42it/s, val_acc=0.5266, val_loss=1.3208]
 .
 .
 .
-9/10(t): 100%|██████████| 352/352 [00:02<00:00, 171.22it/s, running_acc=0.738, running_loss=0.737, acc=0.749, acc_std=0.434, loss=0.723, loss_std=0.0885]
-9/10(v): 100%|██████████| 40/40 [00:00<00:00, 188.51it/s, val_acc=0.669, val_acc_std=0.471, val_loss=0.97, val_loss_std=0.173]
-0/1(e): 100%|██████████| 79/79 [00:00<00:00, 241.00it/s, test_acc=0.675, test_acc_std=0.468, test_loss=0.952, test_loss_std=0.109]
+9/10(t): 100%|██████████| 352/352 [00:02<00:00, 165.28it/s, acc=0.7515, loss=0.715, running_acc=0.7352, running_loss=0.7492]
+9/10(v): 100%|██████████| 40/40 [00:00<00:00, 310.76it/s, val_acc=0.6792, val_loss=0.9743]
+0/1(e): 100%|██████████| 79/79 [00:00<00:00, 233.06it/s, test_acc=0.6673, test_loss=0.9741]
 ```
 
 <a name="docs"/>
