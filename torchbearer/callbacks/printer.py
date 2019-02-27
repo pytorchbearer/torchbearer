@@ -75,6 +75,7 @@ class Tqdm(Callback):
     The given key is used to label validation output.
 
     Args:
+        tqdm_module: The tqdm module to use. If none, defaults to tqdm or tqdm_notebook if in notebook
         validation_label_letter (str): The letter to use for validation outputs.
         precision (int): Precision of the number format in decimal places
         on_epoch (bool): If True, output a single progress bar which tracks epochs
@@ -88,12 +89,12 @@ class Tqdm(Callback):
         - :attr:`torchbearer.state.METRICS`: The metrics dict to print
         - :attr:`torchbearer.state.HISTORY`: The history of the :class:`.Trial` object
     """
-    def __init__(self, tqdm_module=tqdm, validation_label_letter='v', precision=4, on_epoch=False, **tqdm_args):
-        if torchbearer.notebook:
+    def __init__(self, tqdm_module=None, validation_label_letter='v', precision=4, on_epoch=False, **tqdm_args):
+        if torchbearer.magics.is_notebook() and tqdm_module == None:
             from tqdm import tqdm_notebook
             self.tqdm_module = tqdm_notebook
         else:
-            self.tqdm_module = tqdm_module
+            self.tqdm_module = tqdm if tqdm_module is None else tqdm_module
 
         self._loader = None
         self.validation_label = validation_label_letter

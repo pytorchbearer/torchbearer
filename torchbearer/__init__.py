@@ -29,18 +29,7 @@ Utilities
 """
 
 from .version import __version__
-
-# Sets global variable notebook when line magic is called with "%torchbearer notebook"
-global notebook
-notebook = False
-from IPython.core.magic import register_line_magic
-@register_line_magic
-def torchbearer(line):
-    if line == 'notebook':
-        global notebook
-        notebook = True
-del torchbearer  # Avoid scope issues
-
+from . import magics
 from .cite import cite
 from .bases import *
 from .state import *
