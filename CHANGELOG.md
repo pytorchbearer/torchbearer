@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Removed
 - Removed the old Model API (deprecated since version 0.2.0)
 - Removed the 'pass_state' argument from Trial, this will now be inferred
+- Removed the 'std' decorator from the default metrics
 ### Fixed
 - Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
 - Fixed a bug in the cite decorator causing the citation to not show up correctly
