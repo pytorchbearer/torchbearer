@@ -36,6 +36,12 @@ DISC_REAL = state_key('disc_real')
 G_LOSS = state_key('g_loss')
 D_LOSS = state_key('d_loss')
 
+DISC_OPT = state_key('disc_opt')
+DISC_MODEL = state_key('disc_model')
+DISC_IMGS = state_key('disc_imgs')
+DISC_CRIT = state_key('disc_crit')
+
+
 
 class Generator(nn.Module):
     def __init__(self):
@@ -57,7 +63,8 @@ class Generator(nn.Module):
             nn.Tanh()
         )
 
-    def forward(self, z):
+    def forward(self, real_imgs, state):
+        z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
         img = self.model(z)
         img = img.view(img.size(0), *img_shape)
         return img
@@ -76,47 +83,30 @@ class Discriminator(nn.Module):
             nn.Sigmoid()
         )
 
-    def forward(self, img):
+    def forward(self, img, state):
         img_flat = img.view(img.size(0), -1)
         validity = self.model(img_flat)
 
         return validity
 
+def gen_crit(state):
+    loss =  adversarial_loss(state[DISC_MODEL](state[tb.Y_PRED], state), valid)
+    state[G_LOSS] = loss
+    return loss
 
-class GAN(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.discriminator = Discriminator()
-        self.generator = Generator()
-
-    def forward(self, real_imgs, state):
-        # Generator Forward
-        z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
-        state[GEN_IMGS] = self.generator(z)
-        state[DISC_GEN] = self.discriminator(state[GEN_IMGS])
-        # This clears the function graph built up for the discriminator
-        self.discriminator.zero_grad()
-
-        # Discriminator Forward
-        state[DISC_GEN_DET] = self.discriminator(state[GEN_IMGS].detach())
-        state[DISC_REAL] = self.discriminator(real_imgs)
-
-
-@callbacks.add_to_loss
-def loss_callback(state):
-    fake_loss = adversarial_loss(state[DISC_GEN_DET], fake)
-    real_loss = adversarial_loss(state[DISC_REAL], valid)
-    state[G_LOSS] = adversarial_loss(state[DISC_GEN], valid)
-    state[D_LOSS] = (real_loss + fake_loss) / 2
-    return state[G_LOSS] + state[D_LOSS]
-
+def disc_crit(state):
+    real_loss = adversarial_loss(state[DISC_MODEL](state[tb.X], state), valid)
+    fake_loss = adversarial_loss(state[DISC_MODEL](state[tb.Y_PRED].detach(), state), fake)
+    loss = (real_loss + fake_loss) / 2
+    state[D_LOSS] = loss
+    return loss
 
 batch = torch.randn(25, latent_dim).to(device)
 @callbacks.on_step_training
 def saver_callback(state):
     batches_done = state[tb.EPOCH] * len(state[tb.GENERATOR]) + state[tb.BATCH]
     if batches_done % sample_interval == 0:
-        samples = state[tb.MODEL].generator(batch)
+        samples = state[tb.MODEL](batch, state)
         save_image(samples, 'images/%d.png' % batches_done, nrow=5, normalize=True)
 
 
@@ -126,15 +116,15 @@ transform = transforms.Compose([
                         transforms.ToTensor(),
                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                    ])
-
 dataset = datasets.MNIST('./data/mnist', train=True, download=True, transform=transform)
-
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
 # Model and optimizer
-model = GAN()
-optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5, 0.999))
+generator = Generator()
+discriminator = Discriminator()
+optimizer_G = torch.optim.Adam(generator.parameters(), lr=lr, betas=(0.5, 0.999))
+optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
 
 
 @tb.metrics.running_mean
@@ -157,8 +147,24 @@ class d_loss(tb.metrics.Metric):
         return state[D_LOSS]
 
 
-torchbearertrial = tb.Trial(model, optim, criterion=None, metrics=['loss', g_loss(), d_loss()],
-                            callbacks=[loss_callback, saver_callback], pass_state=True)
-torchbearertrial.with_train_generator(dataloader)
-torchbearertrial.to(device)
-torchbearertrial.run(epochs=200)
+from torchbearer.bases import base_closure
+
+
+closure_gen = base_closure(tb.X, tb.MODEL, tb.Y_PRED, tb.CRITERION, tb.LOSS, tb.OPTIMIZER)
+closure_disc = base_closure(tb.Y_PRED, DISC_MODEL, DISC_IMGS, DISC_CRIT, tb.LOSS, DISC_OPT)
+
+def closure(self, state):
+    closure_gen(self, state)
+    closure_disc(self, state)
+    state[DISC_OPT].step()
+
+
+trial = tb.Trial(generator, optimizer_G, criterion=gen_crit, metrics=['loss', g_loss(), d_loss()],
+                            callbacks=[saver_callback], pass_state=True)
+trial.with_train_generator(dataloader)
+trial.state[DISC_MODEL] = discriminator.to(device)
+trial.state[DISC_OPT] = optimizer_D
+trial.state[DISC_CRIT] = disc_crit
+trial.with_closure(closure)
+trial.to(device)
+trial.run(epochs=200)

@@ -2,6 +2,7 @@ from distutils.version import LooseVersion
 import functools
 
 import torch
+import torchbearer
 
 
 def no_grad():
@@ -258,3 +259,27 @@ class Callback(object):
             state (dict): The current state dict of the :class:`.Trial`.
         """
         pass
+
+def base_closure(X, Model, Y_pred, Crit, Loss, Opt):
+    def closure(self, state):
+        # Zero grads
+        state[Opt].zero_grad()
+
+        # Forward Pass
+        if self.pass_state:
+            state[Y_pred] = state[Model](state[X], state=state)
+        else:
+            state[Y_pred] = state[Model](state[X])
+
+        state[torchbearer.CALLBACK_LIST].on_forward(state)
+
+        # Loss Calculation
+        state[Loss] = state[Crit](state)
+
+        state[torchbearer.CALLBACK_LIST].on_criterion(state)
+
+        # Backwards pass
+        state[Loss].backward(**state[torchbearer.BACKWARD_ARGS])
+
+        state[torchbearer.CALLBACK_LIST].on_backward(state)
+    return closure
