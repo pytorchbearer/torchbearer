@@ -49,7 +49,6 @@ class BinaryAccuracy(Metric):
 
 @default_for_key('cat_acc')
 @running_mean
-@std
 @mean
 class CategoricalAccuracy(Metric):
     """Categorical accuracy metric. Uses torch.max to determine predictions and compares to targets. Decorated with a
@@ -83,7 +82,6 @@ class CategoricalAccuracy(Metric):
 @default_for_key('top_10_acc', k=10)
 @default_for_key('top_5_acc')
 @running_mean
-@std
 @mean
 class TopKCategoricalAccuracy(Metric):
     """Top K Categorical accuracy metric. Uses torch.topk to determine the top k predictions and compares to targets.
@@ -143,7 +141,6 @@ class MeanSquaredError(Metric):
 
 @default_for_key('loss')
 @running_mean
-@std
 @mean
 class Loss(Metric):
     """Simply returns the 'loss' value from the model state. Decorated with a mean, running_mean and std. Default for

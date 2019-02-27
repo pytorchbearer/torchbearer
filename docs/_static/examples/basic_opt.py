@@ -39,7 +39,7 @@ training_steps = 50000
 model = Net(p)
 optim = torch.optim.SGD(model.parameters(), lr=0.0001)
 
-tbtrial = tb.Trial(model, optim, loss, [tb.metrics.running_mean(ESTIMATE, dim=1), 'loss'], pass_state=True)
+tbtrial = tb.Trial(model, optim, loss, [tb.metrics.running_mean(ESTIMATE, dim=1), 'loss'])
 tbtrial.for_train_steps(training_steps).to('cuda')
 tbtrial.run()
 print(list(model.parameters())[0].data)
