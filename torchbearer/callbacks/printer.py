@@ -90,7 +90,7 @@ class Tqdm(Callback):
         - :attr:`torchbearer.state.HISTORY`: The history of the :class:`.Trial` object
     """
     def __init__(self, tqdm_module=None, validation_label_letter='v', precision=4, on_epoch=False, **tqdm_args):
-        if torchbearer.magics.is_notebook() and tqdm_module == None:
+        if torchbearer.magics.is_notebook() and tqdm_module is None:
             from tqdm import tqdm_notebook
             self.tqdm_module = tqdm_notebook
         else:

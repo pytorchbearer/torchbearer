@@ -16,9 +16,7 @@ def torchbearer(line):
 try:
     import IPython.core.magic
     torchbearer = IPython.core.magic.register_line_magic(torchbearer)
-    del torchbearer  # Avoid scope issues
     set_notebook(True)
-
 except NameError:
     pass
 
