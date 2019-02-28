@@ -19,6 +19,7 @@ def super(_, obj):
     return old_super(obj.__class__, obj)
 
 
+@default_for_key('binary_accuracy')
 @default_for_key('binary_acc')
 @running_mean
 @mean
@@ -47,6 +48,7 @@ class BinaryAccuracy(Metric):
         return torch.eq(y_pred, y_true).view(-1).float()
 
 
+@default_for_key('cat_accuracy')
 @default_for_key('cat_acc')
 @running_mean
 @mean
@@ -79,6 +81,8 @@ class CategoricalAccuracy(Metric):
         return (y_pred == y_true).float()
 
 
+@default_for_key('top_10_accuracy', k=10)
+@default_for_key('top_5_accuracy')
 @default_for_key('top_10_acc', k=10)
 @default_for_key('top_5_acc')
 @running_mean
