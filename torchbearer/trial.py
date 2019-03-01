@@ -932,7 +932,7 @@ class Trial(object):
         all_metrics = state[torchbearer.METRICS]
 
         # Training pass
-        state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
+        state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS] if state[torchbearer.TRAIN_STEPS] is not None else 0
         state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" not in key}
         callback_list.on_start_training(state)
         for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
@@ -947,7 +947,7 @@ class Trial(object):
 
         # Validation pass
         if not state[torchbearer.STOP_TRAINING]:
-            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
+            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS] if state[torchbearer.VALIDATION_STEPS] is not None else 0
             state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" in key}
             callback_list.on_start_validation(state)
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
