@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed bug where replay errored when train or val steps were None
+
 ## [0.3.0] - 2019-02-28
 ### Added
 - Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
