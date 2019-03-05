@@ -86,9 +86,10 @@ class CyclicLR(Callback):
             i += 1
 
     def next_lr(self, epoch_count, group_id):
-        cycle = np.floor(1 + epoch_count / (2*self.step_size[group_id]))
-        x = np.abs(epoch_count / self.step_size[group_id] - 2*cycle + 1)
-        new_lr = self.base_lr[group_id] + (self.max_lr[group_id]-self.base_lr[group_id])*np.maximum(0, (1-x))
+        epoch_count = float(epoch_count)
+        cycle = np.floor(1.0 + epoch_count / (2.0*self.step_size[group_id]))
+        x = np.abs(epoch_count / self.step_size[group_id] - 2.0*cycle + 1.0)
+        new_lr = self.base_lr[group_id] + (self.max_lr[group_id]-self.base_lr[group_id])*np.maximum(0.0, (1.0-x))
 
         scale_param = cycle
         if self.scale_mode != 'cycle':
