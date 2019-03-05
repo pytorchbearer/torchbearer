@@ -29,7 +29,7 @@ class CyclicLR(Callback):
         gamma (float): Scaling factor for exp_range mode
     """
     def __init__(self, base_lr=0.001, max_lr=0.006, step_size=2000, mode='triangular', scale_fn=None, scale_mode='cycle', gamma=1.):
-        super().__init__()
+        super(CyclicLR, self).__init__()
 
         if not isinstance(base_lr, list):
             base_lr = [base_lr]
@@ -59,7 +59,7 @@ class CyclicLR(Callback):
                 self.scale_mode = 'iterations'
 
     def on_start(self, state):
-        super().on_start(state)
+        super(CyclicLR, self).on_start(state)
         self.optim = state[tb.OPTIMIZER]
         self.iterations = 0
 
@@ -72,11 +72,11 @@ class CyclicLR(Callback):
                 self.step_size = self.step_size * len(self.optim.param_groups)
 
     def on_sample(self, state):
-        super().on_sample(state)
+        super(CyclicLR, self).on_sample(state)
         self.update_lrs()
 
     def on_step_training(self, state):
-        super().on_step_training(state)
+        super(CyclicLR, self).on_step_training(state)
         self.iterations = self.iterations + 1
 
     def update_lrs(self):
