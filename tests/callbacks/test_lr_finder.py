@@ -89,3 +89,32 @@ class TestCyclicLR(TestCase):
         for i, param_group in enumerate(optim.param_groups):
             lr = param_group['lr']
             self.assertAlmostEqual(lr, 0.004399999999999999*0.1**i)
+
+    def test_end_to_end_2(self):
+        import torch.optim
+        import torch.nn
+        model = torch.nn.Linear(10, 10)
+        model2 = torch.nn.Linear(10, 10)
+
+        optim = torch.optim.SGD([
+                        {'params': model.parameters()},
+                        {'params': model2.parameters(), 'lr': 1e-3}
+                    ], lr=1e-2, momentum=0.9)
+
+        clr = lrf.CyclicLR(step_size=[75, 100], base_lr=0.001, max_lr=0.006)
+        clr.on_start({tb.OPTIMIZER: optim})
+
+        lrs = []
+        for i in range(100):
+            clr.on_sample({tb.OPTIMIZER: optim})
+            clr.on_step_training({tb.OPTIMIZER: optim})
+            for param_group in optim.param_groups:
+                lr = param_group['lr']
+                lrs.append(lr)
+
+        for i, param_group in enumerate(optim.param_groups):
+            lr = param_group['lr']
+            if i == 0:
+                self.assertAlmostEqual(lr, 0.004399999999999999)
+            if i == 1:
+                self.assertAlmostEqual(lr, 0.00595)
