@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added on_init callback hook to run at the end of trial init
 ### Changed
 ### Deprecated
 ### Removed

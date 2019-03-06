@@ -386,6 +386,8 @@ class Trial(object):
             torchbearer.INF_TRAIN_LOADING: False,
         })
 
+        self.state[torchbearer.CALLBACK_LIST].on_init(self.state)
+
     def __str__(self):
         def state_string(name, state_key):
             import math
