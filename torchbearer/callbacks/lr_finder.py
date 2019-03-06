@@ -17,7 +17,7 @@ bibtex = """
 
 @cite(bibtex)
 class CyclicLR(Callback):
-    """ Learning rate finder that cyclicly varies the rate. Based off of the keras implementation referenced in the paper. 
+    """ Learning rate finder that cyclicly varies the rate. Based off of the keras implementation referenced in the `paper <https://arxiv.org/abs/1506.01186>`_.
 
     Args:
         base_lr (float / list): Float or list of floats for the base (min) learning rate for each optimiser parameter group
