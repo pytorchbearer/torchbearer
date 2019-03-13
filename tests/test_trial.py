@@ -1873,17 +1873,20 @@ class TestTrialMembers(TestCase):
         torchmodel = "mod"
         optimizer = "opt"
         metric = tb.metrics.Metric('met')
+        cb = tb.callbacks.Callback()
+        cb.on_init = Mock()
 
-        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], ["cb"])
-        correct_string = "--------------------- OPTIMZER ---------------------\nopt\n\n-------------------- CRITERION ---------------------\ncrit\n\n--------------------- METRICS ----------------------\n['met']\n\n-------------------- CALLBACKS ---------------------\n['cb']\n\n---------------------- MODEL -----------------------\nmod\n\n"
+        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], [cb])
+        correct_string = "--------------------- OPTIMZER ---------------------\nopt\n\n-------------------- CRITERION ---------------------\ncrit\n\n--------------------- METRICS ----------------------\n['met']\n\n-------------------- CALLBACKS ---------------------\n['torchbearer.bases.Callback']\n\n---------------------- MODEL -----------------------\nmod\n\n"
         self.assertEqual(str(torchbearertrial), correct_string)
+        self.assertEqual(cb.on_init.call_count, 1)
 
     def test_repr(self):
         torchmodel = "mod"
         optimizer = "opt"
         metric = tb.metrics.Metric('met')
 
-        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], ["cb"])
+        torchbearertrial = Trial(torchmodel, optimizer, "crit", [metric], [tb.callbacks.Callback()])
         self.assertEqual(str(torchbearertrial), repr(torchbearertrial))
 
     def test_train(self):

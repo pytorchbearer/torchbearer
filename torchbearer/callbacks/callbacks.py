@@ -89,7 +89,15 @@ class CallbackList(Callback):
                 self.callback_list = self.callback_list + callback.callback_list
             else:
                 self.callback_list.append(callback)
-        
+
+    def on_init(self, state):
+        """Call on_init on each callback in turn with the given state.
+
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
+        """
+        self._for_list(lambda callback: callback.on_init(state))
+
     def on_start(self, state):
         """Call on_start on each callback in turn with the given state.
 
