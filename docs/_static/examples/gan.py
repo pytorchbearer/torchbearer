@@ -151,19 +151,18 @@ class d_loss(tb.metrics.Metric):
         return state[D_LOSS]
 
 
-closure_gen = base_closure(tb.X, tb.MODEL, tb.Y_PRED, tb.CRITERION, tb.LOSS, GEN_OPT)
-closure_disc = base_closure(tb.Y_PRED, DISC_MODEL, DISC_IMGS, DISC_CRIT, tb.LOSS, DISC_OPT)
+closure_gen = base_closure(tb.X, tb.MODEL, tb.Y_PRED, tb.Y_TRUE, tb.CRITERION, tb.LOSS, GEN_OPT)
+closure_disc = base_closure(tb.Y_PRED, DISC_MODEL, None, DISC_IMGS, DISC_CRIT, tb.LOSS, DISC_OPT)
 
 
-def closure(self, state):
-    closure_gen(self, state)
+def closure(state):
+    closure_gen(state)
     state[GEN_OPT].step()
-    closure_disc(self, state)
+    closure_disc(state)
     state[DISC_OPT].step()
 
 
-trial = tb.Trial(generator, None, criterion=gen_crit, metrics=['loss', g_loss(), d_loss()],
-                            callbacks=[saver_callback], pass_state=True)
+trial = tb.Trial(generator, None, criterion=gen_crit, metrics=['loss', tb.metrics.mean(D_LOSS), tb.metrics.mean(G_LOSS)], callbacks=[saver_callback])
 trial.with_train_generator(dataloader, steps=200000)
 trial.state[DISC_MODEL] = discriminator.to(device)
 trial.state[DISC_OPT] = optimizer_D
