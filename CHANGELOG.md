@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added cyclic learning rate finder
 - Added on_init callback hook to run at the end of trial init
 - Added callbacks for weight initialisation in ``torchbearer.callbacks.init``
 ### Changed
