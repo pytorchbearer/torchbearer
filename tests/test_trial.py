@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import MagicMock, Mock, patch, ANY
+from mock import MagicMock, Mock, patch, ANY, create_autospec
 
 import torch
 from torch.utils.data import DataLoader
@@ -1028,7 +1028,10 @@ class TestFitPass(TestCase):
         optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
-        criterion = Mock(return_value=loss)
+        def crit_sig(y_pred, y_true):
+            return loss
+        # criterion = Mock(return_value=loss)
+        criterion = create_autospec(crit_sig)
 
         metric_list = MagicMock()
         callback_list = MagicMock()

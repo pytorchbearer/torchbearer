@@ -25,6 +25,7 @@ from torchbearer import cite
 from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
+from torchbearer.bases import base_closure
 
 bibtex = """
 @article{2018torchbearer,
@@ -367,7 +368,7 @@ class Trial(object):
 
         self.verbose = verbose
 
-        self.closure = self.default_closure
+        self.closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE, torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
         self.state = State()
         self.state.update({
             torchbearer.MODEL: model,
@@ -752,27 +753,6 @@ class Trial(object):
             return generator.tb_iter
         else:
             return iter(generator)
-
-    def default_closure(self, state):
-        # Zero grads
-        state[torchbearer.OPTIMIZER].zero_grad()
-
-        # Forward Pass
-        try:
-            state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-        except TypeError:
-            state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-
-        state[torchbearer.CALLBACK_LIST].on_forward(state)
-
-        # Loss Calculation
-        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
-
-        state[torchbearer.CALLBACK_LIST].on_criterion(state)
-
-        # Backwards pass
-        state[torchbearer.LOSS].backward(**state[torchbearer.BACKWARD_ARGS])
-        state[torchbearer.CALLBACK_LIST].on_backward(state)
 
     @inject_sampler(torchbearer.TRAIN_DATA)
     def _fit_pass(self, state):

@@ -268,26 +268,44 @@ class Callback(object):
         """
         pass
 
-def base_closure(X, Model, Y_pred, Crit, Loss, Opt):
-    def closure(self, state):
+
+def base_closure(x, model, y_pred, y_true, crit, loss, opt):
+    """Function to create a standard pytorch closure using objects taken from state under the given keys.
+
+    Args:
+        x: State key under which the input data is stored
+        model: State key under which the pytorch model is stored
+        y_pred: State key under which the predictions will be stored
+        y_true: State key under which the targets are stored
+        crit: State key under which the criterion function is stored (function of state or (y_pred, y_true))
+        loss: State key under which the loss will be stored
+        opt: State key under which the optimsiser is stored
+
+    Returns:
+        function: Standard closure function
+    """
+    def closure(state):
         # Zero grads
-        state[Opt].zero_grad()
+        state[opt].zero_grad()
 
         # Forward Pass
-        if self.pass_state:
-            state[Y_pred] = state[Model](state[X], state=state)
-        else:
-            state[Y_pred] = state[Model](state[X])
+        try:
+            state[y_pred] = state[model](state[x], state=state)
+        except TypeError:
+            state[y_pred] = state[model](state[x])
 
         state[torchbearer.CALLBACK_LIST].on_forward(state)
 
         # Loss Calculation
-        state[Loss] = state[Crit](state)
+        try:
+            state[loss] = state[crit](state)
+        except TypeError:
+            state[loss] = state[crit](state[y_pred], state[y_true])
 
         state[torchbearer.CALLBACK_LIST].on_criterion(state)
 
         # Backwards pass
-        state[Loss].backward(**state[torchbearer.BACKWARD_ARGS])
+        state[loss].backward(**state[torchbearer.BACKWARD_ARGS])
 
         state[torchbearer.CALLBACK_LIST].on_backward(state)
     return closure
