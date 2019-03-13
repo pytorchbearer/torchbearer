@@ -3,13 +3,11 @@ import sys
 if sys.version_info[0] < 3:
     import inspect
 
-
     def get_default(fcn, arg):
         a = inspect.getargspec(fcn)
         return dict(zip(a.args[-len(a.defaults):], a.defaults))[arg]
 else:
     from inspect import signature
-
 
     def get_default(fcn, arg):
         return signature(fcn).parameters[arg].default
@@ -114,8 +112,7 @@ def inject_printer(validation_label_letter='v'):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            verbose = kwargs['verbose'] if 'verbose' in kwargs else get_default(func,
-                                                                                'verbose')  # Populate default value
+            verbose = kwargs['verbose'] if 'verbose' in kwargs else get_default(func, 'verbose')  # Populate default value
             verbose = self.verbose if verbose == -1 else verbose
 
             printer = get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
@@ -128,9 +125,7 @@ def inject_printer(validation_label_letter='v'):
 
             self.state[torchbearer.CALLBACK_LIST] = callback_list_old
             return res
-
         return wrapper
-
     return decorator
 
 
@@ -232,7 +227,6 @@ class Sampler:
     Args:
         batch_loader (func): The batch loader to execute
     """
-
     def __init__(self, batch_loader):
         self.batch_loader = batch_loader
 
@@ -251,7 +245,6 @@ def inject_sampler(data_key, predict=False):
     Returns:
         The decorator
     """
-
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -271,7 +264,7 @@ def inject_sampler(data_key, predict=False):
                 inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
                 if over_steps or inf_steps or inf_train_loader:  # Want iterator to refresh at end
                     if steps == -1: warnings.warn("Trial is set to run indefinitely. "
-                                                  "Make sure you have some method to terminate safely.")
+                                              "Make sure you have some method to terminate safely.")
                     loader = load_batch_infinite(loader)
 
                 if inf_train_loader and not hasattr(generator,
@@ -287,9 +280,7 @@ def inject_sampler(data_key, predict=False):
             res = func(self, *args, **kwargs)
 
             return res
-
         return wrapper
-
     return decorator
 
 
@@ -302,7 +293,6 @@ def inject_callback(callback):
     Returns:
         The decorator
     """
-
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -314,21 +304,17 @@ def inject_callback(callback):
 
             self.state[torchbearer.CALLBACK_LIST] = callback_list_old
             return res
-
         return wrapper
-
     return decorator
 
 
 def fluent(func):
     """Decorator for class methods which forces return of self.
     """
-
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         func(self, *args, **kwargs)
         return self
-
     return wrapper
 
 
@@ -374,14 +360,11 @@ class Trial(object):
         verbose (int): Global verbosity .If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training
             progress
     """
-
-    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], pass_state=False, verbose=2):
+    def __init__(self, model, optimizer=None, criterion=None, metrics=[], callbacks=[], verbose=2):
         if criterion is None:
             def criterion(_, __):
-                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE],
-                                   requires_grad=True)
+                return torch.zeros(1, device=self.state[torchbearer.DEVICE], dtype=self.state[torchbearer.DATA_TYPE], requires_grad=True)
 
-        self.pass_state = pass_state
         self.verbose = verbose
 
         self.closure = self.default_closure
@@ -414,7 +397,7 @@ class Trial(object):
     def __str__(self):
         def state_string(name, state_key):
             import math
-            N = (50 - len(name)) / 2
+            N = (50-len(name))/2
             res = "-" * int(math.floor(N)) + " " + name.upper() + " " + "-" * int(math.ceil(N))
             res = res + "-" if len(res) < 52 else res
             return res + "\n" + str(self.state[state_key]) + "\n\n"
@@ -447,8 +430,7 @@ class Trial(object):
             warnings.warn("Number of training steps is not an int, casting to int")
             steps = int(steps)
         self.state[torchbearer.TRAIN_STEPS] = steps
-        self.state[torchbearer.TRAIN_DATA] = (
-        self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
+        self.state[torchbearer.TRAIN_DATA] = (self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
 
     @fluent
     def with_train_generator(self, generator, steps=None):
@@ -501,8 +483,7 @@ class Trial(object):
             warnings.warn("Number of validation steps is not an int, casting to int")
             steps = int(steps)
         self.state[torchbearer.VALIDATION_STEPS] = steps
-        self.state[torchbearer.VALIDATION_DATA] = (
-        self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
+        self.state[torchbearer.VALIDATION_DATA] = (self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
 
     @fluent
     def with_val_generator(self, generator, steps=None):
@@ -612,8 +593,7 @@ class Trial(object):
             self.for_test_steps(test_steps)
 
     @fluent
-    def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None,
-                        val_steps=None, test_steps=None):
+    def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None, val_steps=None, test_steps=None):
         """Use this trial with the given generators. Returns self so that methods can be chained for convenience.
 
         Args:
@@ -764,7 +744,8 @@ class Trial(object):
 
         return self.state[torchbearer.HISTORY]
 
-    def _new_iter(self, generator):
+    @staticmethod
+    def _new_iter(generator):
         if generator is None:
             return None
         if hasattr(generator, 'inf') and generator.inf:  # Inf train loader deals with the iterator itself
@@ -777,9 +758,9 @@ class Trial(object):
         state[torchbearer.OPTIMIZER].zero_grad()
 
         # Forward Pass
-        if self.pass_state:
+        try:
             state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-        else:
+        except TypeError:
             state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
 
         state[torchbearer.CALLBACK_LIST].on_forward(state)
@@ -798,7 +779,7 @@ class Trial(object):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
         self.train()
 
-        state[torchbearer.ITERATOR] = self._new_iter(state[torchbearer.GENERATOR])
+        state[torchbearer.ITERATOR] = Trial._new_iter(state[torchbearer.GENERATOR])
 
         state[torchbearer.METRIC_LIST].reset(state)
         state[torchbearer.METRICS] = {}
@@ -808,10 +789,9 @@ class Trial(object):
             state[torchbearer.SAMPLER].sample(state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
-            closure = self.closure(state)
-
             # Update parameters
-            state[torchbearer.OPTIMIZER].step(closure)
+            state[torchbearer.OPTIMIZER].step(lambda: self.closure(state))
+
             state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
             state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
@@ -825,8 +805,7 @@ class Trial(object):
 
     def _test_pass(self, state):
         with torch.no_grad():
-            state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[
-                                                                                    torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
+            state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
 
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
@@ -838,9 +817,9 @@ class Trial(object):
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward Pass
-                if self.pass_state:
+                try:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                else:
+                except TypeError:
                     state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
 
                 state[torchbearer.CALLBACK_LIST].on_forward_validation(state)
@@ -941,8 +920,7 @@ class Trial(object):
         return []
 
     @fluent
-    def replay(self, callbacks=[], verbose=2,
-               one_batch=False):  # TODO: Should we track if testing passes have happened?
+    def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
 
         Args:
@@ -1108,10 +1086,8 @@ class Trial(object):
             :class:`.Trial`: self
         """
         if resume and torchbearer.MODEL in state_dict:  # torchbearer dict
-            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] != torchbearer.__version__.replace(
-                    '.dev', ''):
-                warnings.warn(
-                    'This state dict was saved with a different torchbearer version, loading available keys. Consider setting resume=False')
+            if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] != torchbearer.__version__.replace('.dev', ''):
+                warnings.warn('This state dict was saved with a different torchbearer version, loading available keys. Consider setting resume=False')
 
             if torchbearer.MODEL in state_dict:
                 self.state[torchbearer.MODEL].load_state_dict(state_dict[torchbearer.MODEL], **kwargs)
