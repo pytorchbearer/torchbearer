@@ -60,10 +60,25 @@ Learning Rate Schedulers
         :members:
         :undoc-members:
 
+
+Learning Rate Finders
+------------------------------------
+
+..  automodule:: torchbearer.callbacks.lr_finder
+        :members:
+        :undoc-members:
+
 Weight Decay
 ------------------------------------
 
 ..  automodule:: torchbearer.callbacks.weight_decay
+        :members:
+        :undoc-members:
+
+Weight / Bias Initialisation
+------------------------------------
+
+..  automodule:: torchbearer.callbacks.init
         :members:
         :undoc-members:
 
@@ -86,6 +101,7 @@ from .tensor_board import TensorBoard, TensorBoardImages, TensorBoardProjector, 
 from .terminate_on_nan import *
 from .torch_scheduler import *
 from .weight_decay import *
+from . import init
 from .aggregate_predictions import *
 from .decorators import *
 from .live_loss_plot import LiveLossPlot

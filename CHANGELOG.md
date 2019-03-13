@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added cyclic learning rate finder
+- Added on_init callback hook to run at the end of trial init
+- Added callbacks for weight initialisation in ``torchbearer.callbacks.init``
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed bug where replay errored when train or val steps were None
+
+## [0.3.0] - 2019-02-28
+### Added
 - Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
 - Added SimpleUniform and SimpleExponential distributions
 - Added a decorator which can be used to cite a research article as part of a doc string
@@ -20,19 +31,30 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added documentation about serialization.
 - Added support for indefinite data loading. Iterators can now be run until complete independent of epochs or iterators can be refreshed during an epoch if complete. 
 - Added support for batch intervals in interval checkpointer
-
+- Added line magic ``%torchbearer notebook``
+- Added 'accuracy' variants of 'acc' default metrics
 ### Changed
 - Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
 - Tqdm precision argument now rounds to decimal places rather than significant figures
 - Trial will now simply infer if the model has an argument called 'state'
+- Torchbearer now infers if inside a notebook and will use the appropriate tqdm module if not set
 ### Deprecated
 ### Removed
 - Removed the old Model API (deprecated since version 0.2.0)
 - Removed the 'pass_state' argument from Trial, this will now be inferred
+- Removed the 'std' decorator from the default metrics
 ### Fixed
 - Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
 - Fixed a bug in the cite decorator causing the citation to not show up correctly
 - Fixed a memory leak in the mse primitive metric
+
+## [0.2.6.1] - 2019-02-25
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where predictions would multiply when predict was called more than once
 
 ## [0.2.6] - 2018-12-19
 ### Added

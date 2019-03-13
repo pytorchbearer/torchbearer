@@ -112,6 +112,14 @@ class Callback(object):
         """
         return self
 
+    def on_init(self, state):
+        """Perform some action with the given state as context at the init of a trial instance
+
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
+        """
+        pass
+
     def on_start(self, state):
         """Perform some action with the given state as context at the start of a model fit.
 

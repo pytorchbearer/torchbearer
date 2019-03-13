@@ -70,7 +70,7 @@ Putting all of it together and running provides the following output:
 
 .. code::
 
-    0/1(t): 100%|██████████| 50000/50000 [00:54<00:00, 912.37it/s, est=[4.9988 0.     1.0004], running_loss=1.6e-06, loss=4.55, loss_std=13.7]
+    0/1(t): 100%|██████████| 50000/50000 [00:53<00:00, 931.36it/s, loss=4.5502, running_est=[4.9988, 0.0, 1.0004], running_loss=0.0]
 
 The final estimate is very close to the true minimum at [5, 0, 1]:
 

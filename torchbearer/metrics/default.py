@@ -4,10 +4,10 @@ Base metrics are the base classes which represent the metrics supplied with torc
 following strings:
 
 - '`acc`' or '`accuracy`': The :class:`.DefaultAccuracy` metric
-- '`binary_acc`': The :class:`.BinaryAccuracy` metric
-- '`cat_acc`': The :class:`.CategoricalAccuracy` metric
-- '`top_5_acc`': The :class:`.TopKCategoricalAccuracy` metric
-- '`top_10_acc`': The :class:`.TopKCategoricalAccuracy` metric with k=10
+- '`binary_acc`' or '`binary_accuracy`': The :class:`.BinaryAccuracy` metric
+- '`cat_acc`' or '`cat_accuracy`': The :class:`.CategoricalAccuracy` metric
+- '`top_5_acc`' or '`top_5_accuracy`': The :class:`.TopKCategoricalAccuracy` metric
+- '`top_10_acc`' or '`top_10_accuracy`': The :class:`.TopKCategoricalAccuracy` metric with k=10
 - '`mse`': The :class:`.MeanSquaredError` metric
 - '`loss`': The :class:`.Loss` metric
 - '`epoch`': The :class:`.Epoch` metric

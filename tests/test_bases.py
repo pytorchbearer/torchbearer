@@ -48,6 +48,7 @@ class TestCallback(unittest.TestCase):
     def test_empty_methods(self):
         callback = Callback()
 
+        self.assertIsNone(callback.on_init({}))
         self.assertIsNone(callback.on_start({}))
         self.assertIsNone(callback.on_start_epoch({}))
         self.assertIsNone(callback.on_start_training({}))
