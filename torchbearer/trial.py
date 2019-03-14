@@ -673,8 +673,8 @@ class Trial(object):
 
     @fluent
     def with_closure(self, closure):
-        """
-        Use this trial with custom closure
+        """ Use this trial with custom closure
+        
         Args:
             closure (function): Function of state that defines the custom closure 
 
