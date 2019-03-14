@@ -1,6 +1,7 @@
 import torchbearer
 from torchbearer import Callback
 from torchbearer.trial import fluent
+from . import once_per_epoch
 
 import torch
 
@@ -12,6 +13,16 @@ def _to_file(filename):
         ndarr = image.mul(255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
         im = Image.fromarray(ndarr)
         im.save(filename)
+    return handler
+
+
+def _to_pyplot():
+    import matplotlib.pyplot as plt
+
+    def handler(image, _):
+        ndarr = image.mul(255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
+        plt.imshow(ndarr)
+        plt.show()
     return handler
 
 
@@ -133,6 +144,15 @@ class ImagingCallback(Callback):
             self
         """
         self.with_handler(_to_file(filename))
+
+    @fluent
+    def to_pyplot(self):
+        """Show images from this callback with pyplot
+
+        Returns:
+            self
+        """
+        self.with_handler(_to_pyplot())
 
     @fluent
     def to_state(self, key):
@@ -297,7 +317,7 @@ class FromState(ImagingCallback):
             This will be applied to the image before it is sent to output.
         decorator: A function which will be used to wrap the callback function. once_per_epoch by default
     """
-    def __init__(self, key, transform=None, decorator=torchbearer.callbacks.once_per_epoch):
+    def __init__(self, key, transform=None, decorator=once_per_epoch):
         super(FromState, self).__init__(transform=transform)
         self.key = key
         self.on_batch = decorator(self.on_batch)
