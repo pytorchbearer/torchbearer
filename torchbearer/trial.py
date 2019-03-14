@@ -616,9 +616,9 @@ class Trial(object):
 
     @fluent
     def for_inf_train_steps(self):
-        """
-        Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
-
+        """Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). 
+        Returns self so that methods can be chained for convenience.
+        
         Returns:
             :class:`.Trial`: self
         """
@@ -626,9 +626,9 @@ class Trial(object):
 
     @fluent
     def for_inf_val_steps(self):
-        """
-        Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
-
+        """Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar).
+        Returns self so that methods can be chained for convenience.
+        
         Returns:
             :class:`.Trial`: self
         """
@@ -636,9 +636,9 @@ class Trial(object):
 
     @fluent
     def for_inf_test_steps(self):
-        """
-        Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
-
+        """Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). 
+        Returns self so that methods can be chained for convenience.
+        
         Returns:
             :class:`.Trial`: self
         """
@@ -646,9 +646,8 @@ class Trial(object):
 
     @fluent
     def for_inf_steps(self, train=True, val=True, test=True):
-        """
-        Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
-
+        """Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
+        
         Args:
             train (bool): Use an infinite number of training steps
             val (bool): Use an infinite number of validation steps
@@ -663,9 +662,10 @@ class Trial(object):
 
     @fluent
     def with_inf_train_loader(self):
-        """
-        Use this trial with a training iterator that refreshes when it finishes instead of each epoch. This allows for setting training steps less than the size of the generator and model will still be trained on all training samples if enough "epochs" are run.
-
+        """Use this trial with a training iterator that refreshes when it finishes instead of each epoch. 
+        This allows for setting training steps less than the size of the generator and model will still be trained on 
+        all training samples if enough "epochs" are run.
+        
         Returns:
             :class:`.Trial`: self:
         """
@@ -673,7 +673,7 @@ class Trial(object):
 
     @fluent
     def with_closure(self, closure):
-        """ Use this trial with custom closure
+        """Use this trial with custom closure
         
         Args:
             closure (function): Function of state that defines the custom closure 
