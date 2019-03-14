@@ -29,6 +29,8 @@ adversarial_loss = torch.nn.BCELoss()
 device = 'cuda'
 valid = torch.ones(batch_size, 1, device=device)
 fake = torch.zeros(batch_size, 1, device=device)
+batch = torch.randn(25, latent_dim).to(device)
+
 
 # Register state keys (optional)
 GEN_IMGS = state_key('gen_imgs')
@@ -43,7 +45,6 @@ GEN_OPT = state_key('gen_opt')
 DISC_MODEL = state_key('disc_model')
 DISC_IMGS = state_key('disc_imgs')
 DISC_CRIT = state_key('disc_crit')
-batch = torch.randn(25, latent_dim).to(device)
 
 
 class Generator(nn.Module):
@@ -131,26 +132,6 @@ optimizer_G = torch.optim.Adam(generator.parameters(), lr=lr, betas=(0.5, 0.999)
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
 
 
-@tb.metrics.running_mean
-@tb.metrics.mean
-class g_loss(tb.metrics.Metric):
-    def __init__(self):
-        super().__init__('g_loss')
-
-    def process(self, state):
-        return state[G_LOSS]
-
-
-@tb.metrics.running_mean
-@tb.metrics.mean
-class d_loss(tb.metrics.Metric):
-    def __init__(self):
-        super().__init__('d_loss')
-
-    def process(self, state):
-        return state[D_LOSS]
-
-
 closure_gen = base_closure(tb.X, tb.MODEL, tb.Y_PRED, tb.Y_TRUE, tb.CRITERION, tb.LOSS, GEN_OPT)
 closure_disc = base_closure(tb.Y_PRED, DISC_MODEL, None, DISC_IMGS, DISC_CRIT, tb.LOSS, DISC_OPT)
 
@@ -161,14 +142,15 @@ def closure(state):
     closure_disc(state)
     state[DISC_OPT].step()
 
+from torchbearer.metrics import mean, running_mean
+metrics = ['loss', mean(running_mean(D_LOSS)), mean(running_mean(G_LOSS))]
 
-trial = tb.Trial(generator, None, criterion=gen_crit, metrics=['loss', tb.metrics.mean(D_LOSS), tb.metrics.mean(G_LOSS)], callbacks=[saver_callback])
+trial = tb.Trial(generator, None, criterion=gen_crit, metrics=metrics, callbacks=[saver_callback])
 trial.with_train_generator(dataloader, steps=200000)
-trial.state[DISC_MODEL] = discriminator.to(device)
-trial.state[DISC_OPT] = optimizer_D
-trial.state[GEN_OPT] = optimizer_G
-trial.state[DISC_CRIT] = disc_crit
-trial.with_closure(closure)
 trial.to(device)
+
+new_keys = {DISC_MODEL: discriminator.to(device), DISC_OPT: optimizer_D, GEN_OPT: optimizer_G, DISC_CRIT: disc_crit}
+trial.state.update(new_keys)
+trial.with_closure(closure)
 trial.run(epochs=1)
 
