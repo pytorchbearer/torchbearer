@@ -358,7 +358,6 @@ class Trial(object):
         criterion (func / None): The final loss criterion that provides a loss value to the optimizer
         metrics (list): The list of :class:`torchbearer.Metric <.Metric>` instances to process during fitting
         callbacks (list): The list of :class:`torchbearer.Callback <.Callback>` instances to call during fitting
-        pass_state (bool): If True, the torchbearer state will be passed to the model during fitting
         verbose (int): Global verbosity .If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training
             progress
     """
