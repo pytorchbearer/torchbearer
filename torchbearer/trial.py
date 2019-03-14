@@ -269,8 +269,7 @@ def inject_sampler(data_key, predict=False):
                                               "Make sure you have some method to terminate safely.")
                     loader = load_batch_infinite(loader)
 
-                if inf_train_loader and not hasattr(generator,
-                                                    'inf'):  # First run and want iterator to not refresh each epoch but on end
+                if inf_train_loader and not hasattr(generator, 'inf'):  # First run and want iterator to not refresh each epoch but on end
                     generator.inf = True
                     generator.tb_iter = iter(generator)
 
