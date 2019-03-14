@@ -673,6 +673,14 @@ class Trial(object):
 
     @fluent
     def with_closure(self, closure):
+        """
+        Use this trial with custom closure
+        Args:
+            closure (function): Function of state that defines the custom closure 
+
+        Returns:
+            :class:`.Trial`: self:
+        """
         self.closure = closure
 
     @inject_printer()
