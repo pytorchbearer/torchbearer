@@ -74,7 +74,7 @@ The training loop of a GAN is a bit different to a standard model training loop.
 GANs require separate forward and backward passes for the generator and discriminator.
 To achieve this in torchbearer we can write a new closure.
 Since the individual training loops for the generator and discriminator are the same as a
-standard training loop we can use a :func:`.base_closure`.
+standard training loop we can use a :func:`~torchbearer.bases.base_closure`.
 The base closure takes state keys for required objects (data, model, optimiser, etc.) and returns a standard closure consisting of:
 
 1. Zero gradients
