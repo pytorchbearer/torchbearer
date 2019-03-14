@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import MagicMock, Mock, patch, ANY
+from mock import MagicMock, Mock, patch, ANY, create_autospec
 
 import torch
 from torch.utils.data import DataLoader
@@ -36,6 +36,13 @@ class TestMockOptimizer(TestCase):
 
         self.assertIsNone(opt.zero_grad())
         mock_opt.zero_grad.assert_not_called()
+
+    def test_mock_optimizer_closure(self):
+        t = Trial(None)
+        closure = Mock()
+        opt = t.state[tb.OPTIMIZER]
+        opt.step(closure)
+        self.assertTrue(closure.call_count == 1)
 
 
 class TestCallbackListInjection(TestCase):
@@ -503,6 +510,7 @@ class TestWithGenerators(TestCase):
 
         self.assertTrue(torchbearertrial.state[tb.INF_TRAIN_LOADING])
 
+
 class TestWithData(TestCase):
     @patch('torchbearer.trial.TensorDataset')
     @patch('torchbearer.trial.DataLoader')
@@ -583,6 +591,15 @@ class TestWithData(TestCase):
         d.assert_called_once_with(ANY, 1, num_workers=num_workers)
         torchbearertrial.with_test_generator.assert_called_once_with(-1, steps=4)
         td.assert_called_once_with(x)
+
+
+class TestWithClosure(TestCase):
+    def test_with_closure(self):
+        def closure():
+            return 'test'
+        t = Trial(None)
+        t.with_closure(closure)
+        self.assertTrue(t.closure() == 'test')
 
 
 class TestRun(TestCase):
@@ -837,6 +854,7 @@ class TestFitPass(TestCase):
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
+            tb.BACKWARD_ARGS: {},
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
@@ -866,6 +884,7 @@ class TestFitPass(TestCase):
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
+            tb.BACKWARD_ARGS: {},
         }
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
@@ -1026,7 +1045,10 @@ class TestFitPass(TestCase):
         optimizer.step = lambda closure: closure()
 
         loss = torch.tensor([2.0], requires_grad=True)
-        criterion = Mock(return_value=loss)
+        def crit_sig(y_pred, y_true):
+            return loss
+        # criterion = Mock(return_value=loss)
+        criterion = create_autospec(crit_sig)
 
         metric_list = MagicMock()
         callback_list = MagicMock()
@@ -1107,7 +1129,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False, tb.BACKWARD_ARGS: {},
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
@@ -1143,7 +1165,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False, tb.BACKWARD_ARGS: {},
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
@@ -1182,7 +1204,7 @@ class TestFitPass(TestCase):
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
-            tb.DATA_TYPE: torch.float,
+            tb.DATA_TYPE: torch.float, tb.BACKWARD_ARGS: {},
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
         }
 
@@ -1216,7 +1238,7 @@ class TestFitPass(TestCase):
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
-            tb.OPTIMIZER: optimizer,
+            tb.OPTIMIZER: optimizer, tb.BACKWARD_ARGS: {},
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.TRAIN_GENERATOR: None, tb.TRAIN_STEPS: steps, tb.EPOCH: 0,
             tb.X: data[0][0], tb.Y_TRUE: data[0][1]
