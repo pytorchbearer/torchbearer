@@ -675,21 +675,7 @@ class Trial(object):
 
     @fluent
     def with_closure(self, closure):
-        # import types
-        # self._closure_checker(closure)
-        # try:
-        #     self.closure = types.MethodType(closure, self)
-        # except TypeError:
-        #     # too many arguments to MethodType, python 3
-        #     self.closure = types.MethodType(closure, self, type(self))
-        # except Exception:
-        #     warnings.warn('Failed to bind closure.')
         self.closure = closure
-
-    def _closure_checker(self, closure):  # TODO: Better closure check
-        if closure is None:
-            warnings.warn("Bad closure")
-        return True
 
     @inject_printer()
     def run(self, epochs=1, verbose=-1):

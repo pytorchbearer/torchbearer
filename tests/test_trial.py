@@ -37,6 +37,13 @@ class TestMockOptimizer(TestCase):
         self.assertIsNone(opt.zero_grad())
         mock_opt.zero_grad.assert_not_called()
 
+    def test_mock_optimizer_closure(self):
+        t = Trial(None)
+        closure = Mock()
+        opt = t.state[tb.OPTIMIZER]
+        opt.step(closure)
+        self.assertTrue(closure.call_count == 1)
+
 
 class TestCallbackListInjection(TestCase):
     def test_pass_through(self):
@@ -503,6 +510,7 @@ class TestWithGenerators(TestCase):
 
         self.assertTrue(torchbearertrial.state[tb.INF_TRAIN_LOADING])
 
+
 class TestWithData(TestCase):
     @patch('torchbearer.trial.TensorDataset')
     @patch('torchbearer.trial.DataLoader')
@@ -583,6 +591,15 @@ class TestWithData(TestCase):
         d.assert_called_once_with(ANY, 1, num_workers=num_workers)
         torchbearertrial.with_test_generator.assert_called_once_with(-1, steps=4)
         td.assert_called_once_with(x)
+
+
+class TestWithClosure(TestCase):
+    def test_with_closure(self):
+        def closure():
+            return 'test'
+        t = Trial(None)
+        t.with_closure(closure)
+        self.assertTrue(t.closure() == 'test')
 
 
 class TestRun(TestCase):
