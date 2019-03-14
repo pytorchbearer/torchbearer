@@ -71,7 +71,7 @@ We will add this metric list to the trial when we create it.
 Closures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The training loop of a GAN is a bit different to a standard model training loop.
-GANs require separate forward passes for the generator and discriminator.
+GANs require separate forward and backward passes for the generator and discriminator.
 To achieve this in torchbearer we can write a new closure.
 Since the individual training loops for the generator and discriminator are the same as a
 standard training loop we can use a :func:`.base_closure`.
