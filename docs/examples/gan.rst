@@ -75,7 +75,7 @@ GANs require separate forward passes for the generator and discriminator.
 To achieve this in torchbearer we can write a new closure.
 Since the individual training loops for the generator and discriminator are the same as a
 standard training loop we can use a :func:`.base_closure`.
-The base closure takes state keys for required objects (data, model, optimiser, etc.) and returns a standard closure of:
+The base closure takes state keys for required objects (data, model, optimiser, etc.) and returns a standard closure consisting of:
 
 1. Zero gradients
 2. Forward pass
@@ -86,7 +86,7 @@ We create a separate closure for the generator and discriminator. We use separat
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 135-136
+   :lines: 15, 135-136
 
 We then create a main closure (a simple function of state) that runs both of these and steps the optimisers.
 
@@ -102,12 +102,14 @@ Training
 
 We now create the torchbearer trial on the GPU in the standard way.
 Note that when torchbearer is passed a ``None`` optimiser it creates a mock optimser that will just run the closure.
+Since we are using the standard torchbearer state keys for the generator model and criterion, we can pass them in here.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
    :lines: 148-150
 
-We not update state with the keys required for the discriminators closure and add the new closure to the trial.
+We now update state with the keys required for the discriminators closure and add the new closure to the trial.
+Note that torchbearer doesn't know the discriminator model is a model here, so we have to sent it to the GPU ourselves.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
