@@ -236,13 +236,14 @@ class Sampler:
         self.batch_loader(state)
 
 
-def inject_sampler(data_key, data_loader):
+def inject_sampler(data_key, batch_loader):
     """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER] along with the specified \
         generator into state[torchbearer.GENERATOR] and number of steps into state[torchbearer.STEPS]
 
     Args:
         data_key (:class:`.StateKey`): Key for the data to inject
-        data_loader (function): Batch loader
+        batch_loader (function): Batch loader function that extracts batch from data loader, stores in state and sends
+        data to correct device
 
     Returns:
         The decorator
@@ -250,7 +251,7 @@ def inject_sampler(data_key, data_loader):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            loader = data_loader
+            loader = batch_loader
 
             key = kwargs['data_key'] if 'data_key' in kwargs else data_key  # Populate default value
             generator, steps = self.state[key] if self.state[key] is not None else (None, None)
