@@ -857,7 +857,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
@@ -889,7 +888,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
@@ -922,7 +920,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
@@ -961,7 +958,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
@@ -995,7 +991,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
@@ -1031,7 +1026,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
@@ -1067,12 +1061,10 @@ class TestFitPass(TestCase):
         loss = torch.tensor([2.0], requires_grad=True)
         def crit_sig(y_pred, y_true):
             return loss
-        # criterion = Mock(return_value=loss)
         criterion = create_autospec(crit_sig)
 
         metric_list = MagicMock()
         callback_list = MagicMock()
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
         mock_inj.return_value = callback_list
 
         state = {
@@ -1113,7 +1105,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
@@ -1150,7 +1141,6 @@ class TestFitPass(TestCase):
         metric_list = MagicMock()
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
-        # tb.CallbackListInjection = Mock(return_value=callback_list)
 
         state = {
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
