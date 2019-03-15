@@ -192,6 +192,9 @@ INPUT = X = state_key('x')
 #: The sampler which loads data from the generator onto the correct device
 SAMPLER = state_key('sampler')
 
+#: The batch loader which handles formatting data from each batch
+LOADER = state_key('loader')
+
 #: The current value for the loss
 LOSS = state_key('loss')
 

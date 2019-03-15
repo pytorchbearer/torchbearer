@@ -236,13 +236,13 @@ class Sampler:
         self.batch_loader(state)
 
 
-def inject_sampler(data_key, predict=False):
+def inject_sampler(data_key, data_loader):
     """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER] along with the specified \
         generator into state[torchbearer.GENERATOR] and number of steps into state[torchbearer.STEPS]
 
     Args:
         data_key (:class:`.StateKey`): Key for the data to inject
-        predict (bool): If true, the prediction batch loader is used, if false the standard data loader is used
+        data_loader (function): Batch loader
 
     Returns:
         The decorator
@@ -250,15 +250,15 @@ def inject_sampler(data_key, predict=False):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
+            loader = data_loader
+
             key = kwargs['data_key'] if 'data_key' in kwargs else data_key  # Populate default value
             generator, steps = self.state[key] if self.state[key] is not None else (None, None)
 
-            if generator is None:
+            if self.state[torchbearer.LOADER] is not None:
+                loader = self.state[torchbearer.LOADER]
+            elif generator is None:
                 loader = load_batch_none
-            elif predict:
-                loader = load_batch_predict
-            else:
-                loader = load_batch_standard
 
             if generator is not None and steps is not None:
                 over_steps = steps > len(generator)
@@ -390,6 +390,7 @@ class Trial(object):
             torchbearer.VALIDATION_DATA: None,
             torchbearer.TEST_DATA: None,
             torchbearer.INF_TRAIN_LOADING: False,
+            torchbearer.LOADER: None
         })
 
         self.state[torchbearer.CALLBACK_LIST].on_init(self.state)
@@ -672,11 +673,24 @@ class Trial(object):
         self.state[torchbearer.INF_TRAIN_LOADING] = True
 
     @fluent
-    def with_closure(self, closure):
-        """Use this trial with custom closure
+    def with_loader(self, batch_loader):
+        """Use this trial with custom batch loader
         
         Args:
-            closure (function): Function of state that defines the custom closure 
+            batch_loader (function): Function of state that extracts data from data loader (calls next), stores it in
+            state and sends it to the correct device
+
+        Returns:
+            :class:`.Trial`: self:
+        """
+        self.state[torchbearer.LOADER] = batch_loader
+
+    @fluent
+    def with_closure(self, closure):
+        """Use this trial with custom closure
+
+        Args:
+            closure (function): Function of state that defines the custom closure
 
         Returns:
             :class:`.Trial`: self:
@@ -748,7 +762,7 @@ class Trial(object):
         else:
             return iter(generator)
 
-    @inject_sampler(torchbearer.TRAIN_DATA)
+    @inject_sampler(torchbearer.TRAIN_DATA, load_batch_standard)
     def _fit_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
         self.train()
@@ -814,7 +828,7 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_end_validation(state)
         return state
 
-    @inject_sampler(torchbearer.VALIDATION_DATA)
+    @inject_sampler(torchbearer.VALIDATION_DATA, load_batch_standard)
     def _validation_pass(self, state):
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 
@@ -824,7 +838,7 @@ class Trial(object):
             self._test_pass(state)
         return state[torchbearer.METRICS]
 
-    @inject_sampler(torchbearer.VALIDATION_DATA)
+    @inject_sampler(torchbearer.VALIDATION_DATA, load_batch_standard)
     @inject_printer(validation_label_letter='e')
     def evaluate(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Evaluate this trial on the validation data.
@@ -861,7 +875,7 @@ class Trial(object):
         return {}
 
     @inject_callback(AggregatePredictions())
-    @inject_sampler(torchbearer.TEST_DATA, predict=True)
+    @inject_sampler(torchbearer.TEST_DATA, load_batch_predict)
     @inject_printer(validation_label_letter='p')
     def predict(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Determine predictions for this trial on the test data.
