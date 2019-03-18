@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added cyclic learning rate finder
 - Added on_init callback hook to run at the end of trial init
 - Added callbacks for weight initialisation in ``torchbearer.callbacks.init``
+- Added ``with_closure`` trial method that allows running of custom closures 
+- Added ``base_closure`` function to bases that allows creation of standard training loop closures
 - Added ``ImagingCallback`` class for callbacks which produce images that can be sent to tensorboard, visdom or a file
 - Added ``CachingImagingCallback`` and ``MakeGrid`` callback to make a grid of images
 ### Changed
@@ -15,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Removed
 ### Fixed
 - Fixed bug where replay errored when train or val steps were None
+- Fixed a bug where mock optimser wouldn't call it's closure
 
 ## [0.3.0] - 2019-02-28
 ### Added
