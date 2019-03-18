@@ -31,7 +31,7 @@ class TestImagingCallback(TestCase):
     @patch('torchbearer.callbacks.imaging._to_file')
     def test_simple_methods(self, mock_to_file, mock_to_pyplot, mock_to_tensorboard, mock_to_visdom):
         callback = imaging.ImagingCallback()
-        self.assertRaises(NotImplementedError, lambda : callback.on_batch('test'))
+        self.assertRaises(NotImplementedError, lambda: callback.on_batch('test'))
 
         callback = imaging.ImagingCallback().to_file('test')
         self.assertTrue(mock_to_file.call_count == 1)
@@ -98,3 +98,25 @@ class TestImagingCallback(TestCase):
         callback.on_step_validation(state)
         mock.assert_called_once_with(state)
         callback.process.assert_called_once_with(state)
+
+
+class TestMakeGrid(TestCase):
+    @patch('torchvision.utils.make_grid')
+    def test_main(self, mock_grid):
+        mock_grid.return_value = 10
+
+        callback = imaging.MakeGrid(key='x', num_images=18, nrow=9, padding=3, normalize=True, norm_range='tmp',
+                                    scale_each=True, pad_value=1)
+
+        res = callback.on_cache('test', {})
+        mock_grid.assert_called_once_with('test', nrow=9, padding=3, normalize=True, range='tmp', scale_each=True,
+                                          pad_value=1)
+        self.assertTrue(res == 10)
+
+
+class TestFromState(TestCase):
+    def test_main(self):
+        callback = imaging.FromState('test', decorator=lambda x: x)
+
+        self.assertTrue(callback.on_batch({'test': 1}) == 1)
+        self.assertTrue(callback.on_batch({'testing': 1}) is None)

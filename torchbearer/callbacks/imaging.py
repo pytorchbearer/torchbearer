@@ -323,4 +323,5 @@ class FromState(ImagingCallback):
         self.on_batch = decorator(self.on_batch)
 
     def on_batch(self, state):
-        return state[self.key]
+        if self.key in state:
+            return state[self.key]
