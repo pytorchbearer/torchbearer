@@ -1,4 +1,5 @@
 import sys
+
 if sys.version_info[0] < 3:
     import inspect
 
@@ -24,7 +25,7 @@ from torchbearer import cite
 from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
-
+from torchbearer.bases import base_closure
 
 bibtex = """
 @article{2018torchbearer,
@@ -39,6 +40,7 @@ bibtex = """
 class MockOptimizer(Optimizer):
     """The Mock Optimizer will be used inplace of an optimizer in the event that none is passed to the Trial class.
     """
+
     def __init__(self):
         super(MockOptimizer, self).__init__([torch.zeros(1)], [])
 
@@ -52,7 +54,8 @@ class MockOptimizer(Optimizer):
         return {}  # Return Empty
 
     def step(self, closure=None):
-        pass  # Do Nothing
+        if closure is not None:
+            closure()
 
     def zero_grad(self):
         pass  # Do Nothing
@@ -67,6 +70,7 @@ class CallbackListInjection(CallbackList):
         callback: The callback to inject
         callback_list (:class:`.CallbackList`): The underlying callback list
     """
+
     def __init__(self, callback, callback_list):
         super(CallbackListInjection, self).__init__([])
 
@@ -106,6 +110,7 @@ def inject_printer(validation_label_letter='v'):
     Returns:
         A decorator
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -215,8 +220,8 @@ def load_batch_predict(state):
         state[torchbearer.X], state[torchbearer.Y_TRUE] = data
     else:
         state[torchbearer.X] = data
-        
-        
+
+
 class Sampler:
     """
     Sampler wraps a batch loader function and executes it when :meth:`Sampler.sample` is called
@@ -259,12 +264,12 @@ def inject_sampler(data_key, predict=False):
                 over_steps = steps > len(generator)
                 inf_steps = steps == -1
                 inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
-                if over_steps or inf_steps or inf_train_loader: # Want iterator to refresh at end
+                if over_steps or inf_steps or inf_train_loader:  # Want iterator to refresh at end
                     if steps == -1: warnings.warn("Trial is set to run indefinitely. "
                                               "Make sure you have some method to terminate safely.")
                     loader = load_batch_infinite(loader)
 
-                if inf_train_loader and not hasattr(generator, 'inf'): # First run and infinite iterator
+                if inf_train_loader and not hasattr(generator, 'inf'):  # First run and want iterator to not refresh each epoch but on end
                     generator.inf = True
                     generator.tb_iter = iter(generator)
 
@@ -362,6 +367,7 @@ class Trial(object):
 
         self.verbose = verbose
 
+        self.closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE, torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
         self.state = State()
         self.state.update({
             torchbearer.MODEL: model,
@@ -610,9 +616,9 @@ class Trial(object):
 
     @fluent
     def for_inf_train_steps(self):
-        """
-        Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
-
+        """Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). 
+        Returns self so that methods can be chained for convenience.
+        
         Returns:
             :class:`.Trial`: self
         """
@@ -620,9 +626,9 @@ class Trial(object):
 
     @fluent
     def for_inf_val_steps(self):
-        """
-        Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
-
+        """Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar).
+        Returns self so that methods can be chained for convenience.
+        
         Returns:
             :class:`.Trial`: self
         """
@@ -630,9 +636,9 @@ class Trial(object):
 
     @fluent
     def for_inf_test_steps(self):
-        """
-        Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). Returns self so that methods can be chained for convenience.
-
+        """Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). 
+        Returns self so that methods can be chained for convenience.
+        
         Returns:
             :class:`.Trial`: self
         """
@@ -640,9 +646,8 @@ class Trial(object):
 
     @fluent
     def for_inf_steps(self, train=True, val=True, test=True):
-        """
-        Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
-
+        """Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
+        
         Args:
             train (bool): Use an infinite number of training steps
             val (bool): Use an infinite number of validation steps
@@ -657,13 +662,26 @@ class Trial(object):
 
     @fluent
     def with_inf_train_loader(self):
-        """
-        Use this trial with a training iterator that refreshes when it finishes instead of each epoch. This allows for setting training steps less than the size of the generator and model will still be trained on all training samples if enough "epochs" are run.
-
+        """Use this trial with a training iterator that refreshes when it finishes instead of each epoch. 
+        This allows for setting training steps less than the size of the generator and model will still be trained on 
+        all training samples if enough "epochs" are run.
+        
         Returns:
             :class:`.Trial`: self:
         """
         self.state[torchbearer.INF_TRAIN_LOADING] = True
+
+    @fluent
+    def with_closure(self, closure):
+        """Use this trial with custom closure
+        
+        Args:
+            closure (function): Function of state that defines the custom closure 
+
+        Returns:
+            :class:`.Trial`: self:
+        """
+        self.closure = closure
 
     @inject_printer()
     def run(self, epochs=1, verbose=-1):
@@ -725,7 +743,7 @@ class Trial(object):
     def _new_iter(generator):
         if generator is None:
             return None
-        if hasattr(generator, 'inf') and generator.inf: # Inf train loader deals with the iterator itself
+        if hasattr(generator, 'inf') and generator.inf:  # Inf train loader deals with the iterator itself
             return generator.tb_iter
         else:
             return iter(generator)
@@ -741,33 +759,13 @@ class Trial(object):
         state[torchbearer.METRICS] = {}
 
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
-        for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()) :
+        for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()):
             state[torchbearer.SAMPLER].sample(state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
-            def closure():
-                # Zero grads
-                state[torchbearer.OPTIMIZER].zero_grad()
-
-                # Forward Pass
-                try:
-                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                except TypeError:
-                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
-
-                state[torchbearer.CALLBACK_LIST].on_forward(state)
-
-                # Loss Calculation
-                state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
-
-                state[torchbearer.CALLBACK_LIST].on_criterion(state)
-
-                # Backwards pass
-                state[torchbearer.LOSS].backward(**state[torchbearer.BACKWARD_ARGS])
-                state[torchbearer.CALLBACK_LIST].on_backward(state)
-
             # Update parameters
-            state[torchbearer.OPTIMIZER].step(closure)
+            state[torchbearer.OPTIMIZER].step(lambda: self.closure(state))
+
             state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
             state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
