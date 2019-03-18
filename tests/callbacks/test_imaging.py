@@ -2,8 +2,65 @@ from unittest import TestCase
 
 from mock import MagicMock, patch
 
+import torch
+
 import torchbearer
 import torchbearer.callbacks.imaging as imaging
+
+import matplotlib.pyplot as plt  # Import so that it can be mocked
+plt.ioff()
+
+
+class TestHandlers(TestCase):
+    @patch('PIL.Image')
+    def test_to_file(self, pil):
+        handler = imaging._to_file('test')
+        mock = MagicMock()
+        handler(mock, '')
+        mock.mul.assert_called_once_with(255)
+        mock.mul().clamp.assert_called_once_with(0, 255)
+        self.assertTrue(mock.mul().clamp().byte.call_count == 1)
+        mock.mul().clamp().byte().permute.assert_called_once_with(1, 2, 0)
+        self.assertTrue(mock.mul().clamp().byte().permute().cpu.call_count == 1)
+        self.assertTrue(mock.mul().clamp().byte().permute().cpu().numpy.call_count == 1)
+
+        pil.fromarray.assert_called_once_with(mock.mul().clamp().byte().permute().cpu().numpy())
+        pil.fromarray().save.assert_called_once_with('test')
+
+    @patch('matplotlib.pyplot')
+    def test_to_pyplot(self, plt):
+        handler = imaging._to_pyplot()
+        mock = MagicMock()
+        handler(mock, '')
+        mock.mul.assert_called_once_with(255)
+        mock.mul().clamp.assert_called_once_with(0, 255)
+        self.assertTrue(mock.mul().clamp().byte.call_count == 1)
+        mock.mul().clamp().byte().permute.assert_called_once_with(1, 2, 0)
+        self.assertTrue(mock.mul().clamp().byte().permute().cpu.call_count == 1)
+        self.assertTrue(mock.mul().clamp().byte().permute().cpu().numpy.call_count == 1)
+
+        plt.imshow.assert_called_once_with(mock.mul().clamp().byte().permute().cpu().numpy())
+        self.assertTrue(plt.show.call_count == 1)
+
+    @patch('torchbearer.callbacks.tensor_board')
+    def test_to_tensorboard(self, tboard):
+        handler = imaging._to_tensorboard('test', log_dir='./logs', comment='comment')
+        image = MagicMock()
+        handler(image, {torchbearer.EPOCH: 1})
+        image.clamp.assert_called_once_with(0, 1)
+        tboard.get_writer.assert_called_once_with('./logs/comment', imaging._to_tensorboard)
+        tboard.get_writer().add_image.assert_called_once_with('test', image.clamp(), 1)
+        tboard.close_writer.assert_called_once_with('./logs/comment', imaging._to_tensorboard)
+
+    @patch('torchbearer.callbacks.tensor_board')
+    def test_to_visdom(self, tboard):
+        handler = imaging._to_visdom('test', log_dir='./logs', comment='comment', visdom_params='test_params')
+        image = MagicMock()
+        handler(image, {torchbearer.EPOCH: 1})
+        image.clamp.assert_called_once_with(0, 1)
+        tboard.get_writer.assert_called_once_with('./logs/comment', imaging._to_visdom, visdom=True, visdom_params='test_params')
+        tboard.get_writer().add_image.assert_called_once_with('test1', image.clamp(), 1)
+        tboard.close_writer.assert_called_once_with('./logs/comment', imaging._to_visdom)
 
 
 class TestImagingCallback(TestCase):
@@ -98,6 +155,51 @@ class TestImagingCallback(TestCase):
         callback.on_step_validation(state)
         mock.assert_called_once_with(state)
         callback.process.assert_called_once_with(state)
+
+
+class TestCachingImagingCallback(TestCase):
+    def test_main(self):
+        callback = imaging.CachingImagingCallback(key='my_key', num_images=5)
+        self.assertRaises(NotImplementedError, lambda: callback.on_cache('', {}))
+
+        callback.on_cache = MagicMock()
+        callback.on_cache.return_value = 'image'
+
+        state = {'my_key': torch.ones(10, 3, 2, 2)}
+        callback.on_batch(state)
+        self.assertTrue(callback.on_cache.call_args[0][0].sum() == 60)
+        self.assertTrue(callback.on_cache.call_args[0][1] == state)
+
+    def test_multi_batch(self):
+        callback = imaging.CachingImagingCallback(key='my_key', num_images=25)
+        self.assertRaises(NotImplementedError, lambda: callback.on_cache('', {}))
+
+        callback.on_cache = MagicMock()
+        callback.on_cache.return_value = 'image'
+
+        state = {'my_key': torch.ones(10, 3, 2, 2)}
+        callback.on_batch(state)
+        callback.on_batch(state)
+        callback.on_batch(state)
+        self.assertTrue(callback.on_cache.call_args[0][0].sum() == 300)
+        self.assertTrue(callback.on_cache.call_args[0][1] == state)
+
+    def test_multi_epoch(self):
+        callback = imaging.CachingImagingCallback(key='my_key', num_images=5)
+        self.assertRaises(NotImplementedError, lambda: callback.on_cache('', {}))
+
+        callback.on_cache = MagicMock()
+        callback.on_cache.return_value = 'image'
+
+        state = {'my_key': torch.ones(10, 3, 2, 2)}
+        callback.on_batch(state)
+        self.assertTrue(callback.on_cache.call_args[0][0].sum() == 60)
+        self.assertTrue(callback.on_cache.call_args[0][1] == state)
+        callback.on_cache.reset_mock()
+        callback.on_end_epoch({})
+        callback.on_batch(state)
+        self.assertTrue(callback.on_cache.call_args[0][0].sum() == 60)
+        self.assertTrue(callback.on_cache.call_args[0][1] == state)
 
 
 class TestMakeGrid(TestCase):

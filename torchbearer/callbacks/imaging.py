@@ -44,9 +44,9 @@ def _to_visdom(name='Image', log_dir='./logs', comment='torchbearer', visdom_par
     log_dir = os.path.join(log_dir, comment)
 
     def handler(image, state):
-        writer = tb.get_writer(log_dir, _to_tensorboard, visdom=True, visdom_params=visdom_params)
+        writer = tb.get_writer(log_dir, _to_visdom, visdom=True, visdom_params=visdom_params)
         writer.add_image(name + str(state[torchbearer.EPOCH]), image.clamp(0, 1), state[torchbearer.EPOCH])
-        tb.close_writer(log_dir, _to_tensorboard)
+        tb.close_writer(log_dir, _to_visdom)
 
     return handler
 
@@ -254,6 +254,7 @@ class CachingImagingCallback(ImagingCallback):
                 return image
 
     def on_end_epoch(self, state):
+        super(CachingImagingCallback, self).on_end_epoch(state)
         self._done = False
 
 
