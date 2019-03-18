@@ -25,15 +25,19 @@ class TestImagingCallback(TestCase):
         handler.assert_called_once_with('test', 'state')
         self.assertTrue(callback.transform.call_count == 1)
 
-    def test_simple_methods(self):
+    @patch('torchbearer.callbacks.imaging._to_visdom')
+    @patch('torchbearer.callbacks.imaging._to_tensorboard')
+    @patch('torchbearer.callbacks.imaging._to_pyplot')
+    @patch('torchbearer.callbacks.imaging._to_file')
+    def test_simple_methods(self, mock_to_file, mock_to_pyplot, mock_to_tensorboard, mock_to_visdom):
         callback = imaging.ImagingCallback()
         self.assertRaises(NotImplementedError, lambda : callback.on_batch('test'))
 
         callback = imaging.ImagingCallback().to_file('test')
-        self.assertTrue('_to_file' in str(callback._handlers[0]))
+        self.assertTrue(mock_to_file.call_count == 1)
 
         callback = imaging.ImagingCallback().to_pyplot()
-        self.assertTrue('_to_pyplot' in str(callback._handlers[0]))
+        self.assertTrue(mock_to_pyplot.call_count == 1)
 
         callback = imaging.ImagingCallback().to_state('test')
         state = {}
@@ -42,10 +46,10 @@ class TestImagingCallback(TestCase):
         self.assertTrue(state['test'] is 'image')
 
         callback = imaging.ImagingCallback().to_tensorboard()
-        self.assertTrue('_to_tensorboard' in str(callback._handlers[0]))
+        self.assertTrue(mock_to_tensorboard.call_count == 1)
 
         callback = imaging.ImagingCallback().to_visdom()
-        self.assertTrue('_to_visdom' in str(callback._handlers[0]))
+        self.assertTrue(mock_to_visdom.call_count == 1)
 
     def test_on_train(self):
         callback = imaging.ImagingCallback()
