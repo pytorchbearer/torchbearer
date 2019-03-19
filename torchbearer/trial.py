@@ -786,7 +786,7 @@ class Trial(object):
 
     def _test_pass(self, state):
         with torch.no_grad():
-            state[torchbearer.ITERATOR] = iter(state[torchbearer.GENERATOR]) if state[torchbearer.GENERATOR] is not None else None  # TODO: Inject this?
+            state[torchbearer.ITERATOR] = Trial._new_iter(state[torchbearer.GENERATOR])
 
             state[torchbearer.METRIC_LIST].reset(state)
             state[torchbearer.METRICS] = {}
@@ -807,8 +807,12 @@ class Trial(object):
 
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
-                    state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
-                                                                           state[torchbearer.Y_TRUE])
+                    try:
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
+                    except TypeError:
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
+                                                                               state[torchbearer.Y_TRUE])
+
                     state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
 
