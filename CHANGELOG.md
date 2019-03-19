@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added callbacks for weight initialisation in ``torchbearer.callbacks.init``
 - Added ``with_closure`` trial method that allows running of custom closures 
 - Added ``base_closure`` function to bases that allows creation of standard training loop closures
+- Added ``with_loader`` trial method that allows running of custom batch loaders
 ### Changed
 ### Deprecated
 ### Removed
