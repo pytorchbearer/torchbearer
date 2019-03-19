@@ -163,7 +163,7 @@ def deep_to(batch, device, dtype):
     elif isinstance(batch, dict):
         for key in batch:
             batch[key] = deep_to(batch[key], device, dtype)
-    else:
+    elif torch.is_tensor(batch):
         if batch.dtype.is_floating_point:
             batch = batch.to(device, dtype)
         else:
@@ -222,60 +222,52 @@ def load_batch_predict(state):
         state[torchbearer.X] = data
 
 
-class Sampler:
-    """
-    Sampler wraps a batch loader function and executes it when :meth:`Sampler.sample` is called
-
-    Args:
-        batch_loader (func): The batch loader to execute
-    """
-    def __init__(self, batch_loader):
-        self.batch_loader = batch_loader
-
-    def sample(self, state):
-        self.batch_loader(state)
-
-
-def inject_sampler(data_key, batch_loader):
+def inject_sampler(data_key, batch_sampler):
     """ Decorator to inject a :class:`Sampler` into state[torchbearer.SAMPLER] along with the specified \
         generator into state[torchbearer.GENERATOR] and number of steps into state[torchbearer.STEPS]
 
     Args:
         data_key (:class:`.StateKey`): Key for the data to inject
-        batch_loader (function): Batch loader function that extracts batch from data loader, stores in state and sends
+        batch_sampler (function): Batch sampler function that extracts batch from data loader, stores in state and sends
         data to correct device
 
     Returns:
         The decorator
     """
     def decorator(func):
+        def infinite_wrapper(self, key, generator, steps, sampler):
+            if generator is not None and steps is not None:
+                over_steps = steps > len(generator)
+                inf_steps = steps == -1
+                inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
+
+                if over_steps or inf_steps or inf_train_loader:  # Want iterator to refresh at end not per epoch
+                    if steps == -1: warnings.warn("Trial is set to run indefinitely. "
+                                              "Make sure you have some method to terminate safely.")
+                    sampler = load_batch_infinite(sampler)
+
+                if inf_train_loader and not hasattr(generator, 'inf'):  # First run and want iterator at end
+                    generator.inf = True
+                    generator.tb_iter = iter(generator)
+
+            return generator, sampler
+
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            loader = batch_loader
+            sampler = batch_sampler
 
             key = kwargs['data_key'] if 'data_key' in kwargs else data_key  # Populate default value
             generator, steps = self.state[key] if self.state[key] is not None else (None, None)
 
             if self.state[torchbearer.LOADER] is not None:
-                loader = self.state[torchbearer.LOADER]
+                sampler = self.state[torchbearer.LOADER]
             elif generator is None:
-                loader = load_batch_none
+                sampler = load_batch_none
 
-            if generator is not None and steps is not None:
-                over_steps = steps > len(generator)
-                inf_steps = steps == -1
-                inf_train_loader = key == torchbearer.TRAIN_DATA and self.state[torchbearer.INF_TRAIN_LOADING]
-                if over_steps or inf_steps or inf_train_loader:  # Want iterator to refresh at end
-                    if steps == -1: warnings.warn("Trial is set to run indefinitely. "
-                                              "Make sure you have some method to terminate safely.")
-                    loader = load_batch_infinite(loader)
-
-                if inf_train_loader and not hasattr(generator, 'inf'):  # First run and want iterator to not refresh each epoch but on end
-                    generator.inf = True
-                    generator.tb_iter = iter(generator)
+            generator, sampler = infinite_wrapper(self, key, generator, steps, sampler)
 
             self.state[torchbearer.DATA] = key
-            self.state[torchbearer.SAMPLER] = Sampler(loader)
+            self.state[torchbearer.SAMPLER] = sampler
             self.state[torchbearer.GENERATOR] = generator
             self.state[torchbearer.STEPS] = steps
 
@@ -775,7 +767,7 @@ class Trial(object):
 
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
         for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()):
-            state[torchbearer.SAMPLER].sample(state)
+            state[torchbearer.SAMPLER](state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
             # Update parameters
@@ -802,7 +794,7 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
-                state[torchbearer.SAMPLER].sample(state)
+                state[torchbearer.SAMPLER](state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward Pass
