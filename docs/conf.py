@@ -19,12 +19,12 @@
 #
 import os
 import sys
-from unittest.mock import MagicMock
 
 autodoc_mock_imports = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision', 'torchvision.utils', 'torchvision.datasets', 'torchvision.datasets.folder', 'torch.nn', 'torch.nn.functional', 'torch.nn.modules', 'torch.optim', 'torch.distributions.utils', 'torch.distributions', 'torch.utils', 'torch.utils.data', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX', 'tensorboardX.torchvis', 'livelossplot', 'IPython']
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../torchbearer'))
 
 
 # -- General configuration ------------------------------------------------
