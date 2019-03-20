@@ -9,8 +9,12 @@ class AggregatePredictions(Callback):
         self.predictions_list = []
 
     def on_step_validation(self, state):
-        super().on_step_validation(state)
+        super(AggregatePredictions, self).on_step_validation(state)
         self.predictions_list.append(state[torchbearer.Y_PRED])
 
     def on_end_validation(self, state):
         state[torchbearer.FINAL_PREDICTIONS] = torch.cat(self.predictions_list, 0)
+
+    def on_end_epoch(self, state):
+        super(AggregatePredictions, self).on_end_epoch(state)
+        self.predictions_list = []

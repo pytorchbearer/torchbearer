@@ -1,8 +1,11 @@
 torch>=0.4
 torchvision
 numpy
-scipy
 scikit-learn
 tqdm
 tensorboardX>=1.4
 visdom
+livelossplot
+mock
+Pillow
+matplotlib

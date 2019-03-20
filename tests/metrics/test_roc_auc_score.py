@@ -1,6 +1,6 @@
 import unittest
 
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
 import torchbearer
 from torchbearer.metrics import RocAucScore, MetricList
@@ -26,6 +26,27 @@ class TestRocAucScore(unittest.TestCase):
         try:
             np.testing.assert_array_almost_equal(np.array([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]]),
                                                                                    mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][1])
+        except AssertionError:
+            self.fail('y_pred not correctly passed to sklearn')
+
+    @patch('sklearn.metrics')
+    def test_non_one_hot_grad(self, mock_sklearn_metrics):
+        mock_sklearn_metrics.roc_auc_score = Mock()
+        metric = RocAucScore(one_hot_labels=False)
+        metric.reset({torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
+        state = {torchbearer.BATCH: 0, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32,
+                              torchbearer.Y_TRUE: torch.LongTensor([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
+                              torchbearer.Y_PRED: torch.FloatTensor(
+                                  [[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]])}
+        state[torchbearer.Y_PRED].requires_grad = True
+        res = metric.process(state)
+        self.assertTrue('roc_auc_score' in res)
+        self.assertEqual(mock_sklearn_metrics.roc_auc_score.call_count, 1)
+        self.assertTrue(np.array_equal(np.array([[1, 1, 1], [2, 2, 2], [3, 3, 3]]),
+                                       mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][0]))
+        try:
+            np.testing.assert_array_almost_equal(np.array([[0.0, 0.0, 0.0], [1.1, 1.1, 1.1], [2.2, 2.2, 2.2]]),
+                                                 mock_sklearn_metrics.roc_auc_score.call_args_list[0][0][1])
         except AssertionError:
             self.fail('y_pred not correctly passed to sklearn')
 

@@ -13,12 +13,15 @@ Model (Deprecated)
         :members:
         :undoc-members:
 
-Utilities
+State
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  automodule:: torchbearer.state
         :members:
         :undoc-members:
+
+Utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  automodule:: torchbearer.cv_utils
         :members:
@@ -26,10 +29,13 @@ Utilities
 """
 
 from .version import __version__
-
+from . import magics
+from .cite import cite
+from .bases import *
 from .state import *
+
 from . import metrics
 from . import callbacks
 from .trial import *
-from .torchbearer import *
 from . import cv_utils
+from . import variational

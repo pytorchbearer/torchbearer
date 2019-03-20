@@ -12,6 +12,8 @@ from torchvision.utils import save_image
 import torchbearer as tb
 import torchbearer.callbacks as callbacks
 from torchbearer import state_key
+from torchbearer.bases import base_closure
+
 
 os.makedirs('images', exist_ok=True)
 
@@ -27,6 +29,8 @@ adversarial_loss = torch.nn.BCELoss()
 device = 'cuda'
 valid = torch.ones(batch_size, 1, device=device)
 fake = torch.zeros(batch_size, 1, device=device)
+batch = torch.randn(25, latent_dim).to(device)
+
 
 # Register state keys (optional)
 GEN_IMGS = state_key('gen_imgs')
@@ -35,6 +39,12 @@ DISC_GEN_DET = state_key('disc_gen_det')
 DISC_REAL = state_key('disc_real')
 G_LOSS = state_key('g_loss')
 D_LOSS = state_key('d_loss')
+
+DISC_OPT = state_key('disc_opt')
+GEN_OPT = state_key('gen_opt')
+DISC_MODEL = state_key('disc_model')
+DISC_IMGS = state_key('disc_imgs')
+DISC_CRIT = state_key('disc_crit')
 
 
 class Generator(nn.Module):
@@ -57,7 +67,8 @@ class Generator(nn.Module):
             nn.Tanh()
         )
 
-    def forward(self, z):
+    def forward(self, real_imgs, state):
+        z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
         img = self.model(z)
         img = img.view(img.size(0), *img_shape)
         return img
@@ -76,46 +87,32 @@ class Discriminator(nn.Module):
             nn.Sigmoid()
         )
 
-    def forward(self, img):
+    def forward(self, img, state):
         img_flat = img.view(img.size(0), -1)
         validity = self.model(img_flat)
 
         return validity
 
 
-class GAN(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.discriminator = Discriminator()
-        self.generator = Generator()
-
-    def forward(self, real_imgs, state):
-        # Generator Forward
-        z = Variable(torch.Tensor(np.random.normal(0, 1, (real_imgs.shape[0], latent_dim)))).to(state[tb.DEVICE])
-        state[GEN_IMGS] = self.generator(z)
-        state[DISC_GEN] = self.discriminator(state[GEN_IMGS])
-        # This clears the function graph built up for the discriminator
-        self.discriminator.zero_grad()
-
-        # Discriminator Forward
-        state[DISC_GEN_DET] = self.discriminator(state[GEN_IMGS].detach())
-        state[DISC_REAL] = self.discriminator(real_imgs)
+def gen_crit(state):
+    loss =  adversarial_loss(state[DISC_MODEL](state[tb.Y_PRED], state), valid)
+    state[G_LOSS] = loss
+    return loss
 
 
-@callbacks.add_to_loss
-def loss_callback(state):
-    fake_loss = adversarial_loss(state[DISC_GEN_DET], fake)
-    real_loss = adversarial_loss(state[DISC_REAL], valid)
-    state[G_LOSS] = adversarial_loss(state[DISC_GEN], valid)
-    state[D_LOSS] = (real_loss + fake_loss) / 2
-    return state[G_LOSS] + state[D_LOSS]
+def disc_crit(state):
+    real_loss = adversarial_loss(state[DISC_MODEL](state[tb.X], state), valid)
+    fake_loss = adversarial_loss(state[DISC_MODEL](state[tb.Y_PRED].detach(), state), fake)
+    loss = (real_loss + fake_loss) / 2
+    state[D_LOSS] = loss
+    return loss
 
 
 @callbacks.on_step_training
+@callbacks.only_if(lambda state: state[tb.BATCH] % sample_interval == 0)
 def saver_callback(state):
-    batches_done = state[tb.EPOCH] * len(state[tb.GENERATOR]) + state[tb.BATCH]
-    if batches_done % sample_interval == 0:
-        save_image(state[GEN_IMGS].data[:25], 'images/%d.png' % batches_done, nrow=5, normalize=True)
+    samples = state[tb.MODEL](batch, state)
+    save_image(samples, 'images/%d.png' % state[tb.BATCH], nrow=5, normalize=True)
 
 
 # Configure data loader
@@ -124,39 +121,36 @@ transform = transforms.Compose([
                         transforms.ToTensor(),
                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                    ])
-
 dataset = datasets.MNIST('./data/mnist', train=True, download=True, transform=transform)
-
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
 # Model and optimizer
-model = GAN()
-optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.5, 0.999))
+generator = Generator()
+discriminator = Discriminator()
+optimizer_G = torch.optim.Adam(generator.parameters(), lr=lr, betas=(0.5, 0.999))
+optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
 
 
-@tb.metrics.running_mean
-@tb.metrics.mean
-class g_loss(tb.metrics.Metric):
-    def __init__(self):
-        super().__init__('g_loss')
-
-    def process(self, state):
-        return state[G_LOSS]
+closure_gen = base_closure(tb.X, tb.MODEL, tb.Y_PRED, tb.Y_TRUE, tb.CRITERION, tb.LOSS, GEN_OPT)
+closure_disc = base_closure(tb.Y_PRED, DISC_MODEL, None, DISC_IMGS, DISC_CRIT, tb.LOSS, DISC_OPT)
 
 
-@tb.metrics.running_mean
-@tb.metrics.mean
-class d_loss(tb.metrics.Metric):
-    def __init__(self):
-        super().__init__('d_loss')
+def closure(state):
+    closure_gen(state)
+    state[GEN_OPT].step()
+    closure_disc(state)
+    state[DISC_OPT].step()
 
-    def process(self, state):
-        return state[D_LOSS]
+from torchbearer.metrics import mean, running_mean
+metrics = ['loss', mean(running_mean(D_LOSS)), mean(running_mean(G_LOSS))]
 
+trial = tb.Trial(generator, None, criterion=gen_crit, metrics=metrics, callbacks=[saver_callback])
+trial.with_train_generator(dataloader, steps=200000)
+trial.to(device)
 
-torchbearertrial = tb.Trial(model, optim, criterion=None, metrics=['loss', g_loss(), d_loss()],
-                            callbacks=[loss_callback, saver_callback], pass_state=True)
-torchbearertrial.with_train_generator(dataloader)
-torchbearertrial.to(device)
-torchbearertrial.run(epochs=200)
+new_keys = {DISC_MODEL: discriminator.to(device), DISC_OPT: optimizer_D, GEN_OPT: optimizer_G, DISC_CRIT: disc_crit}
+trial.state.update(new_keys)
+trial.with_closure(closure)
+trial.run(epochs=1)
+

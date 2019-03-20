@@ -1,3 +1,4 @@
+from __future__ import print_function
 import torchbearer
 
 from torchbearer.callbacks import Callback
@@ -6,11 +7,13 @@ import math
 
 
 class TerminateOnNaN(Callback):
-    """Callback which montiors the given metric and halts training if its value is nan or
-    inf.
+    """Callback which montiors the given metric and halts training if its value is nan or inf.
 
-    :param monitor: The metric name to monitor
-    :type monitor: str
+    Args:
+        monitor (str): The name of the metric to monitor
+
+    State Requirements:
+        - :attr:`torchbearer.state.METRICS`: Metrics should be a dict containing at least the key `monitor`
     """
     def __init__(self, monitor='running_loss'):
         super(TerminateOnNaN, self).__init__()

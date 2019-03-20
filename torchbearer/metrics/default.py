@@ -4,12 +4,14 @@ Base metrics are the base classes which represent the metrics supplied with torc
 following strings:
 
 - '`acc`' or '`accuracy`': The :class:`.DefaultAccuracy` metric
-- '`binary_acc`': The :class:`.BinaryAccuracy` metric
-- '`cat_acc`': The :class:`.CategoricalAccuracy` metric
-- '`top_5_acc`': The :class:`.TopKCategoricalAccuracy` metric
+- '`binary_acc`' or '`binary_accuracy`': The :class:`.BinaryAccuracy` metric
+- '`cat_acc`' or '`cat_accuracy`': The :class:`.CategoricalAccuracy` metric
+- '`top_5_acc`' or '`top_5_accuracy`': The :class:`.TopKCategoricalAccuracy` metric
+- '`top_10_acc`' or '`top_10_accuracy`': The :class:`.TopKCategoricalAccuracy` metric with k=10
 - '`mse`': The :class:`.MeanSquaredError` metric
 - '`loss`': The :class:`.Loss` metric
 - '`epoch`': The :class:`.Epoch` metric
+- '`lr`': The :class:`.LR` metric
 - '`roc_auc`' or '`roc_auc_score`': The :class:`.RocAucScore` metric
 """
 import torch.nn as nn
@@ -56,12 +58,15 @@ class DefaultAccuracy(Metric):
         self.metric = CategoricalAccuracy()  # Default to CategoricalAccuracy
         self.name = self.metric.name
         self._loaded = False
+        self._train = True
 
     def train(self):
+        self._train = True
         return self.metric.train()
 
-    def eval(self):
-        return self.metric.eval()
+    def eval(self, data_key=None):
+        self._train = False
+        return self.metric.eval(data_key=data_key)
 
     def process(self, *args):
         return self.metric.process(*args)
@@ -83,6 +88,10 @@ class DefaultAccuracy(Metric):
             if name is not None and name in __loss_map__:
                 self.metric = __loss_map__[name]()
                 self.name = self.metric.name
+                if self._train:
+                    self.metric.train()
+                else:
+                    self.metric.eval()
 
             self._loaded = True
 

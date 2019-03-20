@@ -18,7 +18,7 @@ class AutoEncoderMNIST(Dataset):
 
     def __getitem__(self, index):
         character, label = self.mnist_dataset.__getitem__(index)
-        return character, character
+        return character, character.view(-1)
 
     def __len__(self):
         return len(self.mnist_dataset)
@@ -83,19 +83,19 @@ class VAE(nn.Module):
         return self.decode(z)
 
 
-def bce_loss(y_pred, y_true):
-    BCE = F.binary_cross_entropy(y_pred, y_true.view(-1, 784), reduction='sum')
+def binary_cross_entropy(y_pred, y_true):
+    BCE = F.binary_cross_entropy(y_pred, y_true, reduction='sum')
     return BCE
 
 
-def kld_Loss(mu, logvar):
+def kld(mu, logvar):
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return KLD
 
 
 @torchbearer.callbacks.add_to_loss
 def add_kld_loss_callback(state):
-    KLD = kld_Loss(state[MU], state[LOGVAR])
+    KLD = kld(state[MU], state[LOGVAR])
     return KLD
 
 
@@ -117,11 +117,11 @@ def save_reconstruction_callback(num_images=8, folder='results/'):
 
 model = VAE()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
-loss = bce_loss
+loss = binary_cross_entropy
 
 from torchbearer import Trial
 
-torchbearer_trial = Trial(model, optimizer, loss, metrics=['loss'],
-                          callbacks=[add_kld_loss_callback, save_reconstruction_callback()], pass_state=True).to('cuda')
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'],
+                          callbacks=[add_kld_loss_callback, save_reconstruction_callback()]).to('cuda')
 torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
 torchbearer_trial.run(epochs=10)

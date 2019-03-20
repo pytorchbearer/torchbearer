@@ -8,7 +8,7 @@ import torchbearer as tb
 
 class Net(Module):
     def __init__(self, x):
-        super().__init__()
+        super(Net, self).__init__()
         self.pars = torch.nn.Parameter(x)
 
     def f(self):
@@ -24,8 +24,15 @@ class Net(Module):
         out[2] = self.pars[2]-1
         return torch.sum(out**2)
 
-    def forward(self, _, state):
+    def forward(self, _):
         return self.f()
+
+
+class NetWithState(Net):
+    def forward(self, _, state=None):
+        if state is None:
+            raise ValueError
+        return super(NetWithState, self).forward(_)
 
 
 def loss(y_pred, y_true):
@@ -37,12 +44,53 @@ class TestEndToEnd(unittest.TestCase):
         p = torch.tensor([2.0, 1.0, 10.0])
         training_steps = 1000
 
-        model = Net(p)
+        model = NetWithState(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = tb.Trial(model, optim, loss, pass_state=True).for_train_steps(training_steps)
+        tbmodel = tb.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1)
         tbmodel.run()
 
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
         self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
         self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)
+
+    def test_basic_checkpoint(self):
+        p = torch.tensor([2.0, 1.0, 10.0])
+        training_steps = 500
+
+        model = Net(p)
+        optim = torch.optim.SGD(model.parameters(), lr=0.01)
+
+        tbmodel = tb.Trial(model, optim, loss, callbacks=[tb.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
+        tbmodel.run(2)  # Simulate 2 'epochs'
+
+        # Reload
+        p = torch.tensor([2.0, 1.0, 10.0])
+        model = Net(p)
+        optim = torch.optim.SGD(model.parameters(), lr=0.01)
+
+        tbmodel = tb.Trial(model, optim, loss, callbacks=[tb.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps)
+        tbmodel.load_state_dict(torch.load('test.pt'))
+        self.assertEqual(len(tbmodel.state[tb.HISTORY]), 2)
+        self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
+        self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
+        self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)
+
+        import os
+        os.remove('test.pt')
+
+    def test_only_model(self):
+        p = torch.tensor([2.0, 1.0, 10.0])
+
+        model = Net(p)
+
+        tbmodel = tb.Trial(model)
+        self.assertListEqual(tbmodel.run(), [])
+
+    def test_no_model(self):
+        tbmodel = tb.Trial(None)
+
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            tbmodel.run()
+            self.assertTrue(len(w) == 1)

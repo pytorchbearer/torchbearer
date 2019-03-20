@@ -1,14 +1,11 @@
-from io import StringIO
 from unittest import TestCase
-from unittest.mock import patch
 
-from torchbearer.callbacks import TerminateOnNaN
 import torchbearer
+from torchbearer.callbacks import TerminateOnNaN
+
 
 class TestTerminateOnNaN(TestCase):
-
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_should_terminate(self, _):
+    def test_should_terminate(self):
         state = {
             torchbearer.EPOCH: 0,
             torchbearer.BATCH: 0,
@@ -42,8 +39,7 @@ class TestTerminateOnNaN(TestCase):
         terminator.on_end_epoch(state)
         self.assertFalse(state[torchbearer.STOP_TRAINING])
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_monitor_should_terminate(self, _):
+    def test_monitor_should_terminate(self):
         state = {
             torchbearer.EPOCH: 0,
             torchbearer.BATCH: 0,
@@ -77,8 +73,7 @@ class TestTerminateOnNaN(TestCase):
         terminator.on_end_epoch(state)
         self.assertFalse(state[torchbearer.STOP_TRAINING])
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_not_found_metric(self, _):
+    def test_not_found_metric(self):
         state = {
             torchbearer.EPOCH: 0,
             torchbearer.BATCH: 0,

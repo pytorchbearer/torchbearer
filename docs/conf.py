@@ -19,6 +19,9 @@
 #
 import os
 import sys
+from unittest.mock import MagicMock
+
+autodoc_mock_imports = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision', 'torchvision.utils', 'torchvision.datasets', 'torchvision.datasets.folder', 'torch.nn', 'torch.nn.functional', 'torch.nn.modules', 'torch.optim', 'torch.distributions.utils', 'torch.distributions', 'torch.utils', 'torch.utils.data', 'numpy', 'sklearn', 'sklearn.metrics', 'tqdm', 'tensorboardX', 'tensorboardX.torchvis', 'livelossplot', 'IPython']
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
@@ -33,7 +36,7 @@ sys.path.insert(0, os.path.abspath('../'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.mathjax', 'sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.intersphinx']
+extensions = ['sphinx.ext.napoleon', 'sphinx.ext.mathjax', 'sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -148,7 +151,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'torchbearer.tex', 'torchbearer Documentation',
-     'Ethan Harris and Matthew Painter', 'manual'),
+     'Ethan Harris, Matthew Painter and Jonathon Hare', 'manual'),
 ]
 
 
@@ -157,7 +160,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pytorchbearer', 'torchbearer Documentation',
+    (master_doc, 'torchbearer', 'torchbearer Documentation',
      [author], 1)
 ]
 

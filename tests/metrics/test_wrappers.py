@@ -1,13 +1,11 @@
 import unittest
 
-from unittest.mock import Mock, call
-
+import torch
+from mock import Mock, call
 from torch.autograd import Variable
 
 import torchbearer
-from torchbearer.metrics import Std, Metric, Mean, BatchLambda, EpochLambda, ToDict
-
-import torch
+from torchbearer.metrics import Metric, BatchLambda, EpochLambda, ToDict
 
 
 class TestToDict(unittest.TestCase):
@@ -47,6 +45,20 @@ class TestToDict(unittest.TestCase):
         self.assertEqual(self._metric.eval.call_count, 1)
 
         self.assertTrue(self._to_dict.process_final('input') == {'val_test': 'process_final'})
+        self._metric.process_final.assert_called_once_with('input')
+
+    def test_eval_train(self):
+        self._to_dict.eval(data_key=torchbearer.TRAIN_DATA)
+        self.assertEqual(self._metric.eval.call_count, 1)
+
+        self.assertTrue(self._to_dict.process_final('input') == {'train_test': 'process_final'})
+        self._metric.process_final.assert_called_once_with('input')
+
+    def test_eval_test(self):
+        self._to_dict.eval(data_key=torchbearer.TEST_DATA)
+        self.assertEqual(self._metric.eval.call_count, 1)
+
+        self.assertTrue(self._to_dict.process_final('input') == {'test_test': 'process_final'})
         self._metric.process_final.assert_called_once_with('input')
 
     def test_reset(self):

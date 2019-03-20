@@ -104,6 +104,6 @@ loss = loss_function
 
 from torchbearer import Trial
 
-torchbearer_trial = Trial(model, optimizer, loss, metrics=['loss'], pass_state=False).to('cuda')
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['loss']).to('cuda')
 torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
 torchbearer_trial.run(epochs=10)

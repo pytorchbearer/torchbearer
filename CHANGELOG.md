@@ -5,6 +5,154 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added cyclic learning rate finder
+- Added on_init callback hook to run at the end of trial init
+- Added callbacks for weight initialisation in ``torchbearer.callbacks.init``
+- Added ``with_closure`` trial method that allows running of custom closures 
+- Added ``base_closure`` function to bases that allows creation of standard training loop closures
+- Added ``ImagingCallback`` class for callbacks which produce images that can be sent to tensorboard, visdom or a file
+- Added ``CachingImagingCallback`` and ``MakeGrid`` callback to make a grid of images
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed bug where replay errored when train or val steps were None
+- Fixed a bug where mock optimser wouldn't call it's closure
+- Fixed a bug where the notebook check raised ModuleNotFoundError when IPython not installed
+
+## [0.3.0] - 2019-02-28
+### Added
+- Added torchbearer.variational, a sub-package for implementations of state of the art variational auto-encoders
+- Added SimpleUniform and SimpleExponential distributions
+- Added a decorator which can be used to cite a research article as part of a doc string
+- Added an optional dimension argument to the mean, std and running_mean metric aggregators
+- Added a var metric and decorator which can be used to calculate the variance of a metric
+- Added an unbiased flag to the std and var metrics to optionally not apply Bessel's correction (consistent with torch.std / torch.var)
+- Added support for rounding 1D lists to the Tqdm callback
+- Added SimpleWeibull distribution
+- Added support for Python 2.7
+- Added SimpleWeibullSimpleWeibullKL
+- Added SimpleExponentialSimpleExponentialKL
+- Added the option for model parameters only saving to Checkpointers.
+- Added documentation about serialization.
+- Added support for indefinite data loading. Iterators can now be run until complete independent of epochs or iterators can be refreshed during an epoch if complete. 
+- Added support for batch intervals in interval checkpointer
+- Added line magic ``%torchbearer notebook``
+- Added 'accuracy' variants of 'acc' default metrics
+### Changed
+- Changed the default behaviour of the std metric to compute the sample std, in line with torch.std
+- Tqdm precision argument now rounds to decimal places rather than significant figures
+- Trial will now simply infer if the model has an argument called 'state'
+- Torchbearer now infers if inside a notebook and will use the appropriate tqdm module if not set
+### Deprecated
+### Removed
+- Removed the old Model API (deprecated since version 0.2.0)
+- Removed the 'pass_state' argument from Trial, this will now be inferred
+- Removed the 'std' decorator from the default metrics
+### Fixed
+- Fixed a bug in the weight decay callback which would result in potentially negative decay (now just uses torch.norm)
+- Fixed a bug in the cite decorator causing the citation to not show up correctly
+- Fixed a memory leak in the mse primitive metric
+
+## [0.2.6.1] - 2019-02-25
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where predictions would multiply when predict was called more than once
+
+## [0.2.6] - 2018-12-19
+### Added
+### Changed
+- Y_PRED, Y_TRUE and X can now equivalently be accessed as PREDICTION, TARGET and INPUT respectively
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where the LiveLossPlot callback would trigger an error if run and evaluate were called separately
+- Fixed a bug where state key errors would report to the wrong stack level
+- Fixed a bug where the user would wrongly get a state key error in some cases
+
+## [0.2.5] - 2018-12-19
+### Added
+- Added flag to replay to replay only a single batch per epoch
+- Added support for PyTorch 1.0.0 and Python 3.7
+- MetricTree can now unpack dictionaries from root, this is useful if you want to get a mean of a metric. However, this should be used with caution as it extracts only the first value in the dict and ignores the rest.
+- Added a callback for the livelossplot visualisation tool for notebooks
+### Changed
+- All error / accuracy metrics can now optionally take state keys for predictions and targets as arguments
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug with the EpochLambda metric which required y_true / y_pred to have specific forms
+
+## [0.2.4] - 2018-11-16
+### Added
+- Added metric functionality to state keys so that they can be used as metrics if desired
+- Added customizable precision to the printer callbacks
+- Added threshold to binary accuracy. Now it will appropriately handle any values in \[0, 1\]
+### Changed
+- Changed the default printer precision to 4s.f.
+- Tqdm on_epoch now shows metrics immediately when resuming
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug which would incorrectly trigger version warnings when loading in models
+- Fixed bugs where the Trial would not fail gracefully if required objects were not in state
+- Fixed a bug where none criterion didn't work with the add_to_loss callback
+- Fixed a bug where tqdm on_epoch always started at 0
+
+## [0.2.3] - 2018-10-12
+### Added
+- Added string representation of Trial to give summary
+- Added option to log Trial summary to TensorboardText
+- Added a callback point ('on_checkpoint') which can be used for model checkpointing after the history ios updated
+### Changed
+- When resuming training checkpointers no longer delete the state file the trial was loaded from
+- Changed the metric eval to include a data_key which tells us what data we are evaluating on
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where callbacks weren't handled correctly in the predict and evaluate methods of Trial
+- Fixed a bug where the history wasn't updated when new metrics were calculated with the evaluate method of Trial
+- Fixed a bug where tensorboard writers couldn't be reused 
+- Fixed a bug where the none criterion didn't require gradient
+- Fix bug where tqdm wouldn't get correct iterator length when evaluating on test generator
+- Fixed a bug where evaluating before training tried to update history before it existed
+- Fixed a bug where the metrics would output 'val_acc' even if evaluating on test or train data
+- Fixed a bug where roc metric didn't detach y_pred before sending to numpy
+- Fixed a bug where resuming from a checkpoint saved with one of the callbacks didn't populate the epoch number correctly
+
+## [0.2.2] - 2018-09-18
+### Added
+- The default_for_key metric decorator can now be used to pass arguments to the init of the inner metric
+- The default metric for the key 'top_10_acc' is now the TopKCategoricalAccuracy metric with k set to 10
+- Added global verbose flag for trial that can be overridden by run, evaluate, predict
+- Added an LR metric which retrieves the current learning rate from the optimizer, default for key 'lr'
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed a bug where the DefaultAccuracy metric would not put the inner metric in eval mode if the first call to reset was after the call to eval
+- Fixed a bug where trying to load a state dict in a different session to where it was saved didn't work properly
+- Fixed a bug where the empty criterion would trigger an error if no Y_TRUE was put in state
+
+## [0.2.1] - 2018-09-11
+### Added
+- Evaluation and prediction can now be done on any data using data_key keywork arg
+- Text tensorboard/visdom logger that writes epoch/batch metrics to text
+### Changed
+- TensorboardX, Numpy, Scikit-learn and Scipy are no longer dependancies and only required if using the tensorboard callbacks or roc metric
+### Deprecated
+### Removed
+### Fixed
+- Model class setting generator incorrectly leading to stop iterations. 
+- Argument ordering is consistent in `Trial.with_generators` and `Trial.__init__`
+- Added a state dict for the early stopping callback
+- Fixed visdom parameters not getting set in some cases
+
+## [0.2.0] - 2018-08-21
+### Added
 - Added the ability to pass custom arguments to the tqdm callback
 - Added an ignore_index flag to the categorical accuracy metric, similar to nn.CrossEntropyLoss. Usage: ``metrics=[CategoricalAccuracyFactory(ignore_index=0)]``
 - Added TopKCategoricalAccuracy metric (default for key: top\_5\_acc)

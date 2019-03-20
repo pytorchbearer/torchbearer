@@ -1,10 +1,23 @@
 import unittest
 
-from unittest.mock import Mock, call
+from mock import Mock, call
 
-from torchbearer.metrics import RunningMean, Metric, RunningMetric, Mean, Std
+from torchbearer.metrics import RunningMean, Metric, RunningMetric, Mean, Std, Var
 
 import torch
+
+
+class TestVar(unittest.TestCase):
+    def test_variance_dim(self):
+        var = Var('test', dim=0)
+        var.process(torch.Tensor([[1., 2.], [3., 4.]]))
+        var.process(torch.Tensor([[4., 3.], [2., 1.]]))
+        var.process(torch.Tensor([[1., 1.], [1., 1.]]))
+
+        res = var.process_final()
+        self.assertTrue(len(res) == 2)
+        for m in res:
+            self.assertTrue(abs(m - 1.6000) < 0.0001)
 
 
 class TestStd(unittest.TestCase):
@@ -17,7 +30,7 @@ class TestStd(unittest.TestCase):
                                             torch.FloatTensor([0.7, 0.8, 0.9]),
                                             torch.ones(torch.Size([]))]
 
-        self._std = Std('test')
+        self._std = Std('test', unbiased=False)
         self._std.reset({})
         self._target = 0.31622776601684
 
@@ -55,7 +68,7 @@ class TestStd(unittest.TestCase):
                                             torch.FloatTensor([[0.4, 0.5, 0.6], [1.4, 1.5, 1.6]]),
                                             torch.FloatTensor([[0.7, 0.8, 0.9], [1.7, 1.8, 1.9]]),
                                             torch.ones(torch.Size([]))]
-        self._std = Std('test')
+        self._std = Std('test', unbiased=False)
         self._std.reset({})
         self._target = 0.57662804083742
 
@@ -65,6 +78,17 @@ class TestStd(unittest.TestCase):
             self._std.process(self._metric.process())
         result = self._std.process_final({})
         self.assertAlmostEqual(self._target, result, places=5)
+
+    def test_std_dim(self):
+        std = Std('test', dim=0)
+        std.process(torch.Tensor([[1., 2.], [3., 4.]]))
+        std.process(torch.Tensor([[4., 3.], [2., 1.]]))
+        std.process(torch.Tensor([[1., 1.], [1., 1.]]))
+
+        res = std.process_final()
+        self.assertTrue(len(res) == 2)
+        for m in res:
+            self.assertTrue(abs(m - 1.2649) < 0.0001)
 
 
 class TestMean(unittest.TestCase):
@@ -116,6 +140,17 @@ class TestMean(unittest.TestCase):
         result = self._mean.process_final({})
         self.assertAlmostEqual(self._target, result, places=5)
 
+    def test_mean_dim(self):
+        mean = Mean('test', dim=0)
+        mean.process(torch.Tensor([[1., 2.], [3., 4.]]))
+        mean.process(torch.Tensor([[4., 3.], [2., 1.]]))
+        mean.process(torch.Tensor([[1., 1.], [1., 1.]]))
+
+        res = mean.process_final()
+        self.assertTrue(len(res) == 2)
+        for m in res:
+            self.assertTrue(abs(m - 2.0) < 0.0001)
+
 
 class TestRunningMetric(unittest.TestCase):
     def setUp(self):
@@ -137,15 +172,15 @@ class TestRunningMetric(unittest.TestCase):
 
     def test_empty_methods(self):
         metric = RunningMetric('test')
-        self.assertTrue(metric._step(['test']) is None)
-        self.assertTrue(metric._process_train(['test']) is None)
+        self.assertRaises(NotImplementedError, lambda: metric._step(['test']) is None)
+        self.assertRaises(NotImplementedError, lambda: metric._process_train(['test']) is None)
 
 
 class TestRunningMean(unittest.TestCase):
     def setUp(self):
         self._metric = Metric('test')
         self._mean = RunningMean('test')
-        self._cache = [1.0, 1.5, 2.0]
+        self._cache = [torch.Tensor([1.0]), torch.Tensor([1.5]), torch.Tensor([2.0])]
         self._target = 1.5
 
     def test_train(self):
@@ -155,3 +190,14 @@ class TestRunningMean(unittest.TestCase):
     def test_step(self):
         result = self._mean._step(self._cache)
         self.assertEqual(self._target, result)
+
+    def test_dims(self):
+        mean = RunningMean('test', dim=0)
+        cache = [mean._process_train(torch.Tensor([[1., 2.], [3., 4.]])),
+                 mean._process_train(torch.Tensor([[4., 3.], [2., 1.]])),
+                 mean._process_train(torch.Tensor([[1., 1.], [1., 1.]]))]
+
+        res = mean._step(cache)
+        self.assertTrue(len(res) == 2)
+        for m in res:
+            self.assertTrue(abs(m - 2.0) < 0.0001)

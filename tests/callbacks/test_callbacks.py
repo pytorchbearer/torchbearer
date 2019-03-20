@@ -1,42 +1,13 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, Mock
+from mock import MagicMock, Mock
 
 import torchbearer
-from torchbearer.callbacks import CallbackList, Callback, Tqdm, TensorBoard
-
-
-class TestCallback(TestCase):
-    def test_state_dict(self):
-        callback = Callback()
-
-        self.assertEqual(callback.state_dict(), {})
-        self.assertEqual(callback.load_state_dict({}), callback)
-
-    def test_empty_methods(self):
-        callback = Callback()
-
-        self.assertIsNone(callback.on_start({}))
-        self.assertIsNone(callback.on_start_epoch({}))
-        self.assertIsNone(callback.on_start_training({}))
-        self.assertIsNone(callback.on_sample({}))
-        self.assertIsNone(callback.on_forward({}))
-        self.assertIsNone(callback.on_criterion({}))
-        self.assertIsNone(callback.on_backward({}))
-        self.assertIsNone(callback.on_step_training({}))
-        self.assertIsNone(callback.on_end_training({}))
-        self.assertIsNone(callback.on_end_epoch({}))
-        self.assertIsNone(callback.on_end({}))
-        self.assertIsNone(callback.on_start_validation({}))
-        self.assertIsNone(callback.on_sample_validation({}))
-        self.assertIsNone(callback.on_forward_validation({}))
-        self.assertIsNone(callback.on_end_validation({}))
-        self.assertIsNone(callback.on_step_validation({}))
-        self.assertIsNone(callback.on_criterion_validation({}))
+from torchbearer.callbacks import CallbackList, Tqdm, TensorBoard
 
 
 class TestCallbackList(TestCase):
     def __init__(self, methodName='runTest'):
-        super().__init__(methodName)
+        super(TestCallbackList, self).__init__(methodName)
         self.callback_1 = MagicMock(spec=torchbearer.callbacks.printer.Tqdm())
         self.callback_2 = MagicMock(spec=torchbearer.callbacks.tensor_board.TensorBoard())
         callbacks = [self.callback_1, self.callback_2]
@@ -71,8 +42,12 @@ class TestCallbackList(TestCase):
         state = self.list.state_dict()
         state[CallbackList.CALLBACK_TYPES] = list(reversed(state[CallbackList.CALLBACK_TYPES]))
 
-        with self.assertWarns(UserWarning, msg='Callback classes did not match, expected: {\'TensorBoard\', \'Tqdm\'}'):
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
             self.list.load_state_dict(state)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
+            self.assertTrue('Callback classes did not match, expected: [\'TensorBoard\', \'Tqdm\']' in str(w[-1].message))
 
     def test_for_list(self):
         self.list.on_start({})
@@ -84,3 +59,15 @@ class TestCallbackList(TestCase):
         clist = CallbackList([callback])
         clist2 = CallbackList([clist])
         self.assertTrue(clist2.callback_list[0] == 'test')
+
+    def test_iter_copy(self):
+        callback = 'test'
+        clist = CallbackList([callback])
+        cpy = clist.__copy__()
+        self.assertTrue(cpy.callback_list[0] == 'test')
+        self.assertTrue(cpy is not clist)
+        cpy = clist.copy()
+        self.assertTrue(cpy.callback_list[0] == 'test')
+        self.assertTrue(cpy is not clist)
+        for cback in clist:
+            self.assertTrue(cback == 'test')

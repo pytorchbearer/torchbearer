@@ -14,77 +14,127 @@ We first define all constants for the example.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 19-29
+   :lines: 20-32
 
 We then define a number of state keys for convenience using :func:`.state_key`. This is optional, however, it automatically avoids key conflicts.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 32-37
+   :lines: 35-47
 
 We then define the dataset and dataloader - for this example, MNIST.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 123-130
+   :lines: 120-125
 
 Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We use the generator and discriminator from PyTorch_GAN_ and combine them into a model that performs a single forward pass.
+We use the generator and discriminator from PyTorch_GAN_.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 86-102
+   :lines: 50-94
 
-Note that we have to be careful to remove the gradient information from the discriminator after doing the generator forward pass.
+We then create the models and optimisers.
+
+.. literalinclude:: /_static/examples/gan.py
+   :language: python
+   :lines: 128-132
 
 Loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since our loss computation in this example is complicated, we shall forgo the basic loss criterion used in normal torchbearer trials.
-Instead we use a callback to provide the loss, in this case we use the :func:`.add_to_loss` callback decorator.
-This decorates a function that returns a loss and automatically adds this to the main loss in training and validation.
+GANs usually require two different losses, one for the generator and one for the discriminator.
+We define these as functions of state so that we can access the discriminator model for the additional forward passes required.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 105-111
+   :lines: 97-108
 
-Note that we have summed the separate discriminator and generator losses, since their graphs are separated, this is allowable.
+We will see later how we get a torchbearer trial to use these losses.
 
 Metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We would like to follow the discriminator and generator losses during training - note that we added these to state during the model definition.
-We can then create metrics from these by decorating simple state fetcher metrics.
+In torchbearer, state keys are also metrics, so we can take means and running means of them and tell torchbearer to output them as metrics.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 139-146
+   :lines: 145-146
+
+We will add this metric list to the trial when we create it.
+
+
+Closures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The training loop of a GAN is a bit different to a standard model training loop.
+GANs require separate forward and backward passes for the generator and discriminator.
+To achieve this in torchbearer we can write a new closure.
+Since the individual training loops for the generator and discriminator are the same as a
+standard training loop we can use a :func:`~torchbearer.bases.base_closure`.
+The base closure takes state keys for required objects (data, model, optimiser, etc.) and returns a standard closure consisting of:
+
+1. Zero gradients
+2. Forward pass
+3. Loss calculation
+4. Backward pass
+
+We create a separate closure for the generator and discriminator. We use separate state keys for some objects so we can use them separately, although the loss is easier to deal with in a single key.
+
+.. literalinclude:: /_static/examples/gan.py
+   :language: python
+   :lines: 15, 135-136
+
+We then create a main closure (a simple function of state) that runs both of these and steps the optimisers.
+
+.. literalinclude:: /_static/examples/gan.py
+   :language: python
+   :lines: 139-143
+
+We will add this closure to the trial next.
+
 
 Training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We can then train the torchbearer trial on the GPU in the standard way.
-Note that when torchbearer is passed a ``None`` criterion it automatically sets the base loss to 0.
+We now create the torchbearer trial on the GPU in the standard way.
+Note that when torchbearer is passed a ``None`` optimiser it creates a mock optimser that will just run the closure.
+Since we are using the standard torchbearer state keys for the generator model and criterion, we can pass them in here.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 158-162
+   :lines: 148-150
+
+We now update state with the keys required for the discriminators closure and add the new closure to the trial.
+Note that torchbearer doesn't know the discriminator model is a model here, so we have to sent it to the GPU ourselves.
+
+.. literalinclude:: /_static/examples/gan.py
+   :language: python
+   :lines: 152-154
+
+Finally we run the trial.
+
+.. literalinclude:: /_static/examples/gan.py
+   :language: python
+   :lines: 155
 
 Visualising
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save :func:`~torchbearer.callbacks.decorators.on_step_training` - again using decorators.
+We borrow the image saving method from PyTorch_GAN_ and put it in a call back to save :func:`~torchbearer.callbacks.decorators.on_step_training`.
+We generate from the same inputs each time to get a better visualisation.
 
 .. literalinclude:: /_static/examples/gan.py
    :language: python
-   :lines: 114-118
+   :lines: 111-115
 
 Here is a Gif created from the saved images.
 
 .. figure:: /_static/img/gan.gif
-   :scale: 200 %
+   :scale: 100 %
    :alt: GAN generated samples
 
 

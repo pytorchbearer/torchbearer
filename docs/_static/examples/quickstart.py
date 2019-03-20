@@ -54,11 +54,11 @@ model = SimpleModel()
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 loss = nn.CrossEntropyLoss()
 
+import torchbearer
 from torchbearer import Trial
+from torchbearer.callbacks import TensorBoard
 
-torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss']).to('cuda')
-torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen)
+torchbearer_trial = Trial(model, optimizer, loss, metrics=['acc', 'loss'], callbacks=[TensorBoard(write_batch_metrics=True)]).to('cuda')
+torchbearer_trial.with_generators(train_generator=traingen, val_generator=valgen, test_generator=testgen)
 torchbearer_trial.run(epochs=10)
-
-torchbearer_trial.with_val_generator(testgen)
-torchbearer_trial.evaluate()
+torchbearer_trial.evaluate(data_key=torchbearer.TEST_DATA)

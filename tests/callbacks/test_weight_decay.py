@@ -1,8 +1,8 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
 
-import torch.nn as nn
 import torch
+import torch.nn as nn
+from mock import Mock
 
 import torchbearer
 from torchbearer.callbacks import WeightDecay

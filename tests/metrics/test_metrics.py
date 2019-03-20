@@ -1,36 +1,28 @@
 import unittest
-from unittest.mock import Mock
+from mock import Mock
 
-import torch
-
-import torchbearer
 from torchbearer.metrics import MetricList, Metric, MetricTree, AdvancedMetric
-from torchbearer.metrics.primitives import CategoricalAccuracy
-
-
-class TestMetric(unittest.TestCase):
-    def setUp(self):
-        self._state = {
-            torchbearer.Y_TRUE: torch.LongTensor([0, 1, 2, 2, 1]),
-            torchbearer.Y_PRED: torch.FloatTensor([
-                [0.9, 0.1, 0.1], # Correct
-                [0.1, 0.9, 0.1], # Correct
-                [0.1, 0.1, 0.9], # Correct
-                [0.9, 0.1, 0.1], # Incorrect
-                [0.9, 0.1, 0.1], # Incorrect
-            ])
-        }
-        self._state[torchbearer.Y_PRED].requires_grad = True
-        self._targets = [1, 1, 1, 0, 0]
-        self._metric = CategoricalAccuracy().root
-
-    def test_requires_grad(self):
-        result = self._metric.process(self._state)
-        self.assertTrue(self._state[torchbearer.Y_PRED].requires_grad is True)
-        self.assertTrue(result.requires_grad is False)
 
 
 class TestMetricTree(unittest.TestCase):
+    def test_dict_return(self):
+        root = Metric('test')
+        root.process = Mock(return_value={0: 'test', 1: 'something else'})
+        leaf1 = Metric('test')
+        leaf1.process = Mock(return_value={'test': 10})
+        leaf2 = Metric('test')
+        leaf2.process = Mock(return_value=None)
+
+        tree = MetricTree(root)
+        tree.add_child(leaf1)
+        tree.add_child(leaf2)
+
+        self.assertTrue(tree.process('args') == {'test': 10})
+
+        root.process.assert_called_once_with('args')
+        leaf1.process.assert_called_once_with('test')
+        leaf2.process.assert_called_once_with('test')
+
     def test_process(self):
         root = Metric('test')
         root.process = Mock(return_value='test')
@@ -107,6 +99,11 @@ class TestMetricTree(unittest.TestCase):
         tree.reset({})
         root.reset.assert_called_once_with({})
         leaf.reset.assert_called_once_with({})
+
+    def test_string(self):
+        root = Metric('test')
+        tree = MetricTree(root)
+        self.assertEqual(str(root), str(tree))
 
 
 class TestMetricList(unittest.TestCase):
