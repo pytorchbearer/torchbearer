@@ -17,7 +17,7 @@ try:
     import IPython.core.magic
     torchbearer = IPython.core.magic.register_line_magic(torchbearer)
     set_notebook(True)
-except NameError or ModuleNotFoundError:
+except (NameError, ModuleNotFoundError) as e:
     pass
 
 
