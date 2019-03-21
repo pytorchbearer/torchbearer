@@ -6,13 +6,6 @@ Trial
         :members:
         :undoc-members:
 
-Model (Deprecated)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-..  automodule:: torchbearer.torchbearer
-        :members:
-        :undoc-members:
-
 State
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
