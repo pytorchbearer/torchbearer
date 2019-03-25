@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed bug where replay errored when train or val steps were None
 - Fixed a bug where mock optimser wouldn't call it's closure
+- Fixed a bug where the notebook check raised ModuleNotFoundError when IPython not installed
+- Fixed a memory leak with metrics that causes issues with very long epochs
 
 ## [0.3.0] - 2019-02-28
 ### Added
