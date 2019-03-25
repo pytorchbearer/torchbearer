@@ -309,3 +309,13 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
 
         state[torchbearer.CALLBACK_LIST].on_backward(state)
     return closure
+
+
+def fluent(func):
+    """Decorator for class methods which forces return of self.
+    """
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        func(self, *args, **kwargs)
+        return self
+    return wrapper

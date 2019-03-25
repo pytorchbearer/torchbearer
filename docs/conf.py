@@ -24,6 +24,7 @@ autodoc_mock_imports = ['torch', 'torch.nn.utils.clip_grad_norm', 'torchvision',
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../torchbearer/'))
 
 
 # -- General configuration ------------------------------------------------

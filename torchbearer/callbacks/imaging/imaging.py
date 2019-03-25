@@ -1,7 +1,7 @@
 import torchbearer
 from torchbearer import Callback
 from torchbearer.trial import fluent
-from . import once_per_epoch
+from callbacks import once_per_epoch
 
 import torch
 

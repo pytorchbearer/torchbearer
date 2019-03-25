@@ -24,7 +24,7 @@ class ClassAppearanceModel(imaging.ImagingCallback):
 
     """
     def __init__(self, nimages, nclasses, input_size,
-                 optimizer_factory=lambda params: optim.Adam(params, lr = 0.05),
+                 optimizer_factory=lambda params: optim.SGD(params, lr = 2),
                  logit_key=torchbearer.PREDICTION, prob_key=None, target=RANDOM, steps=1024, transform=None):
         super(ClassAppearanceModel, self).__init__(transform=transform)
 
@@ -57,7 +57,7 @@ class ClassAppearanceModel(imaging.ImagingCallback):
         state[torchbearer.MODEL].eval()
 
         targets = torch.randint(high=self.nclasses, size=(self.nimages, 1)).long().to(state[torchbearer.DEVICE])
-        targets[0][0] = 251
+        targets[0][0] = 951
         for key in self._target_keys:
             state[key] = targets
         targets_hot = torch.zeros(self.nimages, self.nclasses).to(state[torchbearer.DEVICE])
@@ -74,7 +74,7 @@ class ClassAppearanceModel(imaging.ImagingCallback):
             # torch.masked_select(state[self.logit_key][2], targets_hot).exp().sum()
             # state[self.logit_key][0][:, 10, :, :].mean()
 
-            return - 0.005 * torch.masked_select(state[self.logit_key][2], targets_hot).exp().sum() + 0.5 * img.abs().mean() + 0.05 * variation
+            return - torch.masked_select(state[self.logit_key], targets_hot).exp().sum() + 0.001 * img.pow(2).sum()  # + 0.05 * img.abs().mean() + 0.25 * variation
 
         # base_model = state[torchbearer.MODEL].train()
 
@@ -85,18 +85,20 @@ class ClassAppearanceModel(imaging.ImagingCallback):
                 for param in self.base_model.parameters():
                     param.requires_grad = False
                 self.base_model.requires_grad = False
-                input_image = torch.randn(input_size)
+                input_image = torch.zeros(input_size)
                 args = [nimages]
                 for _ in input_size:
                     args.append(1)
                 # args[0] = nimages
-                self.input_batch = nn.Parameter(input_image.unsqueeze(0).repeat(*args) + 0.5, requires_grad=True)
+                self.input_batch = nn.Parameter(input_image.unsqueeze(0).repeat(*args), requires_grad=True)
+                self.val = nn.Parameter(torch.zeros(1000).unsqueeze(0).repeat(*args), requires_grad=False)
 
             def forward(self, _, state):
-                try:
-                    return self.base_model(self.input_batch, state)
-                except TypeError:
-                    return self.base_model(self.input_batch)
+                return self.val
+                # try:
+                #     return self.base_model(self.input_batch, state)
+                # except TypeError:
+                #     return self.base_model(self.input_batch)
 
         model = Model(self.input_size, self.nimages, state[torchbearer.MODEL])
         trial = torchbearer.Trial(model, self.optimizer_factory(filter(lambda p: p.requires_grad, model.parameters())), loss, ['loss'], [])

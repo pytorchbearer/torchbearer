@@ -338,10 +338,10 @@ def only_if(condition_expr):
             if count == 2:  # Assume Class method
                 def decfcn(o, state):
                     if condition_expr(state):
-                        fcn(o, state)
+                        return fcn(o, state)
             else:  # Assume function of state
                 def decfcn(state):
                     if condition_expr(state):
-                        fcn(state)
+                        return fcn(state)
             return decfcn
     return condition_decorator

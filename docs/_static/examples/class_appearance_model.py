@@ -43,8 +43,8 @@ from torchbearer import Trial
 
 VIS = torchbearer.state_key('vis')
 
-trial = Trial(model, callbacks=[torchbearer.callbacks.imaging.ClassAppearanceModel(1, 1000, (3, 224, 224), steps=1024).on_train().to_state(VIS),
-                                torchbearer.callbacks.imaging.FromState(key=VIS, transform=inv_normalize).on_train().to_file('vis.png')])
+trial = Trial(model, callbacks=[torchbearer.callbacks.imaging.ClassAppearanceModel(1, 1000, (3, 224, 224), steps=1000000).on_train().to_state(VIS),
+                                torchbearer.callbacks.imaging.FromState(key=VIS, transform=inv_normalize).on_train().to_file('vis2.png')])
 trial.for_train_steps(1).to('cuda')
 trial.run()
 
