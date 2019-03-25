@@ -38,7 +38,6 @@ class Metric(object):
     def __str__(self):
         return self.name
 
-    @no_grad()
     def process(self, *args):
         """Process the state and update the metric for one iteration.
 
@@ -50,7 +49,6 @@ class Metric(object):
         """
         pass
 
-    @no_grad()
     def process_final(self, *args):
         """Process the terminal state and output the final value of the metric.
 
