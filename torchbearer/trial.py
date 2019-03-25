@@ -766,13 +766,13 @@ class Trial(object):
             # Update parameters
             state[torchbearer.OPTIMIZER].step(lambda: self.closure(state))
 
-            state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
+            state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
             state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
             if state[torchbearer.STOP_TRAINING]:
                 break
 
-        state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
+        state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state.data))
 
         state[torchbearer.CALLBACK_LIST].on_end_training(state)
         return state
@@ -803,14 +803,14 @@ class Trial(object):
                     state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
                                                                            state[torchbearer.Y_TRUE])
                     state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
-                    state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
+                    state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
 
                 state[torchbearer.CALLBACK_LIST].on_step_validation(state)
                 if state[torchbearer.STOP_TRAINING]:
                     break
 
             if torchbearer.Y_TRUE in state:
-                state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
+                state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state.data))
             state[torchbearer.CALLBACK_LIST].on_end_validation(state)
         return state
 

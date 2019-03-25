@@ -83,6 +83,16 @@ class State(dict):
             warnings.warn("State was accessed with a string: {}, generate keys with StateKey(str).".format(statekey), stacklevel=3)
         return statekey
 
+    @property
+    def data(self):
+        new_state = State()
+        for key in self.keys():
+            try:
+                new_state[key] = self[key].data
+            except AttributeError:
+                new_state[key] = self[key]
+        return new_state
+
     def __getitem__(self, key):
         return super(State, self).__getitem__(self.get_key(key))
 
