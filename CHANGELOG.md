@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added ``base_closure`` function to bases that allows creation of standard training loop closures
 - Added ``ImagingCallback`` class for callbacks which produce images that can be sent to tensorboard, visdom or a file
 - Added ``CachingImagingCallback`` and ``MakeGrid`` callback to make a grid of images
+- Added Layer-sequential unit-variance (LSUV) initialization 
 ### Changed
 ### Deprecated
 ### Removed
