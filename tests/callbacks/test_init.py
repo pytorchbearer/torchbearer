@@ -77,7 +77,6 @@ class TestLsuv(TestCase):
             def forward(self, x):
                 return x.view(x.shape[0], -1)
 
-        from torch.utils.data import DataLoader
         model = torch.nn.Sequential(
             torch.nn.Conv2d(1,1,1),
             Flatten(),
