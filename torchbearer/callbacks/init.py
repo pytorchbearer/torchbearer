@@ -23,6 +23,15 @@ __xavier__ = """
 }
 """
 
+__lsuv__ = """
+@article{mishkin2015all,
+  title={All you need is a good init},
+  author={Mishkin, Dmytro and Matas, Jiri},
+  journal={arXiv preprint arXiv:1511.06422},
+  year={2015}
+}
+"""
+
 
 class WeightInit(Callback):
     """Base class for weight initialisations. Performs the provided function for each module when on_init is
@@ -49,6 +58,36 @@ class WeightInit(Callback):
         for m in self.modules:
             if len(list(filter(lambda target: target in m.__class__.__name__, self.targets))) > 0:
                 self.initialiser(m)
+
+
+@cite(__lsuv__)
+class LsuvInit(Callback):
+    """Layer-sequential unit-variance (LSUV) initialization as described in
+    `All you need is a good init <https://arxiv.org/abs/1511.06422>`_ and
+    modified from the code by  `ducha-aiki <https://github.com/ducha-aiki/LSUV-pytorch>`_
+
+    Args:
+        data_item (torch.Tensor: A representative data item to put through the model
+        needed_std: See `paper <https://arxiv.org/abs/1511.06422>`__, where needed_std is always 1.0
+        std_tol: See `paper <https://arxiv.org/abs/1511.06422>`__, Tol_{var}
+        max_attempts: See `paper <https://arxiv.org/abs/1511.06422>`__, T_{max}
+        do_orthonorm: See `paper <https://arxiv.org/abs/1511.06422>`__, first pre-initialise with orthonormal matricies
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `modules` method if modules is None
+    """
+    def __init__(self, data_item, needed_std=1.0, std_tol=0.1, max_attempts=10, do_orthonorm=True):
+        from torchbearer.callbacks.lsuv import LSUVinit
+        self.lsuv_init = LSUVinit
+        self.data = data_item
+        self.needed_std = needed_std
+        self.std_tol = std_tol
+        self.max_attempts = max_attempts
+        self.do_arthonorm = do_orthonorm
+
+    def on_init(self, state):
+        state[torchbearer.MODEL] = self.lsuv_init(state[torchbearer.MODEL], self.data, self.needed_std, self.std_tol, 
+                                                  self.max_attempts, self.do_arthonorm)
 
 
 @cite(__kaiming__)

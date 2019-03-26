@@ -1,3 +1,4 @@
+import torch
 from unittest import TestCase
 
 from mock import MagicMock, patch
@@ -64,3 +65,37 @@ class TestSimpleInits(TestCase):
         mock = MagicMock()
         callback.initialiser(mock)
         self.assertTrue(mock.bias.data.zero_.call_count == 1)
+
+
+class TestLsuv(TestCase):
+    def test_end_to_end(self):
+        import numpy as np
+        np.random.seed(7)
+        torch.manual_seed(7)
+
+        class Flatten(torch.nn.Module):
+            def forward(self, x):
+                return x.view(x.shape[0], -1)
+
+        from torch.utils.data import DataLoader
+        model = torch.nn.Sequential(
+            torch.nn.Conv2d(1,1,1),
+            Flatten(),
+            torch.nn.Linear(4, 2),
+        )
+
+        state = {torchbearer.MODEL: model}
+        data = torch.rand(2, 1, 2, 2)
+
+        init.LsuvInit(data).on_init(state)
+        correct_conv_weight = torch.FloatTensor([[[[3.4462]]]])
+        correct_linear_weight = torch.FloatTensor([[0.0817, -0.0061, -0.8176, 0.5700],
+                                                   [-0.6918, 0.0483, -0.4575, -0.5566]])
+
+        conv_weight = list(model.modules())[1].weight
+        linear_weight = list(model.modules())[3].weight
+
+        diff_conv = (conv_weight-correct_conv_weight) < 0.0001
+        diff_linear = (linear_weight - correct_linear_weight) < 0.0001
+        self.assertTrue(diff_conv.all().item)
+        self.assertTrue(diff_linear.all().item)
