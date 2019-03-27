@@ -152,6 +152,20 @@ class TestDecorators(unittest.TestCase):
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 1)
 
+        state = {torchbearer.EPOCH: 0, 'value': 0}
+
+        cb2 = Example()
+
+        cb2.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb2.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        state[torchbearer.EPOCH] += 1
+        cb2.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
     def test_once_per_epoch(self):
         class Example(callbacks.Callback):
             @callbacks.once_per_epoch
@@ -170,6 +184,20 @@ class TestDecorators(unittest.TestCase):
 
         state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
+
+        state = {torchbearer.EPOCH: 0, 'value': 0}
+
+        cb2 = Example()
+
+        cb2.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb2.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        state[torchbearer.EPOCH] += 1
+        cb2.on_step_validation(state)
         self.assertTrue(state['value'] == 2)
 
     def test_only_if(self):
@@ -195,6 +223,46 @@ class TestDecorators(unittest.TestCase):
         state[torchbearer.EPOCH] += 1
         cb.on_step_validation(state)
         self.assertTrue(state['value'] == 3)
+
+    def test_once_lambda(self):
+        @callbacks.once
+        @callbacks.on_step_validation
+        def callback_func(state):
+            state['value'] += 1
+
+        state = {torchbearer.EPOCH: 0, 'value': 0}
+
+        cb = callback_func
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        state[torchbearer.EPOCH] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+    def test_once_per_epoch_lambda(self):
+        @callbacks.once_per_epoch
+        @callbacks.on_step_validation
+        def callback_func(state):
+            state['value'] += 1
+
+        state = {torchbearer.EPOCH: 0, 'value': 0}
+
+        cb = callback_func
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 1)
+
+        state[torchbearer.EPOCH] += 1
+        cb.on_step_validation(state)
+        self.assertTrue(state['value'] == 2)
 
     def test_only_if_lambda(self):
         @callbacks.only_if(lambda s: s[torchbearer.EPOCH] % 2 == 0)
