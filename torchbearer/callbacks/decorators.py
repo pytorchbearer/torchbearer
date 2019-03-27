@@ -276,7 +276,9 @@ def add_to_loss(func):
 
 def once(fcn):
     """
-    Decorator to fire a callback once in the entire fitting procedure.
+    Decorator to fire a callback once in the lifetime of the callback. If the callback is a class method, each
+    instance of the class will fire only once. For functions, only the first instance will fire (even if more than
+    one function is present in the callback list).
 
     Args:
         fcn (function): the `torchbearer callback` function to decorate.
@@ -284,20 +286,23 @@ def once(fcn):
     Returns:
         the decorator
     """
-    d = {'done': False}
-
-    def _once(_):
-        if not d['done']:
-            d['done'] = True
+    def _once(self, _):
+        try:
+            return not self.__done__
+        except AttributeError:
+            self.__done__ = True
             return True
-        return False
 
     return only_if(_once)(fcn)
 
 
 def once_per_epoch(fcn):
-    """
-    Decorator to fire a callback once (on the first call) in any given epoch.
+    """Decorator to fire a callback once (on the first call) in any given epoch. If the callback is a class method, each
+    instance of the class will fire once per epoch. For functions, only the first instance will fire (even if more than
+    one function is present in the callback list).
+
+    .. note::
+        The decorated callback may exhibit unusual behaviour if it is reused
 
     Args:
         fcn (function): the `torchbearer callback` function to decorate.
@@ -305,26 +310,29 @@ def once_per_epoch(fcn):
     Returns:
         the decorator
     """
-    d = {'last_epoch': None}
-
-    def ope(state):
-        if state[torchbearer.EPOCH] != d['last_epoch']:
-            d['last_epoch'] = state[torchbearer.EPOCH]
+    def ope(self, state):
+        try:
+            if state[torchbearer.EPOCH] != self.__last_epoch__:
+                self.__last_epoch__ = state[torchbearer.EPOCH]
+                return True
+            return False
+        except AttributeError:
+            self.__last_epoch__ = state[torchbearer.EPOCH]
             return True
-        return False
 
     return only_if(ope)(fcn)
 
 
 def only_if(condition_expr):
     """
-    Decorator to fire a callback only if the given conditional expression function returns True.
+    Decorator to fire a callback only if the given conditional expression function returns True. The conditional
+    expression can be a function of state or self and state. If the decorated function is not a class method (i.e. it
+    does not take state) the decorated function will be passed instead. This enables the storing of temporary variables.
 
     Args:
-        condition_expr: a function/lambda that must evaluate to true for the\
-                        decorated `torchbearer callback` to be called. The `state`\
-                        object passed to the callback will be passed as an argument\
-                        to the condition function.
+        condition_expr (function(self, state) or function(self)): a function/lambda which takes state and optionally\
+                        self that must evaluate to true for the decorated `torchbearer callback` to be called. The\
+                        `state` object passed to the callback will be passed as an argument to the condition function.
 
     Returns:
         the decorator
@@ -337,11 +345,19 @@ def only_if(condition_expr):
             count = count_args(fcn)
             if count == 2:  # Assume Class method
                 def decfcn(o, state):
-                    if condition_expr(state):
-                        return fcn(o, state)
+                    try:
+                        res = condition_expr(o, state)
+                    except TypeError:
+                        res = condition_expr(state)
+                    if res:
+                        fcn(o, state)
             else:  # Assume function of state
                 def decfcn(state):
-                    if condition_expr(state):
-                        return fcn(state)
+                    try:
+                        res = condition_expr(fcn, state)
+                    except TypeError:
+                        res = condition_expr(state)
+                    if res:
+                        fcn(state)
             return decfcn
     return condition_decorator
