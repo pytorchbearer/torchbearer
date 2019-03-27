@@ -111,16 +111,13 @@ def apply_weights_correction(m):
             gg['correction_needed'] = False
 
 
-def LSUVinit(model,data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do_orthonorm = True, cuda = False):
-    cuda = data.is_cuda
+def LSUVinit(model, data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do_orthonorm = True):
     train = True if model.training else False
 
     model.eval()
     model.apply(count_conv_fc_layers)
     if do_orthonorm:
         model.apply(orthogonal_weights_init)
-        if cuda:
-            model = model.cuda()
     for layer_idx in range(gg['total_fc_conv_layers']):
         model.apply(add_current_hook)
         out = model(data)
@@ -130,8 +127,6 @@ def LSUVinit(model,data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do_
             gg['current_coef'] =  needed_std / (current_std  + 1e-8);
             gg['correction_needed'] = True
             model.apply(apply_weights_correction)
-            if cuda:
-                model = model.cuda()
             _ = model(data)
             current_std = gg['act_dict'].std()
             attempts+=1
@@ -143,8 +138,6 @@ def LSUVinit(model,data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do_
         gg['counter_to_apply_correction'] = 0
         gg['hook_position'] = 0
         gg['hook']  = None
-    if not cuda:
-        model = model.cpu()
           
     if train:
         model.train()
