@@ -7,9 +7,9 @@ Main Classes
 
 Deep Inside Convolutional Networks
 ------------------------------------
-.. automodule:: torchbearer.callbacks.imaging.deep_inside
+.. automodule:: torchbearer.callbacks.imaging.inside_cnns
         :members:
         :undoc-members:
 """
 from .imaging import *
-from .deep_inside import *
+from .inside_cnns import *
