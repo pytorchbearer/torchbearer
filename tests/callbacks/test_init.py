@@ -100,3 +100,29 @@ class TestLsuv(TestCase):
         diff_linear = (linear_weight - correct_linear_weight) < 0.0001
         self.assertTrue(diff_conv.all().item())
         self.assertTrue(diff_linear.all().item())
+
+    def test_break(self):
+        import numpy as np
+        import torchbearer.callbacks.lsuv as lsuv
+        from torchbearer.callbacks.init import ZeroBias
+
+        np.random.seed(7)
+        torch.manual_seed(7)
+
+        class Flatten(torch.nn.Module):
+            def forward(self, x):
+                return x.view(x.shape[0], -1)
+
+        model = torch.nn.Sequential(
+            torch.nn.Conv2d(1,1,1),
+        )
+        old_func = lsuv.apply_weights_correction
+        with patch('torchbearer.callbacks.lsuv.apply_weights_correction') as mock_awc:
+            mock_awc.side_effect = old_func
+
+            state = {torchbearer.MODEL: model}
+            data = torch.rand(2, 1, 2, 2)
+            ZeroBias(model.modules()).on_init(state)  # LSUV expects biases to be zero
+            init.LsuvInit(data, std_tol=1e-20, max_attempts=0, do_orthonorm=False).on_init(state)
+
+            self.assertTrue(mock_awc.call_count == 2)

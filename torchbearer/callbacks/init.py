@@ -64,7 +64,8 @@ class WeightInit(Callback):
 class LsuvInit(Callback):
     """Layer-sequential unit-variance (LSUV) initialization as described in
     `All you need is a good init <https://arxiv.org/abs/1511.06422>`_ and
-    modified from the code by  `ducha-aiki <https://github.com/ducha-aiki/LSUV-pytorch>`__
+    modified from the code by  `ducha-aiki <https://github.com/ducha-aiki/LSUV-pytorch>`__.
+    To be consistent with the paper, LsuvInit should be preceeded by a ZeroBias init on the Linear and Conv layers. 
 
     Args:
         data_item (torch.Tensor: A representative data item to put through the model
