@@ -80,8 +80,8 @@ class LsuvInit(Callback):
         - :attr:`torchbearer.state.MODEL`: Model should have the `modules` method if modules is None
     """
     def __init__(self, data_item, weight_lambda=None, needed_std=1.0, std_tol=0.1, max_attempts=10, do_orthonorm=True):
-        from torchbearer.callbacks.lsuv import LSUVinit
-        self.lsuv_init = LSUVinit
+        from torchbearer.callbacks.lsuv import LSUV
+        self.lsuv_init = LSUV
         self.data = data_item
         self.needed_std = needed_std
         self.std_tol = std_tol
@@ -90,7 +90,8 @@ class LsuvInit(Callback):
         self.weight_lambda = weight_lambda
 
     def on_init(self, state):
-        state[torchbearer.MODEL] = self.lsuv_init(state[torchbearer.MODEL], self.data, self.weight_lambda, self.needed_std, 
+        lsuv = self.lsuv_init()
+        state[torchbearer.MODEL] = lsuv.init_model(state[torchbearer.MODEL], self.data, self.weight_lambda, self.needed_std,
                                                   self.std_tol, self.max_attempts, self.do_arthonorm)
 
 
