@@ -350,14 +350,17 @@ def only_if(condition_expr):
                     except TypeError:
                         res = condition_expr(state)
                     if res:
-                        fcn(o, state)
+                        return fcn(o, state)
             else:  # Assume function of state
+                def id_fcn(state):
+                    return fcn(state)  # Hack to allow setting attributes of bound methods
+
                 def decfcn(state):
                     try:
-                        res = condition_expr(fcn, state)
+                        res = condition_expr(id_fcn, state)
                     except TypeError:
                         res = condition_expr(state)
                     if res:
-                        fcn(state)
+                        return fcn(state)
             return decfcn
     return condition_decorator
