@@ -42,22 +42,18 @@ gg['correction_needed'] = False
 gg['current_coef'] = 1.0
 
 
-# Orthonorm init code is modified from Lasagne
-# https://github.com/Lasagne/Lasagne/blob/master/lasagne/init.py
 def svd_orthonormal(w):
     shape = w.shape
-    if len(shape) < 2:
-        raise RuntimeError("Only shapes of length 2 or more are supported.")
     flat_shape = (shape[0], np.prod(shape[1:]))
-    a = np.random.normal(0.0, 1.0, flat_shape)#w;
-    u, _, v = np.linalg.svd(a, full_matrices=False)
-    q = u if u.shape == flat_shape else v
-    q = q.reshape(shape)
-    return q.astype(np.float32)
+    a = torch.rand(flat_shape, device=w.device)
+    u, _1, v = torch.svd(a, some=True)
+    q = u if u.shape == flat_shape else v.t()
+    q = q.view(shape)
+    return q.to(torch.float)
 
 
 def store_activations(self, input, output):
-    gg['act_dict'] = output.data.cpu().numpy();
+    gg['act_dict'] = output.data
     return
 
 
@@ -85,8 +81,8 @@ def orthogonal_weights_init(m):
         except AttributeError:
             weight = m.weight
 
-        w_ortho = svd_orthonormal(weight.data.cpu().numpy())
-        m.weight.data = torch.from_numpy(w_ortho)
+        w_ortho = svd_orthonormal(weight.data)
+        m.weight.data = w_ortho
         try:
             nn.init.constant_(m.bias, 0)
         except Exception:
@@ -111,7 +107,7 @@ def apply_weights_correction(m):
             gg['correction_needed'] = False
 
 
-def LSUVinit(model, data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do_orthonorm = True):
+def LSUVinit(model, data, needed_std=1.0, std_tol=0.1, max_attempts=10, do_orthonorm=True):
     train = True if model.training else False
 
     model.eval()
@@ -120,24 +116,24 @@ def LSUVinit(model, data, needed_std = 1.0, std_tol = 0.1, max_attempts = 10, do
         model.apply(orthogonal_weights_init)
     for layer_idx in range(gg['total_fc_conv_layers']):
         model.apply(add_current_hook)
-        out = model(data)
+        _ = model(data)
         current_std = gg['act_dict'].std()
         attempts = 0
-        while (np.abs(current_std - needed_std) > std_tol):
-            gg['current_coef'] =  needed_std / (current_std  + 1e-8);
+        while (torch.abs(current_std - needed_std) > std_tol):
+            gg['current_coef'] = needed_std / (current_std + 1e-8)
             gg['correction_needed'] = True
             model.apply(apply_weights_correction)
             _ = model(data)
             current_std = gg['act_dict'].std()
-            attempts+=1
+            attempts += 1
             if attempts > max_attempts:
                 break
         if gg['hook'] is not None:
-           gg['hook'].remove()
-        gg['done_counter']+=1
+            gg['hook'].remove()
+        gg['done_counter'] += 1
         gg['counter_to_apply_correction'] = 0
         gg['hook_position'] = 0
-        gg['hook']  = None
+        gg['hook'] = None
           
     if train:
         model.train()

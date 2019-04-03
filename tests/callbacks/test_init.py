@@ -87,14 +87,13 @@ class TestLsuv(TestCase):
         data = torch.rand(2, 1, 2, 2)
 
         init.LsuvInit(data).on_init(state)
-        correct_conv_weight = torch.FloatTensor([[[[3.4462]]]])
-        correct_linear_weight = torch.FloatTensor([[0.0817, -0.0061, -0.8176, 0.5700],
-                                                   [-0.6918, 0.0483, -0.4575, -0.5566]])
+        correct_conv_weight = torch.FloatTensor([[[[3.2236]]]])
+        correct_linear_weight = torch.FloatTensor([[-0.3414, -0.5503, -0.4402, -0.4367],
+                                                   [0.3425, -0.0697, -0.6646, 0.4900]])
 
         conv_weight = list(model.modules())[1].weight
         linear_weight = list(model.modules())[3].weight
-
         diff_conv = (conv_weight-correct_conv_weight) < 0.0001
         diff_linear = (linear_weight - correct_linear_weight) < 0.0001
-        self.assertTrue(diff_conv.all().item)
-        self.assertTrue(diff_linear.all().item)
+        self.assertTrue(diff_conv.all().item())
+        self.assertTrue(diff_linear.all().item())
