@@ -25,7 +25,6 @@
 
 # This file has been modified from https://github.com/ducha-aiki/LSUV-pytorch
 
-from __future__ import print_function
 import numpy as np
 import torch
 import torch.nn.init
