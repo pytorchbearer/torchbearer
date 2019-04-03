@@ -1,3 +1,4 @@
+import torch
 from unittest import TestCase
 
 from mock import MagicMock, patch
@@ -64,3 +65,59 @@ class TestSimpleInits(TestCase):
         mock = MagicMock()
         callback.initialiser(mock)
         self.assertTrue(mock.bias.data.zero_.call_count == 1)
+
+
+class TestLsuv(TestCase):
+    def test_end_to_end(self):
+        import numpy as np
+        from torchbearer.callbacks.init import ZeroBias
+
+        np.random.seed(7)
+        torch.manual_seed(7)
+
+        class Flatten(torch.nn.Module):
+            def forward(self, x):
+                return x.view(x.shape[0], -1)
+
+        model = torch.nn.Sequential(
+            torch.nn.Conv2d(1,1,1),
+            Flatten(),
+            torch.nn.Linear(4, 2),
+        )
+
+        state = {torchbearer.MODEL: model}
+        data = torch.rand(2, 1, 2, 2)
+        ZeroBias(model.modules()).on_init(state)  # LSUV expects biases to be zero
+        init.LsuvInit(data).on_init(state)
+
+        correct_conv_weight = torch.FloatTensor([[[[3.2236]]]])
+        correct_linear_weight = torch.FloatTensor([[-0.3414, -0.5503, -0.4402, -0.4367],
+                                                   [0.3425, -0.0697, -0.6646, 0.4900]])
+
+        conv_weight = list(model.modules())[1].weight
+        linear_weight = list(model.modules())[3].weight
+        diff_conv = (conv_weight-correct_conv_weight) < 0.0001
+        diff_linear = (linear_weight - correct_linear_weight) < 0.0001
+        self.assertTrue(diff_conv.all().item())
+        self.assertTrue(diff_linear.all().item())
+
+    def test_break(self):
+        import numpy as np
+        from torchbearer.callbacks.init import ZeroBias
+
+        np.random.seed(7)
+        torch.manual_seed(7)
+
+        model = torch.nn.Sequential(
+            torch.nn.Conv2d(1,1,1),
+        )
+
+        with patch('torchbearer.callbacks.lsuv.LSUV.apply_weights_correction') as awc:
+            state = {torchbearer.MODEL: model}
+            data = torch.rand(2, 1, 2, 2)
+            ZeroBias(model.modules()).on_init(state)  # LSUV expects biases to be zero
+            init.LsuvInit(data, std_tol=1e-20, max_attempts=0, do_orthonorm=False).on_init(state)
+
+            # torchbearer.callbacks.lsuv.apply_weights_correction = old_fun
+            self.assertTrue(awc.call_count == 2)
+
