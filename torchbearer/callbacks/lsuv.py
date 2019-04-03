@@ -46,7 +46,7 @@ def svd_orthonormal(w):
     shape = w.shape
     flat_shape = (shape[0], np.prod(shape[1:]))
     a = torch.rand(flat_shape, device=w.device)
-    u, _1, v = torch.svd(a, some=True)
+    u, _, v = torch.svd(a, some=True)
     q = u if u.shape == flat_shape else v.t()
     q = q.view(shape)
     return q.to(torch.float)
