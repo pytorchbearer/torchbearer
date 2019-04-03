@@ -70,6 +70,8 @@ class TestSimpleInits(TestCase):
 class TestLsuv(TestCase):
     def test_end_to_end(self):
         import numpy as np
+        from torchbearer.callbacks.init import ZeroBias
+
         np.random.seed(7)
         torch.manual_seed(7)
 
@@ -85,8 +87,9 @@ class TestLsuv(TestCase):
 
         state = {torchbearer.MODEL: model}
         data = torch.rand(2, 1, 2, 2)
-
+        ZeroBias(model.modules()).on_init(state)  # LSUV expects biases to be zero
         init.LsuvInit(data).on_init(state)
+
         correct_conv_weight = torch.FloatTensor([[[[3.2236]]]])
         correct_linear_weight = torch.FloatTensor([[-0.3414, -0.5503, -0.4402, -0.4367],
                                                    [0.3425, -0.0697, -0.6646, 0.4900]])
