@@ -81,7 +81,7 @@ def orthogonal_weights_init(m):
             weight = m.weight
 
         w_ortho = svd_orthonormal(weight.data)
-        m.weight.data = w_ortho
+        m.weight.data = w_ortho.data
         try:
             nn.init.constant_(m.bias, 0)
         except Exception:
