@@ -13,7 +13,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added ``ImagingCallback`` class for callbacks which produce images that can be sent to tensorboard, visdom or a file
 - Added ``CachingImagingCallback`` and ``MakeGrid`` callback to make a grid of images
 - Added the option to give the ``only_if`` callback decorator a function of self and state rather than just state
-- Added Layer-sequential unit-variance (LSUV) initialization 
+- Added Layer-sequential unit-variance (LSUV) initialization
+- Added ClassAppearanceModel callback and example page for visualising CNNs
 ### Changed
 ### Deprecated
 ### Removed
