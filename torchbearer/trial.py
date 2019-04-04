@@ -23,6 +23,7 @@ from torch.optim import Optimizer
 import torchbearer
 from torchbearer import cite
 from torchbearer import State
+from torchbearer import fluent
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
 from torchbearer.bases import base_closure
@@ -307,16 +308,6 @@ def inject_callback(callback):
             return res
         return wrapper
     return decorator
-
-
-def fluent(func):
-    """Decorator for class methods which forces return of self.
-    """
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        func(self, *args, **kwargs)
-        return self
-    return wrapper
 
 
 def update_device_and_dtype(state, *args, **kwargs):
