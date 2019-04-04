@@ -218,7 +218,7 @@ class TestMakeGrid(TestCase):
 
 class TestFromState(TestCase):
     def test_main(self):
-        callback = imaging.FromState('test', decorator=lambda x: x)
+        callback = imaging.FromState('test')
 
-        self.assertTrue(callback.on_batch({'test': 1}) == 1)
-        self.assertTrue(callback.on_batch({'testing': 1}) is None)
+        self.assertTrue(callback.on_batch({torchbearer.EPOCH: 0, 'test': 1}) == 1)
+        self.assertTrue(callback.on_batch({torchbearer.EPOCH: 1, 'testing': 1}) is None)

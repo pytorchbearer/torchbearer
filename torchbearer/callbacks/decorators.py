@@ -361,6 +361,6 @@ def only_if(condition_expr):
                     except TypeError:
                         res = condition_expr(state)
                     if res:
-                        return fcn(state)
+                        return id_fcn(state)
             return decfcn
     return condition_decorator
