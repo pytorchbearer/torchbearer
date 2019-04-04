@@ -343,7 +343,7 @@ def only_if(condition_expr):
             return fcn
         else:
             count = count_args(fcn)
-            if count == 2:  # Assume Class method
+            if count == 2 and not hasattr(fcn, '__self__'):  # Assume Class method
                 def decfcn(o, state):
                     try:
                         res = condition_expr(o, state)
