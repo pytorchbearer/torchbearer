@@ -15,20 +15,19 @@ class Model(nn.Module):
 
     def forward(self, input):
         if input is not None:
-            return self.net(input)[2]
+            return self.net(input)
 
 
 model = Model()
 
-import torchbearer
 from torchbearer import Trial
 import torchbearer.callbacks.imaging as imaging
 
-VIS = torchbearer.state_key('vis')
-
 trial = Trial(model, callbacks=[
-    imaging.ClassAppearanceModel(1000, (3, 224, 224), steps=10000, target=951, transform=inv_normalize).on_val().to_file('lemon.png'),
-    imaging.ClassAppearanceModel(1000, (3, 224, 224), steps=10000, target=968, transform=inv_normalize).on_val().to_file('cup.png')
+    imaging.ClassAppearanceModel(1000, (3, 224, 224), steps=10000, target=951, transform=inv_normalize)
+              .on_val().to_file('lemon.png'),
+    imaging.ClassAppearanceModel(1000, (3, 224, 224), steps=10000, target=968, transform=inv_normalize)
+              .on_val().to_file('cup.png')
 ])
 trial.for_val_steps(1).to('cuda')
 trial.evaluate()
