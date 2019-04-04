@@ -92,6 +92,7 @@ Decorators
 
 from torchbearer import Callback
 from .callbacks import *
+from .dataset_splitter import TrainValTestSplit
 from .checkpointers import *
 from .csv_logger import *
 from .early_stopping import *
