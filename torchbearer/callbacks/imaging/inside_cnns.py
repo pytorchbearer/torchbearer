@@ -90,8 +90,8 @@ class ClassAppearanceModel(imaging.ImagingCallback):
         targets_hot = targets_hot.ge(0.5)
         return targets_hot
 
-    @once_per_epoch
     @torchbearer.enable_grad()
+    @once_per_epoch
     def on_batch(self, state):
         training = state[torchbearer.MODEL].training
         state[torchbearer.MODEL].eval()
