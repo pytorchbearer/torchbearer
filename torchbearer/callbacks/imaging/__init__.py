@@ -12,4 +12,4 @@ Deep Inside Convolutional Networks
         :undoc-members:
 """
 from .imaging import *
-from .inside_cnns import *
+from .inside_cnns import ClassAppearanceModel, RANDOM
