@@ -83,7 +83,7 @@ class TestClassAppearanceModel(TestCase):
         self.assertTrue(model.eval.call_count == 1)
         self.assertTrue(model.train.call_count == 1)
         self.assertTrue(factory.call_count == 1)
-        self.assertTrue(next(factory.call_args[0][0]) is wrapper().input_batch)
+        self.assertTrue(next(iter(factory.call_args[0][0])) is wrapper().input_batch)
 
     def test_end_to_end(self):
         with torchbearer.no_grad():
