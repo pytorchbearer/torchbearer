@@ -5,7 +5,7 @@ from unittest import TestCase
 
 class MockDataset(Dataset):
     def __init__(self, length):
-        super().__init__()
+        super(MockDataset, self).__init__()
         self.length = length
 
     def __getitem__(self, index):

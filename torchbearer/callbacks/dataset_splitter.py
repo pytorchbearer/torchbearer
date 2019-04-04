@@ -8,18 +8,23 @@ from torchbearer.bases import fluent
 
 class TrainValTestSplit(Callback):
     def __init__(self, dataset, train_size=None, val_size=None, test_size=None, seed=None, shuffle=True):
-        super().__init__()
+        super(TrainValTestSplit, self).__init__()
         self.dataset = dataset
         self.train_size, self.val_size, self.test_size = self._get_split_sizes(*self._size_to_frac(train_size, val_size, 
                                                                                                    test_size))
         self.seed = seed
         self.shuffle = shuffle
-        self.dl_args = []
-        self.dl_kwargs = {}
+
+        self.train_dl_args = []
+        self.train_dl_kwargs = {}
+        self.val_dl_args = []
+        self.val_dl_kwargs = {}
+        self.test_dl_args = []
+        self.test_dl_kwargs = {}
 
     def _size_to_frac(self, train_size, val_size, test_size):
         def size_to_float(size):
-            return size / len(self.dataset) if size is not None and size > 1.0 else size
+            return float(size) / len(self.dataset) if size is not None and size > 1.0 else size
         
         train_size = size_to_float(train_size)
         val_size = size_to_float(val_size)
@@ -76,17 +81,33 @@ class TrainValTestSplit(Callback):
         return main_size, second_size, test_size
 
     @fluent
-    def with_dataloader_parameters(self, *args, **kwargs):
-        self.dl_args = args
-        self.dl_kwargs = kwargs
+    def with_params(self, *args, **kwargs):
+        self.with_train_params(*args, **kwargs)
+        self.with_val_params(*args, **kwargs)
+        self.with_test_params(*args, **kwargs)
+
+    @fluent
+    def with_train_params(self, *args, **kwargs):
+        self.train_dl_args = args
+        self.train_dl_kwargs = kwargs
+
+    @fluent
+    def with_val_params(self, *args, **kwargs):
+        self.val_dl_args = args
+        self.val_dl_kwargs = kwargs
+
+    @fluent
+    def with_test_params(self, *args, **kwargs):
+        self.test_dl_args = args
+        self.test_dl_kwargs = kwargs
             
     def on_init(self, state):
         super().on_init(state)
         splitter = DatasetValidationSplitter(len(self.dataset), self.val_size, self.test_size, self.shuffle, self.seed)
         trainset, valset, testset = splitter.get_datasets(self.dataset)
-        trainloader = DataLoader(trainset, *self.dl_args, **self.dl_kwargs)
-        valloader = DataLoader(valset, *self.dl_args, **self.dl_kwargs)
-        testloader = DataLoader(testset, *self.dl_args, **self.dl_kwargs)
+        trainloader = DataLoader(trainset, *self.train_dl_args, **self.train_dl_kwargs)
+        valloader = DataLoader(valset, *self.val_dl_args, **self.val_dl_kwargs)
+        testloader = DataLoader(testset, *self.test_dl_args, **self.test_dl_kwargs)
 
         state[tb.SELF].with_generators(trainloader, valloader, testloader)
 
