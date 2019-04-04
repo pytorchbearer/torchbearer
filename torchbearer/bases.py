@@ -19,6 +19,20 @@ def no_grad():
         return torch.no_grad()
 
 
+def enable_grad():
+    version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
+    if LooseVersion(version) < LooseVersion("0.4.1"):  # Enable grad isn't a decorator
+        def decorator(func):
+            @functools.wraps(func)
+            def wrap_enable_grad(*args, **kwargs):
+                with torch.enable_grad():
+                    return func(*args, **kwargs)
+            return wrap_enable_grad
+        return decorator
+    else:
+        return torch.enable_grad()
+
+
 class Metric(object):
     """Base metric class. Process will be called on each batch, process-final at the end of each epoch.
     The metric contract allows for metrics to take any args but not kwargs. The initial metric call will be given state,
@@ -307,3 +321,13 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
 
         state[torchbearer.CALLBACK_LIST].on_backward(state)
     return closure
+
+
+def fluent(func):
+    """Decorator for class methods which forces return of self.
+    """
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        func(self, *args, **kwargs)
+        return self
+    return wrapper

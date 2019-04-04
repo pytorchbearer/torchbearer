@@ -6,6 +6,13 @@ Base Classes
         :members:
         :undoc-members:
 
+Imaging
+------------------------------------
+
+..  automodule:: torchbearer.callbacks.imaging
+        :members:
+        :undoc-members:
+
 Model Checkpointers
 ------------------------------------
 

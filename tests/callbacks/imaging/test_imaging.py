@@ -14,7 +14,7 @@ plt.ioff()
 class TestHandlers(TestCase):
     @patch('PIL.Image')
     def test_to_file(self, pil):
-        handler = imaging._to_file('test')
+        handler = imaging.imaging._to_file('test')
         mock = MagicMock()
         handler(mock, '')
         mock.mul.assert_called_once_with(255)
@@ -29,7 +29,7 @@ class TestHandlers(TestCase):
 
     @patch('matplotlib.pyplot')
     def test_to_pyplot(self, plt):
-        handler = imaging._to_pyplot()
+        handler = imaging.imaging._to_pyplot()
         mock = MagicMock()
         handler(mock, '')
         mock.mul.assert_called_once_with(255)
@@ -44,23 +44,23 @@ class TestHandlers(TestCase):
 
     @patch('torchbearer.callbacks.tensor_board')
     def test_to_tensorboard(self, tboard):
-        handler = imaging._to_tensorboard('test', log_dir='./logs', comment='comment')
+        handler = imaging.imaging._to_tensorboard('test', log_dir='./logs', comment='comment')
         image = MagicMock()
         handler(image, {torchbearer.EPOCH: 1})
         image.clamp.assert_called_once_with(0, 1)
-        tboard.get_writer.assert_called_once_with('./logs/comment', imaging._to_tensorboard)
+        tboard.get_writer.assert_called_once_with('./logs/comment', imaging.imaging._to_tensorboard)
         tboard.get_writer().add_image.assert_called_once_with('test', image.clamp(), 1)
-        tboard.close_writer.assert_called_once_with('./logs/comment', imaging._to_tensorboard)
+        tboard.close_writer.assert_called_once_with('./logs/comment', imaging.imaging._to_tensorboard)
 
     @patch('torchbearer.callbacks.tensor_board')
     def test_to_visdom(self, tboard):
-        handler = imaging._to_visdom('test', log_dir='./logs', comment='comment', visdom_params='test_params')
+        handler = imaging.imaging._to_visdom('test', log_dir='./logs', comment='comment', visdom_params='test_params')
         image = MagicMock()
         handler(image, {torchbearer.EPOCH: 1})
         image.clamp.assert_called_once_with(0, 1)
-        tboard.get_writer.assert_called_once_with('./logs/comment', imaging._to_visdom, visdom=True, visdom_params='test_params')
+        tboard.get_writer.assert_called_once_with('./logs/comment', imaging.imaging._to_visdom, visdom=True, visdom_params='test_params')
         tboard.get_writer().add_image.assert_called_once_with('test1', image.clamp(), 1)
-        tboard.close_writer.assert_called_once_with('./logs/comment', imaging._to_visdom)
+        tboard.close_writer.assert_called_once_with('./logs/comment', imaging.imaging._to_visdom)
 
 
 class TestImagingCallback(TestCase):
@@ -82,10 +82,10 @@ class TestImagingCallback(TestCase):
         handler.assert_called_once_with('test', 'state')
         self.assertTrue(callback.transform.call_count == 1)
 
-    @patch('torchbearer.callbacks.imaging._to_visdom')
-    @patch('torchbearer.callbacks.imaging._to_tensorboard')
-    @patch('torchbearer.callbacks.imaging._to_pyplot')
-    @patch('torchbearer.callbacks.imaging._to_file')
+    @patch('torchbearer.callbacks.imaging.imaging._to_visdom')
+    @patch('torchbearer.callbacks.imaging.imaging._to_tensorboard')
+    @patch('torchbearer.callbacks.imaging.imaging._to_pyplot')
+    @patch('torchbearer.callbacks.imaging.imaging._to_file')
     def test_simple_methods(self, mock_to_file, mock_to_pyplot, mock_to_tensorboard, mock_to_visdom):
         callback = imaging.ImagingCallback()
         self.assertRaises(NotImplementedError, lambda: callback.on_batch('test'))
@@ -218,7 +218,7 @@ class TestMakeGrid(TestCase):
 
 class TestFromState(TestCase):
     def test_main(self):
-        callback = imaging.FromState('test', decorator=lambda x: x)
+        callback = imaging.FromState('test')
 
-        self.assertTrue(callback.on_batch({'test': 1}) == 1)
-        self.assertTrue(callback.on_batch({'testing': 1}) is None)
+        self.assertTrue(callback.on_batch({torchbearer.EPOCH: 0, 'test': 1}) == 1)
+        self.assertTrue(callback.on_batch({torchbearer.EPOCH: 1, 'testing': 1}) is None)
