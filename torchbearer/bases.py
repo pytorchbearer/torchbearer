@@ -31,7 +31,7 @@ class enable_grad(torch.enable_grad):
     def __call__(self, func):
         @functools.wraps(func)
         def decorate_enable_grad(*args, **kwargs):
-            with torch.enable_grad():
+            with self:
                 return func(*args, **kwargs)
 
         return decorate_enable_grad
