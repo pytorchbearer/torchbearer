@@ -5,18 +5,21 @@ import torch
 import torchbearer
 
 
-def no_grad():
-    version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-    if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad isn't a decorator
-        def decorator(func):
-            @functools.wraps(func)
-            def wrap_no_grad(*args, **kwargs):
-                with torch.no_grad():
-                    return func(*args, **kwargs)
-            return wrap_no_grad
-        return decorator
-    else:
-        return torch.no_grad()
+class no_grad(torch.no_grad):
+    def __init__(self):
+        super(no_grad, self).__init__()
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
+        if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad isn't a decorator
+            self.__call__ = wraped_no_grad
+
+
+def wraped_no_grad(func):
+    @functools.wraps(func)
+    def wrap_no_grad(*args, **kwargs):
+        with torch.no_grad():
+            return func(*args, **kwargs)
+    return wrap_no_grad
+
 
 
 def enable_grad():
