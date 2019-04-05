@@ -6,6 +6,9 @@ import torchbearer
 
 
 class no_grad(torch.no_grad):
+    """ Context-manager and decorator that disables gradient calculation.
+    See `torch.autograd.no_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.no_grad>`_
+    """
     def __init__(self):
         super(no_grad, self).__init__()
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
@@ -29,6 +32,9 @@ def _patch_call(instance, func):
 
 
 class enable_grad(torch.enable_grad):
+    """ Context-manager and decorator that enables gradient calculation.
+    See `torch.autograd.enable_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.enable_grad>`_
+    """
     def __init__(self):
         super(enable_grad, self).__init__()
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
