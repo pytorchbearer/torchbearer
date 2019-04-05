@@ -9,10 +9,10 @@ class no_grad(torch.no_grad):
     def __init__(self):
         super(no_grad, self).__init__()
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-        if LooseVersion(version) >= LooseVersion("0.4.1"):  # No grad is already a decorator
-            self.__call__ = torch.no_grad.__call__
+        if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad is not a decorator
+            _patch_call(self, self.call)
 
-    def __call__(self, func):
+    def call(self, func):
         @functools.wraps(func)
         def decorate_no_grad(*args, **kwargs):
             with self:
@@ -21,14 +21,21 @@ class no_grad(torch.no_grad):
         return decorate_no_grad
 
 
+def _patch_call(instance, func):
+    class _(type(instance)):
+        def __call__(self, *arg, **kwarg):
+            return func(*arg, **kwarg)
+    instance.__class__ = _
+
+
 class enable_grad(torch.enable_grad):
     def __init__(self):
         super(enable_grad, self).__init__()
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-        if LooseVersion(version) >= LooseVersion("0.4.1"):  # Enable grad is already a decorator
-            self.__call__ = torch.enable_grad.__call__
+        if LooseVersion(version) < LooseVersion("0.4.1"):  # Enable grad is not a decorator
+            _patch_call(self, self.call)
 
-    def __call__(self, func):
+    def call(self, func):
         @functools.wraps(func)
         def decorate_enable_grad(*args, **kwargs):
             with self:

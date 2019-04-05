@@ -86,7 +86,7 @@ class TestClassAppearanceModel(TestCase):
         self.assertTrue(next(iter(factory.call_args[0][0])) is wrapper().input_batch)
 
     def test_end_to_end(self):
-        with torch.no_grad():
+        with torchbearer.no_grad():
             model = torch.nn.Linear(10, 5)
             callback = imaging.ClassAppearanceModel(nclasses=5, input_size=(10), steps=1)
             state = {torchbearer.EPOCH: 0, torchbearer.MODEL: model, torchbearer.DEVICE: 'cpu',
