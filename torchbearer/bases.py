@@ -9,7 +9,7 @@ class no_grad(torch.no_grad):
     def __init__(self):
         super(no_grad, self).__init__()
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-        if LooseVersion(version) >= LooseVersion("0.4.1"):  # No grad isn't a decorator
+        if LooseVersion(version) >= LooseVersion("0.4.1"):  # No grad is already a decorator
             self.__call__ = torch.no_grad.__call__
 
     def __call__(self, func):
@@ -25,7 +25,7 @@ class enable_grad(torch.enable_grad):
     def __init__(self):
         super(enable_grad, self).__init__()
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-        if LooseVersion(version) >= LooseVersion("0.4.1"):  # Enable grad isn't a decorator
+        if LooseVersion(version) >= LooseVersion("0.4.1"):  # Enable grad is already a decorator
             self.__call__ = torch.enable_grad.__call__
 
     def __call__(self, func):
