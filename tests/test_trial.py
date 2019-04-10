@@ -1087,7 +1087,8 @@ class TestFitPass(TestCase):
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
-            tb.BACKWARD_ARGS: {}, tb.GENERATOR: generator]
+            tb.BACKWARD_ARGS: {}, tb.GENERATOR: generator
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
