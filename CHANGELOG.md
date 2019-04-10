@@ -10,12 +10,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added callbacks for weight initialisation in ``torchbearer.callbacks.init``
 - Added ``with_closure`` trial method that allows running of custom closures 
 - Added ``base_closure`` function to bases that allows creation of standard training loop closures
+- Added ``ImagingCallback`` class for callbacks which produce images that can be sent to tensorboard, visdom or a file
+- Added ``CachingImagingCallback`` and ``MakeGrid`` callback to make a grid of images
+- Added the option to give the ``only_if`` callback decorator a function of self and state rather than just state
+- Added Layer-sequential unit-variance (LSUV) initialization
+- Added ClassAppearanceModel callback and example page for visualising CNNs
 ### Changed
+- `No_grad` and `enable_grad` decorators are now also context managers
 ### Deprecated
 ### Removed
 ### Fixed
 - Fixed bug where replay errored when train or val steps were None
 - Fixed a bug where mock optimser wouldn't call it's closure
+- Fixed a bug where the notebook check raised ModuleNotFoundError when IPython not installed
+- Fixed a memory leak with metrics that causes issues with very long epochs
+- Fixed a bug with the once and once_per_epoch decorators
 
 ## [0.3.0] - 2019-02-28
 ### Added

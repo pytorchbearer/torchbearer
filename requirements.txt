@@ -7,3 +7,5 @@ tensorboardX>=1.4
 visdom
 livelossplot
 mock
+Pillow
+matplotlib

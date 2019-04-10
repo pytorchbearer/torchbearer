@@ -11,7 +11,7 @@ constructions of this kind should be handled using the :mod:`decorator API <.met
         :undoc-members:
 """
 import inspect
-from torchbearer import Metric
+from torchbearer import Metric, no_grad
 
 __defaults__ = {}
 
@@ -135,6 +135,7 @@ class MetricList(Metric):
                 result.update(out)
         return result
 
+    @no_grad()
     def process(self, *args):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
@@ -143,6 +144,7 @@ class MetricList(Metric):
         """
         return self._for_list(lambda metric: metric.process(*args))
 
+    @no_grad()
     def process_final(self, *args):
         """Process each metric an wrap in a dictionary which maps metric names to values.
 
