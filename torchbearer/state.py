@@ -203,7 +203,7 @@ INPUT = X = state_key('x')
 SAMPLER = state_key('sampler')
 
 #: The batch loader which handles loading and device management of data from each batch
-_LOADER = state_key('loader')
+LOADER = state_key('loader')
 
 #: The current value for the loss
 LOSS = state_key('loss')
