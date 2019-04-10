@@ -260,15 +260,15 @@ def inject_sampler(data_key, batch_sampler):
             key = kwargs['data_key'] if 'data_key' in kwargs else data_key  # Populate default value
             generator, steps = self.state[key] if self.state[key] is not None else (None, None)
 
-            if self.state[torchbearer.LOADER] is not None:
-                sampler = self.state[torchbearer.LOADER]
+            if self.state[torchbearer._LOADER] is not None:
+                sampler = self.state[torchbearer._LOADER]
             elif generator is None:
                 sampler = load_batch_none
 
             generator, sampler = infinite_wrapper(self, key, generator, steps, sampler)
 
             self.state[torchbearer.DATA] = key
-            self.state[torchbearer.SAMPLER] = sampler
+            self.state[torchbearer._SAMPLER] = sampler
             self.state[torchbearer.GENERATOR] = generator
             self.state[torchbearer.STEPS] = steps
 
@@ -374,7 +374,7 @@ class Trial(object):
             torchbearer.VALIDATION_DATA: None,
             torchbearer.TEST_DATA: None,
             torchbearer.INF_TRAIN_LOADING: False,
-            torchbearer.LOADER: None
+            torchbearer._LOADER: None
         })
 
         self.state[torchbearer.CALLBACK_LIST].on_init(self.state)
@@ -667,7 +667,7 @@ class Trial(object):
         Returns:
             :class:`.Trial`: self:
         """
-        self.state[torchbearer.LOADER] = batch_loader
+        self.state[torchbearer._LOADER] = batch_loader
 
     @fluent
     def with_closure(self, closure):
@@ -758,7 +758,7 @@ class Trial(object):
 
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
         for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()):
-            state[torchbearer.SAMPLER](state)
+            state[torchbearer._SAMPLER](state)
             state[torchbearer.CALLBACK_LIST].on_sample(state)
 
             # Update parameters
@@ -785,7 +785,7 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
-                state[torchbearer.SAMPLER](state)
+                state[torchbearer._SAMPLER](state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
                 # Forward Pass

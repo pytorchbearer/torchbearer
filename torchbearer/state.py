@@ -199,11 +199,11 @@ PREDICTION = Y_PRED = state_key('y_pred')
 #: The current batch of inputs
 INPUT = X = state_key('x')
 
-#: The sampler which loads data from the generator onto the correct device
+#: The sampler which is the current loader (may change at train, val, test, predict)
 SAMPLER = state_key('sampler')
 
-#: The batch loader which handles formatting data from each batch
-LOADER = state_key('loader')
+#: The batch loader which handles loading and device management of data from each batch
+_LOADER = state_key('loader')
 
 #: The current value for the loss
 LOSS = state_key('loss')
