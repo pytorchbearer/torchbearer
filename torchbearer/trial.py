@@ -23,6 +23,7 @@ from torch.optim import Optimizer
 import torchbearer
 from torchbearer import cite
 from torchbearer import State
+from torchbearer import fluent
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
 from torchbearer.bases import base_closure
@@ -246,8 +247,8 @@ def inject_sampler(data_key, batch_sampler):
                                               "Make sure you have some method to terminate safely.")
                     sampler = load_batch_infinite(sampler)
 
-                if inf_train_loader and not hasattr(generator, 'inf'):  # First run and want iterator at end
-                    generator.inf = True
+                # Want iterator to run until end before refreshing regardless of number of train/val steps
+                if inf_train_loader and not hasattr(generator, 'tb_iter'):
                     generator.tb_iter = iter(generator)
 
             return generator, sampler
@@ -300,16 +301,6 @@ def inject_callback(callback):
             return res
         return wrapper
     return decorator
-
-
-def fluent(func):
-    """Decorator for class methods which forces return of self.
-    """
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        func(self, *args, **kwargs)
-        return self
-    return wrapper
 
 
 def update_device_and_dtype(state, *args, **kwargs):
@@ -773,13 +764,13 @@ class Trial(object):
             # Update parameters
             state[torchbearer.OPTIMIZER].step(lambda: self.closure(state))
 
-            state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
+            state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
             state[torchbearer.CALLBACK_LIST].on_step_training(state)
 
             if state[torchbearer.STOP_TRAINING]:
                 break
 
-        state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
+        state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state.data))
 
         state[torchbearer.CALLBACK_LIST].on_end_training(state)
         return state
@@ -807,21 +798,17 @@ class Trial(object):
 
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
-                    try:
-                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
-                    except TypeError:
-                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
+                    state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
                                                                                state[torchbearer.Y_TRUE])
-
                     state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
-                    state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state)
+                    state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
 
                 state[torchbearer.CALLBACK_LIST].on_step_validation(state)
                 if state[torchbearer.STOP_TRAINING]:
                     break
 
             if torchbearer.Y_TRUE in state:
-                state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state))
+                state[torchbearer.METRICS].update(state[torchbearer.METRIC_LIST].process_final(state.data))
             state[torchbearer.CALLBACK_LIST].on_end_validation(state)
         return state
 

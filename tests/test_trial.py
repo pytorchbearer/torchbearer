@@ -6,9 +6,23 @@ from torch.utils.data import DataLoader
 
 import torchbearer as tb
 import torchbearer.callbacks as callbacks
-from torchbearer import Trial
+from torchbearer import Trial, State
 from torchbearer.metrics import Metric
 from torchbearer.trial import deep_to, load_batch_none, load_batch_predict, load_batch_standard, load_batch_infinite, update_device_and_dtype, CallbackListInjection
+
+
+class _StateMaker(object):
+    def __getitem__(self, keys):
+        if not isinstance(keys, tuple):
+            keys = (keys,)
+        assert all(isinstance(key, slice) for key in keys)
+        state = State()
+        for k in keys:
+            state[k.start] = k.stop
+        return state
+
+
+make_state = _StateMaker()
 
 
 class TestMockOptimizer(TestCase):
@@ -858,12 +872,12 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {},
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -889,12 +903,12 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {},
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -921,12 +935,12 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -959,12 +973,12 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -992,12 +1006,12 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion, tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu', tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0, tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1027,14 +1041,14 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
             tb.BACKWARD_ARGS: {}
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1067,14 +1081,13 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
-            tb.BACKWARD_ARGS: {}, tb.GENERATOR: generator
-        }
+            tb.BACKWARD_ARGS: {}, tb.GENERATOR: generator]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1106,14 +1119,14 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.LOADER: None,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
             tb.BACKWARD_ARGS: {}
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1142,13 +1155,13 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         mock_inj.return_value = callback_list
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False, tb.BACKWARD_ARGS: {},
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1178,13 +1191,13 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False, tb.BACKWARD_ARGS: {},
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float,
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1215,13 +1228,13 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.BACKWARD_ARGS: {},
             tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1251,13 +1264,13 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer, tb.BACKWARD_ARGS: {},
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.TRAIN_GENERATOR: None, tb.TRAIN_STEPS: steps, tb.EPOCH: 0,
             tb.X: data[0][0], tb.Y_TRUE: data[0][1]
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1287,14 +1300,14 @@ class TestFitPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: steps, tb.EPOCH: 0,
             tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.INF_TRAIN_LOADING: False,
             tb.BACKWARD_ARGS: {}
-        }
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1329,13 +1342,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1364,13 +1377,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1404,13 +1417,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_standard)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_standard
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1440,13 +1453,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1476,13 +1489,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_standard)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_standard
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1513,13 +1526,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1548,13 +1561,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1584,13 +1597,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1619,13 +1632,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: None, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -1654,13 +1667,13 @@ class TestTestPass(TestCase):
         callback_list = MagicMock()
         tb.CallbackListInjection = Mock(return_value=callback_list)
 
-        state = {
+        state = make_state[
             tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: True, tb.MODEL: torchmodel, tb.CRITERION: criterion,
             tb.OPTIMIZER: optimizer,
             tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
             tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
-            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_none)
-        }
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: load_batch_none
+        ]
 
         torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
         torchbearertrial.train = Mock()
@@ -2323,7 +2336,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.GENERATOR: (generator, steps), tb.LOADER: None}
         t.test_func()
-        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_standard)
+        self.assertTrue(t.state[tb.SAMPLER] == tb.trial.load_batch_standard)
 
     def test_inject_sampler_none(self):
         generator = None
@@ -2337,7 +2350,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.GENERATOR: (generator, steps), tb.LOADER: None}
         t.test_func()
-        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_none)
+        self.assertTrue(t.state[tb.SAMPLER] == tb.trial.load_batch_none)
 
     def test_inject_sampler_predict(self):
         generator = MagicMock()
@@ -2351,7 +2364,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.GENERATOR: (generator, steps), tb.LOADER: None}
         t.test_func()
-        self.assertTrue(t.state[tb.SAMPLER].batch_loader == tb.trial.load_batch_predict)
+        self.assertTrue(t.state[tb.SAMPLER] == tb.trial.load_batch_predict)
 
     def test_inject_sampler_custom(self):
         generator = MagicMock()
@@ -2368,7 +2381,7 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {tb.GENERATOR: (generator, steps), tb.LOADER: some_loader}
         t.test_func()
-        self.assertTrue(t.state[tb.SAMPLER].batch_loader == some_loader)
+        self.assertTrue(t.state[tb.SAMPLER] == some_loader)
 
     @patch('warnings.warn')
     @patch('torchbearer.trial.load_batch_infinite')
@@ -2410,7 +2423,7 @@ class TestTrialFunctions(TestCase):
         t.state = {tb.TRAIN_DATA: (generator, steps), tb.INF_TRAIN_LOADING: True, tb.LOADER: None}
         t.test_func()
         self.assertTrue(mock_lbi.call_args[0][0] == load_batch_standard)
-        self.assertTrue(generator.inf)
+        self.assertTrue(generator.tb_iter)
 
     @patch('torchbearer.trial.load_batch_infinite')
     def test_inject_sampler_infinite_train_loading(self, mock_lbi):
@@ -2460,7 +2473,8 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(c_inj.call_args[0][0] == test_callback)
 
     def test_deep_to_tensor(self):
-        tensor = MagicMock()
+        base_tensor = torch.Tensor([1])
+        tensor = MagicMock(spec=base_tensor)
         new_dtype = torch.float16
         new_device = 'cuda:1'
 
@@ -2469,7 +2483,8 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(tensor.to.call_args[0][1] == new_dtype)
 
     def test_deep_to_tensor_int_dtype(self):
-        tensor = MagicMock()
+        base_tensor = torch.Tensor([1])
+        tensor = MagicMock(spec=base_tensor)
         tensor.dtype = torch.uint8
         new_device = 'cuda:1'
         new_dtype = torch.uint8
@@ -2479,8 +2494,9 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(len(tensor.to.call_args[0]) == 1)
 
     def test_deep_to_list(self):
-        tensor_1 = MagicMock()
-        tensor_2 = MagicMock()
+        base_tensor = torch.Tensor([1])
+        tensor_1 = MagicMock(spec=base_tensor)
+        tensor_2 = MagicMock(spec=base_tensor)
         tensors = [tensor_1, tensor_2]
         new_dtype = torch.float16
         new_device = 'cuda:1'
@@ -2504,6 +2520,17 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(tensor_1.to.call_args[0][1] == new_dtype)
         self.assertTrue(tensor_2.to.call_args[0][0] == new_device)
         self.assertTrue(tensor_2.to.call_args[0][1] == new_dtype)
+
+    def test_deep_to_unknown_object(self):
+        tensor_1 = MagicMock()
+        tensor_2 = MagicMock()
+        tensors = {'t1': tensor_1, 't2': tensor_2}
+        new_dtype = torch.float16
+        new_device = 'cuda:1'
+
+        deep_to(tensors, new_device, new_dtype)
+        self.assertTrue(tensor_1.to.call_args is None)
+        self.assertTrue(tensor_2.to.call_args is None)
 
     def test_load_batch_standard(self):
         items = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2]))]
