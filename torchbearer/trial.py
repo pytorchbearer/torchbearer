@@ -804,7 +804,11 @@ class Trial(object):
 
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
-                    state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
+                    # Loss Calculation
+                    try:
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
+                    except TypeError:
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
                                                                            state[torchbearer.Y_TRUE])
                     state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
