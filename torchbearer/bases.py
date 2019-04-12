@@ -13,32 +13,49 @@ else:
         inner.__doc__ = doc
 
 
-def no_grad():
-    version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-    if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad isn't a decorator
-        def decorator(func):
-            @functools.wraps(func)
-            def wrap_no_grad(*args, **kwargs):
-                with torch.no_grad():
-                    return func(*args, **kwargs)
-            return wrap_no_grad
-        return decorator
-    else:
-        return torch.no_grad()
+class no_grad(torch.no_grad):
+    """ Context-manager and decorator that disables gradient calculation.
+    See `torch.autograd.no_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.no_grad>`_
+    """
+    def __init__(self):
+        super(no_grad, self).__init__()
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
+        if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad is not a decorator
+            _patch_call(self, self.call)
+
+    def call(self, func):
+        @functools.wraps(func)
+        def decorate_no_grad(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+
+        return decorate_no_grad
 
 
-def enable_grad():
-    version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-    if LooseVersion(version) < LooseVersion("0.4.1"):  # Enable grad isn't a decorator
-        def decorator(func):
-            @functools.wraps(func)
-            def wrap_enable_grad(*args, **kwargs):
-                with torch.enable_grad():
-                    return func(*args, **kwargs)
-            return wrap_enable_grad
-        return decorator
-    else:
-        return torch.enable_grad()
+def _patch_call(instance, func):
+    class _(type(instance)):
+        def __call__(self, *arg, **kwarg):
+            return func(*arg, **kwarg)
+    instance.__class__ = _
+
+
+class enable_grad(torch.enable_grad):
+    """ Context-manager and decorator that enables gradient calculation.
+    See `torch.autograd.enable_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.enable_grad>`_
+    """
+    def __init__(self):
+        super(enable_grad, self).__init__()
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
+        if LooseVersion(version) < LooseVersion("0.4.1"):  # Enable grad is not a decorator
+            _patch_call(self, self.call)
+
+    def call(self, func):
+        @functools.wraps(func)
+        def decorate_enable_grad(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+
+        return decorate_enable_grad
 
 
 class Metric(object):
