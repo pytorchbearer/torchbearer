@@ -9,8 +9,8 @@ def train_valid_splitter(x, y, split, shuffle=True):
     """ Generate training and validation tensors from whole dataset data and label tensors
 
     Args:
-        x (:class:`torch.Tensor`): Data tensor for whole dataset
-        y (:class:`torch.Tensor`): Label tensor for whole dataset
+        x (torch.Tensor): Data tensor for whole dataset
+        y (torch.Tensor): Label tensor for whole dataset
         split (float): Fraction of dataset to be used for validation
         shuffle (bool): If True randomize tensor order before splitting else do not randomize
 
@@ -34,9 +34,9 @@ def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
     """ Generate validation and training datasets from whole dataset tensors
 
     Args:
-        x (:class:`torch.Tensor`): Data tensor for dataset
-        y (:class:`torch.Tensor`): Label tensor for dataset
-        validation_data ((:class:`torch.Tensor`, :class:`torch.Tensor`)): Optional validation data (x_val, y_val) to be
+        x (torch.Tensor): Data tensor for dataset
+        y (torch.Tensor): Label tensor for dataset
+        validation_data ((torch.Tensor, torch.Tensor)): Optional validation data (x_val, y_val) to be
             used instead of splitting x and y tensors
         validation_split (float): Fraction of dataset to be used for validation
         shuffle (bool): If True randomize tensor order before splitting else do not randomize
@@ -92,10 +92,10 @@ class DatasetValidationSplitter:
         """ Creates a training dataset from existing dataset
 
         Args:
-            dataset (:class:`torch.utils.data.Dataset`): Dataset to be split into a training dataset
+            dataset (torch.utils.data.Dataset): Dataset to be split into a training dataset
 
         Returns:
-            :class:`torch.utils.data.Dataset`: Training dataset split from whole dataset
+            torch.utils.data.Dataset: Training dataset split from whole dataset
         """
         return SubsetDataset(dataset, self.train_ids)
 
@@ -103,10 +103,10 @@ class DatasetValidationSplitter:
         """ Creates a validation dataset from existing dataset
 
         Args:
-        dataset (:class:`torch.utils.data.Dataset`): Dataset to be split into a validation dataset
+        dataset (torch.utils.data.Dataset): Dataset to be split into a validation dataset
 
         Returns:
-            :class:`torch.utils.data.Dataset`: Validation dataset split from whole dataset
+            torch.utils.data.Dataset: Validation dataset split from whole dataset
         """
         return SubsetDataset(dataset, self.valid_ids)
 
@@ -116,7 +116,7 @@ class SubsetDataset(Dataset):
         """ Dataset that consists of a subset of a previous dataset
 
         Args:
-            dataset (:class:`torch.utils.data.Dataset`): Complete dataset
+            dataset (torch.utils.data.Dataset): Complete dataset
             ids (list): List of subset IDs
         """
         super(SubsetDataset, self).__init__()
