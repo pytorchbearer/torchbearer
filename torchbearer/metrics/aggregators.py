@@ -128,7 +128,7 @@ class Var(Metric):
         of squares will be computed over the provided dimension.
 
         Args:
-            args (`torch.Tensor`):  The output of some previous call to :meth:`.Metric.process`.
+            args (torch.Tensor):  The output of some previous call to :meth:`.Metric.process`.
         """
         data = args[0]
         tot = data.sum(**self._kwargs)

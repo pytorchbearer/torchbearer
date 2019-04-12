@@ -49,8 +49,8 @@ class ClassAppearanceModel(imaging.ImagingCallback):
         nclasses (int): The number of output classes
         input_size (tuple): The size to use for the input image
         optimizer_factory: A function of parameters which returns an optimizer to use
-        logit_key (:class:`.StateKey`): State key storing the class logits
-        prob_key (:class:`.StateKey`): State key storing the class probabilities or None if using logits
+        logit_key (StateKey): :class:`.StateKey` storing the class logits
+        prob_key (StateKey): :class:`.StateKey` storing the class probabilities or None if using logits
         target (int): Target class for the optimisation or RANDOM
         steps (int): Number of optimisation steps to take
         decay (float): Lambda for the L2 decay on the image
@@ -75,9 +75,9 @@ class ClassAppearanceModel(imaging.ImagingCallback):
 
         self._target_keys = []
 
-    @torchbearer.fluent
     def target_to_key(self, key):
         self._target_keys.append(key)
+        return self
 
     def _targets_hot(self, state):
         targets = torch.randint(high=self.nclasses, size=(1, 1)).long().to(state[torchbearer.DEVICE])

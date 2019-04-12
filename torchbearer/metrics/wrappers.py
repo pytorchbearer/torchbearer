@@ -31,7 +31,7 @@ class ToDict(AdvancedMetric):
         {'val_my_metric': 9}
 
     Args:
-        metric (:class:`.Metric`): The :class:`.Metric` instance to *wrap*.
+        metric (Metric): The :class:`.Metric` instance to *wrap*.
     """
 
     def __init__(self, metric):

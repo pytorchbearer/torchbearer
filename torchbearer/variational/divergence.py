@@ -63,7 +63,7 @@ class DivergenceBase(callbacks.Callback):
             post_fcn: A function of loss which applies some operation (e.g. multiplying by beta)
 
         Returns:
-            :class:`.Divergence`: self
+            Divergence: self
         """
         old_post = self._post
         self._post = lambda loss: post_fcn(old_post(loss))
@@ -102,7 +102,7 @@ class DivergenceBase(callbacks.Callback):
             reduction_fcn: The function to be applied to the divergence output and return a single value
 
         Returns:
-            :class:`.Divergence`: self
+            Divergence: self
         """
         self._reduce = reduction_fcn
         return self
@@ -111,7 +111,7 @@ class DivergenceBase(callbacks.Callback):
         """Override the reduction function to take a sum over dimension one and a mean over dimension zero. (default)
 
         Returns:
-            :class:`.Divergence`: self
+            Divergence: self
         """
         return self.with_reduction(lambda x: x.sum(1).mean(0))
 
@@ -119,7 +119,7 @@ class DivergenceBase(callbacks.Callback):
         """Override the reduction function to take a sum over all dimensions.
 
         Returns:
-            :class:`.Divergence`: self
+            Divergence: self
         """
         return self.with_reduction(lambda x: x.sum())
 
@@ -131,7 +131,7 @@ class DivergenceBase(callbacks.Callback):
             beta (float): The beta (> 1) to multiply by.
 
         Returns:
-            :class:`.Divergence`: self
+            Divergence: self
         """
         def beta_div(loss):
             return beta * loss
@@ -149,7 +149,7 @@ class DivergenceBase(callbacks.Callback):
             gamma (float): Multiplicative gamma, usually a high number
 
         Returns:
-            :class:`.Divergence`: self
+            Divergence: self
         """
         inc = steps / (max_c - min_c)
         d = {'c': min_c}
