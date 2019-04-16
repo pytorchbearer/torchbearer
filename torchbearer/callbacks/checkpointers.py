@@ -4,6 +4,7 @@ import torch
 
 from torchbearer.callbacks.callbacks import Callback
 import os
+import warnings
 
 
 class _Checkpointer(Callback):
@@ -30,7 +31,10 @@ class _Checkpointer(Callback):
         filepath = self.fileformat.format(**string_state)
 
         if self.most_recent is not None and overwrite_most_recent:
-            os.remove(self.most_recent)
+            try:
+                os.remove(self.most_recent)
+            except FileNotFoundError:
+                warnings.warn('Failed to delete old file. Are you running two checkpointers with the same filename?')
 
         if self.save_model_params_only:
             torch.save(model_state[torchbearer.MODEL].state_dict(), filepath, pickle_module=self.pickle_module,

@@ -12,6 +12,14 @@ class TestCheckpointer(TestCase):
         _Checkpointer('thisdirectoryshouldntexist/norshouldthis/model.pt')
         mock_dirs.assert_called_once_with('thisdirectoryshouldntexist/norshouldthis')
 
+    @patch('torch.save')
+    @patch('os.makedirs')
+    def test_no_existing_file(self, mock_dirs, mock_save):
+        check = _Checkpointer('thisdirectoryshouldntexist/norshouldthis/model.pt')
+        check.most_recent = 'thisfiledoesnotexist.pt'
+        with self.assertWarns(UserWarning):
+            check.save_checkpoint({torchbearer.METRICS: {}, torchbearer.SELF: Mock()}, True)
+
     @patch("torch.save")
     def test_save_checkpoint_save_filename(self, mock_save):
         torchmodel = Mock()
