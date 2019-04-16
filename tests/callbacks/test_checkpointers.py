@@ -4,7 +4,7 @@ from mock import patch, Mock
 import torchbearer
 from torchbearer import Trial
 from torchbearer.callbacks.checkpointers import _Checkpointer, ModelCheckpoint, MostRecent, Interval, Best
-
+import warnings
 
 class TestCheckpointer(TestCase):
     @patch('os.makedirs')
@@ -17,8 +17,11 @@ class TestCheckpointer(TestCase):
     def test_no_existing_file(self, mock_dirs, mock_save):
         check = _Checkpointer('thisdirectoryshouldntexist/norshouldthis/model.pt')
         check.most_recent = 'thisfiledoesnotexist.pt'
-        with self.assertWarns(UserWarning):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
             check.save_checkpoint({torchbearer.METRICS: {}, torchbearer.SELF: Mock()}, True)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue('Failed to delete old file' in str(w[-1].message))
 
     @patch("torch.save")
     def test_save_checkpoint_save_filename(self, mock_save):

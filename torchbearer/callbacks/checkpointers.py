@@ -33,7 +33,7 @@ class _Checkpointer(Callback):
         if self.most_recent is not None and overwrite_most_recent:
             try:
                 os.remove(self.most_recent)
-            except FileNotFoundError:
+            except OSError:
                 warnings.warn('Failed to delete old file. Are you running two checkpointers with the same filename?')
 
         if self.save_model_params_only:
