@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug with the once and once_per_epoch decorators
 - Fixed a bug where the test criterion wouldn't accept a function of state
 - Fixed a bug where type inference would not work correctly when chaining ``Trial`` methods
+- Fixed a bug where checkpointers would error when they couldn't find the old checkpoint to overwrite
 
 ## [0.3.0] - 2019-02-28
 ### Added
