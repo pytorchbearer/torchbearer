@@ -123,6 +123,12 @@ class TestDecorators(unittest.TestCase):
         state = 'test'
         self.assertTrue(callbacks.on_step_validation(example).on_step_validation(state) == state)
 
+    def test_on_checkpoint(self):
+        def example(state):
+            return state
+        state = 'test'
+        self.assertTrue(callbacks.on_checkpoint(example).on_checkpoint(state) == state)
+
     def test_add_to_loss(self):
         def example(state):
             return 1

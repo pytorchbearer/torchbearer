@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added the option to give the ``only_if`` callback decorator a function of self and state rather than just state
 - Added Layer-sequential unit-variance (LSUV) initialization
 - Added ClassAppearanceModel callback and example page for visualising CNNs
+- Added on_checkpoint callback decorator
 ### Changed
 - `No_grad` and `enable_grad` decorators are now also context managers
 ### Deprecated
