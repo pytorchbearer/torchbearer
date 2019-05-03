@@ -257,14 +257,14 @@ def on_step_validation(func):
 
 
 def on_checkpoint(func):
-    """ The :func:`on_step_validation` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_step_validation`
+    """ The :func:`on_checkpoint` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_checkpoint`
     calling the decorated function
 
     Args:
         func (function): The function(state) to *decorate*
 
     Returns:
-        Callback: Initialised callback with :meth:`~.Callback.on_step_validation` calling func
+        Callback: Initialised callback with :meth:`~.Callback.on_checkpoint` calling func
     """
     return bind_to(Callback.on_checkpoint)(func)
 
