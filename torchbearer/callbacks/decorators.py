@@ -256,6 +256,19 @@ def on_step_validation(func):
     return bind_to(Callback.on_step_validation)(func)
 
 
+def on_checkpoint(func):
+    """ The :func:`on_step_validation` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_step_validation`
+    calling the decorated function
+
+    Args:
+        func (function): The function(state) to *decorate*
+
+    Returns:
+        Callback: Initialised callback with :meth:`~.Callback.on_step_validation` calling func
+    """
+    return bind_to(Callback.on_checkpoint)(func)
+
+
 def add_to_loss(func):
     """ The :func:`add_to_loss` decorator is used to initialise a :class:`.Callback` with the value returned from func
     being added to the loss
