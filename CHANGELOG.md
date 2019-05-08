@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added Layer-sequential unit-variance (LSUV) initialization
 - Added ClassAppearanceModel callback and example page for visualising CNNs
 - Added on_checkpoint callback decorator
+- Added support for PyTorch 1.1.0
 ### Changed
 - `No_grad` and `enable_grad` decorators are now also context managers
 ### Deprecated

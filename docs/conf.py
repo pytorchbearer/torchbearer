@@ -52,8 +52,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'torchbearer'
-copyright = '2018, Ethan Harris, Matthew Painter and Jonathon Hare'
-author = 'Ethan Harris, Matthew Painter and Jonathon Hare'
+copyright = 'Torchbearer Contributors'
+author = 'Torchbearer Contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -151,7 +151,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'torchbearer.tex', 'torchbearer Documentation',
-     'Ethan Harris, Matthew Painter and Jonathon Hare', 'manual'),
+     'Torchbearer Contributors', 'manual'),
 ]
 
 
