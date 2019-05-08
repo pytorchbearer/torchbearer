@@ -91,7 +91,7 @@ class DefaultAccuracy(Metric):
                 if self._train:
                     self.metric.train()
                 else:
-                    self.metric.eval()
+                    self.metric.eval(data_key=state[torchbearer.DATA])
 
             self._loaded = True
 
