@@ -97,11 +97,12 @@ class TestDefaultAccuracy(unittest.TestCase):
         cat_acc.reset_mock()
         metric.eval()
 
-        state = {torchbearer.CRITERION: F.cross_entropy}
+        state = {torchbearer.CRITERION: F.cross_entropy, torchbearer.DATA: 'test'}
         mock = Mock()
         mock.eval = Mock()
         torchbearer.metrics.default.__loss_map__[F.cross_entropy.__name__] = lambda: mock
 
         metric.reset(state)
 
+        mock.eval.assert_called_once_with(data_key='test')
         self.assertTrue(mock.eval.call_count == 1)
