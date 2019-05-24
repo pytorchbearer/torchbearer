@@ -5,10 +5,10 @@ import zipfile
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
-from torchvision.datasets.folder import has_file_allowed_extension, default_loader, IMG_EXTENSIONS
 
 
 def make_dataset(dir, extensions):
+    from torchvision.datasets.folder import has_file_allowed_extension
     images = []
     for root, _, fnames in sorted(os.walk(dir)):
         for fname in sorted(fnames):
@@ -20,7 +20,7 @@ def make_dataset(dir, extensions):
 
 
 class SimpleImageFolder(Dataset):
-    def __init__(self, root, loader=default_loader, extensions=IMG_EXTENSIONS, transform=None, target_transform=None):
+    def __init__(self, root, loader=None, extensions=None, transform=None, target_transform=None):
         """
         Simple image folder dataset that loads all images from inside a folder and returns items in (image, image) tuple
 
@@ -31,6 +31,10 @@ class SimpleImageFolder(Dataset):
             transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
             target_transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
+        from torchvision.datasets.folder import default_loader, IMG_EXTENSIONS
+        loader = default_loader if loader is None else loader
+        extensions = IMG_EXTENSIONS if extensions is None else extensions
+
         samples = make_dataset(root, extensions)
 
         self.root = root
@@ -91,6 +95,7 @@ class CelebA_HQ(SimpleImageFolder):
             as_npy (bool, optional): If True, assume images are stored in numpy arrays. Else assume a standard image format
             transform (``Transform``, optional): A function/transform that takes in an PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``
         """
+        from torchvision.datasets.folder import default_loader, IMG_EXTENSIONS
         if as_npy:
             loader = self.npy_loader
             extensions = ['npy']
