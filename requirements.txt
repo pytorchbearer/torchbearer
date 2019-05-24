@@ -1,5 +1,5 @@
 torch>=0.4
-torchvision
+torchvision<0.3
 numpy
 scikit-learn
 tqdm
