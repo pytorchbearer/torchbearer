@@ -156,7 +156,7 @@ class TestCelebA(unittest.TestCase):
 
     @patch.object(ds.SimpleImageFolder, '__len__')
     @patch.object(ds.SimpleImageFolder, '__getitem__')
-    @patch('torchbearer.variational.datasets.default_loader')
+    @patch('torchvision.datasets.folder.default_loader')
     def test_celeba_hq_use_default_loader(self, mock_loader, mock_gi, mock_len, ):
         import torchvision
         mock_len.return_value = 10
