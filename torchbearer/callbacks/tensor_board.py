@@ -3,7 +3,6 @@ import os
 
 import torch
 import torch.nn.functional as F
-import torchvision.utils as utils
 
 import torchbearer
 from torchbearer.callbacks import Callback
@@ -353,7 +352,7 @@ class TensorBoardText(AbstractTensorBoard):
 
 class TensorBoardImages(AbstractTensorBoard):
     """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
-    TensorboardX library and torchvision.utils.make_grid. Images are selected from the given key and saved to the given
+    TensorboardX library and torchvision.utils.make_grid (requires torchvision). Images are selected from the given key and saved to the given
     path. Full name of image sub directory will be model name + _ + comment.
 
     Args:
@@ -404,6 +403,7 @@ class TensorBoardImages(AbstractTensorBoard):
 
     def on_step_validation(self, state):
         if not self.done:
+            import torchvision.utils as utils
             data = state[self.key].clone()
 
             if len(data.size()) == 3:

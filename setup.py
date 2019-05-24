@@ -24,6 +24,6 @@ setup(
     description='A model training and variational auto-encoder library for pytorch',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['torch>=0.4', 'torchvision<0.3', 'tqdm'],
+    install_requires=['torch>=0.4', 'tqdm'],
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
 )

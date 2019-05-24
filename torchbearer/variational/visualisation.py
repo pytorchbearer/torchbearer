@@ -1,5 +1,4 @@
 import torch
-from torchvision.utils import save_image
 
 import torchbearer as tb
 import torchbearer.callbacks as c
@@ -110,6 +109,7 @@ class LatentWalker(c.Callback):
         raise NotImplementedError
 
     def _save_walk(self, tensor):
+        from torchvision.utils import save_image
         save_image(tensor, self.file, self.row_size, normalize=True, pad_value=1)
 
 
