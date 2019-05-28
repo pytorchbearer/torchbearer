@@ -3,13 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.3.2] - 2019-05-28
 ### Added
 ### Changed
 ### Deprecated
 ### Removed
 ### Fixed
 - Fixed a bug where for_steps would sometimes not work as expected if called in the wrong order
+- Fixed a bug where torchbearer installed via pip would crash on import
 
 ## [0.3.1] - 2019-05-24
 ### Added
