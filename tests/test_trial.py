@@ -208,6 +208,23 @@ class TestWithGenerators(TestCase):
 
         self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 2)
 
+    @patch('warnings.warn')
+    def test_with_train_generator_old_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_train_steps(100)
+        torchbearertrial.with_train_generator(generator, None)
+
+        self.assertTrue(torchbearertrial.state[tb.TRAIN_STEPS] == 100)
+
     def test_with_val_generator_state_filled(self):
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -288,6 +305,23 @@ class TestWithGenerators(TestCase):
 
         self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == 2)
 
+    @patch('warnings.warn')
+    def test_with_val_generator_old_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_val_steps(100)
+        torchbearertrial.with_val_generator(generator, None)
+
+        self.assertTrue(torchbearertrial.state[tb.VALIDATION_STEPS] == 100)
+
     def test_with_test_generator_state_filled(self):
         torchmodel = MagicMock()
         torchmodel.forward = Mock(return_value=1)
@@ -367,6 +401,23 @@ class TestWithGenerators(TestCase):
         torchbearertrial.with_test_generator(generator, None)
 
         self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 2)
+
+    @patch('warnings.warn')
+    def test_with_test_generator_old_steps(self, _):
+        torchmodel = MagicMock()
+        torchmodel.forward = Mock(return_value=1)
+
+        optimizer = MagicMock()
+        metric = Metric('test')
+        criterion = None
+        generator = MagicMock()
+        generator.__len__.return_value = 2
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [metric])
+        torchbearertrial.for_test_steps(100)
+        torchbearertrial.with_test_generator(generator, None)
+
+        self.assertTrue(torchbearertrial.state[tb.TEST_STEPS] == 100)
 
     @patch('warnings.warn')
     def test_for_steps(self, _):
