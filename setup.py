@@ -15,7 +15,7 @@ else:
 setup(
     name='torchbearer',
     version=version_dict['__version__'],
-    packages=['torchbearer', 'torchbearer.metrics', 'torchbearer.callbacks', 'torchbearer.variational', 'tests', 'tests.metrics', 'tests.callbacks', 'tests.variational'],
+    packages=['torchbearer', 'torchbearer.metrics', 'torchbearer.callbacks', 'torchbearer.callbacks.imaging', 'torchbearer.variational', 'tests', 'tests.metrics', 'tests.callbacks', 'tests.callbacks.imaging', 'tests.variational'],
     url='https://github.com/ecs-vlc/torchbearer',
     download_url='https://github.com/ecs-vlc/torchbearer/archive/' + version_dict['__version__'] + '.tar.gz',
     license='GPL-3.0',
