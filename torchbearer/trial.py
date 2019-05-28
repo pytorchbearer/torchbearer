@@ -669,10 +669,11 @@ class Trial(object):
         return self
 
     def with_loader(self, batch_loader):
-        """Use this trial with custom batch loader
+        """Use this trial with custom batch loader. Usually calls next on state[torchbearer.ITERATOR] and populates
+        state[torchbearer.X] and state[torchbearer.Y_TRUE]
 
         Args:
-            batch_loader (function): Function of state that extracts data from data loader (calls next), stores it in
+            batch_loader (function): Function of state that extracts data from data loader (stored under torchbearer.ITERATOR), stores it in
             state and sends it to the correct device
 
         Returns:

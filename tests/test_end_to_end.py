@@ -79,6 +79,24 @@ class TestEndToEnd(unittest.TestCase):
         import os
         os.remove('test.pt')
 
+    def test_with_loader(self):
+        p = torch.tensor([2.0, 1.0, 10.0])
+        training_steps = 2
+
+        model = Net(p)
+        optim = torch.optim.SGD(model.parameters(), lr=0.01)
+        test_var = {'loaded': False}
+
+        def custom_loader(state):
+            state[tb.X], state[tb.Y_TRUE] = None, None
+            test_var['loaded'] = True
+
+        tbmodel = tb.Trial(model, optim, loss, callbacks=[tb.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
+        tbmodel.with_loader(custom_loader)
+        self.assertTrue(not test_var['loaded'])
+        tbmodel.run(1)
+        self.assertTrue(test_var['loaded'])
+
     def test_only_model(self):
         p = torch.tensor([2.0, 1.0, 10.0])
 
