@@ -3,7 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.3.1] - 2019-05-24
+### Added
+- Added ``with_loader`` trial method that allows running of custom batch loaders
+### Changed
+### Deprecated
+### Removed
+### Fixed
+
+## [0.3.1] - 2019-05-24
 ### Added
 - Added cyclic learning rate finder
 - Added on_init callback hook to run at the end of trial init
@@ -15,17 +23,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added the option to give the ``only_if`` callback decorator a function of self and state rather than just state
 - Added Layer-sequential unit-variance (LSUV) initialization
 - Added ClassAppearanceModel callback and example page for visualising CNNs
-- Added ``with_loader`` trial method that allows running of custom batch loaders
+- Added on_checkpoint callback decorator
+- Added support for PyTorch 1.1.0
 ### Changed
 - `No_grad` and `enable_grad` decorators are now also context managers
 ### Deprecated
 ### Removed
+- Removed the fluent decorator, just use return self
+- Removed install dependency on `torchvision`, still required for some functionality
 ### Fixed
 - Fixed bug where replay errored when train or val steps were None
 - Fixed a bug where mock optimser wouldn't call it's closure
 - Fixed a bug where the notebook check raised ModuleNotFoundError when IPython not installed
 - Fixed a memory leak with metrics that causes issues with very long epochs
 - Fixed a bug with the once and once_per_epoch decorators
+- Fixed a bug where the test criterion wouldn't accept a function of state
+- Fixed a bug where type inference would not work correctly when chaining ``Trial`` methods
+- Fixed a bug where checkpointers would error when they couldn't find the old checkpoint to overwrite
+- Fixed a bug where the 'test' label would sometimes not populate correctly in the default accuracy metric
 
 ## [0.3.0] - 2019-02-28
 ### Added

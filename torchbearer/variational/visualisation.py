@@ -1,9 +1,7 @@
 import torch
-from torchvision.utils import save_image
 
 import torchbearer as tb
 import torchbearer.callbacks as c
-from torchbearer.trial import fluent
 
 
 class LatentWalker(c.Callback):
@@ -24,39 +22,50 @@ class LatentWalker(c.Callback):
         self.store_key = None
         self.variable_space = 0
 
-    @fluent
     def on_train(self):
         """
         Sets the walker to run during training
+
+        Returns:
+            LatentWalker: self
         """
         self.on_step_training = c.once_per_epoch(self._vis)
+        return self
 
-    @fluent
     def on_val(self):
         """
         Sets the walker to run during validation
+
+        Returns:
+            LatentWalker: self
         """
         self.on_step_validation = c.once_per_epoch(self._vis)
+        return self
 
-    @fluent
     def for_space(self, space_id):
         """
         Sets the ID for which latent space to vary when model outputs [latent_space_0, latent_space_1, ...]
 
         Args:
             space_id (int): ID of the latent space to vary
+
+        Returns:
+            LatentWalker: self
         """
         self.variable_space = space_id
+        return self
 
-    @fluent
     def for_data(self, data_key):
         """
         Args:
             data_key (:class:`.StateKey`): State key which will contain data to act on
+
+        Returns:
+            LatentWalker: self
         """
         self.data_key = data_key
+        return self
 
-    @fluent
     def to_key(self, state_key):
         """
 
@@ -64,17 +73,21 @@ class LatentWalker(c.Callback):
             state_key (:class:`.StateKey`): State key under which to store result
 
         Returns:
-
+            LatentWalker: self
         """
         self.store_key = state_key
+        return self
 
-    @fluent
     def to_file(self, file):
         """
         Args:
             file (string, pathlib.Path object or file object): File in which result is saved
+
+        Returns:
+            LatentWalker: self
         """
         self.file = file
+        return self
 
     def _vis(self, state):
         self.model = state[tb.MODEL]
@@ -96,6 +109,7 @@ class LatentWalker(c.Callback):
         raise NotImplementedError
 
     def _save_walk(self, tensor):
+        from torchvision.utils import save_image
         save_image(tensor, self.file, self.row_size, normalize=True, pad_value=1)
 
 
@@ -106,7 +120,7 @@ class ReconstructionViewer(LatentWalker):
 
         Args:
             row_size (int): Number of images displayed in each row of the grid.
-            recon_key (:class:`.StateKey`): State key of the reconstructed images
+            recon_key (StateKey): :class:`.StateKey` of the reconstructed images
         """
         super(ReconstructionViewer, self).__init__(False, row_size)
         self.recon_key = recon_key
@@ -126,7 +140,7 @@ class LinSpaceWalker(LatentWalker):
             lin_start (float): Starting point of linspace
             lin_end (float): End point of linspace
             lin_steps (int): Number of steps to take in linspace
-            dims_to_walk (:obj:list of int): List of dimensions to walk
+            dims_to_walk (list of int): List of dimensions to walk
             zero_init (bool): If True, dimensions not being walked are 0. Else, they are obtained from encoder
             same_image (bool): If True, use same image for each dimension walked. Else, use different images
         """
@@ -173,7 +187,7 @@ class RandomWalker(LatentWalker):
         Latent space walker that shows random samples from latent space
 
         Args:
-            var (float or :class:`torch.Tensor`): Variance of random sample
+            var (float or torch.Tensor): Variance of random sample
             num_images (int): Number of random images to sample
             uniform (bool): If True, sample uniform distribution [-v, v). If False, sample normal distribution with var v
             row_size (int): Number of images displayed in each row of the grid.
@@ -206,8 +220,8 @@ class CodePathWalker(LatentWalker):
 
         Args:
             num_steps (int): Number of steps to take between points
-            p1 (:class:`torch.Tensor`): Batch of codes
-            p2 (:class:`torch.Tensor`): Batch of codes
+            p1 (torch.Tensor): Batch of codes
+            p2 (torch.Tensor): Batch of codes
         """
         super(CodePathWalker, self).__init__(True, num_steps)
         self.p1 = p1
@@ -233,8 +247,8 @@ class ImagePathWalker(CodePathWalker):
 
         Args:
             num_steps (int): Number of steps to take between points
-            im1 (:class:`torch.Tensor`): Batch of images
-            im2 (:class:`torch.Tensor`): Batch of images
+            im1 (torch.Tensor): Batch of images
+            im2 (torch.Tensor): Batch of images
         """
         super(ImagePathWalker, self).__init__(num_steps, None, None)
         self.im1, self.im2 = im1, im2

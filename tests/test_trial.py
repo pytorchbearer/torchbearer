@@ -1101,6 +1101,46 @@ class TestFitPass(TestCase):
         self.assertTrue(criterion.call_args_list[0][0][0] == 5)
         self.assertTrue(criterion.call_args_list[0][0][1].item() == 1.0)
 
+    def test_fit_criterion_passed_state(self):
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
+                (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        train_steps = len(data)
+        epochs = 1
+        torchmodel = MagicMock()
+        torchmodel.return_value = 5
+        optimizer = MagicMock()
+        optimizer.step = lambda closure: closure()
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        def crit_sig(state):
+            return loss
+        criterion = create_autospec(crit_sig)
+
+        metric_list = MagicMock()
+        callback_list = MagicMock()
+        tb.CallbackListInjection = Mock(return_value=callback_list)
+
+        state = make_state[
+            tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
+            tb.OPTIMIZER: optimizer, tb.INF_TRAIN_LOADING: False,
+            tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
+            tb.DATA_TYPE: torch.float,
+            tb.HISTORY: [], tb.TRAIN_GENERATOR: generator, tb.TRAIN_STEPS: train_steps, tb.EPOCH: 0,
+            tb.BACKWARD_ARGS: {}
+        ]
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
+        torchbearertrial.train = Mock()
+        torchbearertrial.pass_state = True
+        torchbearertrial.state = {tb.TRAIN_GENERATOR: generator, tb.CALLBACK_LIST: callback_list,
+                                  tb.TRAIN_DATA: (generator, train_steps), tb.INF_TRAIN_LOADING: False,}
+
+        torchbearertrial._fit_pass(state)
+        self.assertTrue(criterion.call_count == 3)
+        self.assertTrue(criterion.call_args_list[0][0][0] == state)
+
+
     @patch('torchbearer.CallbackListInjection')
     def test_fit_backward(self, mock_inj):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
@@ -1481,8 +1521,12 @@ class TestTestPass(TestCase):
         torchmodel.return_value = 5
         optimizer = MagicMock()
 
+        def spec_crit(y_pred, y_true):
+            pass
+
         loss = torch.tensor([2.0], requires_grad=True)
-        criterion = Mock(return_value=loss)
+        criterion = create_autospec(spec_crit)
+        criterion.return_value = loss
 
         metric_list = MagicMock()
         metric_list.process.return_value = {'test': 0}
@@ -1507,6 +1551,46 @@ class TestTestPass(TestCase):
         self.assertTrue(criterion.call_count == 3)
         self.assertTrue(criterion.call_args_list[0][0][0] == 5)
         self.assertTrue(criterion.call_args_list[0][0][1].item() == 1.0)
+
+    def test_criterion_passed_state(self):
+        data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),
+                (torch.Tensor([3]), torch.Tensor([3]))]
+        generator = DataLoader(data)
+        steps = len(data)
+        epochs = 1
+        torchmodel = MagicMock()
+        torchmodel.return_value = 5
+        optimizer = MagicMock()
+
+        def spec_crit(state):
+            pass
+
+        loss = torch.tensor([2.0], requires_grad=True)
+        criterion = create_autospec(spec_crit)
+        criterion.return_value = loss
+
+        metric_list = MagicMock()
+        metric_list.process.return_value = {'test': 0}
+        metric_list.process_final.return_value = {'test': 2}
+        callback_list = MagicMock()
+        tb.CallbackListInjection = Mock(return_value=callback_list)
+
+        state = make_state[
+            tb.MAX_EPOCHS: epochs, tb.STOP_TRAINING: False, tb.MODEL: torchmodel, tb.CRITERION: criterion,
+            tb.OPTIMIZER: optimizer,
+            tb.METRIC_LIST: metric_list, tb.CALLBACK_LIST: callback_list, tb.DEVICE: 'cpu',
+            tb.DATA_TYPE: torch.float, tb.HISTORY: [], tb.GENERATOR: generator, tb.STEPS: steps, tb.EPOCH: 0,
+            tb.X: data[0][0], tb.Y_TRUE: data[0][1], tb.SAMPLER: tb.trial.Sampler(load_batch_standard)
+        ]
+
+        torchbearertrial = Trial(torchmodel, optimizer, criterion, [], callbacks=[])
+        torchbearertrial.train = Mock()
+        torchbearertrial.pass_state = False
+        torchbearertrial.state = {tb.GENERATOR: generator, tb.CALLBACK_LIST: callback_list}
+
+        torchbearertrial._test_pass(state)
+        self.assertTrue(criterion.call_count == 3)
+        self.assertTrue(criterion.call_args_list[0][0][0] == state)
 
     def test_metric_process(self):
         data = [(torch.Tensor([1]), torch.Tensor([1])), (torch.Tensor([2]), torch.Tensor([2])),

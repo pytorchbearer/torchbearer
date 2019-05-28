@@ -23,7 +23,6 @@ from torch.optim import Optimizer
 import torchbearer
 from torchbearer import cite
 from torchbearer import State
-from torchbearer import fluent
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
 from torchbearer.bases import base_closure
@@ -68,8 +67,8 @@ class CallbackListInjection(CallbackList):
     trial class.
 
     Args:
-        callback: The callback to inject
-        callback_list (:class:`.CallbackList`): The underlying callback list
+        callback (Callback): The :class:`.Callback` to inject
+        callback_list (CallbackList): The underlying :class:`.CallbackList`
     """
 
     def __init__(self, callback, callback_list):
@@ -147,12 +146,12 @@ def deep_to(batch, device, dtype):
     """ Static method to call :func:`to` on tensors or tuples. All items in tuple will have :func:`deep_to` called
 
     Args:
-        batch (tuple / list / :class:`torch.Tensor`): The mini-batch which requires a :func:`to` call
-        device (:class:`torch.device`): The desired device of the batch
-        dtype (:class:`torch.dtype`): The desired datatype of the batch
+        batch (tuple / list / torch.Tensor): The mini-batch which requires a :func:`to` call
+        device (torch.device): The desired device of the batch
+        dtype (torch.dtype): The desired datatype of the batch
 
     Returns:
-        tuple / list / :class:`torch.Tensor`: The moved or casted batch
+        tuple / list / torch.Tensor: The moved or casted batch
     """
     is_tuple = isinstance(batch, tuple)
 
@@ -283,7 +282,7 @@ def inject_callback(callback):
     """ Decorator to inject a callback into the callback list and remove the callback after the decorated function has executed
 
     Args:
-        callback (:class:`.Callback`): Callback to be injected
+        callback (Callback): :class:`.Callback` to be injected
 
     Returns:
         The decorator
@@ -307,7 +306,7 @@ def update_device_and_dtype(state, *args, **kwargs):
     """Function get data type and device values from the args / kwargs and update state.
 
     Args:
-        state (:class:`.State`): The dict to update
+        state (State): The :class:`.State` to update
         args: Arguments to the :func:`Trial.to` function
         kwargs: Keyword arguments to the :func:`Trial.to` function
 
@@ -336,8 +335,8 @@ class Trial(object):
     API for model fitting, evaluating and predicting.
 
     Args:
-        model (:class:`torch.nn.Module`): The base pytorch model
-        optimizer (:class:`torch.optim.Optimizer`): The optimizer used for pytorch model weight updates
+        model (torch.nn.Module): The base pytorch model
+        optimizer (torch.optim.Optimizer): The optimizer used for pytorch model weight updates
         criterion (func / None): The final loss criterion that provides a loss value to the optimizer
         metrics (list): The list of :class:`torchbearer.Metric <.Metric>` instances to process during fitting
         callbacks (list): The list of :class:`torchbearer.Callback <.Callback>` instances to call during fitting
@@ -398,7 +397,6 @@ class Trial(object):
     def __repr__(self):
         return str(self)
 
-    @fluent
     def for_train_steps(self, steps):
         """Run this trial for the given number of training steps. Note that the generator will output (None, None) if it
         has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
@@ -409,7 +407,7 @@ class Trial(object):
             steps (int): The number of training steps per epoch to run.
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if not isinstance(steps, int):
             warnings.warn("Number of training steps is not an int, casting to int")
@@ -417,7 +415,8 @@ class Trial(object):
         self.state[torchbearer.TRAIN_STEPS] = steps
         self.state[torchbearer.TRAIN_DATA] = (self.state[torchbearer.TRAIN_GENERATOR], self.state[torchbearer.TRAIN_STEPS])
 
-    @fluent
+        return self
+
     def with_train_generator(self, generator, steps=None):
         """Use this trial with the given train generator. Returns self so that methods can be chained for convenience.
 
@@ -426,32 +425,34 @@ class Trial(object):
             steps (int): The number of steps per epoch to take when using this generator.
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.state[torchbearer.TRAIN_GENERATOR] = generator
         steps = len(generator) if steps is None else steps
         self.for_train_steps(steps)
 
-    @fluent
+        return self
+
     def with_train_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
         """Use this trial with the given train data. Returns self so that methods can be chained for convenience.
 
         Args:
-            x (:class:`torch.Tensor`): The train x data to use during calls to :meth:`.run`
-            y (:class:`torch.Tensor`): The train labels to use during calls to :meth:`.run`
+            x (torch.Tensor): The train x data to use during calls to :meth:`.run`
+            y (torch.Tensor): The train labels to use during calls to :meth:`.run`
             batch_size (int): The size of each batch to sample from the data
             shuffle (bool): If True, then data will be shuffled each epoch
             num_workers (int): Number of worker threads to use in the data loader
             steps (int): The number of steps per epoch to take when using this data
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         dataset = TensorDataset(x, y)
         dataloader = DataLoader(dataset, batch_size, shuffle=shuffle, num_workers=num_workers)
         self.with_train_generator(dataloader, steps=steps)
 
-    @fluent
+        return self
+
     def for_val_steps(self, steps):
         """Run this trial for the given number of validation steps. Note that the generator will output (None, None) if
         it has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
@@ -462,7 +463,7 @@ class Trial(object):
             steps (int): The number of validation steps per epoch to run
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if not isinstance(steps, int):
             warnings.warn("Number of validation steps is not an int, casting to int")
@@ -470,7 +471,8 @@ class Trial(object):
         self.state[torchbearer.VALIDATION_STEPS] = steps
         self.state[torchbearer.VALIDATION_DATA] = (self.state[torchbearer.VALIDATION_GENERATOR], self.state[torchbearer.VALIDATION_STEPS])
 
-    @fluent
+        return self
+
     def with_val_generator(self, generator, steps=None):
         """Use this trial with the given validation generator. Returns self so that methods can be chained for
         convenience.
@@ -480,32 +482,34 @@ class Trial(object):
             steps (int): The number of steps per epoch to take when using this generator
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.state[torchbearer.VALIDATION_GENERATOR] = generator
         steps = len(generator) if steps is None else steps
         self.for_val_steps(steps)
 
-    @fluent
+        return self
+
     def with_val_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
         """Use this trial with the given validation data. Returns self so that methods can be chained for convenience.
 
         Args:
-            x (:class:`torch.Tensor`): The validation x data to use during calls to :meth:`.run` and :meth:`.evaluate`
-            y (:class:`torch.Tensor`): The validation labels to use during calls to :meth:`.run` and :meth:`.evaluate`
+            x (torch.Tensor): The validation x data to use during calls to :meth:`.run` and :meth:`.evaluate`
+            y (torch.Tensor): The validation labels to use during calls to :meth:`.run` and :meth:`.evaluate`
             batch_size (int): The size of each batch to sample from the data
             shuffle (bool): If True, then data will be shuffled each epoch
             num_workers (int): Number of worker threads to use in the data loader
             steps (int): The number of steps per epoch to take when using this data
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         dataset = TensorDataset(x, y)
         dataloader = DataLoader(dataset, batch_size, shuffle=shuffle, num_workers=num_workers)
         self.with_val_generator(dataloader, steps=steps)
 
-    @fluent
+        return self
+
     def for_test_steps(self, steps):
         """Run this trial for the given number of test steps. Note that the generator will output (None, None) if
         it has not been set. Useful for differentiable programming. Returns self so that methods can be chained for
@@ -516,7 +520,7 @@ class Trial(object):
             steps (int): The number of test steps per epoch to run (when using :meth:`.predict`)
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if not isinstance(steps, int):
             warnings.warn("Number of test steps is not an int, casting to int")
@@ -524,7 +528,8 @@ class Trial(object):
         self.state[torchbearer.TEST_STEPS] = steps
         self.state[torchbearer.TEST_DATA] = (self.state[torchbearer.TEST_GENERATOR], self.state[torchbearer.TEST_STEPS])
 
-    @fluent
+        return self
+
     def with_test_generator(self, generator, steps=None):
         """Use this trial with the given test generator. Returns self so that methods can be chained for convenience.
 
@@ -533,30 +538,32 @@ class Trial(object):
             steps (int): The number of steps per epoch to take when using this generator
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.state[torchbearer.TEST_GENERATOR] = generator
         steps = len(generator) if steps is None else steps
         self.for_test_steps(steps)
 
-    @fluent
+        return self
+
     def with_test_data(self, x, batch_size=1, num_workers=1, steps=None):
         """Use this trial with the given test data. Returns self so that methods can be chained for convenience.
 
         Args:
-            x (:class:`torch.Tensor`): The test x data to use during calls to :meth:`.predict`
+            x (torch.Tensor): The test x data to use during calls to :meth:`.predict`
             batch_size (int): The size of each batch to sample from the data
             num_workers (int): Number of worker threads to use in the data loader
             steps (int): The number of steps per epoch to take when using this data
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         dataset = TensorDataset(x)
         dataloader = DataLoader(dataset, batch_size, num_workers=num_workers)
         self.with_test_generator(dataloader, steps=steps)
 
-    @fluent
+        return self
+
     def for_steps(self, train_steps=None, val_steps=None, test_steps=None):
         """Use this trial for the given number of train, val and test steps. Returns self so that methods can be chained
         for convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
@@ -568,7 +575,7 @@ class Trial(object):
             test_steps (int): The number of test steps per epoch to run (when using :meth:`.predict`)
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if train_steps is not None:
             self.for_train_steps(train_steps)
@@ -577,7 +584,8 @@ class Trial(object):
         if test_steps is not None:
             self.for_test_steps(test_steps)
 
-    @fluent
+        return self
+
     def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None, val_steps=None, test_steps=None):
         """Use this trial with the given generators. Returns self so that methods can be chained for convenience.
 
@@ -590,7 +598,7 @@ class Trial(object):
             test_steps (int): The number of steps per epoch to take when using the testing generator
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if train_generator is not None:
             self.with_train_generator(train_generator, train_steps)
@@ -599,37 +607,38 @@ class Trial(object):
         if test_generator is not None:
             self.with_test_generator(test_generator, test_steps)
 
-    @fluent
+        return self
+
     def for_inf_train_steps(self):
         """Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). 
         Returns self so that methods can be chained for convenience.
-        
+
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.for_train_steps(-1)
+        return self
 
-    @fluent
     def for_inf_val_steps(self):
         """Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar).
         Returns self so that methods can be chained for convenience.
         
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.for_val_steps(-1)
+        return self
 
-    @fluent
     def for_inf_test_steps(self):
         """Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). 
         Returns self so that methods can be chained for convenience.
         
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.for_test_steps(-1)
+        return self
 
-    @fluent
     def for_inf_steps(self, train=True, val=True, test=True):
         """Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
         
@@ -639,37 +648,39 @@ class Trial(object):
             test (bool): Use an infinite number of test steps
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if train: self.for_inf_train_steps()
         if val: self.for_inf_val_steps()
         if test: self.for_inf_test_steps()
 
-    @fluent
+        return self
+
     def with_inf_train_loader(self):
         """Use this trial with a training iterator that refreshes when it finishes instead of each epoch. 
         This allows for setting training steps less than the size of the generator and model will still be trained on 
         all training samples if enough "epochs" are run.
         
         Returns:
-            :class:`.Trial`: self:
+            Trial: self:
         """
         self.state[torchbearer.INF_TRAIN_LOADING] = True
 
-    @fluent
+        return self
+
     def with_loader(self, batch_loader):
         """Use this trial with custom batch loader
-        
+
         Args:
             batch_loader (function): Function of state that extracts data from data loader (calls next), stores it in
             state and sends it to the correct device
 
         Returns:
-            :class:`.Trial`: self:
+            Trial: self:
         """
         self.state[torchbearer.LOADER] = batch_loader
+        return self
 
-    @fluent
     def with_closure(self, closure):
         """Use this trial with custom closure
 
@@ -677,9 +688,11 @@ class Trial(object):
             closure (function): Function of state that defines the custom closure
 
         Returns:
-            :class:`.Trial`: self:
+            Trial: self:
         """
         self.closure = closure
+
+        return self
 
     @inject_printer()
     def run(self, epochs=1, verbose=-1):
@@ -798,8 +811,12 @@ class Trial(object):
 
                 # Loss and metrics
                 if torchbearer.Y_TRUE in state:
-                    state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
-                                                                               state[torchbearer.Y_TRUE])
+                    # Loss Calculation
+                    try:
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
+                    except TypeError:
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
+                                                                           state[torchbearer.Y_TRUE])
                     state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
 
@@ -829,7 +846,7 @@ class Trial(object):
 
         Args:
             verbose (int): If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
-            data_key (:class:`.StateKey`): Optional key for the data to evaluate on. Default: torchbearer.VALIDATION_DATA
+            data_key (StateKey): Optional :class:`.StateKey` for the data to evaluate on. Default: torchbearer.VALIDATION_DATA
 
         Returns:
             dict: The final metric values
@@ -866,7 +883,7 @@ class Trial(object):
 
         Args:
             verbose (int): If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
-            data_key (:class:`.StateKey`): Optional key for the data to predict on. Default: torchbearer.TEST_DATA
+            data_key (StateKey): Optional :class:`.StateKey` for the data to predict on. Default: torchbearer.TEST_DATA
 
         Returns:
             list: Model outputs as a list
@@ -891,7 +908,6 @@ class Trial(object):
             return res
         return []
 
-    @fluent
     def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
 
@@ -901,7 +917,7 @@ class Trial(object):
             one_batch (bool): If True, only one batch per epoch is replayed. If False, all batches are replayed
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         history = self.state[torchbearer.HISTORY]
         callbacks.append(get_printer(verbose=verbose, validation_label_letter='v'))
@@ -924,7 +940,8 @@ class Trial(object):
             self._replay_pass(state, callbacks)
         callbacks.on_end(state)
 
-    @fluent
+        return self
+
     def _replay_pass(self, state, callback_list):
         callback_list.on_start_epoch(state)
         all_metrics = state[torchbearer.METRICS]
@@ -960,22 +977,24 @@ class Trial(object):
         state[torchbearer.METRICS] = all_metrics
         callback_list.on_end_epoch(state)
 
-    @fluent
+        return self
+
     def train(self):
         """Set model and metrics to training mode.
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.state[torchbearer.MODEL].train()
         self.state[torchbearer.METRIC_LIST].train()
 
-    @fluent
+        return self
+
     def eval(self):
         """Set model and metrics to evaluation mode
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.state[torchbearer.MODEL].eval()
         if torchbearer.DATA in self.state:
@@ -983,7 +1002,8 @@ class Trial(object):
         else:
             self.state[torchbearer.METRIC_LIST].eval()
 
-    @fluent
+        return self
+
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
 
@@ -992,7 +1012,7 @@ class Trial(object):
             kwargs: See: `torch.nn.Module.to <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to>`_
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.state[torchbearer.MODEL].to(*args, **kwargs)
 
@@ -1003,7 +1023,8 @@ class Trial(object):
 
         self.state = update_device_and_dtype(self.state, *args, **kwargs)
 
-    @fluent
+        return self
+
     def cuda(self, device=None):
         """ Moves all model parameters and buffers to the GPU.
 
@@ -1011,20 +1032,23 @@ class Trial(object):
             device (int): if specified, all parameters will be copied to that device
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if device is None:
             device = torch.cuda.current_device()
         self.to('cuda:' + str(device))
 
-    @fluent
+        return self
+
     def cpu(self):
         """ Moves all model parameters and buffers to the CPU.
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         self.to('cpu')
+
+        return self
 
     def state_dict(self, **kwargs):
         """Get a dict containing the model and optimizer states, as well as the model history.
@@ -1044,7 +1068,6 @@ class Trial(object):
         }
         return state_dict
 
-    @fluent
     def load_state_dict(self, state_dict, resume=True, **kwargs):
         """Resume this trial from the given state. Expects that this trial was constructed in the same way. Optionally,
         just load the model state when resume=False.
@@ -1055,7 +1078,7 @@ class Trial(object):
             kwargs: See: `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.load_state_dict>`_
 
         Returns:
-            :class:`.Trial`: self
+            Trial: self
         """
         if resume and torchbearer.MODEL in state_dict:  # torchbearer dict
             if torchbearer.VERSION in state_dict and state_dict[torchbearer.VERSION] != torchbearer.__version__.replace('.dev', ''):
@@ -1077,3 +1100,5 @@ class Trial(object):
         else:  # something else
             warnings.warn('Not a torchbearer state dict, passing to model')
             self.state[torchbearer.MODEL].load_state_dict(state_dict, **kwargs)
+
+        return self

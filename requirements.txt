@@ -1,5 +1,4 @@
 torch>=0.4
-torchvision
 numpy
 scikit-learn
 tqdm
@@ -9,3 +8,4 @@ livelossplot
 mock
 Pillow
 matplotlib
+torchvision<0.3

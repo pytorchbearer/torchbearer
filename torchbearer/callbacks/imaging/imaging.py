@@ -1,6 +1,5 @@
 import torchbearer
 from torchbearer import Callback
-from torchbearer.trial import fluent
 from torchbearer.callbacks.decorators import once_per_epoch
 
 import torch
@@ -74,12 +73,11 @@ class ImagingCallback(Callback):
             for handler in self._handlers:
                 handler(img, state)
 
-    @fluent
     def on_train(self):
         """Process this callback for training batches
 
         Returns:
-            self
+            ImagingCallback: self
         """
         _old_step_training = self.on_step_training
 
@@ -88,13 +86,13 @@ class ImagingCallback(Callback):
             self.process(state)
 
         self.on_step_training = wrapper
+        return self
 
-    @fluent
     def on_val(self):
         """Process this callback for validation batches
 
         Returns:
-            self
+            ImagingCallback: self
         """
         _old_step_validation = self.on_step_validation
 
@@ -104,13 +102,13 @@ class ImagingCallback(Callback):
                 self.process(state)
 
         self.on_step_validation = wrapper
+        return self
 
-    @fluent
     def on_test(self):
         """Process this callback for test batches
 
         Returns:
-            self
+            ImagingCallback: self
         """
         _old_step_validation = self.on_step_validation
 
@@ -120,8 +118,8 @@ class ImagingCallback(Callback):
                 self.process(state)
 
         self.on_step_validation = wrapper
+        return self
 
-    @fluent
     def with_handler(self, handler):
         """Append the given output handler to the list of handlers
 
@@ -129,11 +127,11 @@ class ImagingCallback(Callback):
             handler: A function of image and state which stores the given image in some way
 
         Returns:
-            self
+            ImagingCallback: self
         """
         self._handlers.append(handler)
+        return self
 
-    @fluent
     def to_file(self, filename):
         """Send images from this callback to the given file
 
@@ -141,20 +139,18 @@ class ImagingCallback(Callback):
             filename (str): the filename to store the image to
 
         Returns:
-            self
+            ImagingCallback: self
         """
-        self.with_handler(_to_file(filename))
+        return self.with_handler(_to_file(filename))
 
-    @fluent
     def to_pyplot(self):
         """Show images from this callback with pyplot
 
         Returns:
-            self
+            ImagingCallback: self
         """
-        self.with_handler(_to_pyplot())
+        return self.with_handler(_to_pyplot())
 
-    @fluent
     def to_state(self, key):
         """Put images from this callback in state with the given key
 
@@ -162,13 +158,12 @@ class ImagingCallback(Callback):
             key (StateKey): The state key to use for the image
 
         Returns:
-            self
+            ImagingCallback: self
         """
         def handler(img, state):
             state[key] = img
-        self.with_handler(handler)
+        return self.with_handler(handler)
 
-    @fluent
     def to_tensorboard(self, name='Image', log_dir='./logs', comment='torchbearer'):
         """Direct images from this callback to tensorboard with the given parameters
 
@@ -178,11 +173,10 @@ class ImagingCallback(Callback):
             comment (str): Descriptive comment to append to path
 
         Returns:
-            self
+            ImagingCallback: self
         """
-        self.with_handler(_to_tensorboard(name=name, log_dir=log_dir, comment=comment))
+        return self.with_handler(_to_tensorboard(name=name, log_dir=log_dir, comment=comment))
 
-    @fluent
     def to_visdom(self, name='Image', log_dir='./logs', comment='torchbearer', visdom_params=None):
         """Direct images from this callback to visdom with the given parameters
 
@@ -193,9 +187,9 @@ class ImagingCallback(Callback):
             visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
 
         Returns:
-            self
+            ImagingCallback: self
         """
-        self.with_handler(_to_visdom(name=name, log_dir=log_dir, comment=comment, visdom_params=visdom_params))
+        return self.with_handler(_to_visdom(name=name, log_dir=log_dir, comment=comment, visdom_params=visdom_params))
 
 
 class CachingImagingCallback(ImagingCallback):
@@ -203,7 +197,7 @@ class CachingImagingCallback(ImagingCallback):
     state key up to the required amount before passing this along with state to the implementing class, once per epoch.
 
     Args:
-        key (:class:`.StateKey`): The key in state containing image data (tensor of size [b, c, w, h])
+        key (StateKey): The :class:`.StateKey` containing image data (tensor of size [b, c, w, h])
         transform (callable, optional): A function/transform that  takes in a Tensor and returns a transformed version.
             This will be applied to the image before it is sent to output.
         num_images: The number of images to cache
@@ -263,7 +257,7 @@ class MakeGrid(CachingImagingCallback):
     provided parameters.
 
     Args:
-        key (:class:`.StateKey`): The key in state containing image data (tensor of size [b, c, w, h])
+        key (StateKey): The :class:`.StateKey` containing image data (tensor of size [b, c, w, h])
         transform (callable, optional): A function/transform that  takes in a Tensor and returns a transformed version.
             This will be applied to the image before it is sent to output.
         num_images: The number of images to cache
@@ -313,7 +307,7 @@ class FromState(ImagingCallback):
     etc.)
 
     Args:
-        key (:class:`.StateKey`): The key in state containing image (tensor of size [c, w, h])
+        key (StateKey): The :class:`.StateKey` containing the image (tensor of size [c, w, h])
         transform (callable, optional): A function/transform that  takes in a Tensor and returns a transformed version.
             This will be applied to the image before it is sent to output.
         decorator: A function which will be used to wrap the callback function. once_per_epoch by default

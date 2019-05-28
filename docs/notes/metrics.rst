@@ -24,7 +24,7 @@ Metric Decorators
 Now that we have explained some of the basic aspects of the metric API, lets have a look at an example:
 
 .. literalinclude:: /../torchbearer/metrics/primitives.py
-   :lines: 17-22
+   :lines: 22-26
 
 This is the definition of the default accuracy metric in torchbearer, let's break it down.
 

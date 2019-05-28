@@ -68,7 +68,7 @@ class LsuvInit(Callback):
     To be consistent with the paper, LsuvInit should be preceeded by a ZeroBias init on the Linear and Conv layers. 
 
     Args:
-        data_item (torch.Tensor: A representative data item to put through the model
+        data_item (torch.Tensor): A representative data item to put through the model
         weight_lambda (lambda): A function that takes a module and returns the weight attribute. If none defaults to 
             module.weight.
         needed_std: See `paper <https://arxiv.org/abs/1511.06422>`__, where needed_std is always 1.0

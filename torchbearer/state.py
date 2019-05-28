@@ -22,7 +22,7 @@ def state_key(key):
         key (str): The seed key - basis for new state key
 
     Returns:
-        :class:`.StateKey`: New state key
+        StateKey: New state key
     """
     return StateKey(key)
 

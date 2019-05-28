@@ -37,7 +37,7 @@ class MetricTree(Metric):
        **first** value to the children.
 
     Args:
-        metric (:class:`.Metric`): The metric to act as the root node of the tree / subtree
+        metric (Metric): The metric to act as the root node of the tree / subtree
     """
     def __init__(self, metric):
         super(MetricTree, self).__init__(metric.name)
@@ -51,7 +51,7 @@ class MetricTree(Metric):
         """Add a child to this node of the tree
 
         Args:
-            child (:class:`.Metric`): The child to add
+            child (Metric): The child to add
         """
         self.children.append(child)
 
@@ -241,7 +241,7 @@ class AdvancedMetric(Metric):
         """Put the metric in eval mode.
 
         Args:
-            data_key (:class:`torchbearer.StateKey`): The torchbearer data_key, if used
+            data_key (StateKey): The torchbearer data_key, if used
         """
         self._process = self.process_validate
         self._process_final = self.process_final_validate

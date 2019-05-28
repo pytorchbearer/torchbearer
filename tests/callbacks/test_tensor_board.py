@@ -313,7 +313,7 @@ class TestTensorBoardImages(TestCase):
         self.assertEqual(mock_writer.return_value.close.call_count, 1)
 
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('tensorboardX.SummaryWriter')
     def test_simple_case(self, mock_board, mock_grid, _):
         mock_board.return_value = Mock()
@@ -336,7 +336,7 @@ class TestTensorBoardImages(TestCase):
         self.assertTrue(mock_grid.call_args[0][0].size() == state['x'].size())
         tboard.on_end({})
 
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
@@ -362,7 +362,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('tensorboardX.SummaryWriter')
     def test_multi_batch(self, mock_board, mock_grid, _):
         mock_board.return_value = Mock()
@@ -386,7 +386,7 @@ class TestTensorBoardImages(TestCase):
         self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(36, 3, 10, 10).size())
         tboard.on_end({})
 
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
@@ -413,7 +413,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('tensorboardX.SummaryWriter')
     def test_multi_epoch(self, mock_board, mock_grid, _):
         mock_board.return_value = Mock()
@@ -438,7 +438,7 @@ class TestTensorBoardImages(TestCase):
         self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(36, 3, 10, 10).size())
         tboard.on_end({})
 
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
@@ -466,7 +466,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('tensorboardX.SummaryWriter')
     def test_single_channel(self, mock_board, mock_grid, _):
         mock_board.return_value = Mock()
@@ -489,7 +489,7 @@ class TestTensorBoardImages(TestCase):
         self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(18, 1, 10, 10).size())
         tboard.on_end({})
 
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')
@@ -515,7 +515,7 @@ class TestTensorBoardImages(TestCase):
         tboard.on_end({})
 
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('tensorboardX.SummaryWriter')
     def test_odd_batches(self, mock_board, mock_grid, _):
         mock_board.return_value = Mock()
@@ -540,7 +540,7 @@ class TestTensorBoardImages(TestCase):
         self.assertTrue(mock_grid.call_args[0][0].size() == torch.ones(40, 3, 10, 10).size())
         tboard.on_end({})
 
-    @patch('torchbearer.callbacks.tensor_board.utils.make_grid')
+    @patch('torchvision.utils.make_grid')
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
     @patch('tensorboardX.torchvis.VisdomWriter')
     @patch('visdom.Visdom')

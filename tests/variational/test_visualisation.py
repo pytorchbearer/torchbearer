@@ -100,7 +100,7 @@ class TestLatentWalker(unittest.TestCase):
 
         self.assertTrue(lw.data == state['test_key'])
 
-    @patch('torchbearer.variational.visualisation.save_image')
+    @patch('torchvision.utils.save_image')
     def test_save_walk(self, mock_save_img):
         state = {tb.MODEL: Mock(), tb.X: Mock(), tb.DEVICE: 'cpu'}
 

@@ -28,8 +28,8 @@ class BinaryAccuracy(Metric):
     Default for key: 'binary_acc'.
 
     Args:
-        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
-        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        pred_key (StateKey): The key in state which holds the predicted values
+        target_key (StateKey): The key in state which holds the target values
         threshold (float): value between 0 and 1 to use as a threshold when binarizing predictions and targets
     """
 
@@ -57,8 +57,8 @@ class CategoricalAccuracy(Metric):
     mean, running_mean and std. Default for key: 'cat_acc'
 
     Args:
-        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
-        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        pred_key (StateKey): The key in state which holds the predicted values
+        target_key (StateKey): The key in state which holds the target values
         ignore_index (int): Specifies a target value that is ignored and does not contribute to the metric output.
             See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     """
@@ -92,8 +92,8 @@ class TopKCategoricalAccuracy(Metric):
     Decorated with a mean, running_mean and std. Default for keys: 'top_5_acc', 'top_10_acc'.
 
     Args:
-        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
-        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        pred_key (StateKey): The key in state which holds the predicted values
+        target_key (StateKey): The key in state which holds the target values
         ignore_index (int): Specifies a target value that is ignored and does not contribute to the metric output.
             See `<https://pytorch.org/docs/stable/nn.html#crossentropyloss>`_
     """
@@ -127,8 +127,8 @@ class MeanSquaredError(Metric):
     Decorated with a mean and running_mean. Default for key: 'mse'.
 
     Args:
-        pred_key (:class:`torchbearer.StateKey`): The key in state which holds the predicted values
-        target_key (:class:`torchbearer.StateKey`): The key in state which holds the target values
+        pred_key (StateKey): The key in state which holds the predicted values
+        target_key (StateKey): The key in state which holds the target values
     """
 
     def __init__(self, pred_key=torchbearer.Y_PRED, target_key=torchbearer.Y_TRUE):

@@ -11,27 +11,36 @@ class AutoEncoderBase(nn.Module):
     def encode(self, x, state=None):
         """Encode the given batch of images and return latent space sample for each.
 
-        :param x: Batch of images to encode
-        :param state: The trial state
-        :return: Encoded samples / tuple of samples for different spaces
+        Args:
+            x: Batch of images to encode
+            state: The trial state
+
+        Returns:
+            Encoded samples / tuple of samples for different spaces
         """
         raise NotImplementedError
 
     def decode(self, sample, state=None):
         """Decode the given latent space sample batch to images.
 
-        :param sample: The latent space samples
-        :param state: The trial state
-        :return: Decoded images
+        Args:
+            sample: The latent space samples
+            state: The trial state
+
+        Returns:
+            Decoded images
         """
         raise NotImplementedError
 
     def forward(self, x, state=None):
         """Encode then decode the inputs, returning the result. Also binds the target as the input images in state.
 
-        :param x: Model input batch
-        :param state: The trial state
-        :return: Auto-Encoded images
+        Args:
+            x: Model input batch
+            state: The trial state
+
+        Returns:
+            Auto-Encoded images
         """
         if state is not None:
             state[torchbearer.Y_TRUE] = x
