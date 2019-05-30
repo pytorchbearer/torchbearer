@@ -28,6 +28,14 @@ Deep Learning
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/ecs-vlc/torchbearer/blob/master/docs/_static/notebooks/gan.ipynb>`__   :download:`Download Notebook </_static/notebooks/gan.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/ecs-vlc/torchbearer/blob/master/docs/_static/notebooks/gan.ipynb>`__
 
+- **Class Appearance Model**:
+
+    In this example we will demonstrate the `ClassAppearanceModel <https://torchbearer.readthedocs.io/en/latest/code/callbacks.html#torchbearer.callbacks.imaging.inside_cnns.ClassAppearanceModel>`__ callback included in torchbearer. This implements
+    one of the most simple (and therefore not always the most successful) deep visualisation techniques, discussed in the
+    paper `Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps <https://arxiv.org/abs/1312.6034>`__
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/ecs-vlc/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb>`__   :download:`Download Notebook </_static/notebooks/cam.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/ecs-vlc/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb>`__
+
 
 Differentiable Programming
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
