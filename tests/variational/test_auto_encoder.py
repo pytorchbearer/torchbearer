@@ -1,6 +1,6 @@
 import torch
 import unittest
-import torchbearer as tb
+import torchbearer
 from mock import Mock
 
 import torchbearer.variational.auto_encoder as ae
@@ -24,7 +24,7 @@ class TestAutoEncoder(unittest.TestCase):
     def test_forward_call_counts(self):
         latents = 10
         x = torch.rand(1)
-        state = {tb.X: x, tb.Y_TRUE: 1}
+        state = {torchbearer.X: x, torchbearer.Y_TRUE: 1}
 
         model = SimpleAE(latents)
         model.encode = Mock()
@@ -41,7 +41,7 @@ class TestAutoEncoder(unittest.TestCase):
     def test_forward_call_args(self):
         latents = 10
         x = torch.rand(1)
-        state = {tb.X: x, tb.Y_TRUE: 1}
+        state = {torchbearer.X: x, torchbearer.Y_TRUE: 1}
 
         model = SimpleAE(latents)
         model.encode = Mock()
@@ -55,7 +55,7 @@ class TestAutoEncoder(unittest.TestCase):
     def test_forward_replace_y_true(self):
         latents = 10
         x = torch.rand(1)
-        state = {tb.X: x, tb.Y_TRUE: 1}
+        state = {torchbearer.X: x, torchbearer.Y_TRUE: 1}
 
         model = SimpleAE(latents)
         model.encode = Mock()
@@ -63,12 +63,12 @@ class TestAutoEncoder(unittest.TestCase):
         model.decode = Mock()
 
         model.forward(x, state)
-        self.assertTrue(model.decode.call_args[0][1][tb.Y_TRUE] == x)
+        self.assertTrue(model.decode.call_args[0][1][torchbearer.Y_TRUE] == x)
 
     def test_latent_dims(self):
         latents = 10
         x = torch.rand(1)
-        state = {tb.X: x, tb.Y_TRUE: 1}
+        state = {torchbearer.X: x, torchbearer.Y_TRUE: 1}
 
         model = SimpleAE(latents)
         self.assertTrue(model.latent_dims == latents)
