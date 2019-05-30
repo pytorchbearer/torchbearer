@@ -22,6 +22,7 @@ Welcome to torchbearer's documentation!
    examples/vae
    examples/gan
    examples/cam
+   examples/notebooks
 
 .. toctree::
    :glob:
