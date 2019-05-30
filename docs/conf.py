@@ -176,5 +176,6 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+html_scaled_image_link = False
 
 
