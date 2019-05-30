@@ -1,6 +1,6 @@
 import torch
 
-import torchbearer as tb
+import torchbearer
 import torchbearer.callbacks as c
 
 
@@ -90,9 +90,9 @@ class LatentWalker(c.Callback):
         return self
 
     def _vis(self, state):
-        self.model = state[tb.MODEL]
-        self.data = state[self.data_key] if self.data_key is not None else state[tb.X]
-        self.dev = state[tb.DEVICE]
+        self.model = state[torchbearer.MODEL]
+        self.data = state[self.data_key] if self.data_key is not None else state[torchbearer.X]
+        self.dev = state[torchbearer.DEVICE]
 
         with torch.no_grad():
             result = self.vis(state)
@@ -114,7 +114,7 @@ class LatentWalker(c.Callback):
 
 
 class ReconstructionViewer(LatentWalker):
-    def __init__(self, row_size=8, recon_key=tb.Y_PRED):
+    def __init__(self, row_size=8, recon_key=torchbearer.Y_PRED):
         """
         Latent space walker that just returns the reconstructed images for the batch
 

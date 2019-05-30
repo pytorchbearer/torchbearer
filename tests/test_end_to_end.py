@@ -3,7 +3,7 @@ import unittest
 import torch
 from torch.nn import Module
 
-import torchbearer as tb
+import torchbearer
 
 
 class Net(Module):
@@ -47,7 +47,7 @@ class TestEndToEnd(unittest.TestCase):
         model = NetWithState(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = tb.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1)
+        tbmodel = torchbearer.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1)
         tbmodel.run()
 
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
@@ -61,7 +61,7 @@ class TestEndToEnd(unittest.TestCase):
         model = Net(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = tb.Trial(model, optim, loss, callbacks=[tb.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
+        tbmodel = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
         tbmodel.run(2)  # Simulate 2 'epochs'
 
         # Reload
@@ -69,9 +69,9 @@ class TestEndToEnd(unittest.TestCase):
         model = Net(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = tb.Trial(model, optim, loss, callbacks=[tb.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps)
+        tbmodel = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps)
         tbmodel.load_state_dict(torch.load('test.pt'))
-        self.assertEqual(len(tbmodel.state[tb.HISTORY]), 2)
+        self.assertEqual(len(tbmodel.state[torchbearer.HISTORY]), 2)
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
         self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
         self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)
@@ -84,11 +84,11 @@ class TestEndToEnd(unittest.TestCase):
 
         model = Net(p)
 
-        tbmodel = tb.Trial(model)
+        tbmodel = torchbearer.Trial(model)
         self.assertListEqual(tbmodel.run(), [])
 
     def test_no_model(self):
-        tbmodel = tb.Trial(None)
+        tbmodel = torchbearer.Trial(None)
 
         import warnings
         with warnings.catch_warnings(record=True) as w:

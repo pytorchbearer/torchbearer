@@ -1,4 +1,4 @@
-import torchbearer as tb
+import torchbearer
 from torchbearer import Callback
 import numpy as np
 from torchbearer import cite
@@ -60,7 +60,7 @@ class CyclicLR(Callback):
 
     def on_start(self, state):
         super(CyclicLR, self).on_start(state)
-        self.optim = state[tb.OPTIMIZER]
+        self.optim = state[torchbearer.OPTIMIZER]
         self.iterations = 0
 
         if len(self.optim.param_groups) > 1:

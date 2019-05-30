@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import patch, MagicMock
 
-import torchbearer as tb
+import torchbearer
 from torchbearer.callbacks import LiveLossPlot
 
 
@@ -17,7 +17,7 @@ class TestLiveLossPlot(TestCase):
         llp = LiveLossPlot(True, 1, False, False)
         llp.batch_plt = MagicMock()
         llp.plt = MagicMock()
-        state = {tb.BATCH: 1, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 1, torchbearer.METRICS: {'test': 1}}
         llp.on_step_training(state)
         llp.on_step_training(state)
 
@@ -28,13 +28,13 @@ class TestLiveLossPlot(TestCase):
         llp = LiveLossPlot(True, 2, False, False)
         llp.batch_plt = MagicMock()
         llp.plt = MagicMock()
-        state = {tb.BATCH: 1, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 1, torchbearer.METRICS: {'test': 1}}
         llp.on_step_training(state)
-        state = {tb.BATCH: 2, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 2, torchbearer.METRICS: {'test': 1}}
         llp.on_step_training(state)
-        state = {tb.BATCH: 3, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 3, torchbearer.METRICS: {'test': 1}}
         llp.on_step_training(state)
-        state = {tb.BATCH: 4, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 4, torchbearer.METRICS: {'test': 1}}
         llp.on_step_training(state)
 
         self.assertTrue(llp.batch_plt.draw.call_count == 2)
@@ -44,7 +44,7 @@ class TestLiveLossPlot(TestCase):
         llp = LiveLossPlot(False, 10, False, False)
         llp.batch_plt = MagicMock()
         llp.plt = MagicMock()
-        state = {tb.BATCH: 1, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 1, torchbearer.METRICS: {'test': 1}}
         llp.on_step_training(state)
         llp.on_step_training(state)
 
@@ -54,7 +54,7 @@ class TestLiveLossPlot(TestCase):
         llp = LiveLossPlot(False, 10, True, False)
         llp.batch_plt = MagicMock()
         llp.plt = MagicMock()
-        state = {tb.BATCH: 1, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 1, torchbearer.METRICS: {'test': 1}}
         llp.on_end_epoch(state)
         llp.on_end_epoch(state)
 
@@ -65,7 +65,7 @@ class TestLiveLossPlot(TestCase):
         llp = LiveLossPlot(True, 1, True, True)
         llp.batch_plt = MagicMock()
         llp.plt = MagicMock()
-        state = {tb.BATCH: 1, tb.METRICS: {'test': 1}}
+        state = {torchbearer.BATCH: 1, torchbearer.METRICS: {'test': 1}}
         llp.on_end_epoch(state)
         llp.on_end_epoch(state)
         llp.on_end(state)
