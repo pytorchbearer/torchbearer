@@ -53,6 +53,18 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_p
     will be saved with the epoch number and the validation loss in the filename. The torch :class:`.Trial` will be
     saved to filename.
 
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import ModelCheckpoint
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = ModelCheckpoint('my_path.pt', monitor='val_acc', mode='max')
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
+
     Args:
         filepath (str): Path to save the model file
         save_model_params_only (bool): If `save_model_params_only=True`, only model parameters will be saved so that
@@ -77,7 +89,21 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_p
 
 
 class MostRecent(_Checkpointer):
-    """Model checkpointer which saves the most recent model to a given filepath.
+    """Model checkpointer which saves the most recent model to a given filepath. `filepath` can contain named
+    formatting options, which will be filled any values from state. For example: if `filepath` is
+    `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints will be saved with the epoch number and the
+    validation loss in the filename.
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import MostRecent
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = MostRecent('my_path.pt')
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
 
     Args:
         filepath (str): Path to save the model file
@@ -101,7 +127,21 @@ class MostRecent(_Checkpointer):
 
 
 class Best(_Checkpointer):
-    """Model checkpointer which saves the best model according to the given configurations.
+    """Model checkpointer which saves the best model according to the given configurations. `filepath` can contain
+    named formatting options, which will be filled any values from state. For example: if `filepath` is
+    `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints will be saved with the epoch number and the
+    validation loss in the filename.
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import Best
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = Best('my_path.pt', monitor='val_acc', mode='max')
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
 
     Args:
         filepath (str): Path to save the model file
@@ -178,7 +218,21 @@ class Best(_Checkpointer):
 
 
 class Interval(_Checkpointer):
-    """Model checkpointer which which saves the model every 'period' epochs to the given filepath.
+    """Model checkpointer which which saves the model every 'period' epochs to the given filepath. `filepath` can
+    contain named formatting options, which will be filled any values from state. For example: if `filepath` is
+    `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints will be saved with the epoch number and the
+    validation loss in the filename.
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import Interval
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = Interval('my_path.pt', period=100, on_batch=True)
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
 
     Args:
         filepath (str): Path to save the model file

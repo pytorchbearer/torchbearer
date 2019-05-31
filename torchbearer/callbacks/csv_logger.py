@@ -9,6 +9,16 @@ import csv
 class CSVLogger(Callback):
     """Callback to log metrics to a given csv file.
 
+    Example: ::
+
+        >>> from torchbearer.callbacks import CSVLogger
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which writes metrics to a csv file appending to previous content
+        >>> logger = CSVLogger('my_path.pt', separator=',', append=True)
+        >>> trial = Trial(None, callbacks=[logger], metrics=['acc'])
+
     Args:
         filename (str): The name of the file to output to
         separator (str): The delimiter to use (e.g. comma, tab etc.)

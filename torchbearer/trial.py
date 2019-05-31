@@ -17,6 +17,7 @@ import warnings
 import itertools
 
 import torch
+import torch.nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Optimizer
 
@@ -59,6 +60,14 @@ class MockOptimizer(Optimizer):
 
     def zero_grad(self):
         pass  # Do Nothing
+
+
+class MockModel(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        return None
 
 
 class CallbackListInjection(CallbackList):
@@ -360,7 +369,7 @@ class Trial(object):
         self.closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE, torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
         self.state = State()
         self.state.update({
-            torchbearer.MODEL: model,
+            torchbearer.MODEL: model if model is not None else MockModel(),
             torchbearer.CRITERION: criterion,
             torchbearer.OPTIMIZER: optimizer if optimizer is not None else MockOptimizer(),
             torchbearer.METRIC_LIST: MetricList(metrics),
