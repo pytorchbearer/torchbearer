@@ -11,7 +11,7 @@ class TestMakeDataset(unittest.TestCase):
             ('/root', (), ('b.a', 'c.a'))
         ]
 
-        out = ds.make_dataset('a',['a'])
+        out = ds.make_dataset('a', tuple(tuple(['a'])))
         self.assertTrue(out == ['/root/b.a', '/root/c.a'])
 
     @patch('os.walk')
@@ -20,7 +20,7 @@ class TestMakeDataset(unittest.TestCase):
             ('/root', (), ('b.v', 'c.a'))
         ]
 
-        out = ds.make_dataset('a',['a'])
+        out = ds.make_dataset('a',tuple(['a']))
         self.assertTrue(out == ['/root/c.a'])
 
     @patch('os.walk')
@@ -29,7 +29,7 @@ class TestMakeDataset(unittest.TestCase):
             ('/root', (), ('b.v', 'c.v'))
         ]
 
-        out = ds.make_dataset('a',['a'])
+        out = ds.make_dataset('a',tuple(['a']))
         self.assertTrue(out == [])
 
     @patch('os.walk')
@@ -38,7 +38,7 @@ class TestMakeDataset(unittest.TestCase):
             ('', (), ('b.a', 'c.a'))
         ]
 
-        out = ds.make_dataset('a',['a'])
+        out = ds.make_dataset('a',tuple(['a']))
         self.assertTrue(out == ['b.a', 'c.a'])
 
     @patch('os.walk')
@@ -47,7 +47,7 @@ class TestMakeDataset(unittest.TestCase):
             ('', (), ('b.1', 'c.2'))
         ]
 
-        out = ds.make_dataset('a',['1','2'])
+        out = ds.make_dataset('a',tuple(['1','2']))
         self.assertTrue(out == ['b.1', 'c.2'])
 
 

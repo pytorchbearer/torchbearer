@@ -64,7 +64,7 @@ class MockOptimizer(Optimizer):
 
 class MockModel(torch.nn.Module):
     def __init__(self):
-        super().__init__()
+        super(MockModel, self).__init__()
 
     def forward(self, x):
         return None
