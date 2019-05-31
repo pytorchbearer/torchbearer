@@ -89,8 +89,7 @@ class TestEndToEnd(unittest.TestCase):
 
     def test_no_model(self):
         tbmodel = torchbearer.Trial(None)
+        tbmodel.run()
 
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            tbmodel.run()
-            self.assertTrue(len(w) == 1)
+        self.assertTrue(tbmodel.state[torchbearer.MODEL](torch.rand(1)) is None)
+
