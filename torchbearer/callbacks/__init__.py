@@ -99,6 +99,8 @@ Decorators
 
 from torchbearer import Callback
 from .callbacks import *
+from .lr_finder import CyclicLR
+from .lsuv import LSUV
 from .checkpointers import *
 from .csv_logger import *
 from .early_stopping import *

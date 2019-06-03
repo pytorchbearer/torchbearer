@@ -17,7 +17,19 @@ bibtex = """
 
 @cite(bibtex)
 class CyclicLR(Callback):
-    """ Learning rate finder that cyclicly varies the rate. Based off of the keras implementation referenced in the `paper <https://arxiv.org/abs/1506.01186>`_.
+    """ Learning rate finder that cyclicly varies the rate. Based off of the keras implementation referenced in the
+    `paper <https://arxiv.org/abs/1506.01186>`_.
+
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import CyclicLR
+
+        # Example Trial which does cyclic learning rate variation between 0.00001 and 0.0001 and back
+        with period of 200 steps
+        >>> lr_finder = CyclicLR(0.00001, 0.0001, step_size=100)
+        >>> trial = Trial(model, callbacks=[lr_finder], metrics=['acc'])
 
     Args:
         base_lr (float / list): Float or list of floats for the base (min) learning rate for each optimiser parameter group

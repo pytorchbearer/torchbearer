@@ -7,6 +7,15 @@ from torchbearer.callbacks import Callback
 class EarlyStopping(Callback):
     """Callback to stop training when a monitored quantity has stopped improving.
 
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import EarlyStopping
+
+        # Example Trial which does early stopping if the validation accuracy drops below the max seen for 5 epochs in a row
+        >>> stopping = EarlyStopping(monitor='val_acc', patience=5, mode='max')
+        >>> trial = Trial(None, callbacks=[stopping], metrics=['acc'])
+
     Args:
         monitor (str): Name of quantity in metrics to be monitored
         min_delta (float): Minimum change in the monitored quantity to qualify as an improvement, i.e. an absolute

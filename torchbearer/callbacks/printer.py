@@ -29,6 +29,17 @@ def _format_metrics(metrics, rounder):
 class ConsolePrinter(Callback):
     """The ConsolePrinter callback simply outputs the training metrics to the console.
 
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import ConsolePrinter
+
+        # Example Trial which forgoes the usual printer for a console printer
+        >>> printer = ConsolePrinter()
+        >>> trial = Trial(None, callbacks=[printer], verbose=0).for_steps(1).run()
+        0/1(t):
+
     Args:
         validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase
             of training
