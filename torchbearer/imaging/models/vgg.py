@@ -31,20 +31,20 @@ def _make_vgg_layer_names(cfg, bn=False):
 
     if bn:
         return [
-                *_make_block_layer_names(['conv1', 'batchnorm1', 'relu1'], depths[0]), 'maxpool1',
-                *_make_block_layer_names(['conv2', 'batchnorm2', 'relu2'], depths[1]), 'maxpool2',
-                *_make_block_layer_names(['conv3', 'batchnorm3', 'relu3'], depths[2]), 'maxpool3',
-                *_make_block_layer_names(['conv4', 'batchnorm4', 'relu4'], depths[3]), 'maxpool4',
-                *_make_block_layer_names(['conv5', 'batchnorm5', 'relu5'], depths[4]), 'maxpool5',
-                'avgpool6', 'fc7a', 'relu7a', 'dropout7a', 'fc7b', 'relu7b', 'dropout7b', 'fc7c']
+                *_make_block_layer_names(['conv1', 'batchnorm1', 'relu1'], depths[0]), 'maxpool2',
+                *_make_block_layer_names(['conv2', 'batchnorm2', 'relu2'], depths[1]), 'maxpool3',
+                *_make_block_layer_names(['conv3', 'batchnorm3', 'relu3'], depths[2]), 'maxpool4',
+                *_make_block_layer_names(['conv4', 'batchnorm4', 'relu4'], depths[3]), 'maxpool5',
+                *_make_block_layer_names(['conv5', 'batchnorm5', 'relu5'], depths[4]), 'maxpool6',
+                'avgpool7', 'fc7a', 'relu7a', 'dropout7a', 'fc7b', 'relu7b', 'dropout7b', 'fc7c']
     else:
         return [
-                *_make_block_layer_names(['conv1', 'relu1'], depths[0]), 'maxpool1',
-                *_make_block_layer_names(['conv2', 'relu2'], depths[1]), 'maxpool2',
-                *_make_block_layer_names(['conv3', 'relu3'], depths[2]), 'maxpool3',
-                *_make_block_layer_names(['conv4', 'relu4'], depths[3]), 'maxpool4',
-                *_make_block_layer_names(['conv5', 'relu5'], depths[4]), 'maxpool5',
-                'avgpool6', 'fc7a', 'relu7a', 'dropout7a', 'fc7b', 'relu7b', 'dropout7b', 'fc7c']
+                *_make_block_layer_names(['conv1', 'relu1'], depths[0]), 'maxpool2',
+                *_make_block_layer_names(['conv2', 'relu2'], depths[1]), 'maxpool3',
+                *_make_block_layer_names(['conv3', 'relu3'], depths[2]), 'maxpool4',
+                *_make_block_layer_names(['conv4', 'relu4'], depths[3]), 'maxpool5',
+                *_make_block_layer_names(['conv5', 'relu5'], depths[4]), 'maxpool6',
+                'avgpool7', 'fc7a', 'relu7a', 'dropout7a', 'fc7b', 'relu7b', 'dropout7b', 'fc7c']
 
 
 layer_names = {

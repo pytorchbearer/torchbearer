@@ -7,9 +7,9 @@ from torchvision.models.utils import load_state_dict_from_url
 
 from torchbearer.imaging.models.utils import storer, basemodel
 
-layer_names = ['conv1', 'maxpool1', 'conv2', 'conv3', 'maxpool2', 'inception3a', 'inception3b', 'maxpool3',
-               'inception4a', 'inception4b', 'inception4c', 'inception4d', 'inception4e', 'maxpool4', 'inception5a',
-               'inception5b', 'avgpool', 'dropout', 'fc', 'aux1', 'aux2'
+layer_names = ['conv1', 'maxpool2', 'conv2', 'conv3', 'maxpool3', 'inception3a', 'inception3b', 'maxpool4',
+               'inception4a', 'inception4b', 'inception4c', 'inception4d', 'inception4e', 'maxpool5', 'inception5a',
+               'inception5b', 'avgpool6', 'dropout6', 'fc6', 'aux1', 'aux2'
                ]
 
 

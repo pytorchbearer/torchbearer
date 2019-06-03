@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torchbearer.imaging.models.utils import storer, basemodel
 
 
-layer_names = ['conv0', 'norm0', 'relu0', 'pool0', 'denseblock1', 'transition1', 'denseblock2', 'transition2',
+layer_names = ['conv0', 'norm0', 'relu0', 'pool1', 'denseblock1', 'transition1', 'denseblock2', 'transition2',
                'denseblock3', 'transition3', 'denseblock4', 'norm5', 'relu5', 'avgpool6', 'fc6']
 
 
