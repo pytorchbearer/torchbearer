@@ -5,7 +5,7 @@ from mock import MagicMock, patch
 import torch
 
 import torchbearer
-import imaging as imaging
+import torchbearer.imaging as imaging
 
 import matplotlib.pyplot as plt  # Import so that it can be mocked
 plt.ioff()
@@ -82,10 +82,10 @@ class TestImagingCallback(TestCase):
         handler.assert_called_once_with('test', 'state')
         self.assertTrue(callback.transform.call_count == 1)
 
-    @patch('torchbearer.callbacks.imaging.imaging._to_visdom')
-    @patch('torchbearer.callbacks.imaging.imaging._to_tensorboard')
-    @patch('torchbearer.callbacks.imaging.imaging._to_pyplot')
-    @patch('torchbearer.callbacks.imaging.imaging._to_file')
+    @patch('torchbearer.imaging.imaging._to_visdom')
+    @patch('torchbearer.imaging.imaging._to_tensorboard')
+    @patch('torchbearer.imaging.imaging._to_pyplot')
+    @patch('torchbearer.imaging.imaging._to_file')
     def test_simple_methods(self, mock_to_file, mock_to_pyplot, mock_to_tensorboard, mock_to_visdom):
         callback = imaging.ImagingCallback()
         self.assertRaises(NotImplementedError, lambda: callback.on_batch('test'))

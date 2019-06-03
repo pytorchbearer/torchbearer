@@ -5,7 +5,7 @@ from mock import MagicMock, patch, ANY
 import torch
 
 import torchbearer
-import imaging as imaging
+import torchbearer.imaging as imaging
 
 
 class TestClassAppearanceModel(TestCase):
@@ -24,7 +24,7 @@ class TestClassAppearanceModel(TestCase):
         self.assertTrue(targets_hot[0][5] == 1)
         self.assertTrue(state['test'] == 5)
 
-    @patch('torchbearer.callbacks.imaging.inside_cnns.torch.randint')
+    @patch('torchbearer.imaging.inside_cnns.torch.randint')
     def test_random_targets(self, randint):
         randint.return_value = torch.ones(1, 1) * 6
         callback = imaging.ClassAppearanceModel(nclasses=10, input_size=(1, 1, 1))
@@ -63,9 +63,9 @@ class TestClassAppearanceModel(TestCase):
         self.assertTrue(model.call)
         self.assertTrue(model.call_args[0][0] is wrapper.input_batch)
 
-    @patch('torchbearer.callbacks.imaging.inside_cnns._cam_loss')
-    @patch('torchbearer.callbacks.imaging.inside_cnns._CAMWrapper')
-    @patch('torchbearer.callbacks.imaging.inside_cnns.torchbearer.Trial')
+    @patch('torchbearer.imaging.inside_cnns._cam_loss')
+    @patch('torchbearer.imaging.inside_cnns._CAMWrapper')
+    @patch('torchbearer.imaging.inside_cnns.torchbearer.Trial')
     def test_on_batch(self, _, wrapper, loss):
         wrapper().input_batch = torch.nn.Parameter(torch.zeros(10))
 
