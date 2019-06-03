@@ -85,6 +85,18 @@ class Tqdm(Callback):
     """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM.
     The given key is used to label validation output.
 
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import Tqdm
+
+        # Example Trial which forgoes the usual printer for a customised tqdm printer.
+        >>> printer = Tqdm(precision=8)
+        # Note that outputs are written to stderr, not stdout as shown in this example
+        >>> trial = Trial(None, callbacks=[printer], verbose=0).for_steps(1).run(1)
+        0/1(t): 100%|██████████| 1/1 [00:00<00:00, 29.40it/s]
+
     Args:
         tqdm_module: The tqdm module to use. If none, defaults to tqdm or tqdm_notebook if in notebook
         validation_label_letter (str): The letter to use for validation outputs.
