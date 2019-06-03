@@ -13,3 +13,7 @@ Deep Inside Convolutional Networks
 """
 from .imaging import *
 from .inside_cnns import ClassAppearanceModel, RANDOM
+from .loss import *
+from .images import *
+from . import transforms
+from.ascent import *

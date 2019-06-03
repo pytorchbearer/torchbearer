@@ -5,7 +5,7 @@ from mock import MagicMock, patch
 import torch
 
 import torchbearer
-import torchbearer.callbacks.imaging as imaging
+import imaging as imaging
 
 import matplotlib.pyplot as plt  # Import so that it can be mocked
 plt.ioff()

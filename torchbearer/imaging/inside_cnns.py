@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchbearer
-from . import imaging, once_per_epoch
+from . import imaging, once_per_epoch, transforms
 
 _inside_cnns = """
 @article{simonyan2013deep,
@@ -20,21 +20,24 @@ class _CAMWrapper(nn.Module):
     def __init__(self, input_size, base_model):
         super(_CAMWrapper, self).__init__()
         self.base_model = base_model
-        input_image = torch.zeros(input_size)
+        input_image = torch.rand(input_size)
 
         self.input_batch = nn.Parameter(input_image.unsqueeze(0), requires_grad=True)
+        self.tform = transforms.Compose([transforms.SpatialJitter(8), transforms.RandomScale([1 + (i - 5) / 50. for i in range(11)]), transforms.RandomRotate(list(range(-10, 11)) + 5 * [0]), transforms.SpatialJitter(4)])
 
     def forward(self, _, state):
+        x = self.tform(self.input_batch)
         try:
-            return self.base_model(self.input_batch, state)
+            return self.base_model(x, state)
         except TypeError:
-            return self.base_model(self.input_batch)
+            return self.base_model(x)
 
 
 def _cam_loss(key, to_prob, targets_hot, decay):
     def loss(state):
         img = state[torchbearer.MODEL].input_batch
-        return - to_prob(torch.masked_select(state[key], targets_hot)).sum() + decay * img.pow(2).sum()
+        # return - (state[key][0, 452].mean() + decay * img.abs().sum())
+        return - torch.masked_select(to_prob(state[key]), targets_hot).sum() + decay * (img).abs().sum()  # img.pow(2).mean()
     return loss
 
 
@@ -59,8 +62,8 @@ class ClassAppearanceModel(imaging.ImagingCallback):
             This will be applied to the image before it is sent to output
 
     """
-    def __init__(self, nclasses, input_size, optimizer_factory=lambda params: optim.SGD(params, lr=2), steps=1024,
-                 logit_key=torchbearer.PREDICTION, prob_key=None, target=RANDOM, decay=0.001, verbose=0, transform=None):
+    def __init__(self, nclasses, input_size, optimizer_factory=lambda params: optim.Adam(params, lr=0.05), steps=1024,
+                 logit_key=torchbearer.PREDICTION, prob_key=None, target=RANDOM, decay=5e-4, verbose=0, transform=None):
         super(ClassAppearanceModel, self).__init__(transform=transform)
 
         self.nclasses = nclasses
@@ -94,16 +97,19 @@ class ClassAppearanceModel(imaging.ImagingCallback):
     @once_per_epoch
     def on_batch(self, state):
         training = state[torchbearer.MODEL].training
-        state[torchbearer.MODEL].eval()
+
+        @torchbearer.callbacks.on_start_epoch
+        def cback(state):
+            state[torchbearer.MODEL].eval()
 
         targets_hot = self._targets_hot(state)
 
-        to_prob = (lambda x: x.exp()) if self.prob_key is None else (lambda x: x)
+        to_prob = (lambda x: x) if self.prob_key is None else (lambda x: x)
         key = self.logit_key if self.prob_key is None else self.prob_key
 
         model = _CAMWrapper(self.input_size, state[torchbearer.MODEL])
-        trial = torchbearer.Trial(model, self.optimizer_factory(filter(lambda p: p.requires_grad, [model.input_batch])),
-                                  _cam_loss(key, to_prob, targets_hot, self.decay))
+        trial = torchbearer.Trial(model, self.optimizer_factory([model.input_batch]),
+                                  _cam_loss(key, to_prob, targets_hot, self.decay), callbacks=[cback])
         trial.for_train_steps(self.steps).to(state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
         trial.run(verbose=self.verbose)
 

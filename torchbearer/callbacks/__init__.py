@@ -6,13 +6,6 @@ Base Classes
         :members:
         :undoc-members:
 
-Imaging
-------------------------------------
-
-..  automodule:: torchbearer.callbacks.imaging
-        :members:
-        :undoc-members:
-
 Model Checkpointers
 ------------------------------------
 
@@ -97,7 +90,6 @@ Decorators
         :undoc-members:
 """
 
-from torchbearer import Callback
 from .callbacks import *
 from .checkpointers import *
 from .csv_logger import *
@@ -112,4 +104,3 @@ from .aggregate_predictions import *
 from .decorators import *
 from .live_loss_plot import LiveLossPlot
 from . import init
-from . import imaging

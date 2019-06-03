@@ -5,7 +5,7 @@ from mock import MagicMock, patch, ANY
 import torch
 
 import torchbearer
-import torchbearer.callbacks.imaging as imaging
+import imaging as imaging
 
 
 class TestClassAppearanceModel(TestCase):
