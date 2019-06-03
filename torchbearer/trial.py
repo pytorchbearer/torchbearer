@@ -152,10 +152,18 @@ def get_printer(verbose, validation_label_letter):
 
 
 def deep_to(batch, device, dtype):
-    """ Static method to call :func:`to` on tensors or tuples. All items in tuple will have :func:`deep_to` called
+    """ Static method to call :func:`to` on tensors, tuples or dicts. All items will have :func:`deep_to` called
+
+    Example::
+
+        >>> import torch
+        >>> from torchbearer import deep_to
+        >>> example_dict = {'a': torch.ones(5)*2.1, 'b': torch.ones(1)*5.9}
+        >>> deep_to(example_dict, device='cpu', dtype=torch.int)
+        {'a': tensor([2, 2, 2, 2, 2], dtype=torch.int32), 'b': tensor([5], dtype=torch.int32)}
 
     Args:
-        batch (tuple / list / torch.Tensor): The mini-batch which requires a :func:`to` call
+        batch (tuple / list / torch.Tensor / dict): The mini-batch which requires a :func:`to` call
         device (torch.device): The desired device of the batch
         dtype (torch.dtype): The desired datatype of the batch
 
@@ -350,6 +358,24 @@ class Trial(object):
     The trial class contains all of the required hyper-parameters for model running in torchbearer and presents an
     API for model fitting, evaluating and predicting.
 
+    Example::
+
+        >>> import torch
+        >>> from torchbearer import Trial
+
+        # Example trial that attempts to aims the output of a linear layer.
+        # Makes use of a callback to input the random data at each batch and a loss that is the absolute value of the
+        # linear layer output. Runs for 10 iterations and a single epoch.
+        >>> model = torch.nn.Linear(2,1)
+        >>> optimiser = torch.optim.Adam(model.parameters(), lr=3e-4)
+
+        >>> @torchbearer.callbacks.on_sample
+        ... def initial_data(state):
+        ...     state[torchbearer.X] = torch.rand(1, 2)*10
+        >>> def minimise_output_loss(y_pred, y_true):
+        ...     return torch.abs(y_pred)
+        >>> trial = Trial(model, optimiser, minimise_output_loss, ['loss'], [initial_data]).for_steps(10).run(1)
+
     Args:
         model (torch.nn.Module): The base pytorch model
         optimizer (torch.optim.Optimizer): The optimizer used for pytorch model weight updates
@@ -418,6 +444,12 @@ class Trial(object):
         convenience. If steps is larger than dataset size then loader will be refreshed like if it was a new epoch. If
         steps is -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
+        Example::
+
+            # Simple trial that runs for 100 training iterations, in this case optimising nothing
+            >>> from torchbearer import Trial
+            >>> trial = Trial(None).for_train_steps(100)
+
         Args:
             steps (int): The number of training steps per epoch to run.
 
@@ -435,6 +467,15 @@ class Trial(object):
     def with_train_generator(self, generator, steps=None):
         """Use this trial with the given train generator. Returns self so that methods can be chained for convenience.
 
+        Example::
+
+            # Simple trial that runs for 100 training iterations on the MNIST dataset
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> dataloader = DataLoader(MNIST('./data/', train=True))
+            >>> trial = Trial(None).with_train_generator(dataloader).for_steps(100).run(1)
+
         Args:
             generator: The train data generator to use during calls to :meth:`.run`
             steps (int): The number of steps per epoch to take when using this generator.
@@ -451,6 +492,13 @@ class Trial(object):
 
     def with_train_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
         """Use this trial with the given train data. Returns self so that methods can be chained for convenience.
+
+        Example::
+
+            # Simple trial that runs for 10 training iterations on some random data
+            >>> from torchbearer import Trial
+            >>> data = torch.rand(10, 1)
+            >>> trial = Trial(None).with_train_data(data).for_steps(10).run(1)
 
         Args:
             x (torch.Tensor): The train x data to use during calls to :meth:`.run`
