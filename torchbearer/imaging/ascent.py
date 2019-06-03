@@ -21,12 +21,12 @@ class _Wrapper(nn.Module):
 
 
 class BasicAscent(ImagingCallback):
-    def __init__(self, image, objective, transform=None, verbose=0,
+    def __init__(self, image, criterion, transform=None, verbose=0,
                  optimizer=None, steps=256):
         super(BasicAscent, self).__init__(transform=transform)
 
         self.image = image
-        self.objective = objective
+        self.criterion = criterion
         self.verbose = verbose
         self.optimizer = optim.Adam(filter(lambda x: x.requires_grad, image.parameters()), lr=0.05) if optimizer is None else optimizer
         self.steps = steps
@@ -41,7 +41,7 @@ class BasicAscent(ImagingCallback):
 
         @torchbearer.callbacks.add_to_loss
         def loss(state):
-            return - self.objective(state)
+            return - self.criterion(state)
 
         model = _Wrapper(self.image, state[torchbearer.MODEL])
         trial = torchbearer.Trial(model, self.optimizer, callbacks=[make_eval, loss])
@@ -51,7 +51,7 @@ class BasicAscent(ImagingCallback):
         if training:
             state[torchbearer.MODEL].train()
 
-        return model.image.get_rgb_image()
+        return model.image.get_valid_image()
 
     def run(self, model, verbose=2, device='cpu', dtype=torch.float32):
         old_verbose = self.verbose

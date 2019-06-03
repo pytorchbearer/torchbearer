@@ -95,7 +95,7 @@ class RandomRotate(object):
 
 
 class RandomAlpha(object):
-    def __init__(self, sd=0.5, decay_power=1, colour=False):
+    def __init__(self, sd=0.5, decay_power=1, colour=True):
         self._sd = sd
         self._decay_power = decay_power
         self._colour = colour
@@ -104,7 +104,7 @@ class RandomAlpha(object):
         x = _as_3d(x)
         size = list(x.size())
         size[0] = size[0] - 1 if self._colour else 1
-        random_image = FFTImage(size, decorrelate=self._colour, sd=self._sd, decay_power=self._decay_power, requires_grad=False).to(x.device).sigmoid().get_rgb_image()
+        random_image = FFTImage(size, correlate=self._colour, sd=self._sd, decay_power=self._decay_power, requires_grad=False).to(x.device).sigmoid().get_valid_image()
         alpha = x[-1].repeat(x.size(0) - 1, 1, 1)
         image = x[:-1] * alpha
         random_image = random_image * (1 - alpha)

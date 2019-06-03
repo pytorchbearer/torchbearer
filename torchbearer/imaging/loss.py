@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
-import torchbearer
+
+from .images import IMAGE
 
 
 def _evaluate_target(state, target, channels=lambda x: x[:]):
@@ -60,18 +61,8 @@ class Channel(Criterion):
         return _evaluate_target(state, self._target)[0, self._channel].mean()
 
 
-# class Neuron(Criterion):
-#     def __init__(self, channel, target):
-#         super(Criterion, self).__init__()
-#         self._channel = channel
-#         self._target = target
-#
-#     def process(self, state):
-#         return _evaluate_target(state, self._target)[0, self._channel].mean()
-
-
 class TotalVariation(Criterion):
-    def __init__(self, target=torchbearer.INPUT):
+    def __init__(self, target=IMAGE):
         super(TotalVariation, self).__init__()
         self._target = target
 
@@ -92,7 +83,7 @@ class DeepDream(Criterion):
 
 
 class L1(Criterion):
-    def __init__(self, constant=0, target=torchbearer.INPUT, channels=lambda x: x[:]):
+    def __init__(self, constant=0, target=IMAGE, channels=lambda x: x[:]):
         super(L1, self).__init__()
         self._constant = constant
         self._target = target
@@ -103,7 +94,7 @@ class L1(Criterion):
 
 
 class L2(Criterion):
-    def __init__(self, constant=0, eps=1e-6, target=torchbearer.INPUT, channels=lambda x: x[:]):
+    def __init__(self, constant=0, eps=1e-6, target=IMAGE, channels=lambda x: x[:]):
         super(L2, self).__init__()
         self._constant = constant
         self._eps = eps
@@ -115,20 +106,20 @@ class L2(Criterion):
 
 
 class Blur(Criterion):
-    def __init__(self, target=torchbearer.INPUT, channels=lambda x: x[:]):
+    def __init__(self, target=IMAGE, channels=lambda x: x[:]):
         self._target = target
         self._channels = channels
 
     @staticmethod
-    def _blur(x, w=3):
+    def _blur(x):
         depth = x.size(1)
-        k = torch.zeros(w, w, depth, depth)
+        k = torch.zeros(3, 3, depth, depth)
         for ch in range(depth):
             k_ch = k[:, :, ch, ch]
             k_ch[:, :] = 0.5
             k_ch[1:-1, 1:-1] = 1.0
-        k = k.permute(2, 3, 0, 1).to(x.device)
-        conv_k = lambda x: F.conv2d(x, k, padding=w // 2)
+        k = k.permute(3, 2, 0, 1).to(x.device)
+        conv_k = lambda x: F.conv2d(x, k, padding=1)
         return conv_k(x) / conv_k(torch.ones_like(x))
 
     def process(self, state):
@@ -136,9 +127,10 @@ class Blur(Criterion):
         if x.dim() == 3:
             x = x.unsqueeze(0)
         x_blur = Blur._blur(x).detach()
+
         return 0.5 * (x - x_blur).pow(2).sum()
 
 
 class BlurAlpha(Blur):
-    def __init__(self, target=torchbearer.INPUT):
+    def __init__(self, target=IMAGE):
         super(BlurAlpha, self).__init__(target=target, channels=lambda x: x[-1].unsqueeze(0))
