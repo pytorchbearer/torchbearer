@@ -2,10 +2,15 @@ import torch
 import torch.nn.functional as F
 
 from .images import IMAGE
+from .models.utils import LAYER_DICT
+import torchbearer
 
 
 def _evaluate_target(state, target, channels=lambda x: x[:]):
-    return channels(state[target])
+    if isinstance(target, torchbearer.StateKey):
+        return channels(state[target])
+    else:
+        return channels(state[LAYER_DICT][target])
 
 
 class Criterion(object):
