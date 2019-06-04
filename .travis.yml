@@ -37,6 +37,7 @@ matrix:
 install:
   - pip install -q coverage
   - pip install -q $TORCH_URL
+  - pip install -e .
   - pip install -q -r requirements.txt
 # command to run tests
 script:
