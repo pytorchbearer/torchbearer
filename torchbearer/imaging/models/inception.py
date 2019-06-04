@@ -116,7 +116,7 @@ def inception_v3(pretrained=False, progress=True, **kwargs):
             kwargs['aux_logits'] = True
         else:
             original_aux_logits = True
-        model = basemodel(Inception3)(**kwargs)
+        model = basemodel(Inception3)(layer_names, **kwargs)
         state_dict = load_state_dict_from_url(model_urls['inception_v3_google'], progress=progress)
         model.load_state_dict(state_dict)
         if not original_aux_logits:
@@ -124,4 +124,4 @@ def inception_v3(pretrained=False, progress=True, **kwargs):
             del model.AuxLogits
         return model
 
-    return basemodel(Inception3)(**kwargs)
+    return basemodel(Inception3)(layer_names, **kwargs)

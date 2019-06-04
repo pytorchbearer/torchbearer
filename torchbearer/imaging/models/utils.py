@@ -27,17 +27,18 @@ def storer(state, name, x):
 
 def basemodel(model):
     class BaseModel(model):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, layer_names, *args, **kwargs):
             super().__init__(*args, **kwargs)
             relus_to_not_inplace(self)
+            self.layer_names = layer_names
             self.__name__ = model.__name__
             self.__qualname__ = model.__qualname__
 
+        def get_layer_names(self):
+            return self.layer_names
+
         def _get_name(self):
             return self.__name__
-
-        def forward(self, x, state):
-            super().forward(x, state)
 
     return BaseModel
 

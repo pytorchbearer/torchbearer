@@ -117,7 +117,7 @@ def googlenet(pretrained=False, progress=True, **kwargs):
         original_aux_logits = kwargs['aux_logits']
         kwargs['aux_logits'] = True
         kwargs['init_weights'] = False
-        model = basemodel(GoogLeNet)(**kwargs)
+        model = basemodel(GoogLeNet)(layer_names, **kwargs)
         state_dict = load_state_dict_from_url(model_urls['googlenet'],
                                               progress=progress)
         model.load_state_dict(state_dict)
@@ -126,4 +126,4 @@ def googlenet(pretrained=False, progress=True, **kwargs):
             del model.aux1, model.aux2
         return model
 
-    return basemodel(GoogLeNet)(**kwargs)
+    return basemodel(GoogLeNet)(layer_names, **kwargs)

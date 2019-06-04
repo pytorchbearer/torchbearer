@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision
 from torchvision import transforms
+from torchbearer.imaging.models.alexnet import alexnet
 
 # inv_normalize = transforms.Normalize(
 #     mean=[-0.485/0.229, -0.456/0.224, -0.406/0.225],
@@ -14,23 +15,14 @@ normalize = transforms.Normalize(
 )
 
 
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.net = torchvision.models.googlenet(True)
-
-    def forward(self, input):
-        if input is not None:
-            return self.net(input)
-
-
-model = Model()
+model = alexnet(True)
+print(model.get_layer_names())
 
 import torchbearer
 from torchbearer import Trial
 import torchbearer.imaging as imaging
-from imaging import Image as my_image, FFTImage, TensorImage
-import imaging.transforms as my_transforms
+from torchbearer.imaging import Image as my_image, FFTImage, TensorImage
+import torchbearer.imaging.transforms as my_transforms
 import torch.optim as optim
 
 transform = my_transforms.Compose([
@@ -63,7 +55,7 @@ transform = my_transforms.Compose([
 # input_image2 = my_image.from_tensor(input_image2, transform=transform, sigmoid=False, decorrelate=False, requires_grad=False)
 
 # input_image = TensorImage(torch.randn(3, 256, 256) * 0.01, transform=transform, decorrelate=False).sigmoid()
-input_image = FFTImage((4, 512, 512), transform=transform, decorrelate=True).sigmoid()
+input_image = FFTImage((4, 512, 512), transform=transform, correlate=True).sigmoid()
 # input_image = my_image.from_tensor(torch.randn(3, 512, 512) * 0.01, transform=transform, decorrelate=True).sigmoid()
 # input_image += input_image2
 
@@ -72,7 +64,7 @@ optimizer = optim.Adam(input_image.parameters(), lr=0.03)
 
 @imaging.criterion
 def alpha_loss(state):
-    alpha = input_image.get_rgb_image()[-1].mean()
+    alpha = input_image.get_valid_image()[-1].mean()
     # alpha_crop = state[torchbearer.INPUT][0, -1].mean()
     obj = state[torchbearer.PREDICTION][0, 366].mean()  # 340].mean()  # [0, 366].mean()  # 385].mean()
     return obj * (1.0 - alpha)  #  * 0.5) - (obj * (1.0 - alpha_crop))

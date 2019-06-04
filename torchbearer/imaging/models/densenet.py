@@ -27,7 +27,7 @@ class DenseNet(DNet):
 
 def _densenet(arch, growth_rate, block_config, num_init_features, pretrained, progress,
               **kwargs):
-    model = basemodel(DenseNet)(growth_rate, block_config, num_init_features, **kwargs)
+    model = basemodel(DenseNet)(layer_names, growth_rate, block_config, num_init_features, **kwargs)
     if pretrained:
         _load_state_dict(model, model_urls[arch], progress)
     return model

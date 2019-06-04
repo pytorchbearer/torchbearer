@@ -82,7 +82,7 @@ class VGG(VGGNet):
 def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
     if pretrained:
         kwargs['init_weights'] = False
-    model = basemodel(VGG)(make_layers(cfgs[cfg], batch_norm=batch_norm), arch,  **kwargs)
+    model = basemodel(VGG)(layer_names[arch], make_layers(cfgs[cfg], batch_norm=batch_norm), arch,  **kwargs)
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
         model.load_state_dict(state_dict)
@@ -159,12 +159,3 @@ def vgg19_bn(pretrained=False, progress=True, **kwargs):
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _vgg('vgg19_bn', 'E', True, pretrained, progress, **kwargs)
-
-
-import torch
-from torchbearer.imaging.models.utils import LAYER_DICT
-v = vgg16_bn()
-data = torch.rand(1, 3, 256, 256)
-state = {}
-v(data, state)
-print(state[LAYER_DICT].keys())

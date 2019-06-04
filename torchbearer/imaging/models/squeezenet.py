@@ -30,7 +30,7 @@ class SqueezeNet(BaseSqueezeNet):
 
 
 def _squeezenet(version, pretrained, progress, **kwargs):
-    model = basemodel(SqueezeNet)(version, **kwargs)
+    model = basemodel(SqueezeNet)(layer_names[version], version, **kwargs)
     if pretrained:
         arch = 'squeezenet' + version
         state_dict = load_state_dict_from_url(model_urls[arch],

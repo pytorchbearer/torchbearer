@@ -30,7 +30,7 @@ def mobilenet_v2(pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    model = basemodel(MobileNetV2)(**kwargs)
+    model = basemodel(MobileNetV2)(layer_names, **kwargs)
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'], progress=progress)
         model.load_state_dict(state_dict)

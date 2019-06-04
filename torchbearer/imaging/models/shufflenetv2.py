@@ -30,7 +30,7 @@ class ShuffleNetV2(ShuffleNet):
 
 
 def _shufflenetv2(arch, pretrained, progress, *args, **kwargs):
-    model = basemodel(ShuffleNetV2)(*args, **kwargs)
+    model = basemodel(ShuffleNetV2)(layer_names, *args, **kwargs)
 
     if pretrained:
         model_url = model_urls[arch]

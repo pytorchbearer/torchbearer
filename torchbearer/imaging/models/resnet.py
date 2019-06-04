@@ -37,7 +37,7 @@ class ResNet(BaseResNet):
 
 
 def _resnet(arch, block, layers, pretrained, progress, **kwargs):
-    model = basemodel(ResNet)(block, layers, **kwargs)
+    model = basemodel(ResNet)(layer_names, block, layers, **kwargs)
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls[arch],
                                               progress=progress)
