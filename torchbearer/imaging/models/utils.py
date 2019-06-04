@@ -46,3 +46,4 @@ def relus_to_not_inplace(model):
     for m in model.modules():
         if type(m) in _relu_classes:
             m.inplace = False
+
