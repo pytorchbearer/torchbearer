@@ -12,15 +12,6 @@ if sys.version_info[0] >= 3:
 else:
     long_description = 'A model training and variational auto-encoder library for pytorch'
 
-torchvision = 'torchvision'
-try:
-    import torch
-    from distutils.version import LooseVersion
-    if LooseVersion(torch.__version__) < LooseVersion("1.1.0"):
-        torchvision += '<0.3.0'
-except ImportError:
-    pass
-
 setup(
     name='torchbearer',
     version=version_dict['__version__'],
@@ -33,6 +24,6 @@ setup(
     description='A model training and variational auto-encoder library for pytorch',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['torch>=0.4', torchvision, 'tqdm'],
+    install_requires=['torch>=0.4', 'tqdm'],
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
 )
