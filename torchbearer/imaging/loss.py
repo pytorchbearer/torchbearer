@@ -2,8 +2,9 @@ import torch
 import torch.nn.functional as F
 
 from .images import IMAGE
-from .models.utils import LAYER_DICT
 import torchbearer
+
+LAYER_DICT = torchbearer.state_key('layer_dict')
 
 
 def _evaluate_target(state, target, channels=lambda x: x[:]):

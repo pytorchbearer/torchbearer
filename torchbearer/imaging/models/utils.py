@@ -1,8 +1,7 @@
 import torch.nn
 import torchbearer
 
-
-LAYER_DICT = torchbearer.state_key('layer_dict')
+from torchbearer.imaging import LAYER_DICT
 
 _relu_classes = [torch.nn.ReLU, torch.nn.ReLU6, torch.nn.LeakyReLU, torch.nn.RReLU, torch.nn.PReLU]
 
