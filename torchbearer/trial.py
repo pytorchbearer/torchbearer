@@ -428,6 +428,7 @@ class Trial(object):
             Trial: self
         """
         self.state[torchbearer.TRAIN_GENERATOR] = generator
+        steps = self.state[torchbearer.TRAIN_STEPS] if steps is None else steps
         steps = len(generator) if steps is None else steps
         self.for_train_steps(steps)
 
@@ -485,6 +486,7 @@ class Trial(object):
             Trial: self
         """
         self.state[torchbearer.VALIDATION_GENERATOR] = generator
+        steps = self.state[torchbearer.VALIDATION_STEPS] if steps is None else steps
         steps = len(generator) if steps is None else steps
         self.for_val_steps(steps)
 
@@ -541,6 +543,7 @@ class Trial(object):
             Trial: self
         """
         self.state[torchbearer.TEST_GENERATOR] = generator
+        steps = self.state[torchbearer.TEST_STEPS] if steps is None else steps
         steps = len(generator) if steps is None else steps
         self.for_test_steps(steps)
 

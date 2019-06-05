@@ -1,5 +1,5 @@
 from unittest import TestCase
-import torchbearer as tb
+import torchbearer
 from torchbearer.callbacks import lr_finder as lrf
 import numpy as np
 
@@ -76,12 +76,12 @@ class TestCyclicLR(TestCase):
                     ], lr=1e-2, momentum=0.9)
 
         clr = lrf.CyclicLR(step_size=75, base_lr=[0.001, 0.0001], max_lr=[0.006, 0.0006])
-        clr.on_start({tb.OPTIMIZER: optim})
+        clr.on_start({torchbearer.OPTIMIZER: optim})
 
         lrs = []
         for i in range(100):
-            clr.on_sample({tb.OPTIMIZER: optim})
-            clr.on_step_training({tb.OPTIMIZER: optim})
+            clr.on_sample({torchbearer.OPTIMIZER: optim})
+            clr.on_step_training({torchbearer.OPTIMIZER: optim})
             for param_group in optim.param_groups:
                 lr = param_group['lr']
                 lrs.append(lr)
@@ -102,12 +102,12 @@ class TestCyclicLR(TestCase):
                     ], lr=1e-2, momentum=0.9)
 
         clr = lrf.CyclicLR(step_size=[75, 100], base_lr=0.001, max_lr=0.006)
-        clr.on_start({tb.OPTIMIZER: optim})
+        clr.on_start({torchbearer.OPTIMIZER: optim})
 
         lrs = []
         for i in range(100):
-            clr.on_sample({tb.OPTIMIZER: optim})
-            clr.on_step_training({tb.OPTIMIZER: optim})
+            clr.on_sample({torchbearer.OPTIMIZER: optim})
+            clr.on_step_training({torchbearer.OPTIMIZER: optim})
             for param_group in optim.param_groups:
                 lr = param_group['lr']
                 lrs.append(lr)
