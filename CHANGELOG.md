@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Added ``with_loader`` trial method that allows running of custom batch loaders
 ### Changed
 ### Deprecated
 ### Removed
