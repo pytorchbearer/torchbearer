@@ -28,7 +28,6 @@ Welcome to torchbearer's documentation!
    code/main
    code/callbacks
    code/metrics
-   code/variational
 
 
 Indices and tables
