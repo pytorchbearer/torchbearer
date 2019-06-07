@@ -13,26 +13,30 @@ year={2018}
 }
 """
 
+MIXUP_LAMBDA = torchbearer.state_key('mixup_lambda')
+
 
 # @torchbearer.cite(_mixup)
 class MixupInputs(Callback):
 
-    def __init__(self, alpha=1.0, lam=1.0 ):
+    def __init__(self, alpha=1.0):
         super(MixupInput, self).__init__()
 
         self.alpha = alpha
-        self.lam = lam
 
     @staticmethod
-    def mixup_loss(input, target, crit):
+    def loss(state):
+        input, target = state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE]
         y1, y2, lam = target
-        return F.cross_entropy(input, y1) * lam + F.cross_entropy(input, y2) * (1-lam)
+        return F.cross_entropy(input, y1) * state[torchbearer.MIXUP_LAMBDA] + F.cross_entropy(input, y2) * (1-state[torchbearer.MIXUP_LAMBDA])
 
-    def on_sample(self, state):
-        if alpha > 0:
-            lam = np.random.beta(alpha, alpha)
+    def on_sample(self, state, lam=1.0):
+        import numpy as np
+        if self.alpha > 0:
+            lam = np.random.beta(self.alpha, self.alpha)
 
         permutation = torch.randperm(state[torchbearer.BATCH])
         state[torchbearer.BATCH] = state[torchbearer.BATCH] * lam + state[torchbearer.BATCH][permutation, :] * (1-lam)
-        state[torchbearer.Y_TRUE] = (state[torchbearer.Y_TRUE], state[torchbearer.Y_TRUE][permutation], lam)
+        state[torchbearer.Y_TRUE] = (state[torchbearer.Y_TRUE], state[torchbearer.Y_TRUE][permutation])
+        state[torchbearer.MIXUP_LAMBDA] = lam
         print("doua fire doua paie")
