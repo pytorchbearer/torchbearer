@@ -808,6 +808,7 @@ class Trial(object):
 
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
+            state[torchbearer.STEPS] = 0 if state[torchbearer.STEPS] is None else state[torchbearer.STEPS]
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
                 state[torchbearer.SAMPLER](state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
