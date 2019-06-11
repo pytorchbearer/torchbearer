@@ -1,5 +1,6 @@
 import copy
 import os
+import warnings
 
 import torch
 import torch.nn.functional as F
@@ -175,8 +176,10 @@ class AbstractTensorBoard(Callback):
                         key, met = met, metric[met]
 
                     AbstractTensorBoard.add_metric(add_fn, tag+'_{}'.format(key), met, *args, **kwargs)
-            except TypeError:
-                pass
+            except TypeError as e:
+                warnings.warn('Failed to log with error: {}'.format(e))
+        except Exception as e:
+            warnings.warn('Failed to log with error: {}'.format(e))
 
     def on_end(self, state):
         self.close_writer()
