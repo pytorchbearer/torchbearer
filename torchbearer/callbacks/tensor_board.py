@@ -164,7 +164,8 @@ class AbstractTensorBoard(Callback):
         self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
         self.writer = self.get_writer(visdom=self.visdom, visdom_params=self.visdom_params)
 
-    def add_metric(self, add_fn, tag, metric, *args, **kwargs):
+    @staticmethod
+    def add_metric(add_fn, tag, metric, *args, **kwargs):
         try:
             add_fn(tag, metric, *args, **kwargs)
         except NotImplementedError:
@@ -173,7 +174,7 @@ class AbstractTensorBoard(Callback):
                     if isinstance(metric, dict):
                         key, met = met, metric[met]
 
-                    self.add_metric(add_fn, tag+'_{}'.format(key), met, *args, **kwargs)
+                    AbstractTensorBoard.add_metric(add_fn, tag+'_{}'.format(key), met, *args, **kwargs)
             except TypeError:
                 pass
 

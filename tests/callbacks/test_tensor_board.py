@@ -95,8 +95,10 @@ class TestTensorBoard(TestCase):
         state = {torchbearer.METRICS: {'test': {'key1': 2, 'key2': 3}}}
         tb.add_metric(fn_test(NotImplementedError, [list, dict]), 'single', state[torchbearer.METRICS]['test'])
 
-        self.assertTrue(mock_fn.call_args_list[0][0] == ('single_key2', 3))
-        self.assertTrue(mock_fn.call_args_list[1][0] == ('single_key1', 2))
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(call_args[0][0] == ('single_key1', 2))
+        self.assertTrue(call_args[1][0] == ('single_key2', 3))
 
     @patch('tensorboardX.SummaryWriter')
     @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
@@ -116,9 +118,11 @@ class TestTensorBoard(TestCase):
         state = {torchbearer.METRICS: {'test': {'key1': 2, 'key2': [3, 4]}}}
         tb.add_metric(fn_test(NotImplementedError, [list, dict]), 'single', state[torchbearer.METRICS]['test'])
 
-        self.assertTrue(mock_fn.call_args_list[0][0] == ('single_key2_0', 3))
-        self.assertTrue(mock_fn.call_args_list[1][0] == ('single_key2_1', 4))
-        self.assertTrue(mock_fn.call_args_list[2][0] == ('single_key1', 2))
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(call_args[0][0] == ('single_key1', 2))
+        self.assertTrue(call_args[1][0] == ('single_key2_0', 3))
+        self.assertTrue(call_args[2][0] == ('single_key2_1', 4))
 
     @patch('tensorboardX.SummaryWriter')
     @patch('visdom.Visdom')
