@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Removed
 - Removed the variational sub-package, this will now be packaged separately
 ### Fixed
+- Fixed a bug where list or dictionary metrics would cause the tensorboard callback to error
 
 ## [0.3.2] - 2019-05-28
 ### Added
