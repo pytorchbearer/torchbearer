@@ -125,6 +125,29 @@ class TestTensorBoard(TestCase):
         self.assertTrue(call_args[2][0] == ('single_key2_1', 4))
 
     @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_silent_fail(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': 0.1}}
+        tb.add_metric(fn_test(NotImplementedError, [list, dict, float]), 'single', state[torchbearer.METRICS]['test'])
+
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(len(call_args) == 0)
+
+
+    @patch('tensorboardX.SummaryWriter')
     @patch('visdom.Visdom')
     @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
     @patch('torchbearer.callbacks.tensor_board.os.makedirs')
