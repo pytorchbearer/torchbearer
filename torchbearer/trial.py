@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import sys
 
 if sys.version_info[0] < 3:
@@ -517,6 +520,13 @@ class Trial(object):
         convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
         steps -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
+        Example::
+
+            # Simple trial that runs for 10 validation iterations on no data
+            >>> from torchbearer import Trial
+            >>> data = torch.rand(10, 1)
+            >>> trial = Trial(None).for_val_steps(10).run(1)
+
         Args:
             steps (int): The number of validation steps per epoch to run
 
@@ -535,6 +545,15 @@ class Trial(object):
         """Use this trial with the given validation generator. Returns self so that methods can be chained for
         convenience.
 
+        Example::
+
+            # Simple trial that runs for 100 validation iterations on the MNIST dataset
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> dataloader = DataLoader(MNIST('./data/', train=False))
+            >>> trial = Trial(None).with_val_generator(dataloader).for_steps(100).run(1)
+
         Args:
             generator: The validation data generator to use during calls to :meth:`.run` and :meth:`.evaluate`
             steps (int): The number of steps per epoch to take when using this generator
@@ -551,6 +570,13 @@ class Trial(object):
 
     def with_val_data(self, x, y, batch_size=1, shuffle=True, num_workers=1, steps=None):
         """Use this trial with the given validation data. Returns self so that methods can be chained for convenience.
+
+        Example::
+
+            # Simple trial that runs for 10 validation iterations on some random data
+            >>> from torchbearer import Trial
+            >>> data = torch.rand(10, 1)
+            >>> trial = Trial(None).with_val_data(data).for_steps(10).run(1)
 
         Args:
             x (torch.Tensor): The validation x data to use during calls to :meth:`.run` and :meth:`.evaluate`
@@ -575,6 +601,13 @@ class Trial(object):
         convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
         steps -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
+        Example::
+
+            # Simple trial that runs for 10 test iterations on some random data
+            >>> from torchbearer import Trial
+            >>> data = torch.rand(10, 1)
+            >>> trial = Trial(None).with_test_data(data).for_test_steps(10).run(1)
+
         Args:
             steps (int): The number of test steps per epoch to run (when using :meth:`.predict`)
 
@@ -592,6 +625,13 @@ class Trial(object):
     def with_test_generator(self, generator, steps=None):
         """Use this trial with the given test generator. Returns self so that methods can be chained for convenience.
 
+        Example::
+
+            # Simple trial that runs for 10 test iterations on no data
+            >>> from torchbearer import Trial
+            >>> data = torch.rand(10, 1)
+            >>> trial = Trial(None).with_test_data(data).for_test_steps(10).run(1)
+
         Args:
             generator: The test data generator to use during calls to :meth:`.predict`
             steps (int): The number of steps per epoch to take when using this generator
@@ -608,6 +648,13 @@ class Trial(object):
 
     def with_test_data(self, x, batch_size=1, num_workers=1, steps=None):
         """Use this trial with the given test data. Returns self so that methods can be chained for convenience.
+
+        Example::
+
+            # Simple trial that runs for 10 test iterations on some random data
+            >>> from torchbearer import Trial
+            >>> data = torch.rand(10, 1)
+            >>> trial = Trial(None).with_test_data(data).for_test_steps(10).run(1)
 
         Args:
             x (torch.Tensor): The test x data to use during calls to :meth:`.predict`
@@ -830,6 +877,7 @@ class Trial(object):
         state[torchbearer.METRIC_LIST].reset(state)
         state[torchbearer.METRICS] = {}
 
+        state[torchbearer.STEPS] = 0 if state[torchbearer.STEPS] is None else state[torchbearer.STEPS]
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
         for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()):
             state[torchbearer.SAMPLER](state)
