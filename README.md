@@ -1,6 +1,6 @@
-<img src="https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/logo_dark_text.svg?sanitize=true" width="100%"/>
+<img src="https://raw.githubusercontent.com/pytorchbearer/torchbearer/master/docs/_static/img/logo_dark_text.svg?sanitize=true" width="100%"/>
 
-[![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Python 2.7 | 3.5 | 3.6 | 3.7](https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7-brightgreen.svg)](https://www.python.org/) [![PyTorch 0.4.0 | 0.4.1 | 1.0.0 | 1.1.0](https://img.shields.io/badge/pytorch-0.4.0%20%7C%200.4.1%20%7C%201.0.0%20%7C%201.1.0-brightgreen.svg)](https://pytorch.org/) [![Build Status](https://travis-ci.com/ecs-vlc/torchbearer.svg?branch=master)](https://travis-ci.com/ecs-vlc/torchbearer) [![codecov](https://codecov.io/gh/ecs-vlc/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/ecs-vlc/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/torchbearer)](https://pepy.tech/project/torchbearer)
+[![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Python 2.7 | 3.5 | 3.6 | 3.7](https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7-brightgreen.svg)](https://www.python.org/) [![PyTorch 0.4.0 | 0.4.1 | 1.0.0 | 1.1.0](https://img.shields.io/badge/pytorch-0.4.0%20%7C%200.4.1%20%7C%201.0.0%20%7C%201.1.0-brightgreen.svg)](https://pytorch.org/) [![Build Status](https://travis-ci.com/pytorchbearer/torchbearer.svg?branch=master)](https://travis-ci.com/pytorchbearer/torchbearer) [![codecov](https://codecov.io/gh/pytorchbearer/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/pytorchbearer/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/torchbearer)](https://pepy.tech/project/torchbearer)
 
 A model fitting library for PyTorch
 ## Contents
@@ -12,7 +12,7 @@ A model fitting library for PyTorch
 - [Documentation](#docs)
 - [Other Libraries](#others)
 
-![SVM fitting](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/svm_fit.gif)![GAN Gif](https://raw.githubusercontent.com/ecs-vlc/torchbearer/master/docs/_static/img/gan.gif)
+![SVM fitting](https://raw.githubusercontent.com/pytorchbearer/torchbearer/master/docs/_static/img/svm_fit.gif)![GAN Gif](https://raw.githubusercontent.com/pytorchbearer/torchbearer/master/docs/_static/img/gan.gif)
 
 <a name="about"/>
 
@@ -45,7 +45,7 @@ The easiest way to install torchbearer is with pip:
 
 Alternatively, build from source with:
 
-`pip install git+https://github.com/ecs-vlc/torchbearer`
+`pip install git+https://github.com/pytorchbearer/torchbearer`
 
 <a name="citing"/>
 

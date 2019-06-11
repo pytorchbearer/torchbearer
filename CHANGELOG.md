@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- Added ``with_loader`` trial method that allows running of custom batch loaders
+### Changed
+### Deprecated
+### Removed
+- Removed the variational sub-package, this will now be packaged separately
+### Fixed
+
 ## [0.3.2] - 2019-05-28
 ### Added
 ### Changed

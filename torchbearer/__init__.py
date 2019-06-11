@@ -30,4 +30,3 @@ from . import metrics
 from . import callbacks
 from .trial import *
 from . import cv_utils
-from . import variational
