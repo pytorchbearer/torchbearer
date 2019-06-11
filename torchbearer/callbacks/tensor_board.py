@@ -177,9 +177,9 @@ class AbstractTensorBoard(Callback):
 
                     AbstractTensorBoard.add_metric(add_fn, tag+'_{}'.format(key), met, *args, **kwargs)
             except TypeError as e:
-                warnings.warn('Failed to log with error: {}'.format(e))
+                warnings.warn('Failed to log metric to tensorboard with error: {}'.format(e))
         except Exception as e:
-            warnings.warn('Failed to log with error: {}'.format(e))
+            warnings.warn('Failed to log metric to tensorboard with error: {}'.format(e))
 
     def on_end(self, state):
         self.close_writer()
