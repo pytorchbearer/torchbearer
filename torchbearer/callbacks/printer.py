@@ -95,7 +95,7 @@ class Tqdm(Callback):
         >>> printer = Tqdm(precision=8)
         # Note that outputs are written to stderr, not stdout as shown in this example
         >>> trial = Trial(None, callbacks=[printer], verbose=0).for_steps(1).run(1)
-        0/1(t): 100%|██████████| 1/1 [00:00<00:00, 29.40it/s]
+        0/1(t): 100%|...| 1/1 [00:00<00:00, 29.40it/s]
 
     Args:
         tqdm_module: The tqdm module to use. If none, defaults to tqdm or tqdm_notebook if in notebook
