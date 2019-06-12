@@ -17,6 +17,7 @@ import warnings
 import itertools
 
 import torch
+import torch.nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Optimizer
 
@@ -59,6 +60,11 @@ class MockOptimizer(Optimizer):
 
     def zero_grad(self):
         pass  # Do Nothing
+
+
+class MockModel(torch.nn.Module):
+    def forward(self, x, state=None):
+        return None
 
 
 class CallbackListInjection(CallbackList):
@@ -719,11 +725,11 @@ class Trial(object):
             torchbearer.STOP_TRAINING: False,
         })
 
-        state.update(self.state)  # TODO: Swap this for something which makes `self.state` still mutable
-
-        if state[torchbearer.MODEL] is None or not callable(state[torchbearer.MODEL]):
+        if self.state[torchbearer.MODEL] is None or not callable(self.state[torchbearer.MODEL]):
             warnings.warn('The Model is None or not callable which may cause issues if not deliberate')
-            state[torchbearer.MODEL] = lambda *args, **kwargs: None
+            self.state[torchbearer.MODEL] = MockModel()
+
+        state.update(self.state)  # TODO: Swap this for something which makes `self.state` still mutable
 
         if state[torchbearer.TRAIN_GENERATOR] is not None \
                 or state[torchbearer.TRAIN_STEPS] is not None \
@@ -773,6 +779,7 @@ class Trial(object):
         state[torchbearer.METRIC_LIST].reset(state)
         state[torchbearer.METRICS] = {}
 
+        state[torchbearer.STEPS] = 0 if state[torchbearer.STEPS] is None else state[torchbearer.STEPS]
         state[torchbearer.CALLBACK_LIST].on_start_training(state)
         for state[torchbearer.BATCH] in (range(state[torchbearer.STEPS]) if state[torchbearer.STEPS] != -1 else itertools.count()):
             state[torchbearer.SAMPLER](state)
@@ -801,6 +808,7 @@ class Trial(object):
 
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
+            state[torchbearer.STEPS] = 0 if state[torchbearer.STEPS] is None else state[torchbearer.STEPS]
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
                 state[torchbearer.SAMPLER](state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)

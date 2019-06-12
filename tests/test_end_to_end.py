@@ -115,3 +115,10 @@ class TestEndToEnd(unittest.TestCase):
         with warnings.catch_warnings(record=True) as w:
             tbmodel.run()
             self.assertTrue(len(w) == 1)
+
+        self.assertTrue(torchbearer.trial.MockModel()(torch.rand(1)) is None)
+
+    def test_no_train_steps(self):
+        tbmodel = torchbearer.Trial(None)
+        tbmodel.for_val_steps(10)
+        tbmodel.run()
