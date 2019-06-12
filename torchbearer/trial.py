@@ -317,7 +317,7 @@ def inject_callback(callback):
 
 
 def update_device_and_dtype(state, *args, **kwargs):
-    """Function get data type and device values from the args / kwargs and update state.
+    """Function gets data type and device values from the args / kwargs and updates state.
 
     Args:
         state (State): The :class:`.State` to update
@@ -325,7 +325,7 @@ def update_device_and_dtype(state, *args, **kwargs):
         kwargs: Keyword arguments to the :func:`Trial.to` function
 
     Returns:
-        device, dtype pair
+        state
     """
     for key, _ in kwargs.items():
         if key == str(torchbearer.DATA_TYPE):
