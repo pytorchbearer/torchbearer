@@ -1050,7 +1050,7 @@ class Trial(object):
     def evaluate(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Evaluate this trial on the validation data.
 
-        Example: ::
+        Example::
 
             # Simple trial to evaluate on both validation and test data
             >>> from torchbearer import Trial
@@ -1096,7 +1096,7 @@ class Trial(object):
     def predict(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Determine predictions for this trial on the test data.
 
-        Example: ::
+        Example::
 
             # Simple trial to predict on some validation and test data
             >>> from torchbearer import Trial
@@ -1136,7 +1136,7 @@ class Trial(object):
     def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
 
-        Example: ::
+        Example::
 
             >>> from torchbearer import Trial
             >>> state = torch.load('some_state.pt')
@@ -1213,8 +1213,8 @@ class Trial(object):
 
     def train(self):
         """Set model and metrics to training mode.
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).train()
 
@@ -1228,8 +1228,8 @@ class Trial(object):
 
     def eval(self):
         """Set model and metrics to evaluation mode
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).eval()
 
@@ -1246,8 +1246,8 @@ class Trial(object):
 
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).to('cuda:1')
 
@@ -1271,8 +1271,8 @@ class Trial(object):
 
     def cuda(self, device=None):
         """ Moves all model parameters and buffers to the GPU.
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).cuda()
 
@@ -1290,8 +1290,8 @@ class Trial(object):
 
     def cpu(self):
         """ Moves all model parameters and buffers to the CPU.
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).cpu()
 
@@ -1304,8 +1304,8 @@ class Trial(object):
 
     def state_dict(self, **kwargs):
         """Get a dict containing the model and optimizer states, as well as the model history.
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None)
             >>> state = t.state_dict() # State dict that can now be saved with torch.save
@@ -1328,8 +1328,8 @@ class Trial(object):
     def load_state_dict(self, state_dict, resume=True, **kwargs):
         """Resume this trial from the given state. Expects that this trial was constructed in the same way. Optionally,
         just load the model state when resume=False.
-
-        Example: ::
+        
+        Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None)
             >>> state = torch.load('some_state.pt')

@@ -171,6 +171,17 @@ class AbstractTensorBoard(Callback):
 class TensorBoard(AbstractTensorBoard):
     """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
 
+    Example::
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import TensorBoard
+        >>> import datetime
+        >>> current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+
+        # Callback that will log to tensorboard under "(model name)_(current time)"
+        >>> tb = TensorBoard(log_dir='./logs', write_graph=False, comment=current_time)
+        # Trial that will run the callback and log accuracy and loss metrics
+        >>> t = Trial(None, callbacks=[tb], metrics=['acc', 'loss'])
+
     Args:
         log_dir (str): The tensorboard log path for output
         write_graph (bool): If True, the model graph will be written using the TensorboardX library
@@ -265,6 +276,16 @@ class TensorBoardText(AbstractTensorBoard):
     """TensorBoard callback which writes metrics as text to the given log directory. Requires the TensorboardX library
     for python.
 
+    Example::
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import TensorBoardText
+        >>> import datetime
+        >>> current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+
+        # Callback that will log to tensorboard under "(model name)_(current time)"
+        >>> tb = TensorBoardText(comment=current_time)
+        # Trial that will run the callback and log accuracy and loss metrics as text to tensorboard
+        >>> t = Trial(None, callbacks=[tb], metrics=['acc', 'loss'])
 
     Args:
         log_dir (str): The tensorboard log path for output
@@ -354,6 +375,18 @@ class TensorBoardImages(AbstractTensorBoard):
     """The TensorBoardImages callback will write a selection of images from the validation pass to tensorboard using the
     TensorboardX library and torchvision.utils.make_grid (requires torchvision). Images are selected from the given key and saved to the given
     path. Full name of image sub directory will be model name + _ + comment.
+
+    Example::
+        >>> from torchbearer import Trial, state_key
+        >>> from torchbearer.callbacks import TensorBoardImages
+        >>> import datetime
+        >>> current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+        >>> IMAGE_KEY = state_key('image_key')
+
+        # Callback that will log to tensorboard under "(model name)_(current time)"
+        >>> tb = TensorBoardImages(comment=current_time, name='test_image', key=IMAGE_KEY)
+        # Trial that will run log to tensorboard images stored under IMAGE_KEY
+        >>> t = Trial(None, callbacks=[tb], metrics=['acc', 'loss'])
 
     Args:
         log_dir (str): The tensorboard log path for output
