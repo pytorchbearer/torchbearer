@@ -15,7 +15,7 @@ Welcome to torchbearer's documentation!
 
 .. toctree::
    :glob:
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Examples
 
    examples/notebooks
