@@ -23,6 +23,17 @@ class LiveLossPlot(Callback):
     """
     Callback to write metrics to `LiveLossPlot <https://github.com/stared/livelossplot>`_, a library for visualisation in notebooks
 
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import LiveLossPlot
+
+        # Example Trial which clips all model gradients norms at 2 under the L1 norm.
+        >>> model = torch.nn.Linear(1,1)
+        >>> live_loss_plot = LiveLossPlot()
+        >>> trial = Trial(model, callbacks=[live_loss_plot], metrics=['acc'])
+
     Args:
         on_batch (bool): If True, batch metrics will be logged. Else batch metrics will not be logged
         batch_step_size (int): The number of batches between logging metrics

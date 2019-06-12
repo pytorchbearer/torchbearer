@@ -32,6 +32,22 @@ import torch.nn as nn
 
 
 class LSUV(object):
+    """Initialisation from the paper `All you need is a good init <https://arxiv.org/abs/1511.06422>`__. Call
+    LSUV.init_model(...) on a torch model to perform the initialisation. Implementation based off of the PyTorch
+    implementation `here <https://github.com/ducha-aiki/LSUV-pytorch>`__.
+
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer.callbacks import LSUV
+
+        # Example of initialising a torch model with LSUV
+        >>> model = torch.nn.Linear(1,1)
+        >>> data = torch.rand(100, 1)
+        >>> lsuv = LSUV(model, data)
+        >>> model = lsuv.init_model(model, data)
+
+    """
     def __init__(self):
         super(LSUV, self).__init__()
         self.gg = self.reset_parameters()

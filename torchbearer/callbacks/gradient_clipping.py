@@ -9,6 +9,17 @@ class GradientNormClipping(Callback):
     """GradientNormClipping callback, which uses 'torch.nn.utils.clip_grad_norm\_' to clip the gradient norms to the
     given value. If params is None they will be retrieved from state.
 
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import GradientNormClipping
+
+        # Example Trial which clips all model gradients norms at 2 under the L1 norm.
+        >>> model = torch.nn.Linear(1,1)
+        >>> clip = GradientNormClipping(2, 1)
+        >>> trial = Trial(model, callbacks=[clip], metrics=['acc'])
+
     Args:
         max_norm (float or int): max norm of the gradients
         norm_type (float or int): type of the used p-norm. Can be ``'inf'`` for
@@ -48,6 +59,17 @@ class GradientNormClipping(Callback):
 class GradientClipping(Callback):
     """GradientClipping callback, which uses 'torch.nn.utils.clip_grad_value\_' to clip the gradients of the given
     parameters to the given value. If params is None they will be retrieved from state.
+
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import GradientClipping
+
+        # Example Trial which clips all model gradients at 2 under the L1 norm.
+        >>> model = torch.nn.Linear(1,1)
+        >>> clip = GradientNormClipping(2, 1)
+        >>> trial = Trial(model, callbacks=[clip], metrics=['acc'])
 
     Args:
         clip_value (float or int): maximum allowed value of the gradients

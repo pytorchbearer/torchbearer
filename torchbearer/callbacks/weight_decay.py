@@ -9,6 +9,15 @@ class WeightDecay(Callback):
     """Create a WeightDecay callback which uses the given norm on the given parameters and with the given decay rate.
     If params is None (default) then the parameters will be retrieved from the model.
 
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import WeightDecay
+
+        # Example Trial which runs a trial with weight decay on the model
+        >>> decay = WeightDecay()
+        >>> trial = Trial(None, callbacks=[decay], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         rate (float): The decay rate or lambda
         p (int): The norm level
@@ -49,6 +58,15 @@ class L1WeightDecay(WeightDecay):
     """WeightDecay callback which uses an L1 norm with the given rate and parameters. If params is None (default) then
     the parameters will be retrieved from the model.
 
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import L1WeightDecay
+
+        # Example Trial which runs a trial with weight decay on the model using an L1 norm
+        >>> decay = L1WeightDecay()
+        >>> trial = Trial(None, callbacks=[decay], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         rate (float): The decay rate or lambda
         params (Iterable[Tensor] or Tensor, optional): an iterable of Tensors or a
@@ -65,6 +83,15 @@ class L1WeightDecay(WeightDecay):
 class L2WeightDecay(WeightDecay):
     """WeightDecay callback which uses an L2 norm with the given rate and parameters. If params is None (default) then
     the parameters will be retrieved from the model.
+
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import L2WeightDecay
+
+        # Example Trial which runs a trial with weight decay on the model using an L2 norm
+        >>> decay = L2WeightDecay()
+        >>> trial = Trial(None, callbacks=[decay], metrics=['loss'], verbose=2).for_steps(10).run(1)
 
     Args:
         rate (float): The decay rate or lambda
