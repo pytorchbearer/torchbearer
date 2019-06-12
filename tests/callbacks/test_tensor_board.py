@@ -1,15 +1,179 @@
 import os
 from unittest import TestCase
+import warnings
 
 import torch
 import torch.nn as nn
-from mock import patch, Mock, ANY
+from mock import patch, Mock, ANY, MagicMock
 
 import torchbearer
 from torchbearer.callbacks import TensorBoard, TensorBoardImages, TensorBoardProjector, TensorBoardText
 
 
 class TestTensorBoard(TestCase):
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_single(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': 1, 'test2': [1, 2, 3], 'test3': [[1], [2], [3, 4]]}}
+        tb.add_metric(fn_test(NotImplementedError, [list]), 'single', state[torchbearer.METRICS]['test'])
+
+        self.assertTrue(mock_fn.call_args_list[0][0] == ('single', 1))
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_list(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': 1, 'test2': [1, 2, 3], 'test3': [[1], [2], [3, 4]]}}
+        tb.add_metric(fn_test(NotImplementedError, [list]), 'single', state[torchbearer.METRICS]['test2'])
+
+        self.assertTrue(mock_fn.call_args_list[0][0] == ('single_0', 1))
+        self.assertTrue(mock_fn.call_args_list[1][0] == ('single_1', 2))
+        self.assertTrue(mock_fn.call_args_list[2][0] == ('single_2', 3))
+
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_list_of_list(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': 1, 'test2': [1, 2, 3], 'test3': [[1], 2, [3, 4]]}}
+        tb.add_metric(fn_test(NotImplementedError, [list]), 'single', state[torchbearer.METRICS]['test3'])
+
+        self.assertTrue(mock_fn.call_args_list[0][0] == ('single_0_0', 1))
+        self.assertTrue(mock_fn.call_args_list[1][0] == ('single_1', 2))
+        self.assertTrue(mock_fn.call_args_list[2][0] == ('single_2_0', 3))
+        self.assertTrue(mock_fn.call_args_list[3][0] == ('single_2_1', 4))
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_dict(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': {'key1': 2, 'key2': 3}}}
+        tb.add_metric(fn_test(NotImplementedError, [list, dict]), 'single', state[torchbearer.METRICS]['test'])
+
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(call_args[0][0] == ('single_key1', 2))
+        self.assertTrue(call_args[1][0] == ('single_key2', 3))
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_dict_and_list(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': {'key1': 2, 'key2': [3, 4]}}}
+        tb.add_metric(fn_test(NotImplementedError, [list, dict]), 'single', state[torchbearer.METRICS]['test'])
+
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(call_args[0][0] == ('single_key1', 2))
+        self.assertTrue(call_args[1][0] == ('single_key2_0', 3))
+        self.assertTrue(call_args[2][0] == ('single_key2_1', 4))
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_fail_iterable(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': 0.1}}
+        with warnings.catch_warnings(record=True) as w:
+            tb.add_metric(fn_test(NotImplementedError, [list, dict, float]), 'single', state[torchbearer.METRICS]['test'])
+            self.assertTrue(len(w) == 1)
+
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(len(call_args) == 0)
+
+    @patch('tensorboardX.SummaryWriter')
+    @patch('torchbearer.callbacks.tensor_board.os.path.isdir')
+    @patch('torchbearer.callbacks.tensor_board.os.makedirs')
+    def test_add_metric_fail(self, _, __, writer):
+        mock_fn = MagicMock()
+
+        def fn_test(ex, types):
+            def fn_test_1(tag, metric, *args, **kwargs):
+                if type(metric) in types:
+                    raise ex
+                else:
+                    mock_fn(tag, metric)
+            return fn_test_1
+
+        tb = TensorBoard()
+        state = {torchbearer.METRICS: {'test': 0.1}}
+        with warnings.catch_warnings(record=True) as w:
+            tb.add_metric(fn_test(Exception, [float]), 'single', state[torchbearer.METRICS]['test'])
+            self.assertTrue(len(w) == 1)
+
+        call_args = list(mock_fn.call_args_list)
+        call_args.sort()
+        self.assertTrue(len(call_args) == 0)
+
+
     @patch('tensorboardX.SummaryWriter')
     @patch('visdom.Visdom')
     @patch('torchbearer.callbacks.tensor_board.os.path.isdir')

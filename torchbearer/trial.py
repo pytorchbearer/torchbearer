@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import sys
 
 if sys.version_info[0] < 3:
@@ -66,10 +63,7 @@ class MockOptimizer(Optimizer):
 
 
 class MockModel(torch.nn.Module):
-    def __init__(self):
-        super(MockModel, self).__init__()
-
-    def forward(self, x):
+    def forward(self, x, state=None):
         return None
 
 
@@ -920,11 +914,11 @@ class Trial(object):
             torchbearer.STOP_TRAINING: False,
         })
 
-        state.update(self.state)  # TODO: Swap this for something which makes `self.state` still mutable
-
-        if state[torchbearer.MODEL] is None or not callable(state[torchbearer.MODEL]):
+        if self.state[torchbearer.MODEL] is None or not callable(self.state[torchbearer.MODEL]):
             warnings.warn('The Model is None or not callable which may cause issues if not deliberate')
-            state[torchbearer.MODEL] = lambda *args, **kwargs: None
+            self.state[torchbearer.MODEL] = MockModel()
+
+        state.update(self.state)  # TODO: Swap this for something which makes `self.state` still mutable
 
         if state[torchbearer.TRAIN_GENERATOR] is not None \
                 or state[torchbearer.TRAIN_STEPS] is not None \
@@ -1003,6 +997,7 @@ class Trial(object):
 
             state[torchbearer.CALLBACK_LIST].on_start_validation(state)
 
+            state[torchbearer.STEPS] = 0 if state[torchbearer.STEPS] is None else state[torchbearer.STEPS]
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
                 state[torchbearer.SAMPLER](state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
@@ -1213,7 +1208,7 @@ class Trial(object):
 
     def train(self):
         """Set model and metrics to training mode.
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).train()
@@ -1228,7 +1223,7 @@ class Trial(object):
 
     def eval(self):
         """Set model and metrics to evaluation mode
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).eval()
@@ -1246,7 +1241,7 @@ class Trial(object):
 
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).to('cuda:1')
@@ -1271,7 +1266,7 @@ class Trial(object):
 
     def cuda(self, device=None):
         """ Moves all model parameters and buffers to the GPU.
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).cuda()
@@ -1290,7 +1285,7 @@ class Trial(object):
 
     def cpu(self):
         """ Moves all model parameters and buffers to the CPU.
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None).cpu()
@@ -1304,7 +1299,7 @@ class Trial(object):
 
     def state_dict(self, **kwargs):
         """Get a dict containing the model and optimizer states, as well as the model history.
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None)
@@ -1328,7 +1323,7 @@ class Trial(object):
     def load_state_dict(self, state_dict, resume=True, **kwargs):
         """Resume this trial from the given state. Expects that this trial was constructed in the same way. Optionally,
         just load the model state when resume=False.
-        
+
         Example::
             >>> from torchbearer import Trial
             >>> t = Trial(None)
