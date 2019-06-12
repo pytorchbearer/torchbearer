@@ -47,8 +47,8 @@ class TestEndToEnd(unittest.TestCase):
         model = NetWithState(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = torchbearer.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1)
-        tbmodel.run()
+        trial = torchbearer.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1)
+        trial.run()
 
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
         self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
@@ -61,17 +61,17 @@ class TestEndToEnd(unittest.TestCase):
         model = Net(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
-        tbmodel.run(2)  # Simulate 2 'epochs'
+        trial = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
+        trial.run(2)  # Simulate 2 'epochs'
 
         # Reload
         p = torch.tensor([2.0, 1.0, 10.0])
         model = Net(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        tbmodel = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps)
-        tbmodel.load_state_dict(torch.load('test.pt'))
-        self.assertEqual(len(tbmodel.state[torchbearer.HISTORY]), 2)
+        trial = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps)
+        trial.load_state_dict(torch.load('test.pt'))
+        self.assertEqual(len(trial.state[torchbearer.HISTORY]), 2)
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
         self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
         self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)
@@ -91,10 +91,10 @@ class TestEndToEnd(unittest.TestCase):
             state[torchbearer.X], state[torchbearer.Y_TRUE] = None, None
             test_var['loaded'] = True
 
-        tbmodel = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
-        tbmodel.with_loader(custom_loader)
+        trial = torchbearer.Trial(model, optim, loss, callbacks=[torchbearer.callbacks.MostRecent(filepath='test.pt')]).for_train_steps(training_steps).for_val_steps(1)
+        trial.with_loader(custom_loader)
         self.assertTrue(not test_var['loaded'])
-        tbmodel.run(1)
+        trial.run(1)
         self.assertTrue(test_var['loaded'])
 
         import os
@@ -102,23 +102,16 @@ class TestEndToEnd(unittest.TestCase):
 
     def test_only_model(self):
         p = torch.tensor([2.0, 1.0, 10.0])
-
         model = Net(p)
-
-        tbmodel = torchbearer.Trial(model)
-        self.assertListEqual(tbmodel.run(), [])
+        trial = torchbearer.Trial(model)
+        self.assertListEqual(trial.run(), [])
 
     def test_no_model(self):
-        tbmodel = torchbearer.Trial(None)
-
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            tbmodel.run()
-            self.assertTrue(len(w) == 1)
-
+        trial = torchbearer.Trial(None)
+        trial.run()
         self.assertTrue(torchbearer.trial.MockModel()(torch.rand(1)) is None)
 
     def test_no_train_steps(self):
-        tbmodel = torchbearer.Trial(None)
-        tbmodel.for_val_steps(10)
-        tbmodel.run()
+        trial = torchbearer.Trial(None)
+        trial.for_val_steps(10)
+        trial.run()
