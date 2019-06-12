@@ -676,6 +676,16 @@ class Trial(object):
         for convenience. If steps larger than dataset size then loader will be refreshed like if it was a new epoch. If
         steps -1 then loader will be refreshed until stopped by STOP_TRAINING flag or similar.
 
+        Example::
+
+            # Simple trial that runs for 10 training, validation and test iterations on some random data
+            >>> from torchbearer import Trial
+            >>> train_data = torch.rand(10, 1)
+            >>> val_data = torch.rand(10, 1)
+            >>> test_data = torch.rand(10, 1)
+            >>> trial = Trial(None).with_train_data(train_data).with_val_data(val_data).with_test_data(test_data)
+            >>> trial.for_steps(10, 10, 10).run(1)
+
         Args:
             train_steps (int): The number of training steps per epoch to run
             val_steps (int): The number of validation steps per epoch to run
@@ -695,6 +705,16 @@ class Trial(object):
 
     def with_generators(self, train_generator=None, val_generator=None, test_generator=None, train_steps=None, val_steps=None, test_steps=None):
         """Use this trial with the given generators. Returns self so that methods can be chained for convenience.
+
+        Example::
+
+            # Simple trial that runs for 100 steps from a training and validation data generator
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> trainloader = DataLoader(MNIST('./data/', train=True))
+            >>> valloader = DataLoader(MNIST('./data/', train=False))
+            >>> trial = Trial(None).with_generators(trainloader, valloader, train_steps=100, val_steps=100).run(1)
 
         Args:
             train_generator: The training data generator to use during calls to :meth:`.run`
@@ -720,6 +740,16 @@ class Trial(object):
         """Use this trial with an infinite number of training steps (until stopped via STOP_TRAINING flag or similar). 
         Returns self so that methods can be chained for convenience.
 
+        Example::
+
+            # Simple trial that runs training data until stopped
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> trainloader = DataLoader(MNIST('./data/', train=True))
+            >>> trial = Trial(None).with_train_generator(trainloader).for_inf_train_steps()
+            >>> trial.run(1)
+
         Returns:
             Trial: self
         """
@@ -729,7 +759,17 @@ class Trial(object):
     def for_inf_val_steps(self):
         """Use this trial with an infinite number of validation steps (until stopped via STOP_TRAINING flag or similar).
         Returns self so that methods can be chained for convenience.
-        
+
+        Example::
+
+            # Simple trial that runs validation data until stopped
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> valloader = DataLoader(MNIST('./data/', train=False))
+            >>> trial = Trial(None).with_val_generator(valloader).for_inf_val_steps()
+            >>> trial.run(1)
+
         Returns:
             Trial: self
         """
@@ -739,7 +779,15 @@ class Trial(object):
     def for_inf_test_steps(self):
         """Use this trial with an infinite number of test steps (until stopped via STOP_TRAINING flag or similar). 
         Returns self so that methods can be chained for convenience.
-        
+
+        Example::
+
+            # Simple trial that runs test data until stopped
+            >>> from torchbearer import Trial
+            >>> test_data = torch.rand(1000, 10)
+            >>> trial = Trial(None).with_test_data(test_data).for_inf_test_steps()
+            >>> trial.run(1)
+
         Returns:
             Trial: self
         """
@@ -748,7 +796,18 @@ class Trial(object):
 
     def for_inf_steps(self, train=True, val=True, test=True):
         """Use this trail with infinite steps. Returns self so that methods can be chained for convenience.
-        
+
+        Example::
+
+            # Simple trial that runs training and test data until stopped
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> trainloader = DataLoader(MNIST('./data/', train=True))
+            >>> valloader = DataLoader(MNIST('./data/', train=False))
+            >>> trial = Trial(None).with_train_generator(trainloader).for_inf_steps(valloader)
+            >>> trial.with_inf_test_loader(True, False, True).run(1)
+
         Args:
             train (bool): Use an infinite number of training steps
             val (bool): Use an infinite number of validation steps
@@ -767,7 +826,17 @@ class Trial(object):
         """Use this trial with a training iterator that refreshes when it finishes instead of each epoch. 
         This allows for setting training steps less than the size of the generator and model will still be trained on 
         all training samples if enough "epochs" are run.
-        
+
+        Example::
+
+            # Simple trial that runs 10 epochs of 100 iterations of a training generator without reshuffling until all data has been seen
+            >>> from torchbearer import Trial
+            >>> from torchvision.datasets import MNIST
+            >>> from torch.utils.data import DataLoader
+            >>> trainloader = DataLoader(MNIST('./data/', train=True))
+            >>> trial = Trial(None).with_train_generator(trainloader).with_inf_train_loader()
+            >>> trial.run(10)
+
         Returns:
             Trial: self:
         """
@@ -778,6 +847,15 @@ class Trial(object):
     def with_loader(self, batch_loader):
         """Use this trial with custom batch loader. Usually calls next on state[torchbearer.ITERATOR] and populates
         state[torchbearer.X] and state[torchbearer.Y_TRUE]
+
+        Example::
+
+            # Simple trial that runs with a custom loader function that populates X and Y_TRUE in state with random data
+            >>> from torchbearer import Trial
+            >>> def custom_loader(state):
+            ...     state[X], state[Y_TRUE] = torch.rand(5, 5), torch.rand(5, 5)
+            >>> trial = Trial(None).with_loader(custom_loader)
+            >>> trial.run(10)
 
         Args:
             batch_loader (function): Function of state that extracts data from data loader (stored under torchbearer.ITERATOR), stores it in
@@ -792,6 +870,18 @@ class Trial(object):
     def with_closure(self, closure):
         """Use this trial with custom closure
 
+        Example::
+
+            # Simple trial that runs with a custom closure
+            >>> from torchbearer import Trial
+            >>> def custom_closure(state):
+            ...     print(state[torchbearer.BATCH])
+            >>> trial = Trial(None).with_closure(custom_closure).for_steps(3)
+            >>> _ = trial.run(1)
+            0
+            1
+            2
+
         Args:
             closure (function): Function of state that defines the custom closure
 
@@ -805,6 +895,13 @@ class Trial(object):
     @inject_printer()
     def run(self, epochs=1, verbose=-1):
         r"""Run this trial for the given number of epochs, starting from the last trained epoch.
+
+        Example::
+
+            # Simple trial that runs with a custom closure
+            >>> from torchbearer import Trial
+            >>> trial = Trial(None).for_steps(100)
+            >>> _ = trial.run(1)
 
         Args:
             epochs (int, optional): The number of epochs to run for
@@ -953,6 +1050,15 @@ class Trial(object):
     def evaluate(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Evaluate this trial on the validation data.
 
+        Example: ::
+
+            # Simple trial to evaluate on both validation and test data
+            >>> from torchbearer import Trial
+            >>> test_data = torch.rand(5, 5)
+            >>> val_data = torch.rand(5, 5)
+            >>> t = Trial(None).with_val_data(val_data).with_test_data(test_data)
+            >>> t.evaluate(data_key=torchbearer.VALIDATION_DATA).evaluate(data_key=torchbearer.TEST_DATA)
+
         Args:
             verbose (int): If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
             data_key (StateKey): Optional :class:`.StateKey` for the data to evaluate on. Default: torchbearer.VALIDATION_DATA
@@ -990,6 +1096,16 @@ class Trial(object):
     def predict(self, verbose=-1, data_key=None):  # Note: kwargs appear unused but are inspected in inject_sampler
         """Determine predictions for this trial on the test data.
 
+        Example: ::
+
+            # Simple trial to predict on some validation and test data
+            >>> from torchbearer import Trial
+            >>> val_data = torch.rand(5, 5)
+            >>> test_data = torch.rand(5, 5)
+            >>> t = Trial(None).with_val_data(val_data).with_test_data(test_data)
+            >>> val_predictions = t.predict(data_key=torchbearer.VALIDATION_DATA)
+            >>> test_predictions = t.predict(data_key=torchbearer.TEST_DATA)
+
         Args:
             verbose (int): If 2: use tqdm on batch, If 1: use tqdm on epoch, If 0: display no training progress, If -1: Automatic
             data_key (StateKey): Optional :class:`.StateKey` for the data to predict on. Default: torchbearer.TEST_DATA
@@ -1019,6 +1135,13 @@ class Trial(object):
 
     def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
+
+        Example: ::
+
+            >>> from torchbearer import Trial
+            >>> state = torch.load('some_state.pt')
+            >>> t = Trial(None).load_state_dict(state)
+            >>> t.replay()
 
         Args:
             callbacks (list): List of callbacks to be run during the replay
@@ -1091,6 +1214,10 @@ class Trial(object):
     def train(self):
         """Set model and metrics to training mode.
 
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None).train()
+
         Returns:
             Trial: self
         """
@@ -1101,6 +1228,10 @@ class Trial(object):
 
     def eval(self):
         """Set model and metrics to evaluation mode
+
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None).eval()
 
         Returns:
             Trial: self
@@ -1115,6 +1246,10 @@ class Trial(object):
 
     def to(self, *args, **kwargs):
         """ Moves and/or casts the parameters and buffers.
+
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None).to('cuda:1')
 
         Args:
             args: See: `torch.nn.Module.to <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.to>`_
@@ -1137,6 +1272,10 @@ class Trial(object):
     def cuda(self, device=None):
         """ Moves all model parameters and buffers to the GPU.
 
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None).cuda()
+
         Args:
             device (int): if specified, all parameters will be copied to that device
 
@@ -1152,6 +1291,10 @@ class Trial(object):
     def cpu(self):
         """ Moves all model parameters and buffers to the CPU.
 
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None).cpu()
+
         Returns:
             Trial: self
         """
@@ -1161,6 +1304,11 @@ class Trial(object):
 
     def state_dict(self, **kwargs):
         """Get a dict containing the model and optimizer states, as well as the model history.
+
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None)
+            >>> state = t.state_dict() # State dict that can now be saved with torch.save
 
         Args:
             kwargs: See: `torch.nn.Module.state_dict <https://pytorch.org/docs/stable/nn.html?highlight=#torch.nn.Module.state_dict>`_
@@ -1180,6 +1328,12 @@ class Trial(object):
     def load_state_dict(self, state_dict, resume=True, **kwargs):
         """Resume this trial from the given state. Expects that this trial was constructed in the same way. Optionally,
         just load the model state when resume=False.
+
+        Example: ::
+            >>> from torchbearer import Trial
+            >>> t = Trial(None)
+            >>> state = torch.load('some_state.pt')
+            >>> t.load_state_dict(state)
 
         Args:
             state_dict (dict): The state dict to reload
