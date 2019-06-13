@@ -7,7 +7,7 @@ from torchbearer.callbacks import Callback
 class EarlyStopping(Callback):
     """Callback to stop training when a monitored quantity has stopped improving.
 
-    Example: ::
+    Example::
 
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import EarlyStopping
