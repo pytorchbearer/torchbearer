@@ -3,13 +3,13 @@ from unittest import TestCase
 import torch
 
 import torchbearer
-from torchbearer.callbacks.cutout import CutOut
+from torchbearer.callbacks.cutout import Cutout
 
 
 class TestCutOut(TestCase):
     def test_cutout(self):
         random_image = torch.rand(2, 3, 100, 100)
-        co = CutOut(1, 10, seed=7)
+        co = Cutout(1, 10, seed=7)
         state = {torchbearer.X: random_image}
         co.on_sample(state)
 

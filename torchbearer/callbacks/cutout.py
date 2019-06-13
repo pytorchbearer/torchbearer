@@ -6,7 +6,7 @@ from torchbearer.bases import cite
 
 bibtex = """
 @article{devries2017improved,
-  title={Improved regularization of convolutional neural networks with cutout},
+  title={Improved regularization of convolutional neural networks with Cutout},
   author={DeVries, Terrance and Taylor, Graham W},
   journal={arXiv preprint arXiv:1708.04552},
   year={2017}
@@ -15,18 +15,18 @@ bibtex = """
 
 
 @cite(bibtex)
-class CutOut(Callback):
+class Cutout(Callback):
     """ Cutout callback which randomly masks out patches of image data. Implementation a modified version of the code
-    found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py>`_.
+    found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
 
     Example::
 
         >>> from torchbearer import Trial
-        >>> from torchbearer.callbacks import CutOut
+        >>> from torchbearer.callbacks import Cutout
 
-        # Example Trial which does cutout regularisation
-        >>> cutout = CutOut
-        >>> trial = Trial(None, callbacks=[cutout], metrics=['acc'])
+        # Example Trial which does Cutout regularisation
+        >>> Cutout = Cutout(1, 10)
+        >>> trial = Trial(None, callbacks=[Cutout], metrics=['acc'])
 
     Args:
         n_holes (int): Number of patches to cut out of each image.
@@ -34,11 +34,11 @@ class CutOut(Callback):
         seed: Random seed
     """
     def __init__(self, n_holes, length, seed=None):
-        super(CutOut, self).__init__()
+        super(Cutout, self).__init__()
         self.cutter = BatchCutout(n_holes, length, seed)
 
     def on_sample(self, state):
-        super(CutOut, self).on_sample(state)
+        super(Cutout, self).on_sample(state)
         state[torchbearer.X] = self.cutter(state[torchbearer.X])
 
 
