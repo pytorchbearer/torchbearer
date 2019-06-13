@@ -43,6 +43,7 @@ class CutOut(Callback):
 
 class BatchCutout(object):
     """Randomly mask out one or more patches from a batch of images.
+
     Args:
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
@@ -54,6 +55,7 @@ class BatchCutout(object):
 
     def __call__(self, img):
         """
+
         Args:
             img (Tensor): Tensor image of size (B, C, H, W).
         Returns:
