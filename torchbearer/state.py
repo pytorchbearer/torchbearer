@@ -217,7 +217,3 @@ HISTORY = state_key('history')
 
 #: The optional arguments which should be passed to the backward call
 BACKWARD_ARGS = state_key('backward_args')
-
-# Legacy
-VALIDATION_ITERATOR = 'validation_iterator'
-TRAIN_ITERATOR = 'train_iterator'
