@@ -16,6 +16,12 @@ Deep Learning
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb>`__   :download:`Download Notebook </_static/notebooks/quickstart.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb>`__
 
+- **Callbacks Guide**:
+
+    This guide will give an introduction to using callbacks with Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb>`__   :download:`Download Notebook </_static/notebooks/quickstart.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb>`__
+
 - **Training a VAE**:
 
     This guide covers training a variational auto-encoder (VAE) in Torchbearer, taking advantage of the persistent state.
@@ -36,6 +42,11 @@ Deep Learning
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb>`__   :download:`Download Notebook </_static/notebooks/cam.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb>`__
 
+- **Adversarial Example Generation**:
+
+    This guide will cover how to perform a simple adversarial attack in Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb>`__   :download:`Download Notebook </_static/notebooks/adversarial.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb>`__
 
 Differentiable Programming
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
