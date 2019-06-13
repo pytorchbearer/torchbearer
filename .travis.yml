@@ -34,11 +34,12 @@ matrix:
       sudo: true
       env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
 before_install:
-  if ! git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qE '^(torchbearer/|tests/)'
-  then
-    echo "Only docs were updated, not running the CI."
-    exit
-  fi
+  - |
+      if ! git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qE '^(torchbearer/|tests/)'
+      then
+        echo "Only docs were updated, not running the CI."
+        exit
+      fi
 # command to install dependencies
 install:
   - pip install -q coverage
