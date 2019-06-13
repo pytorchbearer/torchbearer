@@ -31,6 +31,7 @@ class CutOut(Callback):
     Args:
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
+        seed: Random seed
     """
     def __init__(self, n_holes, length, seed=None):
         super(CutOut, self).__init__()
@@ -47,6 +48,7 @@ class BatchCutout(object):
     Args:
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
+        seed: Random seed
     """
     def __init__(self, n_holes, length, seed):
         self.n_holes = n_holes
