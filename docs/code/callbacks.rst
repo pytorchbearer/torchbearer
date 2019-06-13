@@ -105,9 +105,10 @@ Weight / Bias Initialisation
 Regularisers
 ------------------------------------
 
-..  automodule:: torchbearer.callbacks.cutout
+..  autoclass:: torchbearer.callbacks.cutout.CutOut
         :members:
         :undoc-members:
+
 
 Decorators
 ------------------------------------
