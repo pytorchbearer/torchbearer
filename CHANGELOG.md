@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added ``with_loader`` trial method that allows running of custom batch loaders
 - Added a Mock Model which is set when None is passed as the model to a Trial. Mock Model always returns None. 
 - Added `__call__(state)` to `StateKey` so that they can now be used as losses
+- Added a callback to do cutout regularisation
 ### Changed
 ### Deprecated
 ### Removed
