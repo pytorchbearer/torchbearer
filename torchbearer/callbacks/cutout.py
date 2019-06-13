@@ -2,8 +2,19 @@ import torchbearer
 from torchbearer import Callback
 import torch
 import numpy as np
+from torchbearer.bases import cite
+
+bibtex = """
+@article{devries2017improved,
+  title={Improved regularization of convolutional neural networks with cutout},
+  author={DeVries, Terrance and Taylor, Graham W},
+  journal={arXiv preprint arXiv:1708.04552},
+  year={2017}
+}
+"""
 
 
+@cite(bibtex)
 class CutOut(Callback):
     """ Cutout callback which randomly masks out patches of image data. Implementation a modified version of the code
     found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py>`_.
