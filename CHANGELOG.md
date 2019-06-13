@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed a bug where list or dictionary metrics would cause the tensorboard callback to error
 - Fixed a bug where running a trial without training steps would error
+- Fixed a bug where the caching imaging callback didn't reset data so couldn't be run in multiple trials
 
 ## [0.3.2] - 2019-05-28
 ### Added
