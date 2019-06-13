@@ -12,6 +12,12 @@ class TestStateKey(unittest.TestCase):
         self.assertDictEqual(key.process(state), {str(key): 4})
         self.assertDictEqual(key.process_final(state), {str(key): 4})
 
+    def test_key_call(self):
+        key = torchbearer.state_key('call_test')
+        state = {key: 'test'}
+
+        self.assertEqual(key(state), 'test')
+
     def test_key_repr(self):
         key = torchbearer.state_key('repr_test')
         self.assertEqual(str(key), 'repr_test')
