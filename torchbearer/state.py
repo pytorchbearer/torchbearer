@@ -1,14 +1,3 @@
-"""
-The state is central in torchbearer, storing all of the relevant intermediate values that may be changed or replaced
-during model fitting. This module defines classes for interacting with state and all of the built in state keys used
-throughout torchbearer. The :func:`state_key` function can be used to create custom state keys for use in callbacks or
-metrics.
-
-Example: ::
-
-    from torchbearer import state_key
-    MY_KEY = state_key('my_test_key')
-"""
 from torchbearer import Metric
 import warnings
 
@@ -43,6 +32,9 @@ class StateKey(Metric):
 
     def process_final(self, state):
         return {self.name: state[self]}
+
+    def __call__(self, state):
+        return state[self]
 
     def _gen_key_(self, key):
         if key in __keys__:

@@ -1,9 +1,3 @@
-"""
-..  autoclass:: torchbearer.bases.Callback
-        :members:
-        :undoc-members:
-"""
-
 from torchbearer import Callback
 
 

@@ -34,6 +34,17 @@ class TorchScheduler(Callback):
 
 class LambdaLR(TorchScheduler):
     """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import LambdaLR
+
+        # Example Trial which performs the two learning rate lambdas from the PyTorch docs
+        >>> lambda1 = lambda epoch: epoch // 30
+        >>> lambda2 = lambda epoch: 0.95 ** epoch
+        >>> scheduler = LambdaLR(lr_lambda=[lambda1, lambda2])
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
 
@@ -48,6 +59,18 @@ class LambdaLR(TorchScheduler):
 
 class StepLR(TorchScheduler):
     """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import StepLR
+
+        >>> # Assuming optimizer uses lr = 0.05 for all groups
+        >>> # lr = 0.05     if epoch < 30
+        >>> # lr = 0.005    if 30 <= epoch < 60
+        >>> # lr = 0.0005   if 60 <= epoch < 90
+        >>> scheduler = StepLR(step_size=30, gamma=0.1)
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
 
@@ -63,6 +86,18 @@ class StepLR(TorchScheduler):
 
 class MultiStepLR(TorchScheduler):
     """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import MultiStepLR
+
+        >>> # Assuming optimizer uses lr = 0.05 for all groups
+        >>> # lr = 0.05     if epoch < 30
+        >>> # lr = 0.005    if 30 <= epoch < 80
+        >>> # lr = 0.0005   if epoch >= 80
+        >>> scheduler = MultiStepLR(milestones=[30,80], gamma=0.1)
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
 
@@ -78,6 +113,15 @@ class MultiStepLR(TorchScheduler):
 
 class ExponentialLR(TorchScheduler):
     """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import ExponentialLR
+
+        >>> # Example scheduler which multiplies the learning rate by 0.1 every epoch
+        >>> scheduler = ExponentialLR(gamma=0.1)
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
 
@@ -92,6 +136,15 @@ class ExponentialLR(TorchScheduler):
 
 class CosineAnnealingLR(TorchScheduler):
     """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import CosineAnnealingLR
+
+        >>> # Example scheduler which uses cosine learning rate annealing - see PyTorch docs
+        >>> scheduler = MultiStepLR(milestones=[30,80], gamma=0.1)
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).run(1)
+
     Args:
         step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
 
@@ -107,6 +160,16 @@ class CosineAnnealingLR(TorchScheduler):
 
 class ReduceLROnPlateau(TorchScheduler):
     """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import ReduceLROnPlateau
+
+        >>> # Example scheduler which multiplies the learning rate by 10 on plateaus of 5 epochs without significant
+        >>> # validation loss decrease
+        >>> scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5)
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).for_val_steps(10).run(1)
+
     Args:
         monitor (str): The name of the quantity in metrics to monitor. (Default value = 'val_loss')
         step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
