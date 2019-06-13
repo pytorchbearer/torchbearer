@@ -26,7 +26,7 @@ class CutOut(Callback):
         self.cutter = BatchCutout(n_holes, length, seed)
 
     def on_sample(self, state):
-        super().on_sample(state)
+        super(CutOut, self).on_sample(state)
         state[torchbearer.X] = self.cutter(state[torchbearer.X])
 
 
