@@ -33,6 +33,9 @@ class StateKey(Metric):
     def process_final(self, state):
         return {self.name: state[self]}
 
+    def __call__(self, state):
+        return state[self]
+
     def _gen_key_(self, key):
         if key in __keys__:
             count = 1
