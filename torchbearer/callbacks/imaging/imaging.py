@@ -249,6 +249,7 @@ class CachingImagingCallback(ImagingCallback):
 
     def on_end_epoch(self, state):
         super(CachingImagingCallback, self).on_end_epoch(state)
+        self._data = None
         self._done = False
 
 
