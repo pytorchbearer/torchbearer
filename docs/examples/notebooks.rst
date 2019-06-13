@@ -2,13 +2,15 @@ Notebooks List
 ================================
 Here we have a list of example notebooks using Torchbearer with a brief description of the contents and broken down by broad subject.
 
-Deep Learning
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. |colab| image:: /_static/img/colab.jpg
     :width: 25
 
 .. |nbviewer| image:: /_static/img/nbviewer_logo.svg
     :width: 12
+
+General
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - **Quickstart Guide**:
 
@@ -21,6 +23,9 @@ Deep Learning
     This guide will give an introduction to using callbacks with Torchbearer.
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__   :download:`Download Notebook </_static/notebooks/callbacks.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__
+
+Deep Learning
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - **Training a VAE**:
 
