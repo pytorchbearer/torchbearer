@@ -14,6 +14,7 @@ _inside_cnns = """
 """
 
 RANDOM = -10
+""" Flag that when passed as the target chosses a random target"""
 
 
 class _CAMWrapper(nn.Module):
