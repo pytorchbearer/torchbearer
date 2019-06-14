@@ -109,6 +109,10 @@ Regularisers
         :members:
         :undoc-members:
 
+..  autoclass:: torchbearer.callbacks.cutout.RandomErase
+        :members:
+        :undoc-members:
+
 
 Decorators
 ------------------------------------
