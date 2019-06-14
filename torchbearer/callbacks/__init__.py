@@ -1,5 +1,6 @@
 from torchbearer import Callback
 from .callbacks import *
+from .cutout import Cutout, RandomErase
 from .lr_finder import CyclicLR
 from .lsuv import LSUV
 from .checkpointers import *
