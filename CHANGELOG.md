@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added `__call__(state)` to `StateKey` so that they can now be used as losses
 - Added a callback to do cutout regularisation
 - Added a `with_data` trial method that allows passing of train, val and test data in one call
+- Added the missing on_init callback decorator 
 ### Changed
 ### Deprecated
 ### Removed
