@@ -39,7 +39,7 @@ def on_init(func):
     """ The :func:`on_init` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_init`
     calling the decorated function
 
-    Example::
+    Example: ::
 
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import on_init

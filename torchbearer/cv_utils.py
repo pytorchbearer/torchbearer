@@ -62,15 +62,15 @@ def get_train_valid_sets(x, y, validation_data, validation_split, shuffle=True):
 
 
 class DatasetValidationSplitter:
-    def __init__(self, dataset_len, split_fraction, shuffle_seed=None):
-        """ Generates training and validation split indicies for a given dataset length and creates training and
-        validation datasets using these splits
+    """ Generates training and validation split indicies for a given dataset length and creates training and
+    validation datasets using these splits
 
-        Args:
-            dataset_len: The length of the dataset to be split into training and validation
-            split_fraction: The fraction of the whole dataset to be used for validation
-            shuffle_seed: Optional random seed for the shuffling process
-        """
+    Args:
+        dataset_len: The length of the dataset to be split into training and validation
+        split_fraction: The fraction of the whole dataset to be used for validation
+        shuffle_seed: Optional random seed for the shuffling process
+    """
+    def __init__(self, dataset_len, split_fraction, shuffle_seed=None):
         self.dataset_len = dataset_len
         self.split_fraction = split_fraction
         self.valid_ids = None
@@ -112,13 +112,13 @@ class DatasetValidationSplitter:
 
 
 class SubsetDataset(Dataset):
-    def __init__(self, dataset, ids):
-        """ Dataset that consists of a subset of a previous dataset
+    """ Dataset that consists of a subset of a previous dataset
 
-        Args:
-            dataset (torch.utils.data.Dataset): Complete dataset
-            ids (list): List of subset IDs
-        """
+    Args:
+        dataset (torch.utils.data.Dataset): Complete dataset
+        ids (list): List of subset IDs
+    """
+    def __init__(self, dataset, ids):
         super(SubsetDataset, self).__init__()
         self.dataset = dataset
         self.ids = ids
