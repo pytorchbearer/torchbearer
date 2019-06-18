@@ -28,7 +28,7 @@ class Cutout(Callback):
     """ Cutout callback which randomly masks out patches of image data. Implementation a modified version of the code
     found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
 
-    Example::
+    Example: ::
 
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import Cutout
@@ -61,7 +61,7 @@ class RandomErase(Callback):
     Implementation a modified version of the cutout code found
     `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
 
-    Example::
+    Example: ::
 
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import RandomErase

@@ -657,6 +657,24 @@ class TestWithData(TestCase):
         torchbearertrial.with_test_generator.assert_called_once_with(-1, steps=4)
         td.assert_called_once_with(x)
 
+    def test_with_data(self):
+        trial = Trial(None)
+        mock_train_data, mock_val_data, mock_test_data = Mock(), Mock(), Mock()
+        trial.with_train_data = mock_train_data
+        trial.with_val_data = mock_val_data
+        trial.with_test_data = mock_test_data
+        shuffle = True
+        batch_size = 30
+
+        one_tensor = torch.Tensor([1])
+        target_tensor = torch.Tensor([10])
+        trial.with_data(one_tensor, target_tensor, one_tensor*2, target_tensor*2, one_tensor*3, batch_size,
+                        train_steps=100, val_steps=200, test_steps=300, shuffle=shuffle)
+
+        self.assertTrue(mock_train_data.call_args[0] == (one_tensor, target_tensor, 30, shuffle, 1, 100))
+        self.assertTrue(mock_val_data.call_args[0] == (one_tensor*2, target_tensor*2, 30, shuffle, 1, 200))
+        self.assertTrue(mock_test_data.call_args[0] == (one_tensor*3, 30, 1, 300))
+
 
 class TestWithClosureAndLoader(TestCase):
     def test_with_closure(self):

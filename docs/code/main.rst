@@ -4,12 +4,11 @@ torchbearer
 Trial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Trial
---------------------
-
 ..  autoclass:: torchbearer.Trial
+        :member-order: bysource
         :members:
         :undoc-members:
+
 
 Batch Loaders
 --------------------
@@ -32,7 +31,7 @@ during model fitting. This module defines classes for interacting with state and
 throughout torchbearer. The :func:`state_key` function can be used to create custom state keys for use in callbacks or
 metrics.
 
-Example::
+Example: ::
 
     >>> from torchbearer import state_key
     >>> MY_KEY = state_key('my_test_key')
