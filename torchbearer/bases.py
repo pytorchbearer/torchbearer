@@ -229,32 +229,6 @@ class Callback(object):
         """
         pass
 
-    def on_end_epoch(self, state):
-        """Perform some action with the given state as context at the end of each epoch.
-
-        Args:
-            state (dict): The current state dict of the :class:`.Trial`.
-        """
-        pass
-
-    def on_checkpoint(self, state):
-        """Perform some action with the state after all other callbacks have completed at the end of an epoch and the
-        history has been updated. Should only be used for taking checkpoints or snapshots and will only be called by the
-        run method of Trial.
-
-        Args:
-            state (dict): The current state dict of the :class:`.Trial`.
-        """
-        pass
-
-    def on_end(self, state):
-        """Perform some action with the given state as context at the end of the model fitting.
-
-        Args:
-            state (dict): The current state dict of the :class:`.Trial`.
-        """
-        pass
-
     def on_start_validation(self, state):
         """Perform some action with the given state as context at the start of the validation loop.
 
@@ -289,6 +263,14 @@ class Callback(object):
         """
         pass
 
+    def on_step_validation(self, state):
+        """Perform some action with the given state as context at the end of each validation step.
+
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
+        """
+        pass
+
     def on_end_validation(self, state):
         """Perform some action with the given state as context at the end of the validation loop.
 
@@ -297,8 +279,26 @@ class Callback(object):
         """
         pass
 
-    def on_step_validation(self, state):
-        """Perform some action with the given state as context at the end of each validation step.
+    def on_end_epoch(self, state):
+        """Perform some action with the given state as context at the end of each epoch.
+
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
+        """
+        pass
+
+    def on_checkpoint(self, state):
+        """Perform some action with the state after all other callbacks have completed at the end of an epoch and the
+        history has been updated. Should only be used for taking checkpoints or snapshots and will only be called by the
+        run method of Trial.
+
+        Args:
+            state (dict): The current state dict of the :class:`.Trial`.
+        """
+        pass
+
+    def on_end(self, state):
+        """Perform some action with the given state as context at the end of the model fitting.
 
         Args:
             state (dict): The current state dict of the :class:`.Trial`.

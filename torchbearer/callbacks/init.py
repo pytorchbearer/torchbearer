@@ -65,7 +65,24 @@ class LsuvInit(Callback):
     """Layer-sequential unit-variance (LSUV) initialization as described in
     `All you need is a good init <https://arxiv.org/abs/1511.06422>`_ and
     modified from the code by  `ducha-aiki <https://github.com/ducha-aiki/LSUV-pytorch>`__.
-    To be consistent with the paper, LsuvInit should be preceeded by a ZeroBias init on the Linear and Conv layers. 
+    To be consistent with the paper, LsuvInit should be preceeded by a ZeroBias init on the Linear and Conv layers.
+
+
+    Example: ::
+
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks.init import LsuvInit
+
+        # 100 random data points
+        >>> data = torch.rand(100, 3, 5, 5)
+        >>> example_batch = data[:3]
+        >>> lsuv = LsuvInit(example_batch)
+
+        # Model and trail using lsuv init for some random data
+        >>> model = nn.Sequential(nn.Conv2d(3, 1, 3), nn.ReLU())
+        >>> trial = Trial(model, callbacks=[lsuv]).with_train_data(data, data+5)
 
     Args:
         data_item (torch.Tensor): A representative data item to put through the model
@@ -100,13 +117,32 @@ class KaimingNormal(WeightInit):
     """Kaiming Normal weight initialisation. Uses ``torch.nn.init.kaiming_normal_`` on the ``weight`` attribute of the
     filtered modules.
 
+    Example: ::
+
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks.init import KaimingNormal
+
+        # 100 random data points
+        >>> data = torch.rand(100, 3, 5, 5)
+        >>> example_batch = data[:3]
+        >>> initialiser = KaimingNormal()
+
+        # Model and trail using kaiming init for some random data
+        >>> model = nn.Sequential(nn.Conv2d(3, 1, 3), nn.ReLU())
+        >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
+
     Args:
+        a (int): See `PyTorch kaiming_uniform_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.kaiming_uniform_>`_
+        mode (str): See `PyTorch kaiming_uniform_`_
+        nonlinearity (str): See `PyTorch kaiming_uniform_`_
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a
             single nn.Module that will have weights initialised, otherwise this is retrieved from the model
         targets (list[String]): A list of lookup strings to match which modules will be initialised
 
     See:
-        `PyTorch kaiming_normal_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.kaiming_normal_>`_
+        `PyTorch kaiming_normal_`_
     """
     def __init__(self, a=0, mode='fan_in', nonlinearity='leaky_relu', modules=None,
                  targets=['Conv', 'Linear', 'Bilinear']):
@@ -121,13 +157,32 @@ class KaimingUniform(WeightInit):
     """Kaiming Uniform weight initialisation. Uses ``torch.nn.init.kaiming_uniform_`` on the ``weight`` attribute of the
     filtered modules.
 
+    Example: ::
+
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks.init import KaimingUniform
+
+        # 100 random data points
+        >>> data = torch.rand(100, 3, 5, 5)
+        >>> example_batch = data[:3]
+        >>> initialiser = KaimingUniform()
+
+        # Model and trail using kaiming init for some random data
+        >>> model = nn.Sequential(nn.Conv2d(3, 1, 3), nn.ReLU())
+        >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
+
     Args:
+        a (int): See `PyTorch kaiming_uniform_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.kaiming_uniform_>`_
+        mode (str): See `PyTorch kaiming_uniform_`_
+        nonlinearity (str): See `PyTorch kaiming_uniform_`_
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a
             single nn.Module that will have weights initialised, otherwise this is retrieved from the model
         targets (list[String]): A list of lookup strings to match which modules will be initialised
 
     See:
-        `PyTorch kaiming_uniform_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.kaiming_uniform_>`_
+        `PyTorch kaiming_uniform_`_
     """
     def __init__(self, a=0, mode='fan_in', nonlinearity='leaky_relu', modules=None,
                  targets=['Conv', 'Linear', 'Bilinear']):
@@ -142,13 +197,30 @@ class XavierNormal(WeightInit):
     """Xavier Normal weight initialisation. Uses ``torch.nn.init.xavier_normal_`` on the ``weight`` attribute of the
     filtered modules.
 
+    Example: ::
+
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks.init import XavierNormal
+
+        # 100 random data points
+        >>> data = torch.rand(100, 3, 5, 5)
+        >>> example_batch = data[:3]
+        >>> initialiser = XavierNormal()
+
+        # Model and trail using Xavier init for some random data
+        >>> model = nn.Sequential(nn.Conv2d(3, 1, 3), nn.ReLU())
+        >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
+
     Args:
+        gain (int): See `PyTorch xavier_normal_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.xavier_normal_>`_
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a
             single nn.Module that will have weights initialised, otherwise this is retrieved from the model
         targets (list[String]): A list of lookup strings to match which modules will be initialised
 
     See:
-        `PyTorch xavier_normal_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.xavier_normal_>`_
+        `PyTorch xavier_normal_`_
     """
     def __init__(self, gain=1, modules=None, targets=['Conv', 'Linear', 'Bilinear']):
         def initialiser(module):
@@ -162,13 +234,30 @@ class XavierUniform(WeightInit):
     """Xavier Uniform weight initialisation. Uses ``torch.nn.init.xavier_uniform_`` on the ``weight`` attribute of the
     filtered modules.
 
+    Example: ::
+
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks.init import XavierUniform
+
+        # 100 random data points
+        >>> data = torch.rand(100, 3, 5, 5)
+        >>> example_batch = data[:3]
+        >>> initialiser = XavierUniform()
+
+        # Model and trail using Xavier init for some random data
+        >>> model = nn.Sequential(nn.Conv2d(3, 1, 3), nn.ReLU())
+        >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
+
     Args:
+        gain (int): See `PyTorch xavier_normal_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.xavier_normal_>`_
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a
             single nn.Module that will have weights initialised, otherwise this is retrieved from the model
         targets (list[String]): A list of lookup strings to match which modules will be initialised
 
     See:
-        `PyTorch xavier_uniform_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.xavier_uniform_>`_
+        `PyTorch xavier_uniform_`_
     """
     def __init__(self, gain=1, modules=None, targets=['Conv', 'Linear', 'Bilinear']):
         def initialiser(module):
@@ -180,6 +269,22 @@ class XavierUniform(WeightInit):
 class ZeroBias(WeightInit):
     """Zero initialisation for the ``bias`` attributes of filtered modules. This is recommended for use in conjunction
     with weight initialisation schemes.
+
+    Example: ::
+
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks.init import ZeroBias
+
+        # 100 random data points
+        >>> data = torch.rand(100, 3, 5, 5)
+        >>> example_batch = data[:3]
+        >>> initialiser = ZeroBias()
+
+        # Model and trail using zero bias init for some random data
+        >>> model = nn.Sequential(nn.Conv2d(3, 1, 3), nn.ReLU())
+        >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
 
     Args:
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a

@@ -9,10 +9,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a Mock Model which is set when None is passed as the model to a Trial. Mock Model always returns None. 
 - Added `__call__(state)` to `StateKey` so that they can now be used as losses
 - Added a callback to do cutout regularisation
+- Added a `with_data` trial method that allows passing of train, val and test data in one call
+- Added the missing on_init callback decorator
+- Added a `step_on_batch` flag to the early stopping callback
 ### Changed
 ### Deprecated
 ### Removed
 - Removed the variational sub-package, this will now be packaged separately
+- Removed `verbose` argument from the early stopping callback
 ### Fixed
 - Fixed a bug where list or dictionary metrics would cause the tensorboard callback to error
 - Fixed a bug where running a trial without training steps would error

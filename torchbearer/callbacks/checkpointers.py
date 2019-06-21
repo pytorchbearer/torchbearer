@@ -79,6 +79,11 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_p
             automatically inferred from the name of the monitored quantity.
         period (int): Interval (number of epochs) between checkpoints
         min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
     if save_best_only:
         check = Best(filepath, save_model_params_only, monitor, mode, period, min_delta)
@@ -112,6 +117,11 @@ class MostRecent(_Checkpointer):
             should be used only if the results will be loaded into a Torchbearer Trial object later.
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False,
@@ -157,6 +167,11 @@ class Best(_Checkpointer):
         min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist, with the `monitor` key populated
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False, monitor='val_loss',
@@ -244,6 +259,11 @@ class Interval(_Checkpointer):
         period (int): Interval (number of epochs) between checkpoints
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False, period=1, on_batch=False, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):

@@ -4,10 +4,12 @@ torchbearer.callbacks
 Base Classes
 ------------------------------------
 ..  autoclass:: torchbearer.bases.Callback
+        :member-order: bysource
         :members:
         :undoc-members:
 
 ..  automodule:: torchbearer.callbacks.callbacks
+        :member-order: bysource
         :members:
         :undoc-members:
 
@@ -117,6 +119,35 @@ Regularisers
 Decorators
 ------------------------------------
 
+Main
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The main callback decorators simply take a function and bind it to a callback point, returning the result.
+.. autofunction:: torchbearer.callbacks.decorators.on_init
+.. autofunction:: torchbearer.callbacks.decorators.on_start
+.. autofunction:: torchbearer.callbacks.decorators.on_start_epoch
+.. autofunction:: torchbearer.callbacks.decorators.on_start_training
+.. autofunction:: torchbearer.callbacks.decorators.on_sample
+.. autofunction:: torchbearer.callbacks.decorators.on_forward
+.. autofunction:: torchbearer.callbacks.decorators.on_criterion
+.. autofunction:: torchbearer.callbacks.decorators.on_backward
+.. autofunction:: torchbearer.callbacks.decorators.on_step_training
+.. autofunction:: torchbearer.callbacks.decorators.on_end_training
+.. autofunction:: torchbearer.callbacks.decorators.on_start_validation
+.. autofunction:: torchbearer.callbacks.decorators.on_sample_validation
+.. autofunction:: torchbearer.callbacks.decorators.on_forward_validation
+.. autofunction:: torchbearer.callbacks.decorators.on_criterion_validation
+.. autofunction:: torchbearer.callbacks.decorators.on_step_validation
+.. autofunction:: torchbearer.callbacks.decorators.on_end_validation
+.. autofunction:: torchbearer.callbacks.decorators.on_end_epoch
+.. autofunction:: torchbearer.callbacks.decorators.on_checkpoint
+.. autofunction:: torchbearer.callbacks.decorators.on_end
+
+Utility
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Alongside the base callback decorators that simply bind a function to a callback point, Torchbearer has a number of utility decorators that help simplify callback construction.
+
 ..  automodule:: torchbearer.callbacks.decorators
+        :noindex: LambdaCallback, bind_to, count_args, on_init, on_start, on_start_epoch, on_start_training, on_sample, on_forward, on_criterion, on_backward, on_step_training, on_step_training, on_end_training, on_start_validation, on_sample_validation, on_forward_validation, on_criterion_validation, on_step_validation, on_end_validation, on_end_epoch, on_checkpoint, on_end
+        :exclude-members: LambdaCallback, bind_to, count_args, on_init, on_start, on_start_epoch, on_start_training, on_sample, on_forward, on_criterion, on_backward, on_step_training, on_step_training, on_end_training, on_start_validation, on_sample_validation, on_forward_validation, on_criterion_validation, on_step_validation, on_end_validation, on_end_epoch, on_checkpoint, on_end
         :members:
         :undoc-members:

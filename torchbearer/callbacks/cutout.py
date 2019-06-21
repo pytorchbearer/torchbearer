@@ -28,7 +28,7 @@ class Cutout(Callback):
     """ Cutout callback which randomly masks out patches of image data. Implementation a modified version of the code
     found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
 
-    Example::
+    Example: ::
 
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import Cutout
@@ -42,6 +42,9 @@ class Cutout(Callback):
         length (int): The length (in pixels) of each square patch.
         constant (float): Constant value for each square patch
         seed: Random seed
+
+    State Requirements:
+        - :attr:`torchbearer.state.X`: State should have the current data stored
     """
     def __init__(self, n_holes, length, constant=0., seed=None):
         super(Cutout, self).__init__()
@@ -58,7 +61,7 @@ class RandomErase(Callback):
     Implementation a modified version of the cutout code found
     `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
 
-    Example::
+    Example: ::
 
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import RandomErase
@@ -71,6 +74,9 @@ class RandomErase(Callback):
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
         seed: Random seed
+
+    State Requirements:
+        - :attr:`torchbearer.state.X`: State should have the current data stored
     """
     def __init__(self, n_holes, length, seed=None):
         super(RandomErase, self).__init__()

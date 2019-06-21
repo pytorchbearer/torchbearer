@@ -35,6 +35,32 @@ def bind_to(target):
     return decorator
 
 
+def on_init(func):
+    """ The :func:`on_init` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_init`
+    calling the decorated function
+
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import on_init
+
+        # Example callback on start
+        >>> @on_init
+        ... def print_callback(state):
+        ...     print('Initialised trial.')
+
+        >>> trial = Trial(None, callbacks=[print_callback]).for_steps(1).run()
+        Initialised trial.
+
+    Args:
+        func (function): The function(state) to *decorate*
+
+    Returns:
+        Callback: Initialised callback with :meth:`~.Callback.on_start` calling func
+    """
+    return bind_to(Callback.on_start)(func)
+
+
 def on_start(func):
     """ The :func:`on_start` decorator is used to initialise a :class:`.Callback` with :meth:`~.Callback.on_start`
     calling the decorated function

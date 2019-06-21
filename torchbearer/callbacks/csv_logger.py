@@ -25,6 +25,11 @@ class CSVLogger(Callback):
         batch_granularity (bool): If True, write on each batch, else on each epoch
         write_header (bool): If True, write the CSV header at the beginning of training
         append (bool): If True, append to the file instead of replacing it
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: State should have the current epoch stored
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.BATCH`: State should have the current batch stored if using `batch_granularity`
     """
 
     def __init__(self, filename, separator=',', batch_granularity=False, write_header=True, append=False):
