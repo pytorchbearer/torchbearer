@@ -2,6 +2,7 @@ from __future__ import print_function
 import torchbearer
 
 from torchbearer.callbacks import Callback
+from .decorators import only_if
 
 
 class EarlyStopping(Callback):
@@ -21,7 +22,6 @@ class EarlyStopping(Callback):
         min_delta (float): Minimum change in the monitored quantity to qualify as an improvement, i.e. an absolute
             change of less than min_delta, will count as no improvement.
         patience (int): Number of epochs with no improvement after which training will be stopped.
-        verbose (int): Verbosity mode, will print stopping info if verbose > 0
         mode (str): One of {auto, min, max}. In `min` mode, training will stop when the quantity monitored has stopped
             decreasing; in `max` mode it will stop when the quantity monitored has stopped increasing; in `auto` mode,
             the direction is automatically inferred from the name of the monitored quantity.
@@ -31,15 +31,15 @@ class EarlyStopping(Callback):
     """
 
     def __init__(self, monitor='val_loss',
-                 min_delta=0, patience=0, verbose=0, mode='auto'):
+                 min_delta=0, patience=0, mode='auto', step_on_batch=False):
 
         super(EarlyStopping, self).__init__()
 
         self.monitor = monitor
         self.min_delta = min_delta
         self.patience = patience
-        self.verbose = verbose
         self.mode = mode
+        self.step_on_batch = step_on_batch
 
         if self.mode not in ['min', 'max']:
             if 'acc' in self.monitor:
@@ -55,23 +55,20 @@ class EarlyStopping(Callback):
             self.monitor_op = lambda x1, x2: x1 > x2
 
         self.wait = 0
-        self.stopped_epoch = 0
         self.best = float('inf') if self.mode == 'min' else -float('inf')
 
     def state_dict(self):
         state_dict = {
             'wait': self.wait,
-            'best': self.best,
-            'stopped_epoch': self.stopped_epoch
+            'best': self.best
         }
         return state_dict
 
     def load_state_dict(self, state_dict):
         self.wait = state_dict['wait']
         self.best = state_dict['best']
-        self.stopped_epoch = state_dict['stopped_epoch']
 
-    def on_end_epoch(self, state):
+    def step(self, state):
         current = state[torchbearer.METRICS][self.monitor]
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
@@ -79,9 +76,12 @@ class EarlyStopping(Callback):
         else:
             self.wait += 1
             if self.wait >= self.patience:
-                self.stopped_epoch = state[torchbearer.EPOCH]
                 state[torchbearer.STOP_TRAINING] = True
 
-    def on_end(self, state):
-        if self.stopped_epoch > 0 and self.verbose > 0:
-            print('Epoch %05d: early stopping' % (self.stopped_epoch + 1))
+    @only_if(lambda self, _: self.step_on_batch)
+    def on_step_training(self, state):
+        self.step(state)
+
+    @only_if(lambda self, _: not self.step_on_batch)
+    def on_end_epoch(self, state):
+        self.step(state)
