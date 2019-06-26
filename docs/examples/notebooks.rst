@@ -53,6 +53,13 @@ Deep Learning
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb>`__   :download:`Download Notebook </_static/notebooks/adversarial.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb>`__
 
+
+- **Transfer Learning**:
+
+    This guide will cover how to perform transfer learning of a model with Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb>`__   :download:`Download Notebook </_static/notebooks/transfer_learning.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb>`__
+
 Differentiable Programming
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - **Optimising Functions**:
