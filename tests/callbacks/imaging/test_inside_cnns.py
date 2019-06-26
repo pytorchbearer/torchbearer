@@ -35,13 +35,12 @@ class TestClassAppearanceModel(TestCase):
 
     def test_cam_loss(self):
         key = 'my_key'
-        to_prob = lambda x: x
         targets_hot = torch.FloatTensor([[0, 0, 0, 1, 0]]).ge(0.5)
         decay = 0.5
-        loss = imaging.inside_cnns._cam_loss(key, to_prob, targets_hot, decay)
+        loss = imaging.inside_cnns._cam_loss(key, targets_hot, decay)
 
         model = MagicMock
-        model.input_batch = torch.ones(5, 5) * 2
+        model.input_image = torch.ones(5, 5) * 2
 
         state = {'my_key': torch.FloatTensor([[0, 0, 0, 100, 0]]), torchbearer.MODEL: model}
         res = loss(state)
@@ -51,23 +50,25 @@ class TestClassAppearanceModel(TestCase):
         model = MagicMock()
         wrapper = imaging.inside_cnns._CAMWrapper((3, 10, 10), model)
 
-        self.assertTrue(wrapper.input_batch.requires_grad)
-        self.assertTrue(wrapper.input_batch.shape == torch.Size([1, 3, 10, 10]))
+        self.assertTrue(wrapper.input_image.requires_grad)
+        self.assertTrue(wrapper.input_image.shape == torch.Size([3, 10, 10]))
         wrapper('', 'state')
-        model.assert_called_once_with(wrapper.input_batch, 'state')
+        self.assertTrue(model.call_count == 1)
+        self.assertTrue(model.call_args[0][0].shape == torch.Size([1, 3, 10, 10]))
+        self.assertTrue(model.call_args[0][1] == 'state')
         model.reset_mock()
 
         model.side_effect = lambda x: x
         wrapper('', 'state')
         self.assertTrue(model.call_count == 2)
         self.assertTrue(model.call)
-        self.assertTrue(model.call_args[0][0] is wrapper.input_batch)
+        self.assertTrue(model.call_args[0][0].shape == torch.Size([1, 3, 10, 10]))
 
     @patch('torchbearer.callbacks.imaging.inside_cnns._cam_loss')
     @patch('torchbearer.callbacks.imaging.inside_cnns._CAMWrapper')
     @patch('torchbearer.callbacks.imaging.inside_cnns.torchbearer.Trial')
     def test_on_batch(self, _, wrapper, loss):
-        wrapper().input_batch = torch.nn.Parameter(torch.zeros(10))
+        wrapper().input_image = torch.nn.Parameter(torch.zeros(10))
 
         factory = MagicMock()
         callback = imaging.ClassAppearanceModel(nclasses=10, input_size=(1, 1, 1), optimizer_factory=factory)
@@ -75,15 +76,12 @@ class TestClassAppearanceModel(TestCase):
         model = MagicMock()
         callback.on_batch({torchbearer.EPOCH: 0, torchbearer.MODEL: model, torchbearer.DEVICE: 'cpu', torchbearer.DATA_TYPE: torch.float32})
 
-        loss.assert_called_once_with(torchbearer.PREDICTION, ANY, ANY, 0.001)
-        to_prob = loss.call_args[0][1]
-        mock_x = MagicMock()
-        to_prob(mock_x)
-        self.assertTrue(mock_x.exp.call_count == 1)
+        loss.assert_called_once_with(torchbearer.PREDICTION, ANY, 0.01)
+
         self.assertTrue(model.eval.call_count == 1)
         self.assertTrue(model.train.call_count == 1)
         self.assertTrue(factory.call_count == 1)
-        self.assertTrue(next(iter(factory.call_args[0][0])) is wrapper().input_batch)
+        self.assertTrue(next(iter(factory.call_args[0][0])) is wrapper().input_image)
 
     def test_end_to_end(self):
         with torchbearer.no_grad():
