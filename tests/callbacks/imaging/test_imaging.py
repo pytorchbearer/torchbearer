@@ -119,6 +119,12 @@ class TestImagingCallback(TestCase):
         self.assertTrue('test' in state)
         self.assertTrue(state['test'] is 'image')
 
+        callback = imaging.ImagingCallback().to_state(0)
+        state = {}
+        callback._handlers[0][0]('image', 0, state)
+        self.assertTrue(0 in state)
+        self.assertTrue(state[0] is 'image')
+
         callback = imaging.ImagingCallback().to_tensorboard()
         self.assertTrue(mock_to_tensorboard.call_count == 1)
 
