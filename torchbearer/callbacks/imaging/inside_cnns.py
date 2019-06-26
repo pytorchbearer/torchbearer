@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchbearer
-from . import imaging, once_per_epoch
+from torchbearer.callbacks.decorators import once_per_epoch
+from . import imaging
 
 _inside_cnns = """
 @article{simonyan2013deep,
