@@ -30,6 +30,12 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb>`__   :download:`Download Notebook </_static/notebooks/serialization.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb>`__
 
+- **History and Replay**:
+
+    This guide gives an introduction to the history returned by a trial and the ability to replay training.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb>`__   :download:`Download Notebook </_static/notebooks/history.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb>`__
+
 Deep Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

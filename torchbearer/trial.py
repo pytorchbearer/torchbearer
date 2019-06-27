@@ -1172,7 +1172,7 @@ class Trial(object):
             return res
         return []
 
-    def replay(self, callbacks=[], verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
+    def replay(self, callbacks=None, verbose=2, one_batch=False):  # TODO: Should we track if testing passes have happened?
         """ Replay the fit passes stored in history with given callbacks, useful when reloading a saved Trial. Note that only progress and metric information is populated in state during a replay.
 
         Example: ::
@@ -1190,6 +1190,8 @@ class Trial(object):
         Returns:
             Trial: self
         """
+        if callbacks is None:
+            callbacks = []
         history = self.state[torchbearer.HISTORY]
         callbacks.append(get_printer(verbose=verbose, validation_label_letter='v'))
         callbacks = CallbackList(callbacks)
@@ -1206,7 +1208,9 @@ class Trial(object):
             if not one_batch:
                 state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = metrics[str(torchbearer.TRAIN_STEPS)], metrics[str(torchbearer.VALIDATION_STEPS)]
             else:
-                state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = 1, 1
+                state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] =\
+                    1 if metrics[str(torchbearer.TRAIN_STEPS)] is not None else None,\
+                    1 if metrics[str(torchbearer.VALIDATION_STEPS)] is not None else None
             del metrics[str(torchbearer.TRAIN_STEPS)]
             del metrics[str(torchbearer.VALIDATION_STEPS)]
             state[torchbearer.METRICS] = metrics
@@ -1220,33 +1224,35 @@ class Trial(object):
         callback_list.on_start_epoch(state)
         all_metrics = state[torchbearer.METRICS]
 
-        # Training pass
-        state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS] if state[torchbearer.TRAIN_STEPS] is not None else 0
-        state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" not in key}
-        callback_list.on_start_training(state)
-        for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
-            callback_list.on_sample(state)
-            callback_list.on_forward(state)
-            callback_list.on_criterion(state)
-            callback_list.on_backward(state)
-            callback_list.on_step_training(state)
-            if state[torchbearer.STOP_TRAINING]:
-                break
-        callback_list.on_end_training(state)
-
-        # Validation pass
-        if not state[torchbearer.STOP_TRAINING]:
-            state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS] if state[torchbearer.VALIDATION_STEPS] is not None else 0
-            state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" in key}
-            callback_list.on_start_validation(state)
+        if state[torchbearer.TRAIN_STEPS] is not None:
+            # Training pass
+            state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
+            state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" not in key}
+            callback_list.on_start_training(state)
             for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
-                callback_list.on_sample_validation(state)
-                callback_list.on_forward_validation(state)
-                callback_list.on_criterion_validation(state)
-                callback_list.on_step_validation(state)
+                callback_list.on_sample(state)
+                callback_list.on_forward(state)
+                callback_list.on_criterion(state)
+                callback_list.on_backward(state)
+                callback_list.on_step_training(state)
                 if state[torchbearer.STOP_TRAINING]:
                     break
-            callback_list.on_end_validation(state)
+            callback_list.on_end_training(state)
+
+        if state[torchbearer.VALIDATION_STEPS] is not None:
+            # Validation pass
+            if not state[torchbearer.STOP_TRAINING]:
+                state[torchbearer.STEPS] = state[torchbearer.VALIDATION_STEPS]
+                state[torchbearer.METRICS] = {key: all_metrics[key] for key in all_metrics.keys() if "val_" in key}
+                callback_list.on_start_validation(state)
+                for state[torchbearer.BATCH] in range(state[torchbearer.STEPS]):
+                    callback_list.on_sample_validation(state)
+                    callback_list.on_forward_validation(state)
+                    callback_list.on_criterion_validation(state)
+                    callback_list.on_step_validation(state)
+                    if state[torchbearer.STOP_TRAINING]:
+                        break
+                callback_list.on_end_validation(state)
 
         state[torchbearer.METRICS] = all_metrics
         callback_list.on_end_epoch(state)
