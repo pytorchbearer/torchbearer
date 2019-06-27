@@ -109,4 +109,5 @@ ENV/
 /docs/_static/examples/logs
 /docs/_static/notebooks/data
 /docs/_static/notebooks/*.png
+/docs/_static/notebooks/*.pt
 /docs/_static/notebooks/images

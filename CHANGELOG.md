@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a `step_on_batch` flag to the early stopping callback
 - Added multi image support to `imaging`
 ### Changed
+- Changed history to now just be a list of records
 ### Deprecated
 ### Removed
 - Removed the variational sub-package, this will now be packaged separately

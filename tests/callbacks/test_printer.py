@@ -89,7 +89,7 @@ class TestTqdm(TestCase):
     def test_tqdm_custom_args(self):
         state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.TRAIN_STEPS: 100,
                  torchbearer.VALIDATION_STEPS: 101, torchbearer.METRICS: {'test': 10}}
-        state[torchbearer.HISTORY] = [[[], state[torchbearer.METRICS]]]
+        state[torchbearer.HISTORY] = [dict(state[torchbearer.METRICS], train_steps=None, validation_steps=None)]
         tqdm = Tqdm(ascii=True)
         state[torchbearer.STEPS] = state[torchbearer.TRAIN_STEPS]
 
@@ -108,7 +108,7 @@ class TestTqdm(TestCase):
         mock_tqdm.assert_called_once_with(initial=1, total=10, ascii=True)
 
     def test_tqdm_on_epoch(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.HISTORY: [0, (1, {'test': 0.99456})],
+        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.HISTORY: [0, {'train_steps': 1, 'validation_steps': None, 'test': 0.99456}],
                  torchbearer.METRICS: {'test': 0.99456}}
         tqdm = Tqdm(validation_label_letter='e', on_epoch=True)
         tqdm.tqdm_module = MagicMock()
