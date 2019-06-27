@@ -25,6 +25,17 @@ class TestUnpackState(TestCase):
         packer.on_sample_validation(state)
         self.assertTrue(state[torchbearer.X] == {torchbearer.X: 'data', torchbearer.Y_TRUE: 'targets'})
 
+    def test_no_key(self):
+        packer = UnpackState()
+        state = self.reset_state()
+
+        packer.on_sample(state)
+        self.assertTrue(state[torchbearer.X] == 'data')
+
+        state = self.reset_state()
+        packer.on_sample_validation(state)
+        self.assertTrue(state[torchbearer.X] == 'data')
+
     def test_fill_X(self):
         packer = UnpackState(keys=[torchbearer.Y_TRUE])
         state = self.reset_state()

@@ -41,7 +41,7 @@ class UnpackState(Callback):
 
     Args:
         keys (list / tuple): List of keys to unpack from state and pass to the model on forward
-        output_to_state: If True and torchbearer.Y_PRED in model_outputs, main torchbearer state will be updated
+        output_to_state (bool): If True and torchbearer.Y_PRED in model_outputs, main torchbearer state will be updated
         (state.update(model_outputs)). If False then model outputs will be stored in the main state under
         torchbeaerer.Y_PRED.
     """
