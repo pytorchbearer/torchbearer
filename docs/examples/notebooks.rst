@@ -24,6 +24,12 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__   :download:`Download Notebook </_static/notebooks/callbacks.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__
 
+- **Serialization**:
+
+    This guide gives an introduction to serializing and restarting training in Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb>`__   :download:`Download Notebook </_static/notebooks/serialization.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb>`__
+
 Deep Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
