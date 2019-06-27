@@ -327,8 +327,9 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
 
         # Forward Pass
         try:
+            # print(state[model](torch.rand(10, 1)))
             state[y_pred] = state[model](state[x], state=state)
-        except TypeError:
+        except TypeError as e:
             state[y_pred] = state[model](state[x])
 
         state[torchbearer.CALLBACK_LIST].on_forward(state)
