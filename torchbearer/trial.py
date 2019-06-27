@@ -982,8 +982,8 @@ class Trial(object):
                 final_metrics.update(self._validation_pass(state))
                 state[torchbearer.METRICS] = final_metrics
                 state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
-                steps_summary = (state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS])
-                self.state[torchbearer.HISTORY].append((steps_summary, state[torchbearer.METRICS]))
+                steps_summary = {str(torchbearer.TRAIN_STEPS): state[torchbearer.TRAIN_STEPS], str(torchbearer.VALIDATION_STEPS): state[torchbearer.VALIDATION_STEPS]}
+                self.state[torchbearer.HISTORY].append(dict(state[torchbearer.METRICS], **steps_summary))
                 state[torchbearer.CALLBACK_LIST].on_checkpoint(state)
 
                 if state[torchbearer.STOP_TRAINING]:
@@ -1201,12 +1201,15 @@ class Trial(object):
 
         callbacks.on_start(state)
         for i in range(len(history)):
+            metrics = dict(history[i])
             state[torchbearer.EPOCH] = i
             if not one_batch:
-                state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = history[i][0]
+                state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = metrics[str(torchbearer.TRAIN_STEPS)], metrics[str(torchbearer.VALIDATION_STEPS)]
             else:
                 state[torchbearer.TRAIN_STEPS], state[torchbearer.VALIDATION_STEPS] = 1, 1
-            state[torchbearer.METRICS] = history[i][1]
+            del metrics[str(torchbearer.TRAIN_STEPS)]
+            del metrics[str(torchbearer.VALIDATION_STEPS)]
+            state[torchbearer.METRICS] = metrics
 
             self._replay_pass(state, callbacks)
         callbacks.on_end(state)
