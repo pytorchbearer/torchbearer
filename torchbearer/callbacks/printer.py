@@ -144,7 +144,9 @@ class Tqdm(Callback):
             self._loader = self.tqdm_module(initial=n, total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
 
             if n > 0:
-                metrics = state[torchbearer.HISTORY][-1][1]
+                metrics = dict(state[torchbearer.HISTORY][-1])
+                del metrics[str(torchbearer.TRAIN_STEPS)]
+                del metrics[str(torchbearer.VALIDATION_STEPS)]
                 state[torchbearer.METRICS] = metrics
                 self._update(state)
 
