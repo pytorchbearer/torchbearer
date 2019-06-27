@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a `with_data` trial method that allows passing of train, val and test data in one call
 - Added the missing on_init callback decorator
 - Added a `step_on_batch` flag to the early stopping callback
+- Added a callback to unpack state into torchbearer.X at sample time for specified keys and update state after the forward pass based on model outputs. This is useful for using DataParallel which pass the main state dict directly. 
 ### Changed
 ### Deprecated
 ### Removed
