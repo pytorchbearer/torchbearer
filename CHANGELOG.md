@@ -12,8 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a `with_data` trial method that allows passing of train, val and test data in one call
 - Added the missing on_init callback decorator
 - Added a `step_on_batch` flag to the early stopping callback
+- Added multi image support to `imaging`
 - Added a callback to unpack state into torchbearer.X at sample time for specified keys and update state after the forward pass based on model outputs. This is useful for using DataParallel which pass the main state dict directly. 
 ### Changed
+- Changed history to now just be a list of records
 ### Deprecated
 ### Removed
 - Removed the variational sub-package, this will now be packaged separately
@@ -22,6 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where list or dictionary metrics would cause the tensorboard callback to error
 - Fixed a bug where running a trial without training steps would error
 - Fixed a bug where the caching imaging callback didn't reset data so couldn't be run in multiple trials
+- Fixed a bug in the `ClassAppearanceModel` callback
 
 ## [0.3.2] - 2019-05-28
 ### Added

@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchbearer
-from . import imaging, once_per_epoch
+from torchbearer.callbacks.decorators import once_per_epoch
+from . import imaging
 
 _inside_cnns = """
 @article{simonyan2013deep,
@@ -18,24 +19,26 @@ RANDOM = -10
 
 
 class _CAMWrapper(nn.Module):
-    def __init__(self, input_size, base_model):
+    def __init__(self, input_size, base_model, transform=None):
         super(_CAMWrapper, self).__init__()
         self.base_model = base_model
         input_image = torch.zeros(input_size)
 
-        self.input_batch = nn.Parameter(input_image.unsqueeze(0), requires_grad=True)
+        self.input_image = nn.Parameter(input_image, requires_grad=True)
+
+        self.transform = (lambda x: x) if transform is None else transform
 
     def forward(self, _, state):
         try:
-            return self.base_model(self.input_batch, state)
+            return self.base_model(self.transform(self.input_image.sigmoid()).unsqueeze(0), state)
         except TypeError:
-            return self.base_model(self.input_batch)
+            return self.base_model(self.transform(self.input_image.sigmoid()).unsqueeze(0))
 
 
-def _cam_loss(key, to_prob, targets_hot, decay):
+def _cam_loss(key, targets_hot, decay):
     def loss(state):
-        img = state[torchbearer.MODEL].input_batch
-        return - to_prob(torch.masked_select(state[key], targets_hot)).sum() + decay * img.pow(2).sum()
+        img = state[torchbearer.MODEL].input_image
+        return - torch.masked_select(state[key], targets_hot).sum() + decay * img.pow(2).sum()
     return loss
 
 
@@ -51,7 +54,6 @@ class ClassAppearanceModel(imaging.ImagingCallback):
         input_size (tuple): The size to use for the input image
         optimizer_factory: A function of parameters which returns an optimizer to use
         logit_key (StateKey): :class:`.StateKey` storing the class logits
-        prob_key (StateKey): :class:`.StateKey` storing the class probabilities or None if using logits
         target (int): Target class for the optimisation or RANDOM
         steps (int): Number of optimisation steps to take
         decay (float): Lambda for the L2 decay on the image
@@ -60,19 +62,19 @@ class ClassAppearanceModel(imaging.ImagingCallback):
             This will be applied to the image before it is sent to output
 
     """
-    def __init__(self, nclasses, input_size, optimizer_factory=lambda params: optim.SGD(params, lr=2), steps=1024,
-                 logit_key=torchbearer.PREDICTION, prob_key=None, target=RANDOM, decay=0.001, verbose=0, transform=None):
+    def __init__(self, nclasses, input_size, optimizer_factory=lambda params: optim.Adam(params, lr=0.5), steps=256,
+                 logit_key=torchbearer.PREDICTION, target=RANDOM, decay=0.01, verbose=0, in_transform=None, transform=None):
         super(ClassAppearanceModel, self).__init__(transform=transform)
 
         self.nclasses = nclasses
         self.input_size = input_size
         self.optimizer_factory = optimizer_factory
         self.logit_key = logit_key
-        self.prob_key = prob_key
         self.target = target
         self.steps = steps
         self.decay = decay
         self.verbose = verbose
+        self.in_transform = in_transform
 
         self._target_keys = []
 
@@ -99,16 +101,19 @@ class ClassAppearanceModel(imaging.ImagingCallback):
 
         targets_hot = self._targets_hot(state)
 
-        to_prob = (lambda x: x.exp()) if self.prob_key is None else (lambda x: x)
-        key = self.logit_key if self.prob_key is None else self.prob_key
+        key = self.logit_key
 
-        model = _CAMWrapper(self.input_size, state[torchbearer.MODEL])
-        trial = torchbearer.Trial(model, self.optimizer_factory(filter(lambda p: p.requires_grad, [model.input_batch])),
-                                  _cam_loss(key, to_prob, targets_hot, self.decay))
+        @torchbearer.callbacks.on_sample
+        def make_eval(_):
+            state[torchbearer.MODEL].eval()
+
+        model = _CAMWrapper(self.input_size, state[torchbearer.MODEL], transform=self.in_transform)
+        trial = torchbearer.Trial(model, self.optimizer_factory(filter(lambda p: p.requires_grad, [model.input_image])),
+                                  _cam_loss(key, targets_hot, self.decay), callbacks=[make_eval])
         trial.for_train_steps(self.steps).to(state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
         trial.run(verbose=self.verbose)
 
         if training:
             state[torchbearer.MODEL].train()
 
-        return model.input_batch.squeeze(0)
+        return model.input_image.sigmoid()

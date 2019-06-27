@@ -24,6 +24,18 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__   :download:`Download Notebook </_static/notebooks/callbacks.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__
 
+- **Serialization**:
+
+    This guide gives an introduction to serializing and restarting training in Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb>`__   :download:`Download Notebook </_static/notebooks/serialization.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb>`__
+
+- **History and Replay**:
+
+    This guide gives an introduction to the history returned by a trial and the ability to replay training.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb>`__   :download:`Download Notebook </_static/notebooks/history.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb>`__
+
 Deep Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -52,6 +64,13 @@ Deep Learning
     This guide will cover how to perform a simple adversarial attack in Torchbearer.
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb>`__   :download:`Download Notebook </_static/notebooks/adversarial.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb>`__
+
+
+- **Transfer Learning**:
+
+    This guide will cover how to perform transfer learning of a model with Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb>`__   :download:`Download Notebook </_static/notebooks/transfer_learning.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb>`__
 
 Differentiable Programming
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
