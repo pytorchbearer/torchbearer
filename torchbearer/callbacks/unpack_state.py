@@ -53,7 +53,8 @@ class UnpackState(Callback):
             self.keys.insert(0, torchbearer.X)
 
     def on_sample(self, state):
-        state[torchbearer.X] = {k: state[k] for k in self.keys}
+        if self.keys != [torchbearer.X]:
+            state[torchbearer.X] = {k: state[k] for k in self.keys}
 
     def on_sample_validation(self, state):
         self.on_sample(state)
