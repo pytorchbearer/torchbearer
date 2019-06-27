@@ -1194,7 +1194,7 @@ class Trial(object):
             callbacks = []
         history = self.state[torchbearer.HISTORY]
         callbacks.append(get_printer(verbose=verbose, validation_label_letter='v'))
-        callbacks = CallbackList(callbacks)
+        callcbacks = CallbackList(callbacks)
 
         state = State()
         state.update(self.state)

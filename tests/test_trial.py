@@ -1980,6 +1980,18 @@ class TestReplay(TestCase):
         t.replay(callbacks=[callback], verbose=0)
         tq.assert_not_called()
 
+    @patch('torchbearer.trial.Tqdm')
+    def test_replay_multi_call(self, mock_tqdm):
+        t = Trial(MagicMock())
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i + 1} for i in range(1)]
+
+        t.state[torchbearer.HISTORY] = history
+        t.replay(verbose=2)
+        mock_tqdm.reset_mock()
+        callback = MagicMock()
+        t.replay(callbacks=[callback], verbose=0)
+        mock_tqdm.assert_not_called()
+
     def test_replay_callback_calls(self):
         t = Trial(MagicMock())
         callback = MagicMock()
