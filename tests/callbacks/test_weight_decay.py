@@ -2,10 +2,10 @@ from unittest import TestCase
 
 import torch
 import torch.nn as nn
-from mock import Mock
+from mock import Mock, patch
 
 import torchbearer
-from torchbearer.callbacks import WeightDecay
+from torchbearer.callbacks import WeightDecay, L1WeightDecay, L2WeightDecay
 
 
 class TestWeightDecay(TestCase):
@@ -78,3 +78,27 @@ class TestWeightDecay(TestCase):
         decay.on_start(state)
 
         self.assertTrue(decay.params == -1)
+
+    @patch('torchbearer.callbacks.weight_decay.WeightDecay.__init__')
+    def test_L1(self, mock_wd):
+        model = nn.Sequential(nn.Conv2d(3, 3, 3))
+        model.parameters = Mock(return_value=-1)
+        state = {
+            torchbearer.MODEL: model,
+            torchbearer.LOSS: 1
+        }
+
+        decay = L1WeightDecay()
+        self.assertTrue(mock_wd.call_args[1]['p'] == 1)
+
+    @patch('torchbearer.callbacks.weight_decay.WeightDecay.__init__')
+    def test_L2(self, mock_wd):
+        model = nn.Sequential(nn.Conv2d(3, 3, 3))
+        model.parameters = Mock(return_value=-1)
+        state = {
+            torchbearer.MODEL: model,
+            torchbearer.LOSS: 1
+        }
+
+        decay = L2WeightDecay()
+        self.assertTrue(mock_wd.call_args[1]['p'] == 2)

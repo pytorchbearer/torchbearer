@@ -138,7 +138,7 @@ class TestTqdm(TestCase):
         self.assertTrue(tqdm.tqdm_module == tqdm_notebook)
 
     @patch('torchbearer.magics.is_notebook')
-    def test_tqdm_module_init_notebook(self, mock_is_notebook):
+    def test_tqdm_module_init_not_notebook(self, mock_is_notebook):
         from tqdm import tqdm as base_tqdm
         mock_is_notebook.return_value = False
         tqdm = Tqdm(validation_label_letter='e', on_epoch=True)
