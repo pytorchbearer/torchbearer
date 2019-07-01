@@ -66,7 +66,7 @@ class StateKey(Metric):
 
     def __eq__(self, other):
         return self.key == str(other)
-        
+
     def __hash__(self):
         return self.key.__hash__()
 
@@ -229,3 +229,9 @@ BACKWARD_ARGS = state_key('backward_args')
 # Legacy
 VALIDATION_ITERATOR = 'validation_iterator'
 TRAIN_ITERATOR = 'train_iterator'
+
+#: The lambda coefficient of the linear combination of inputs
+MIXUP_LAMBDA = state_key('mixup_lambda')
+
+#: The permutation of input indices for input mixup
+MIXUP_PERMUTATION = state_key('mixup_permutation')
