@@ -66,7 +66,6 @@ class TestEndToEnd(unittest.TestCase):
         trial = torchbearer.Trial(model, optim, loss)
         trial.with_test_data(torch.rand(10, 3), batch_size=3)
         preds = trial.predict()
-        print(preds)
 
         for i in range(len(preds)):
             self.assertAlmostEqual(preds[i], 0)
