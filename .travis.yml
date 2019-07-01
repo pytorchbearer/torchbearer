@@ -38,7 +38,6 @@ before_install:
       if ! git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
       then
         echo "Only docs were updated, not running the CI."
-        git diff --name-only $TRAVIS_COMMIT_RANGE
         exit
       fi
 # command to install dependencies
