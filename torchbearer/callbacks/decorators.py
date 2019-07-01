@@ -1,12 +1,10 @@
 import sys
 if sys.version_info[0] < 3:
     import inspect
-
     def count_args(fcn):
         return len(inspect.getargspec(fcn).args)
 else:
     from inspect import signature
-
     def count_args(fcn):
         return len(signature(fcn).parameters)
 
@@ -56,9 +54,9 @@ def on_init(func):
         func (function): The function(state) to *decorate*
 
     Returns:
-        Callback: Initialised callback with :meth:`~.Callback.on_start` calling func
+        Callback: Initialised callback with :meth:`~.Callback.on_init` calling func
     """
-    return bind_to(Callback.on_start)(func)
+    return bind_to(Callback.on_init)(func)
 
 
 def on_start(func):

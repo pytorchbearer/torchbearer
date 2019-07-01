@@ -2,13 +2,11 @@ import sys
 
 if sys.version_info[0] < 3:
     import inspect
-
     def get_default(fcn, arg):
         a = inspect.getargspec(fcn)
         return dict(zip(a.args[-len(a.defaults):], a.defaults))[arg]
 else:
     from inspect import signature
-
     def get_default(fcn, arg):
         return signature(fcn).parameters[arg].default
 

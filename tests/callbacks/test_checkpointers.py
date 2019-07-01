@@ -91,6 +91,25 @@ class TestCheckpointer(TestCase):
         self.assertTrue(mock_save.call_args[0][1] == 'test_file_0.0.pt')
 
     @patch("torch.save")
+    def test_save_checkpoint_model_only(self, mock_save):
+        torchmodel = Mock()
+        optim = Mock()
+        state = {
+            torchbearer.SELF: Trial(torchmodel, optim, None, []),
+            torchbearer.METRICS: {'test_metric': 0.001},
+            torchbearer.EPOCH: 2,
+            torchbearer.MODEL: torchmodel,
+        }
+
+        file_format = 'test_file_{test_metric:.01f}.pt'
+        check = _Checkpointer(file_format, save_model_params_only=True)
+        check.save_checkpoint(state)
+        self.assertEqual(mock_save.call_count, 1)
+        self.assertTrue(mock_save.call_args[0][0] == torchmodel.state_dict())
+        self.assertTrue(mock_save.call_args[0][1] == 'test_file_0.0.pt')
+
+
+    @patch("torch.save")
     def test_save_checkpoint_wrong_format(self, _):
         torchmodel = Mock()
         optim = Mock()

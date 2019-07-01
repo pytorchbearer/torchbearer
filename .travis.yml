@@ -2,40 +2,47 @@ language: python
 matrix:
   include:
     - python: "2.7"
-      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "2.7"
-      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "2.7"
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "2.7"
       env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp27-cp27mu-linux_x86_64.whl
     - python: "3.5"
-      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.5"
-      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.5"
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.5"
       env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp35-cp35m-linux_x86_64.whl
     - python: "3.6"
-      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=0.4.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.6"
-      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=0.4.1 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-0.4.1-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.6"
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.6"
       env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
     - python: "3.7"
       dist: xenial
       sudo: true
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=torchvision<0.3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
     - python: "3.7"
       dist: xenial
       sudo: true
       env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
 before_install:
+  - echo $TRAVIS_COMMIT_RANGE
+
   - |
-      if ! git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qE '^(torchbearer/|tests/)'
+      if [ -z "$TRAVIS_COMMIT_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=$TRAVIS_COMMIT_RANGE;  fi;
+
+  - echo $COMMIT_RANGE
+
+  - |
+      if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
       then
         echo "Only docs were updated, not running the CI."
         exit

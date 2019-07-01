@@ -21,6 +21,12 @@ class TestDecorators(unittest.TestCase):
         state = 'test'
         self.assertTrue(callbacks.bind_to(callbacks.on_start)(example).on_start(state) == state)
 
+    def test_on_init(self):
+        def example(state):
+            return state
+        state = 'test'
+        self.assertTrue(callbacks.on_init(example).on_init(state) == state)
+
     def test_on_start(self):
         def example(state):
             return state

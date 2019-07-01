@@ -2063,6 +2063,21 @@ class TestReplay(TestCase):
         self.assertTrue(callback.on_sample.call_count == 10)
         callback.on_sample_validation.assert_not_called()
 
+    def test_replay_stop_training_on_validation(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+
+        @torchbearer.callbacks.on_sample_validation
+        def stop_training(state):
+            state[torchbearer.STOP_TRAINING] = True
+
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
+
+        t.state[torchbearer.HISTORY] = history
+        t.replay(callbacks=[callback, stop_training], verbose=0)
+
+        self.assertTrue(callback.on_sample_validation.call_count == 1)
+
 
 class TestTrialMembers(TestCase):
     def test_init_none_criterion(self):
