@@ -1,7 +1,8 @@
 import unittest
 
 import torch
-from torch.nn import Module
+from torch.nn import Module, Linear
+import torch.nn.init as init
 
 import torchbearer
 
@@ -47,12 +48,27 @@ class TestEndToEnd(unittest.TestCase):
         model = NetWithState(p)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)
 
-        trial = torchbearer.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1)
+        trial = torchbearer.Trial(model, optim, loss).for_train_steps(training_steps).for_val_steps(1).for_test_steps(1)
         trial.run()
+        trial.predict()
+        trial.evaluate()
 
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
         self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
         self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)
+
+    def test_zero_model(self):
+        model = Linear(3, 1)
+        init.constant_(model.weight, 0)
+        init.constant_(model.bias, 0)
+        optim = torch.optim.SGD(model.parameters(), lr=0.01)
+
+        trial = torchbearer.Trial(model, optim, loss)
+        trial.with_test_data(torch.rand(10, 3), batch_size=3)
+        preds = trial.predict()
+
+        for i in range(len(preds)):
+            self.assertAlmostEqual(preds[i], 0)
 
     def test_basic_checkpoint(self):
         p = torch.tensor([2.0, 1.0, 10.0])

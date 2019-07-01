@@ -66,13 +66,13 @@ class LiveLossPlot(Callback):
         self.batch_plt = PlotLosses(**self._kwargs)
 
     def _on_step_training(self, state):
-        self.batch_plt.update(state[torchbearer.METRICS])
+        self.batch_plt.update({k: state[torchbearer.METRICS][k] for k in state[torchbearer.METRICS]})
         if state[torchbearer.BATCH] % self.batch_step_size == 0 and not self.draw_once:
             with no_print():
                 self.batch_plt.draw()
 
     def _on_end_epoch(self, state):
-        self.plt.update(state[torchbearer.METRICS])
+        self.plt.update({k: state[torchbearer.METRICS][k] for k in state[torchbearer.METRICS]})
         if not self.draw_once:
             with no_print():
                 self.plt.draw()
