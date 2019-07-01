@@ -231,7 +231,10 @@ def load_batch_predict(state):
     """
     data = deep_to(next(state[torchbearer.ITERATOR]), state[torchbearer.DEVICE], state[torchbearer.DATA_TYPE])
     if isinstance(data, list) or isinstance(data, tuple):
-        state[torchbearer.X], state[torchbearer.Y_TRUE] = data
+        try:
+            state[torchbearer.X], state[torchbearer.Y_TRUE] = data
+        except ValueError:
+            state[torchbearer.X] = data[0]
     else:
         state[torchbearer.X] = data
 
@@ -1123,7 +1126,7 @@ class Trial(object):
             state[torchbearer.CALLBACK_LIST].on_end_epoch(state)
 
             if len(self.state[torchbearer.HISTORY]) != 0:
-                self.state[torchbearer.HISTORY][-1][1].update(state[torchbearer.METRICS])
+                self.state[torchbearer.HISTORY][-1].update(state[torchbearer.METRICS])
 
             state[torchbearer.CALLBACK_LIST].on_end(state)
             return state[torchbearer.METRICS]
@@ -1152,11 +1155,12 @@ class Trial(object):
         Returns:
             list: Model outputs as a list
         """
-        state = {
+        state = State()
+        state.update({
             torchbearer.MAX_EPOCHS: 1,
             torchbearer.EPOCH: 0,
             torchbearer.STOP_TRAINING: False
-        }
+        })
 
         state.update(self.state)  # TODO: Hack to make injection work, should be removed if `self.state` is mutable
 

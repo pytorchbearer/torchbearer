@@ -1885,7 +1885,7 @@ class TestTrialValEvalPred(TestCase):
         t = Trial(MagicMock())
         eval_mock = t.eval = Mock()
         clist = MagicMock()
-        state = {torchbearer.HISTORY: [('steps', {'train_metric': 2})], torchbearer.VALIDATION_GENERATOR: generator,
+        state = {torchbearer.HISTORY: [{'train_steps': 'steps', 'train_metric': 2}], torchbearer.VALIDATION_GENERATOR: generator,
                  torchbearer.CALLBACK_LIST: clist, torchbearer.VALIDATION_STEPS: steps, torchbearer.VALIDATION_DATA: (generator, steps),
                  torchbearer.METRICS: {'val_metric': 1}, torchbearer.LOADER: None}
         test_pass_mock = t._test_pass = Mock(return_value=state)
@@ -1902,7 +1902,7 @@ class TestTrialValEvalPred(TestCase):
         self.assertTrue(test_pass_state[torchbearer.GENERATOR] == generator)
         self.assertTrue(test_pass_state[torchbearer.STEPS] == steps)
         self.assertEqual(metrics['val_metric'], 1)
-        self.assertDictEqual(state[torchbearer.HISTORY][0][1], {'train_metric': 2, 'val_metric': 1})
+        self.assertDictEqual(state[torchbearer.HISTORY][0], {'train_steps': 'steps', 'train_metric': 2, 'val_metric': 1})
 
     def test_evaluate_none(self):
         generator = None
