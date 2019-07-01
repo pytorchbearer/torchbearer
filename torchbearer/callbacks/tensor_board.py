@@ -1,5 +1,6 @@
 import copy
 import os
+import warnings
 
 import torch
 import torch.nn.functional as F
@@ -113,6 +114,9 @@ class AbstractTensorBoard(Callback):
         comment (str): Descriptive comment to append to path
         visdom (bool): If true, log to visdom instead of tensorboard
         visdom_params (VisdomParams): Visdom parameter settings object, uses default if None
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: PyTorch model
     """
 
     def __init__(self, log_dir='./logs',
@@ -164,12 +168,55 @@ class AbstractTensorBoard(Callback):
         self.log_dir = os.path.join(self.log_dir, state[torchbearer.MODEL].__class__.__name__ + '_' + self.comment)
         self.writer = self.get_writer(visdom=self.visdom, visdom_params=self.visdom_params)
 
+    @staticmethod
+    def add_metric(add_fn, tag, metric, *args, **kwargs):
+        """ Static method that recurses through `metric` until the `add_fn` can be applied. Useful when metric is an
+        iterable of tensors so that the tensors can  all be passed to an `add_fn` such as writer.add_scalar.
+        For example, if passed `metric` as [[A, B], [C, ], D, {'E': E}] then `add_fn` would be called on A, B, C, D and
+        E and the respective tags (with base tag 'met') would be: met_0_0, met_0_1, met_1_0, met_2, met_E. Throws a
+        warning if `add_fn` fails to parse a metric.
+
+        Args:
+            add_fn: Function to be called to log a metric, e.g. SummaryWriter.add_scalar
+            tag: Tag under which to log the metric
+            metric: Iterable of metrics.
+            *args: Args for `add_fn`
+            **kwargs: Keyword args for `add_fn`
+
+        Returns:
+
+        """
+        try:
+            add_fn(tag, metric, *args, **kwargs)
+        except NotImplementedError:
+            try:
+                for key, met in enumerate(metric):
+                    if isinstance(metric, dict):
+                        key, met = met, metric[met]
+
+                    AbstractTensorBoard.add_metric(add_fn, tag+'_{}'.format(key), met, *args, **kwargs)
+            except TypeError as e:
+                warnings.warn('Failed to log metric to tensorboard with error: {}'.format(e))
+        except Exception as e:
+            warnings.warn('Failed to log metric to tensorboard with error: {}'.format(e))
+
     def on_end(self, state):
         self.close_writer()
 
 
 class TensorBoard(AbstractTensorBoard):
     """TensorBoard callback which writes metrics to the given log directory. Requires the TensorboardX library for python.
+
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import TensorBoard
+        >>> import datetime
+        >>> current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+        # Callback that will log to tensorboard under "(model name)_(current time)"
+        >>> tb = TensorBoard(log_dir='./logs', write_graph=False, comment=current_time)
+        # Trial that will run the callback and log accuracy and loss metrics
+        >>> t = Trial(None, callbacks=[tb], metrics=['acc', 'loss'])
 
     Args:
         log_dir (str): The tensorboard log path for output
@@ -180,6 +227,14 @@ class TensorBoard(AbstractTensorBoard):
         comment (str): Descriptive comment to append to path
         visdom (bool): If true, log to visdom instead of tensorboard
         visdom_params (VisdomParams): Visdom parameter settings object, uses default if None
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: PyTorch model
+        - :attr:`torchbearer.state.EPOCH`: State should have the current epoch stored
+        - :attr:`torchbearer.state.X`: State should have the current data stored if a model graph is to be built
+        - :attr:`torchbearer.state.BATCH`: State should have the current batch number stored if logging batch metrics
+        - :attr:`torchbearer.state.TRAIN_STEPS`: State should have the number of training steps stored
+        - :attr:`torchbearer.state.METRICS`: State should have a dictionary of metrics stored
     """
 
     def __init__(self, log_dir='./logs',
@@ -227,21 +282,21 @@ class TensorBoard(AbstractTensorBoard):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             for metric in state[torchbearer.METRICS]:
                 if self.visdom:
-                    self.batch_writer.add_scalar(metric, state[torchbearer.METRICS][metric],
+                    self.add_metric(self.batch_writer.add_scalar, metric, state[torchbearer.METRICS][metric],
                                                  state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[
                                                      torchbearer.BATCH], main_tag='batch')
                 else:
-                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
+                    self.add_metric(self.batch_writer.add_scalar, 'batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
 
     def on_step_validation(self, state):
         if self.write_batch_metrics and state[torchbearer.BATCH] % self.batch_step_size == 0:
             for metric in state[torchbearer.METRICS]:
                 if self.visdom:
-                    self.batch_writer.add_scalar(metric, state[torchbearer.METRICS][metric],
+                    self.add_metric(self.batch_writer.add_scalar, metric, state[torchbearer.METRICS][metric],
                                                  state[torchbearer.EPOCH] * state[torchbearer.TRAIN_STEPS] + state[
                                                      torchbearer.BATCH], main_tag='batch')
                 else:
-                    self.batch_writer.add_scalar('batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
+                    self.add_metric(self.batch_writer.add_scalar, 'batch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.BATCH])
 
     def on_end_epoch(self, state):
         if self.write_batch_metrics and not self.visdom:
@@ -250,10 +305,10 @@ class TensorBoard(AbstractTensorBoard):
         if self.write_epoch_metrics:
             for metric in state[torchbearer.METRICS]:
                 if self.visdom:
-                    self.writer.add_scalar(metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH],
+                    self.add_metric(self.writer.add_scalar, metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH],
                                            main_tag='epoch')
                 else:
-                    self.writer.add_scalar('epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
+                    self.add_metric(self.writer.add_scalar, 'epoch/' + metric, state[torchbearer.METRICS][metric], state[torchbearer.EPOCH])
 
     def on_end(self, state):
         super(TensorBoard, self).on_end(state)
@@ -265,6 +320,16 @@ class TensorBoardText(AbstractTensorBoard):
     """TensorBoard callback which writes metrics as text to the given log directory. Requires the TensorboardX library
     for python.
 
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import TensorBoardText
+        >>> import datetime
+        >>> current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+        # Callback that will log to tensorboard under "(model name)_(current time)"
+        >>> tb = TensorBoardText(comment=current_time)
+        # Trial that will run the callback and log accuracy and loss metrics as text to tensorboard
+        >>> t = Trial(None, callbacks=[tb], metrics=['acc', 'loss'])
 
     Args:
         log_dir (str): The tensorboard log path for output
@@ -274,6 +339,12 @@ class TensorBoardText(AbstractTensorBoard):
         comment (str): Descriptive comment to append to path
         visdom (bool): If true, log to visdom instead of tensorboard
         visdom_params (VisdomParams): Visdom parameter settings object, uses default if None
+
+    State Requirements:
+        - :attr:`torchbearer.state.SELF`: The :attr:`torchbearer.Trial` running this callback
+        - :attr:`torchbearer.state.EPOCH`: State should have the current epoch stored
+        - :attr:`torchbearer.state.BATCH`: State should have the current batch number stored if logging batch metrics
+        - :attr:`torchbearer.state.METRICS`: State should have a dictionary of metrics stored
     """
 
     def __init__(self, log_dir='./logs',
@@ -355,6 +426,19 @@ class TensorBoardImages(AbstractTensorBoard):
     TensorboardX library and torchvision.utils.make_grid (requires torchvision). Images are selected from the given key and saved to the given
     path. Full name of image sub directory will be model name + _ + comment.
 
+    Example: ::
+
+        >>> from torchbearer import Trial, state_key
+        >>> from torchbearer.callbacks import TensorBoardImages
+        >>> import datetime
+        >>> current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+        >>> IMAGE_KEY = state_key('image_key')
+
+        >>> # Callback that will log to tensorboard under "(model name)_(current time)"
+        >>> tb = TensorBoardImages(comment=current_time, name='test_image', key=IMAGE_KEY)
+        >>> # Trial that will run log to tensorboard images stored under IMAGE_KEY
+        >>> t = Trial(None, callbacks=[tb], metrics=['acc', 'loss'])
+
     Args:
         log_dir (str): The tensorboard log path for output
         comment (str): Descriptive comment to append to path
@@ -370,6 +454,10 @@ class TensorBoardImages(AbstractTensorBoard):
         pad_value: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
         visdom (bool): If true, log to visdom instead of tensorboard
         visdom_params (VisdomParams): Visdom parameter settings object, uses default if None
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: State should have the current epoch stored
+        - `key`: State should have images stored under the given state key
     """
 
     def __init__(self, log_dir='./logs',
@@ -459,6 +547,11 @@ class TensorBoardProjector(AbstractTensorBoard):
         write_features (bool): If True, the image features will be written as an embedding
         features_key (StateKey): The key in state to use for the embedding. Typically model output but can be used to show
             features from any layer of the model.
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: State should have the current epoch stored
+        - :attr:`torchbearer.state.X`: State should have the current data stored
+        - :attr:`torchbearer.state.Y_TRUE`: State should have the current targets stored
     """
 
     def __init__(self, log_dir='./logs',

@@ -1,6 +1,5 @@
 import torchbearer
 from torchbearer import Callback
-from torchbearer.callbacks.decorators import once_per_epoch
 
 import torch
 
@@ -8,20 +7,24 @@ import torch
 def _to_file(filename):
     from PIL import Image
 
-    def handler(image, _):
+    def handler(image, index, _):
         ndarr = image.mul(255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
         im = Image.fromarray(ndarr)
-        im.save(filename)
+        im.save(filename.format(index=str(index)))
+
     return handler
 
 
-def _to_pyplot():
+def _to_pyplot(title=None):
     import matplotlib.pyplot as plt
 
-    def handler(image, _):
+    def handler(image, index, _):
         ndarr = image.mul(255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
         plt.imshow(ndarr)
+        if title is not None:
+            plt.title(title.format(index=str(index)))
         plt.show()
+
     return handler
 
 
@@ -30,10 +33,11 @@ def _to_tensorboard(name='Image', log_dir='./logs', comment='torchbearer'):
     import os
     log_dir = os.path.join(log_dir, comment)
 
-    def handler(image, state):
+    def handler(image, index, state):
         writer = tb.get_writer(log_dir, _to_tensorboard)
-        writer.add_image(name, image.clamp(0, 1), state[torchbearer.EPOCH])
+        writer.add_image(name.format(index=str(index)), image.clamp(0, 1), state[torchbearer.EPOCH])
         tb.close_writer(log_dir, _to_tensorboard)
+
     return handler
 
 
@@ -42,12 +46,44 @@ def _to_visdom(name='Image', log_dir='./logs', comment='torchbearer', visdom_par
     import os
     log_dir = os.path.join(log_dir, comment)
 
-    def handler(image, state):
+    def handler(image, index, state):
         writer = tb.get_writer(log_dir, _to_visdom, visdom=True, visdom_params=visdom_params)
-        writer.add_image(name + str(state[torchbearer.EPOCH]), image.clamp(0, 1), state[torchbearer.EPOCH])
+        writer.add_image(name.format(index=str(index)) + '_' + str(state[torchbearer.EPOCH]), image.clamp(0, 1), state[torchbearer.EPOCH])
         tb.close_writer(log_dir, _to_visdom)
 
     return handler
+
+
+def _cache_images(num_images):
+    cache = {'images': None, 'done': False}
+
+    def decorator(fun):
+        def step(state):
+            if state[torchbearer.BATCH] == 0:
+                cache['done'] = False
+
+            if not cache['done']:
+                data = fun(state)
+
+                if cache['images'] is None:
+                    remaining = num_images if num_images < data.size(0) else data.size(0)
+
+                    cache['images'] = data[:remaining]
+                else:
+                    remaining = num_images - cache['images'].size(0)
+
+                    if remaining > data.size(0):
+                        remaining = data.size(0)
+
+                    cache['images'] = torch.cat((cache['images'], data[:remaining]), dim=0)
+
+                if cache['images'].size(0) >= num_images:
+                    res = cache['images']
+                    cache['done'] = True
+                    cache['images'] = None
+                    return res
+        return step
+    return decorator
 
 
 class ImagingCallback(Callback):
@@ -70,8 +106,15 @@ class ImagingCallback(Callback):
         img = self.on_batch(state)
         if img is not None:
             img = self.transform(img)
-            for handler in self._handlers:
-                handler(img, state)
+            for handler, index in self._handlers:
+                if img.dim() == 3:
+                    img = img.unsqueeze(0)
+                rng = range(img.size(0)) if index is None else index
+                try:
+                    for i in rng:
+                        handler(img[i], i, state)
+                except TypeError:
+                    handler(img[rng], rng, state)
 
     def on_train(self):
         """Process this callback for training batches
@@ -120,64 +163,79 @@ class ImagingCallback(Callback):
         self.on_step_validation = wrapper
         return self
 
-    def with_handler(self, handler):
+    def with_handler(self, handler, index=None):
         """Append the given output handler to the list of handlers
 
         Args:
             handler: A function of image and state which stores the given image in some way
+            index (int or list or None): if not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
-        self._handlers.append(handler)
+        self._handlers.append((handler, index))
         return self
 
-    def to_file(self, filename):
+    def to_file(self, filename, index=None):
         """Send images from this callback to the given file
 
         Args:
             filename (str): the filename to store the image to
+            index (int or list or None): if not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
-        return self.with_handler(_to_file(filename))
+        return self.with_handler(_to_file(filename), index=index)
 
-    def to_pyplot(self):
+    def to_pyplot(self, index=None):
         """Show images from this callback with pyplot
 
+        Args:
+            index (int or list or None): if not None, only apply the handler on this index / list of indices
+
         Returns:
             ImagingCallback: self
         """
-        return self.with_handler(_to_pyplot())
+        return self.with_handler(_to_pyplot(), index=index)
 
-    def to_state(self, key):
+    def to_state(self, keys, index=None):
         """Put images from this callback in state with the given key
 
         Args:
-            key (StateKey): The state key to use for the image
+            keys (StateKey or list[StateKey]): The state key or keys to use for the images
+            index (int or list or None): if not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
-        def handler(img, state):
-            state[key] = img
-        return self.with_handler(handler)
+        if str(keys) == keys:
+            keys = [keys]
 
-    def to_tensorboard(self, name='Image', log_dir='./logs', comment='torchbearer'):
+        try:
+            _ = (key for key in keys)
+        except TypeError:
+            keys = [keys]
+
+        def handler(img, i, state):
+            state[keys[i]] = img
+        return self.with_handler(handler, index=index)
+
+    def to_tensorboard(self, name='Image', log_dir='./logs', comment='torchbearer', index=None):
         """Direct images from this callback to tensorboard with the given parameters
 
         Args:
             name (str): The name of the image
             log_dir (str): The tensorboard log path for output
             comment (str): Descriptive comment to append to path
+            index (int or list or None): if not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
-        return self.with_handler(_to_tensorboard(name=name, log_dir=log_dir, comment=comment))
+        return self.with_handler(_to_tensorboard(name=name, log_dir=log_dir, comment=comment), index=index)
 
-    def to_visdom(self, name='Image', log_dir='./logs', comment='torchbearer', visdom_params=None):
+    def to_visdom(self, name='Image', log_dir='./logs', comment='torchbearer', visdom_params=None, index=None):
         """Direct images from this callback to visdom with the given parameters
 
         Args:
@@ -185,14 +243,80 @@ class ImagingCallback(Callback):
             log_dir (str): The visdom log path for output
             comment (str): Descriptive comment to append to path
             visdom_params (:class:`.VisdomParams`): Visdom parameter settings object, uses default if None
+            index (int or list or None): if not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
-        return self.with_handler(_to_visdom(name=name, log_dir=log_dir, comment=comment, visdom_params=visdom_params))
+        return self.with_handler(_to_visdom(name=name, log_dir=log_dir, comment=comment, visdom_params=visdom_params), index=index)
+
+    def cache(self, num_images):
+        """Cache images **before** they are passed to handlers. Once per epoch, a single cache will be returned,
+        containing the first `num_images` to be returned.
+
+        Args:
+            num_images (int): The number of images to cache
+
+        Returns:
+            ImagingCallback: self
+        """
+        self.on_batch = _cache_images(num_images)(self.on_batch)
+        return self
+
+    def make_grid(self, nrow=8, padding=2, normalize=False, norm_range=None, scale_each=False, pad_value=0):
+        """Use `torchvision.utils.make_grid` to make a grid of the images being returned by this callback. Recommended
+        for use alongside `cache`.
+
+        Args:
+            nrow: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+            padding: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+            normalize: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+            norm_range: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+            scale_each: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+            pad_value: See `torchvision.utils.make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`_
+
+        Returns:
+            ImagingCallback: self
+        """
+        import torchvision.utils as utils
+
+        def decorator(func):
+            def wrapper(state):
+                cache = func(state)
+                return utils.make_grid(cache, nrow=nrow, padding=padding, normalize=normalize, range=norm_range,
+                                       scale_each=scale_each, pad_value=pad_value)
+            return wrapper
+
+        self.on_batch = decorator(self.on_batch)
+        return self
 
 
-class CachingImagingCallback(ImagingCallback):
+class FromState(ImagingCallback):
+    """The :class:`FromState` callback is an :class:`ImagingCallback` which retrieves and image from state when called.
+    The number of times the function is called can be controlled with a provided decorator (once_per_epoch, only_if
+    etc.)
+
+    Args:
+        key (StateKey): The :class:`.StateKey` containing the image (tensor of size [c, w, h])
+        transform (callable, optional): A function/transform that  takes in a Tensor and returns a transformed version.
+            This will be applied to the image before it is sent to output.
+        decorator: A function which will be used to wrap the callback function. once_per_epoch by default
+    """
+    def __init__(self, key, transform=None, decorator=None):
+        super(FromState, self).__init__(transform=transform)
+        self.key = key
+
+        if decorator is not None:
+            self.on_batch = decorator(self.on_batch)
+
+    def on_batch(self, state):
+        try:
+            return state[self.key]
+        except KeyError:
+            return None
+
+
+class CachingImagingCallback(FromState):
     """The :class:`CachingImagingCallback` is an :class:`ImagingCallback` which caches batches of images from the given
     state key up to the required amount before passing this along with state to the implementing class, once per epoch.
 
@@ -206,12 +330,16 @@ class CachingImagingCallback(ImagingCallback):
                  key=torchbearer.INPUT,
                  transform=None,
                  num_images=16):
-        super(CachingImagingCallback, self).__init__(transform=transform)
-        self.key = key
-        self.num_images = num_images
+        super(CachingImagingCallback, self).__init__(key=key, transform=transform, decorator=_cache_images(num_images))
 
-        self._data = None
-        self._done = False
+        def decorator(func):
+            def wrapper(state):
+                res = func(state)
+                if res is not None:
+                    return self.on_cache(res, state)
+            return wrapper
+
+        self.on_batch = decorator(self.on_batch)
 
     def on_cache(self, cache, state):
         """This method should be implemented by the overriding class to return an image from the cache.
@@ -224,32 +352,6 @@ class CachingImagingCallback(ImagingCallback):
             The processed image
         """
         raise NotImplementedError
-
-    def on_batch(self, state):
-        if not self._done:
-            data = state[self.key].detach()
-
-            if self._data is None:
-                remaining = self.num_images if self.num_images < data.size(0) else data.size(0)
-
-                self._data = data[:remaining]
-            else:
-                remaining = self.num_images - self._data.size(0)
-
-                if remaining > data.size(0):
-                    remaining = data.size(0)
-
-                self._data = torch.cat((self._data, data[:remaining]), dim=0)
-
-            if self._data.size(0) >= self.num_images:
-                image = self.on_cache(self._data, state)
-                self._done = True
-                self._data = None
-                return image
-
-    def on_end_epoch(self, state):
-        super(CachingImagingCallback, self).on_end_epoch(state)
-        self._done = False
 
 
 class MakeGrid(CachingImagingCallback):
@@ -299,26 +401,3 @@ class MakeGrid(CachingImagingCallback):
             scale_each=self.scale_each,
             pad_value=self.pad_value
         )
-
-
-class FromState(ImagingCallback):
-    """The :class:`FromState` callback is an :class:`ImagingCallback` which retrieves and image from state when called.
-    The number of times the function is called can be controlled with a provided decorator (once_per_epoch, only_if
-    etc.)
-
-    Args:
-        key (StateKey): The :class:`.StateKey` containing the image (tensor of size [c, w, h])
-        transform (callable, optional): A function/transform that  takes in a Tensor and returns a transformed version.
-            This will be applied to the image before it is sent to output.
-        decorator: A function which will be used to wrap the callback function. once_per_epoch by default
-    """
-    def __init__(self, key, transform=None, decorator=once_per_epoch):
-        super(FromState, self).__init__(transform=transform)
-        self.key = key
-        self.on_batch = decorator(self.on_batch)
-
-    def on_batch(self, state):
-        try:
-            return state[self.key]
-        except KeyError:
-            return None

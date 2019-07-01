@@ -1,9 +1,3 @@
-"""
-..  autoclass:: torchbearer.bases.Callback
-        :members:
-        :undoc-members:
-"""
-
 from torchbearer import Callback
 
 
@@ -170,30 +164,6 @@ class CallbackList(Callback):
         """
         self._for_list(lambda callback: callback.on_end_training(state))
 
-    def on_end_epoch(self, state):
-        """Call on_end_epoch on each callback in turn with the given state.
-
-        Args:
-            state (dict[str,any]): The current state dict of the :class:`.Trial`.
-        """
-        self._for_list(lambda callback: callback.on_end_epoch(state))
-
-    def on_checkpoint(self, state):
-        """Call on_checkpoint on each callback in turn with the given state.
-
-        Args:
-            state (dict[str,any]): The current state dict of the :class:`.Trial`.
-        """
-        self._for_list(lambda callback: callback.on_checkpoint(state))
-
-    def on_end(self, state):
-        """Call on_end on each callback in turn with the given state.
-
-        Args:
-            state (dict[str,any]): The current state dict of the :class:`.Trial`.
-        """
-        self._for_list(lambda callback: callback.on_end(state))
-
     def on_start_validation(self, state):
         """Call on_start_validation on each callback in turn with the given state.
 
@@ -226,6 +196,14 @@ class CallbackList(Callback):
         """
         self._for_list(lambda callback: callback.on_criterion_validation(state))
 
+    def on_step_validation(self, state):
+        """Call on_step_validation on each callback in turn with the given state.
+
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
+        """
+        self._for_list(lambda callback: callback.on_step_validation(state))
+
     def on_end_validation(self, state):
         """Call on_end_validation on each callback in turn with the given state.
 
@@ -234,10 +212,26 @@ class CallbackList(Callback):
         """
         self._for_list(lambda callback: callback.on_end_validation(state))
 
-    def on_step_validation(self, state):
-        """Call on_step_validation on each callback in turn with the given state.
+    def on_end_epoch(self, state):
+        """Call on_end_epoch on each callback in turn with the given state.
 
         Args:
             state (dict[str,any]): The current state dict of the :class:`.Trial`.
         """
-        self._for_list(lambda callback: callback.on_step_validation(state))
+        self._for_list(lambda callback: callback.on_end_epoch(state))
+
+    def on_checkpoint(self, state):
+        """Call on_checkpoint on each callback in turn with the given state.
+
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
+        """
+        self._for_list(lambda callback: callback.on_checkpoint(state))
+
+    def on_end(self, state):
+        """Call on_end on each callback in turn with the given state.
+
+        Args:
+            state (dict[str,any]): The current state dict of the :class:`.Trial`.
+        """
+        self._for_list(lambda callback: callback.on_end(state))

@@ -657,6 +657,24 @@ class TestWithData(TestCase):
         torchbearertrial.with_test_generator.assert_called_once_with(-1, steps=4)
         td.assert_called_once_with(x)
 
+    def test_with_data(self):
+        trial = Trial(None)
+        mock_train_data, mock_val_data, mock_test_data = Mock(), Mock(), Mock()
+        trial.with_train_data = mock_train_data
+        trial.with_val_data = mock_val_data
+        trial.with_test_data = mock_test_data
+        shuffle = True
+        batch_size = 30
+
+        one_tensor = torch.Tensor([1])
+        target_tensor = torch.Tensor([10])
+        trial.with_data(one_tensor, target_tensor, one_tensor*2, target_tensor*2, one_tensor*3, batch_size,
+                        train_steps=100, val_steps=200, test_steps=300, shuffle=shuffle)
+
+        self.assertTrue(mock_train_data.call_args[0] == (one_tensor, target_tensor, 30, shuffle, 1, 100))
+        self.assertTrue(mock_val_data.call_args[0] == (one_tensor*2, target_tensor*2, 30, shuffle, 1, 200))
+        self.assertTrue(mock_test_data.call_args[0] == (one_tensor*3, 30, 1, 300))
+
 
 class TestWithClosureAndLoader(TestCase):
     def test_with_closure(self):
@@ -903,7 +921,7 @@ class TestRun(TestCase):
         torchbearertrial._validation_pass = Mock(return_value={'val_test': 2})
         torchbearertrial.with_train_generator(generator, steps=train_steps)
         history = torchbearertrial.run(epochs=epochs, verbose=0)
-        self.assertDictEqual(history[0][1], {'fit_test': 1, 'val_test': 2})
+        self.assertDictEqual(history[0], {'train_steps': train_steps, 'validation_steps': None, 'fit_test': 1, 'val_test': 2})
 
 
 class TestFitPass(TestCase):
@@ -1946,7 +1964,7 @@ class TestReplay(TestCase):
     def test_replay_tqdm(self, tq):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback])
@@ -1956,16 +1974,28 @@ class TestReplay(TestCase):
     def test_replay_no_tqdm(self, tq):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0)
         tq.assert_not_called()
 
+    @patch('torchbearer.trial.Tqdm')
+    def test_replay_multi_call(self, mock_tqdm):
+        t = Trial(MagicMock())
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i + 1} for i in range(1)]
+
+        t.state[torchbearer.HISTORY] = history
+        t.replay(verbose=2)
+        mock_tqdm.reset_mock()
+        callback = MagicMock()
+        t.replay(callbacks=[callback], verbose=0)
+        mock_tqdm.assert_not_called()
+
     def test_replay_callback_calls(self):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0)
@@ -1976,7 +2006,7 @@ class TestReplay(TestCase):
     def test_replay_none_train_steps(self):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((None, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+        history = [{'train_steps': None, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0)
@@ -1987,7 +2017,7 @@ class TestReplay(TestCase):
     def test_replay_none_validation_steps(self):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((10, None), {'test': i}) for i in range(10)]
+        history = [{'train_steps': 10, 'validation_steps': None, 'test': i} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0)
@@ -1998,18 +2028,18 @@ class TestReplay(TestCase):
     def test_replay_one_batch_true(self):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(1)]
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(1)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0, one_batch=True)
-        self.assertEqual(callback.on_start.call_count, 1)
+        self.assertTrue(callback.on_start.call_count == 1)
         self.assertTrue(callback.on_sample.call_count == 1)
         self.assertTrue(callback.on_sample_validation.call_count == 1)
 
     def test_replay_metrics(self):
         t = Trial(MagicMock())
         callback = MagicMock()
-        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback], verbose=0)
@@ -2025,13 +2055,28 @@ class TestReplay(TestCase):
         def stop_training(state):
             state[torchbearer.STOP_TRAINING] = True
 
-        history = [((10, 5), {'test': i, 'val_test2': i+1}) for i in range(10)]
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
 
         t.state[torchbearer.HISTORY] = history
         t.replay(callbacks=[callback, stop_training], verbose=0)
 
         self.assertTrue(callback.on_sample.call_count == 10)
         callback.on_sample_validation.assert_not_called()
+
+    def test_replay_stop_training_on_validation(self):
+        t = Trial(MagicMock())
+        callback = MagicMock()
+
+        @torchbearer.callbacks.on_sample_validation
+        def stop_training(state):
+            state[torchbearer.STOP_TRAINING] = True
+
+        history = [{'train_steps': 10, 'validation_steps': 5, 'test': i, 'val_test2': i+1} for i in range(10)]
+
+        t.state[torchbearer.HISTORY] = history
+        t.replay(callbacks=[callback, stop_training], verbose=0)
+
+        self.assertTrue(callback.on_sample_validation.call_count == 1)
 
 
 class TestTrialMembers(TestCase):

@@ -1,15 +1,3 @@
-"""
-The base metric classes exist to enable complex data flow requirements between metrics. All metrics are either instances
-of :class:`.Metric` or :class:`MetricFactory`. These can then be collected in a :class:`MetricList` or a
-:class:`MetricTree`. The :class:`MetricList` simply aggregates calls from a list of metrics, whereas the
-:class:`MetricTree` will pass data from its root metric to each child and collect the outputs. This enables complex
-running metrics and statistics, without needing to compute the underlying values more than once. Typically,
-constructions of this kind should be handled using the :mod:`decorator API <.metrics.decorators>`.
-
-..  autoclass:: torchbearer.bases.Metric
-        :members:
-        :undoc-members:
-"""
 import inspect
 from torchbearer import Metric, no_grad
 

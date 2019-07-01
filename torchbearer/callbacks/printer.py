@@ -29,6 +29,17 @@ def _format_metrics(metrics, rounder):
 class ConsolePrinter(Callback):
     """The ConsolePrinter callback simply outputs the training metrics to the console.
 
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import ConsolePrinter
+
+        # Example Trial which forgoes the usual printer for a console printer
+        >>> printer = ConsolePrinter()
+        >>> trial = Trial(None, callbacks=[printer], verbose=0).for_steps(1).run()
+        0/1(t):
+
     Args:
         validation_label_letter (str): This is the letter displayed after the epoch number indicating the current phase
             of training
@@ -73,6 +84,18 @@ class ConsolePrinter(Callback):
 class Tqdm(Callback):
     """The Tqdm callback outputs the progress and metrics for training and validation loops to the console using TQDM.
     The given key is used to label validation output.
+
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import Tqdm
+
+        # Example Trial which forgoes the usual printer for a customised tqdm printer.
+        >>> printer = Tqdm(precision=8)
+        # Note that outputs are written to stderr, not stdout as shown in this example
+        >>> trial = Trial(None, callbacks=[printer], verbose=0).for_steps(1).run(1)
+        0/1(t): 100%|...| 1/1 [00:00<00:00, 29.40it/s]
 
     Args:
         tqdm_module: The tqdm module to use. If none, defaults to tqdm or tqdm_notebook if in notebook
@@ -121,7 +144,9 @@ class Tqdm(Callback):
             self._loader = self.tqdm_module(initial=n, total=state[torchbearer.MAX_EPOCHS], **self.tqdm_args)
 
             if n > 0:
-                metrics = state[torchbearer.HISTORY][-1][1]
+                metrics = dict(state[torchbearer.HISTORY][-1])
+                del metrics[str(torchbearer.TRAIN_STEPS)]
+                del metrics[str(torchbearer.VALIDATION_STEPS)]
                 state[torchbearer.METRICS] = metrics
                 self._update(state)
 

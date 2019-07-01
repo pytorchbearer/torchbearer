@@ -53,6 +53,18 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_p
     will be saved with the epoch number and the validation loss in the filename. The torch :class:`.Trial` will be
     saved to filename.
 
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import ModelCheckpoint
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = ModelCheckpoint('my_path.pt', monitor='val_acc', mode='max')
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
+
     Args:
         filepath (str): Path to save the model file
         save_model_params_only (bool): If `save_model_params_only=True`, only model parameters will be saved so that
@@ -67,6 +79,11 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_p
             automatically inferred from the name of the monitored quantity.
         period (int): Interval (number of epochs) between checkpoints
         min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
     if save_best_only:
         check = Best(filepath, save_model_params_only, monitor, mode, period, min_delta)
@@ -77,7 +94,21 @@ def ModelCheckpoint(filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_p
 
 
 class MostRecent(_Checkpointer):
-    """Model checkpointer which saves the most recent model to a given filepath.
+    """Model checkpointer which saves the most recent model to a given filepath. `filepath` can contain named
+    formatting options, which will be filled any values from state. For example: if `filepath` is
+    `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints will be saved with the epoch number and the
+    validation loss in the filename.
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import MostRecent
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = MostRecent('my_path.pt')
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
 
     Args:
         filepath (str): Path to save the model file
@@ -86,6 +117,11 @@ class MostRecent(_Checkpointer):
             should be used only if the results will be loaded into a Torchbearer Trial object later.
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False,
@@ -101,7 +137,21 @@ class MostRecent(_Checkpointer):
 
 
 class Best(_Checkpointer):
-    """Model checkpointer which saves the best model according to the given configurations.
+    """Model checkpointer which saves the best model according to the given configurations. `filepath` can contain
+    named formatting options, which will be filled any values from state. For example: if `filepath` is
+    `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints will be saved with the epoch number and the
+    validation loss in the filename.
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import Best
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = Best('my_path.pt', monitor='val_acc', mode='max')
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
 
     Args:
         filepath (str): Path to save the model file
@@ -117,6 +167,11 @@ class Best(_Checkpointer):
         min_delta (float): If `save_best_only=True`, this is the minimum improvement required to trigger a save
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist, with the `monitor` key populated
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False, monitor='val_loss',
@@ -178,7 +233,21 @@ class Best(_Checkpointer):
 
 
 class Interval(_Checkpointer):
-    """Model checkpointer which which saves the model every 'period' epochs to the given filepath.
+    """Model checkpointer which which saves the model every 'period' epochs to the given filepath. `filepath` can
+    contain named formatting options, which will be filled any values from state. For example: if `filepath` is
+    `weights.{epoch:02d}-{val_loss:.2f}`, then the model checkpoints will be saved with the epoch number and the
+    validation loss in the filename.
+
+    Example: ::
+
+        >>> from torchbearer.callbacks import Interval
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which uses this checkpointer
+        >>> model = torch.nn.Linear(1,1)
+        >>> checkpoint = Interval('my_path.pt', period=100, on_batch=True)
+        >>> trial = Trial(model, callbacks=[checkpoint], metrics=['acc'])
 
     Args:
         filepath (str): Path to save the model file
@@ -190,6 +259,11 @@ class Interval(_Checkpointer):
         period (int): Interval (number of epochs) between checkpoints
         pickle_module (module): The pickle module to use, default is 'torch.serialization.pickle'
         pickle_protocol (int): The pickle protocol to use, default is 'torch.serialization.DEFAULT_PROTOCOL'
+
+    State Requirements:
+        - :attr:`torchbearer.state.MODEL`: Model should have the `state_dict` method
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.SELF`: Self should be the :attr:`torchbearer.Trial` which is running this callback
     """
 
     def __init__(self, filepath='model.{epoch:02d}-{val_loss:.2f}.pt', save_model_params_only=False, period=1, on_batch=False, pickle_module=torch.serialization.pickle, pickle_protocol=torch.serialization.DEFAULT_PROTOCOL):

@@ -9,12 +9,27 @@ import csv
 class CSVLogger(Callback):
     """Callback to log metrics to a given csv file.
 
+    Example: ::
+
+        >>> from torchbearer.callbacks import CSVLogger
+        >>> from torchbearer import Trial
+        >>> import torch
+
+        # Example Trial (without optimiser or loss criterion) which writes metrics to a csv file appending to previous content
+        >>> logger = CSVLogger('my_path.pt', separator=',', append=True)
+        >>> trial = Trial(None, callbacks=[logger], metrics=['acc'])
+
     Args:
         filename (str): The name of the file to output to
         separator (str): The delimiter to use (e.g. comma, tab etc.)
         batch_granularity (bool): If True, write on each batch, else on each epoch
         write_header (bool): If True, write the CSV header at the beginning of training
         append (bool): If True, append to the file instead of replacing it
+
+    State Requirements:
+        - :attr:`torchbearer.state.EPOCH`: State should have the current epoch stored
+        - :attr:`torchbearer.state.METRICS`: Metrics dictionary should exist
+        - :attr:`torchbearer.state.BATCH`: State should have the current batch stored if using `batch_granularity`
     """
 
     def __init__(self, filename, separator=',', batch_granularity=False, write_header=True, append=False):

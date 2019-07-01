@@ -3,7 +3,7 @@ from torchbearer import Callback
 import numpy as np
 from torchbearer import cite
 
-bibtex = """
+_bibtex = """
 @inproceedings{smith2017cyclical,
   title={Cyclical learning rates for training neural networks},
   author={Smith, Leslie N},
@@ -15,9 +15,21 @@ bibtex = """
 """
 
 
-@cite(bibtex)
+@cite(_bibtex)
 class CyclicLR(Callback):
-    """ Learning rate finder that cyclicly varies the rate. Based off of the keras implementation referenced in the `paper <https://arxiv.org/abs/1506.01186>`_.
+    """ Learning rate finder that cyclicly varies the rate. Based off of the keras implementation referenced in the
+    `paper <https://arxiv.org/abs/1506.01186>`_.
+
+    Example: ::
+
+        >>> import torch.nn
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import CyclicLR
+
+        # Example Trial which does cyclic learning rate variation between 0.00001 and 0.0001 and back
+        with period of 200 steps
+        >>> lr_finder = CyclicLR(0.00001, 0.0001, step_size=100)
+        >>> trial = Trial(model, callbacks=[lr_finder], metrics=['acc'])
 
     Args:
         base_lr (float / list): Float or list of floats for the base (min) learning rate for each optimiser parameter group
@@ -27,6 +39,9 @@ class CyclicLR(Callback):
         scale_fn (function): Scale function for learning rates over time. Default is defined by mode.
         scale_mode (str): One of (cycle, iterations). Argument passed to the scale function each step
         gamma (float): Scaling factor for exp_range mode
+
+    State Requirements:
+        - :attr:`torchbearer.state.OPTIMIZER`: State should have the current optimiser stored
     """
     def __init__(self, base_lr=0.001, max_lr=0.006, step_size=2000, mode='triangular', scale_fn=None, scale_mode='cycle', gamma=1.):
         super(CyclicLR, self).__init__()
