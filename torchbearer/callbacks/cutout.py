@@ -26,7 +26,7 @@ random_erase = """
 @cite(cutout)
 class Cutout(Callback):
     """ Cutout callback which randomly masks out patches of image data. Implementation a modified version of the code
-    found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
+    found `here <https://github.com/uoguelph-mlrg/Cutout>`_.
 
     Example: ::
 
@@ -59,7 +59,7 @@ class Cutout(Callback):
 class RandomErase(Callback):
     """ Random erase callback which replaces random patches of image data with random noise.
     Implementation a modified version of the cutout code found
-    `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
+    `here <https://github.com/uoguelph-mlrg/Cutout>`_.
 
     Example: ::
 
@@ -136,8 +136,8 @@ class BatchCutout(object):
         if self.random_erasing:
             random = torch.from_numpy(np.random.rand(*img.shape)).to(torch.float)
         else:
-            random = torch.from_numpy(np.ones_like(img)).to(torch.float) * self.constant
+            random = torch.from_numpy(np.ones_like(img.cpu())).to(torch.float) * self.constant
 
-        img[erase_locations] = random[erase_locations]
+        img[erase_locations] = random[erase_locations].to(img.device)
 
         return img
