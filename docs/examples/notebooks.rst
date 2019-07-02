@@ -24,6 +24,12 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__   :download:`Download Notebook </_static/notebooks/callbacks.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb>`__
 
+- **Imaging Guide**:
+
+    This guide will give an introduction to using the imaging sub-package with Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/imaging.ipynb>`__   :download:`Download Notebook </_static/notebooks/imaging.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/imaging.ipynb>`__
+
 - **Serialization**:
 
     This guide gives an introduction to serializing and restarting training in Torchbearer.
@@ -55,6 +61,12 @@ General
     This guide shows how we can get live loss visualisations in notebooks with LiveLossPlot.
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb>`__   :download:`Download Notebook </_static/notebooks/livelossplot.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb>`__
+
+- **PyCM with Torchbearer**:
+
+    This guide shows how we can generate confusion matrices with PyCM in torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb>`__   :download:`Download Notebook </_static/notebooks/pycm.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb>`__
 
 Deep Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
