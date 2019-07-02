@@ -283,8 +283,9 @@ class ImagingCallback(Callback):
         def decorator(func):
             def wrapper(state):
                 cache = func(state)
-                return utils.make_grid(cache, nrow=nrow, padding=padding, normalize=normalize, range=norm_range,
-                                       scale_each=scale_each, pad_value=pad_value)
+                if cache is not None:
+                    return utils.make_grid(cache, nrow=nrow, padding=padding, normalize=normalize, range=norm_range,
+                                           scale_each=scale_each, pad_value=pad_value)
             return wrapper
 
         self.on_batch = decorator(self.on_batch)
