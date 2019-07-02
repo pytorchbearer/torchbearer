@@ -42,6 +42,13 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb>`__   :download:`Download Notebook </_static/notebooks/data_parallel.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb>`__
 
+
+- **LiveLossPlot with Torchbearer**:
+
+    This guide shows how we can get live loss visualisations in notebooks with LiveLossPlot.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb>`__   :download:`Download Notebook </_static/notebooks/livelossplot.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb>`__
+
 Deep Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
