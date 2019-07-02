@@ -27,6 +27,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where the caching imaging callback didn't reset data so couldn't be run in multiple trials
 - Fixed a bug in the `ClassAppearanceModel` callback
 - Fixed a bug where the state given to predict was not a State object
+- Fixed a bug with Cutout on gpu
+- Fixed a bug where MakeGrid callback wasn't passing all arguments correctly
 
 ## [0.3.2] - 2019-05-28
 ### Added
