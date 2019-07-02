@@ -41,33 +41,33 @@ class TestPyCM(TestCase):
         if sys.version_info[0] < 3:
             self.assertRaises(Exception, PyCM)
 
-    @patch('pycm.ConfusionMatrix', create=True)
     @patch('torchbearer.callbacks.pycm.EpochLambda')
-    def test_make_cm(self, emock_lambda, confusion_mocktrix):
+    def test_make_cm(self, emock_lambda):
         if sys.version_info[0] >= 3:
-            confusion_mocktrix.return_value = 'test'
-            handler = MagicMock()
-            callback = PyCM(test=10).with_handler(handler)
-            state = {torchbearer.METRIC_LIST: None}
+            with patch('pycm.ConfusionMatrix') as confusion_mocktrix:
+                confusion_mocktrix.return_value = 'test'
+                handler = MagicMock()
+                callback = PyCM(test=10).with_handler(handler)
+                state = {torchbearer.METRIC_LIST: None}
 
-            callback._add_metric(state)
-            emock_lambda.assert_called_once_with('pycm', ANY, False)
+                callback._add_metric(state)
+                emock_lambda.assert_called_once_with('pycm', ANY, False)
 
-            make_cm = emock_lambda.call_args[0][1]
+                make_cm = emock_lambda.call_args[0][1]
 
-            import torch
+                import torch
 
-            y_pred = torch.rand(5, 2) / 2
-            y_pred[:, 1] = 1
-            y_true = MagicMock()
+                y_pred = torch.rand(5, 2) / 2
+                y_pred[:, 1] = 1
+                y_true = MagicMock()
 
-            make_cm(y_pred, y_true)
+                make_cm(y_pred, y_true)
 
-            self.assertTrue(y_true.cpu.call_count == 1)
-            self.assertTrue(y_true.cpu().numpy.call_count == 1)
-            confusion_mocktrix.assert_called_once_with(y_true.cpu().numpy(), ANY, test=10)
-            self.assertTrue(confusion_mocktrix.call_args[0][1].sum() == 5)
-            handler.assert_called_once_with('test', state)
+                self.assertTrue(y_true.cpu.call_count == 1)
+                self.assertTrue(y_true.cpu().numpy.call_count == 1)
+                confusion_mocktrix.assert_called_once_with(y_true.cpu().numpy(), ANY, test=10)
+                self.assertTrue(confusion_mocktrix.call_args[0][1].sum() == 5)
+                handler.assert_called_once_with('test', state)
 
     def test_on_train(self):
         if sys.version_info[0] >= 3:
