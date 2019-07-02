@@ -18,7 +18,7 @@ class TestMixupInputs(TestCase):
         }
 
         mixup.on_sample(state)
-        self.assertTrue(torch.all(torch.eq(state[torchbearer.X], X * state[torchbearer.MIXUP_LAMBDA] + X[state[torchbearer.MIXUP_PERMUTATION], :] * (1-state[torchbearer.MIXUP_LAMBDA]))))
+        self.assertTrue((torch.eq(state[torchbearer.X], X * state[torchbearer.MIXUP_LAMBDA] + X[state[torchbearer.MIXUP_PERMUTATION], :] * (1-state[torchbearer.MIXUP_LAMBDA]))).all())
 
     def test_alpha(self):
         mixup = Mixup(-0.1)
