@@ -18,3 +18,4 @@ from .decorators import *
 from .live_loss_plot import LiveLossPlot
 from . import init
 from . import imaging
+from .pycm import PyCM

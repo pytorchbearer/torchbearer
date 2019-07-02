@@ -9,3 +9,4 @@ mock
 Pillow
 matplotlib
 torchvision
+pycm;python_version>="3.5"
