@@ -36,6 +36,13 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb>`__   :download:`Download Notebook </_static/notebooks/history.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb>`__
 
+
+- **custom Data Loaders**:
+
+    This guide gives an introduction on how to run custom data loaders in Torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb>`__   :download:`Download Notebook </_static/notebooks/custom_loaders.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb>`__
+
 - **Data Parallel with Torchbearer**:
 
     This guide gives a brief introduction on how to use PyTorch DataParallel with Torchbearer models.
