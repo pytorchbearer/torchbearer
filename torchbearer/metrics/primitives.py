@@ -74,6 +74,10 @@ class CategoricalAccuracy(Metric):
         state = args[0]
         y_pred = state[self.pred_key]
         y_true = state[self.target_key]
+
+        if len(y_true.shape) == 2:
+            _, y_true = torch.max(y_true, 1)
+
         mask = y_true.eq(self.ignore_index).eq(0)
         y_pred = y_pred[mask]
         y_true = y_true[mask]
