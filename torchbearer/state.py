@@ -58,7 +58,7 @@ class StateKey(Metric):
 
     def __eq__(self, other):
         return self.key == str(other)
-        
+
     def __hash__(self):
         return self.key.__hash__()
 
@@ -217,3 +217,9 @@ HISTORY = state_key('history')
 
 #: The optional arguments which should be passed to the backward call
 BACKWARD_ARGS = state_key('backward_args')
+
+#: The lambda coefficient of the linear combination of inputs
+MIXUP_LAMBDA = state_key('mixup_lambda')
+
+#: The permutation of input indices for input mixup
+MIXUP_PERMUTATION = state_key('mixup_permutation')
