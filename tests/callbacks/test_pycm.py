@@ -36,12 +36,12 @@ class TestHandlers(TestCase):
             self.assertTrue(mock_pyplot.imshow.call_args[0][0].max() > 1)
 
 
-class TestImagingCallback(TestCase):
+class TestPyCM(TestCase):
     def test_exception(self):
         if sys.version_info[0] < 3:
             self.assertRaises(Exception, PyCM)
 
-    @patch('pycm.ConfusionMatrix')
+    @patch('pycm.ConfusionMatrix', create=True)
     @patch('torchbearer.callbacks.pycm.EpochLambda')
     def test_make_cm(self, emock_lambda, confusion_mocktrix):
         if sys.version_info[0] >= 3:
