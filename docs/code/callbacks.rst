@@ -115,6 +115,13 @@ Regularisers
         :members:
         :undoc-members:
 
+Unpack State
+------------------------------------
+
+..  autoclass:: torchbearer.callbacks.unpack_state
+        :members:
+        :undoc-members:
+
 
 Decorators
 ------------------------------------
@@ -122,6 +129,7 @@ Decorators
 Main
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The main callback decorators simply take a function and bind it to a callback point, returning the result.
+
 .. autofunction:: torchbearer.callbacks.decorators.on_init
 .. autofunction:: torchbearer.callbacks.decorators.on_start
 .. autofunction:: torchbearer.callbacks.decorators.on_start_epoch
