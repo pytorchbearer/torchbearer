@@ -1930,7 +1930,7 @@ class TestTrialValEvalPred(TestCase):
         clist = MagicMock()
         t.state = {torchbearer.TEST_GENERATOR: generator, torchbearer.CALLBACK_LIST: clist, torchbearer.TEST_STEPS: steps,
                    torchbearer.TEST_DATA: (generator, steps), torchbearer.LOADER: None}
-        metrics = t.predict(state)
+        metrics = t.predict()
 
         self.assertEqual(clist.on_start.call_count, 1)
         self.assertEqual(clist.on_start_epoch.call_count, 1)
@@ -1954,7 +1954,7 @@ class TestTrialValEvalPred(TestCase):
         test_pass_mock = t._test_pass = Mock(return_value={torchbearer.FINAL_PREDICTIONS: 1})
         t.state = {torchbearer.TEST_GENERATOR: generator, torchbearer.CALLBACK_LIST: None, torchbearer.TEST_STEPS: steps,
                    torchbearer.TEST_DATA: (generator, steps), torchbearer.LOADER: None}
-        metrics = t.predict(state)
+        metrics = t.predict()
 
         self.assertTrue(eval_mock.call_count == 0)
 
