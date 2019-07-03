@@ -115,6 +115,14 @@ Regularisers
         :members:
         :undoc-members:
 
+..  autoclass:: torchbearer.callbacks.cutout.CutMix
+        :members:
+        :undoc-members:
+
+..  autoclass:: torchbearer.callbacks.mixup.Mixup
+        :members:
+        :undoc-members:
+
 ..  autoclass:: torchbearer.callbacks.sample_pairing.SamplePairing
         :members:
         :undoc-members:
