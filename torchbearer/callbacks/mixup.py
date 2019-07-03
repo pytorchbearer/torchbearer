@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torchbearer
 from torchbearer import cite
 from torchbearer.callbacks import Callback
+from torchbearer.metrics import CategoricalAccuracy, AdvancedMetric, running_mean, mean, super
 
 
 mixup= """
@@ -15,7 +16,6 @@ mixup= """
 }
 """
 
-from torchbearer.metrics import CategoricalAccuracy, AdvancedMetric, Metric, running_mean, mean, super
 
 @running_mean
 @mean
@@ -52,6 +52,11 @@ class MixupAcc(AdvancedMetric):
 class Mixup(Callback):
     """Perform mixup on the model inputs. Requires use of :meth:`MixupInputs.loss`, otherwise lambdas can be found in
     state under :attr:`.MIXUP_LAMBDA`. Model targets will be a tuple containing the original target and permuted target.
+
+    .. note::
+
+        The accuracy metric for mixup is different on training to deal with the different targets,
+    but for validation it is exactly the categorical accuracy, despite being called "val_mixup_acc"
 
     Example: ::
 

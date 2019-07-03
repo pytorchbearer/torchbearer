@@ -20,6 +20,15 @@ class SamplePairing(Callback):
     """Perform SamplePairing on the model inputs. This is the process of averaging each image with another random image
     without changing the targets. The key here is to use the policy function to only do this some of the time.
 
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import SamplePairing
+
+        # Example Trial which does Sample Pairing regularisation with the policy from the paper
+        >>> pairing = SamplePairing()
+        >>> trial = Trial(None, criterion=Mixup.loss, callbacks=[pairing], metrics=['acc'])
+
     Args:
         policy: A function of state which returns True if the current batch should be paired.
     """
