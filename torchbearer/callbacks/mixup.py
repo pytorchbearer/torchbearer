@@ -77,6 +77,7 @@ class Mixup(Callback):
         super(Mixup, self).__init__()
         self.alpha = alpha
         self.lam = lam
+        self.distrib = Beta(self.alpha, self.alpha)
 
     @staticmethod
     def mixup_loss(state):
@@ -96,11 +97,13 @@ class Mixup(Callback):
     def on_sample(self, state):
         if self.lam is Mixup.RANDOM:
             if self.alpha > 0:
-                lam = Beta(self.alpha, self.alpha).sample()
+                lam = self.distrib.sample()
             else:
                 lam = 1.0
         else:
             lam = self.lam
+        torch.manual_seed(7)
+
         state[torchbearer.MIXUP_LAMBDA] = lam
 
         state[torchbearer.MIXUP_PERMUTATION] = torch.randperm(state[torchbearer.X].size(0))

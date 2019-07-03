@@ -73,5 +73,7 @@ class SamplePairing(Callback):
         self.on_sample = only_if(SamplePairing.default_policy(100, 800, 8, 2) if policy is None else policy)(self.on_sample)
 
     def on_sample(self, state):
+        torch.manual_seed(7)
+
         permutation = torch.randperm(state[torchbearer.X].size(0))
         state[torchbearer.INPUT] = (state[torchbearer.INPUT] + state[torchbearer.INPUT][permutation]) / 2.
