@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from torch.distributions.beta import Beta
 
 import torchbearer
 from torchbearer import cite
@@ -93,10 +94,9 @@ class Mixup(Callback):
             return F.cross_entropy(input, target)
 
     def on_sample(self, state):
-        import numpy as np
         if self.lam is Mixup.RANDOM:
             if self.alpha > 0:
-                lam = np.random.beta(self.alpha, self.alpha)
+                lam = Beta(self.alpha, self.alpha).sample()
             else:
                 lam = 1.0
         else:
