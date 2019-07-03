@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a callback to unpack state into torchbearer.X at sample time for specified keys and update state after the forward pass based on model outputs. This is useful for using DataParallel which pass the main state dict directly. 
 - Added callback for generating confusion matrices with PyCM
 - Added a mixup callback with associated loss
+- Added Label Smoothing Regularisation (LSR) callback
 ### Changed
 - Changed history to now just be a list of records
 ### Deprecated

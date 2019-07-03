@@ -119,6 +119,10 @@ Regularisers
         :members:
         :undoc-members:
 
+..  autoclass:: torchbearer.callbacks.label_smoothing.LabelSmoothingRegularisation
+        :members:
+        :undoc-members:
+
 Unpack State
 ------------------------------------
 
