@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added callback for generating confusion matrices with PyCM
 - Added a mixup callback with associated loss
 - Added Label Smoothing Regularisation (LSR) callback
+- Added CutMix regularisation
 ### Changed
 - Changed history to now just be a list of records
 ### Deprecated
