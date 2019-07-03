@@ -114,11 +114,13 @@ def inject_printer(validation_label_letter='v'):
     Returns:
         A decorator
     """
+    from inspect import getcallargs
 
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            verbose = kwargs['verbose'] if 'verbose' in kwargs else get_default(func, 'verbose')  # Populate default value
+            call_args = getcallargs(func, self, *args, **kwargs)
+            verbose = call_args['verbose'] if 'verbose' in call_args else get_default(func, 'verbose')  # Populate default value
             verbose = self.verbose if verbose == -1 else verbose
 
             printer = get_printer(verbose=verbose, validation_label_letter=validation_label_letter)
@@ -249,6 +251,8 @@ def inject_sampler(data_key, batch_sampler):
     Returns:
         The decorator
     """
+    from inspect import getcallargs
+
     def decorator(func):
         def infinite_wrapper(self, key, generator, steps, sampler):
             if generator is not None and steps is not None:
@@ -271,7 +275,8 @@ def inject_sampler(data_key, batch_sampler):
         def wrapper(self, *args, **kwargs):
             sampler = batch_sampler
 
-            key = kwargs['data_key'] if 'data_key' in kwargs else data_key  # Populate default value
+            call_args = getcallargs(func, self, *args, **kwargs)
+            key = call_args['data_key'] if 'data_key' in call_args else data_key  # Populate default value
             generator, steps = self.state[key] if self.state[key] is not None else (None, None)
 
             if self.state[torchbearer.LOADER] is not None:
