@@ -150,7 +150,7 @@ class CutMix(Callback):
         super(CutMix, self).on_sample(state)
         lam = self.dist.sample()
         length = (1 - lam).sqrt()
-        cutter = BatchCutout(1, (length * state[torchbearer.X].size(-1)).round().long(), (length * state[torchbearer.X].size(-2)).round().long())
+        cutter = BatchCutout(1, (length * state[torchbearer.X].size(-1)).round().item(), (length * state[torchbearer.X].size(-2)).round().item())
         mask = cutter(state[torchbearer.X])
         erase_locations = mask == 0
         permutation = torch.randperm(state[torchbearer.X].size(0))
@@ -195,8 +195,8 @@ class BatchCutout(object):
         mask = torch.ones((b, h, w), device=img.device)
 
         for n in range(self.n_holes):
-            y = torch.randint(h, (b,))
-            x = torch.randint(w, (b,))
+            y = torch.randint(h, (b,)).long()
+            x = torch.randint(w, (b,)).long()
 
             y1 = (y - self.height // 2).clamp(0, h)
             y2 = (y + self.height // 2).clamp(0, h)
