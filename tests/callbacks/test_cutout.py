@@ -69,7 +69,7 @@ class TestCutOut(TestCase):
 
     def test_cutmix(self):
         random_image = torch.rand(5, 3, 100, 100)
-        state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.randint(10, (5,))}
+        state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.randint(10, (5,)).long()}
         co = CutMix(0.25, classes=10, seed=7)
         co.on_sample(state)
         reg_img = state[torchbearer.X].view(-1)
