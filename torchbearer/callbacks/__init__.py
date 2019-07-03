@@ -20,3 +20,4 @@ from . import init
 from . import imaging
 from .pycm import PyCM
 from .mixup import Mixup, MixupAcc
+from .sample_pairing import SamplePairing
