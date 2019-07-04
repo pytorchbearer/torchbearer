@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added callback for generating confusion matrices with PyCM
 - Added a mixup callback with associated loss
 - Added Label Smoothing Regularisation (LSR) callback
+- Added CutMix regularisation
 ### Changed
 - Changed history to now just be a list of records
 ### Deprecated
@@ -32,6 +33,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug with Cutout on gpu
 - Fixed a bug where MakeGrid callback wasn't passing all arguments correctly
 - Fixed a bug in `ImagingCallback` that would sometimes cause `make_grid` to throw an error
+- Fixed a bug where the verbose argument would not work unless given as a keyword argument
 
 ## [0.3.2] - 2019-05-28
 ### Added

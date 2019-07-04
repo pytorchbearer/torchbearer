@@ -1930,7 +1930,7 @@ class TestTrialValEvalPred(TestCase):
         clist = MagicMock()
         t.state = {torchbearer.TEST_GENERATOR: generator, torchbearer.CALLBACK_LIST: clist, torchbearer.TEST_STEPS: steps,
                    torchbearer.TEST_DATA: (generator, steps), torchbearer.LOADER: None}
-        metrics = t.predict(state)
+        metrics = t.predict()
 
         self.assertEqual(clist.on_start.call_count, 1)
         self.assertEqual(clist.on_start_epoch.call_count, 1)
@@ -1954,7 +1954,7 @@ class TestTrialValEvalPred(TestCase):
         test_pass_mock = t._test_pass = Mock(return_value={torchbearer.FINAL_PREDICTIONS: 1})
         t.state = {torchbearer.TEST_GENERATOR: generator, torchbearer.CALLBACK_LIST: None, torchbearer.TEST_STEPS: steps,
                    torchbearer.TEST_DATA: (generator, steps), torchbearer.LOADER: None}
-        metrics = t.predict(state)
+        metrics = t.predict()
 
         self.assertTrue(eval_mock.call_count == 0)
 
@@ -2444,6 +2444,22 @@ class TestTrialFunctions(TestCase):
 
     @patch('torchbearer.trial.get_printer')
     @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_printer_no_kwargs(self, c_inj, get_print_mock):
+        callback_list = torchbearer.callbacks.CallbackList([])
+
+        class SomeClass:
+            @torchbearer.inject_printer('v')
+            def test_func(self, verbose=0):
+                pass
+
+        t = SomeClass()
+        t.state = {torchbearer.CALLBACK_LIST: callback_list}
+        t.test_func(1)
+        self.assertEqual(c_inj.call_count, 1)
+        get_print_mock.assert_called_once_with(validation_label_letter='v', verbose=1)
+
+    @patch('torchbearer.trial.get_printer')
+    @patch('torchbearer.trial.CallbackListInjection')
     def test_inject_printer_tqdm_on_epoch(self, c_inj, get_print_mock):
         callback_list = torchbearer.callbacks.CallbackList([])
 
@@ -2635,6 +2651,22 @@ class TestTrialFunctions(TestCase):
         t = SomeClass()
         t.state = {torchbearer.GENERATOR: (generator, None), torchbearer.TEST_GENERATOR: (test_generator, test_steps), torchbearer.LOADER: None}
         t.test_func(data_key=torchbearer.TEST_GENERATOR)
+        self.assertTrue(t.state[torchbearer.GENERATOR] == test_generator)
+        self.assertTrue(t.state[torchbearer.STEPS] == test_steps)
+
+    def test_inject_sampler_data_key_no_kwargs(self):
+        generator = MagicMock()
+        test_generator = 'test'
+        test_steps = 1
+
+        class SomeClass:
+            @torchbearer.inject_sampler(torchbearer.GENERATOR, load_batch_predict)
+            def test_func(self, data_key=None):
+                pass
+
+        t = SomeClass()
+        t.state = {torchbearer.GENERATOR: (generator, None), torchbearer.TEST_GENERATOR: (test_generator, test_steps), torchbearer.LOADER: None}
+        t.test_func(torchbearer.TEST_GENERATOR)
         self.assertTrue(t.state[torchbearer.GENERATOR] == test_generator)
         self.assertTrue(t.state[torchbearer.STEPS] == test_steps)
 
