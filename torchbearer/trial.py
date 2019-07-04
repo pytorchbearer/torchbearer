@@ -117,9 +117,10 @@ def inject_printer(validation_label_letter='v'):
     from inspect import getcallargs
 
     def decorator(func):
+        root = func if not hasattr(func, 'root') else func.root
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            call_args = getcallargs(func, self, *args, **kwargs)
+            call_args = getcallargs(root, self, *args, **kwargs)
             verbose = call_args['verbose'] if 'verbose' in call_args else get_default(func, 'verbose')  # Populate default value
             verbose = self.verbose if verbose == -1 else verbose
 
@@ -133,6 +134,7 @@ def inject_printer(validation_label_letter='v'):
 
             self.state[torchbearer.CALLBACK_LIST] = callback_list_old
             return res
+        wrapper.root = root
         return wrapper
     return decorator
 
@@ -254,6 +256,8 @@ def inject_sampler(data_key, batch_sampler):
     from inspect import getcallargs
 
     def decorator(func):
+        root = func if not hasattr(func, 'root') else func.root
+
         def infinite_wrapper(self, key, generator, steps, sampler):
             if generator is not None and steps is not None:
                 over_steps = steps > len(generator)
@@ -275,8 +279,8 @@ def inject_sampler(data_key, batch_sampler):
         def wrapper(self, *args, **kwargs):
             sampler = batch_sampler
 
-            call_args = getcallargs(func, self, *args, **kwargs)
-            key = call_args['data_key'] if 'data_key' in call_args else data_key  # Populate default value
+            call_args = getcallargs(root, self, *args, **kwargs)
+            key = call_args['data_key'] if ('data_key' in call_args and call_args['data_key'] is not None) else data_key  # Populate default value
             generator, steps = self.state[key] if self.state[key] is not None else (None, None)
 
             if self.state[torchbearer.LOADER] is not None:
@@ -294,6 +298,7 @@ def inject_sampler(data_key, batch_sampler):
             res = func(self, *args, **kwargs)
 
             return res
+        wrapper.root = root
         return wrapper
     return decorator
 

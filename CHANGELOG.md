@@ -34,6 +34,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where MakeGrid callback wasn't passing all arguments correctly
 - Fixed a bug in `ImagingCallback` that would sometimes cause `make_grid` to throw an error
 - Fixed a bug where the verbose argument would not work unless given as a keyword argument
+- Fixed a bug where the data_key argument would sometimes not work as expected
 
 ## [0.3.2] - 2019-05-28
 ### Added
