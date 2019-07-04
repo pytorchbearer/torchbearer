@@ -69,7 +69,7 @@ class TestCutOut(TestCase):
 
     def test_cutmix(self):
         random_image = torch.rand(5, 3, 100, 100)
-        state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.randint(10, (5,)).long()}
+        state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.randint(10, (5,)).long(), torchbearer.DEVICE: 'cpu'}
         co = CutMix(0.25, classes=10, seed=7)
         co.on_sample(state)
         reg_img = state[torchbearer.X].view(-1)
@@ -99,7 +99,7 @@ class TestCutOut(TestCase):
             [0., 1., 0., 0.],
             [0., 0., 0., 1.]
         ])
-        state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.tensor([1, 3]).long()}
+        state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.tensor([1, 3]).long(), torchbearer.DEVICE: 'cpu'}
         co.on_sample(state)
         self.assertTrue(((state[torchbearer.TARGET] - target).abs() < 0.00001).all())
         state = {torchbearer.X: random_image, torchbearer.Y_TRUE: torch.tensor([1, 3]).long()}
