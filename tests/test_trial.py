@@ -2460,6 +2460,25 @@ class TestTrialFunctions(TestCase):
 
     @patch('torchbearer.trial.get_printer')
     @patch('torchbearer.trial.CallbackListInjection')
+    def test_inject_both(self, c_inj, get_print_mock):
+        callback_list = torchbearer.callbacks.CallbackList([])
+        generator = MagicMock()
+        steps = None
+
+        class SomeClass:
+            @torchbearer.inject_printer('v')
+            @torchbearer.inject_sampler(torchbearer.GENERATOR, load_batch_standard)
+            def test_func(self, verbose=0):
+                pass
+
+        t = SomeClass()
+        t.state = {torchbearer.CALLBACK_LIST: callback_list, torchbearer.GENERATOR: (generator, steps), torchbearer.LOADER: None}
+        t.test_func(1)
+        self.assertEqual(c_inj.call_count, 1)
+        get_print_mock.assert_called_once_with(validation_label_letter='v', verbose=1)
+
+    @patch('torchbearer.trial.get_printer')
+    @patch('torchbearer.trial.CallbackListInjection')
     def test_inject_printer_tqdm_on_epoch(self, c_inj, get_print_mock):
         callback_list = torchbearer.callbacks.CallbackList([])
 
