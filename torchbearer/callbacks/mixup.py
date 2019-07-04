@@ -102,7 +102,6 @@ class Mixup(Callback):
                 lam = 1.0
         else:
             lam = self.lam
-        torch.manual_seed(7)
 
         state[torchbearer.MIXUP_LAMBDA] = lam
 

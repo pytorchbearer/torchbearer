@@ -156,7 +156,6 @@ class CutMix(Callback):
         cutter = BatchCutout(1, (length * state[torchbearer.X].size(-1)).round().item(), (length * state[torchbearer.X].size(-2)).round().item())
         mask = cutter(state[torchbearer.X])
         erase_locations = mask == 0
-        # torch.manual_seed(7)
 
         permutation = torch.randperm(state[torchbearer.X].size(0))
 
