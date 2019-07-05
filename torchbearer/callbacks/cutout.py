@@ -1,6 +1,5 @@
 import torchbearer
 from torchbearer import Callback
-
 import torch
 from torch.distributions import Beta
 
@@ -38,7 +37,7 @@ cutmix = """
 @cite(cutout)
 class Cutout(Callback):
     """ Cutout callback which randomly masks out patches of image data. Implementation a modified version of the code
-    found `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
+    found `here <https://github.com/uoguelph-mlrg/Cutout>`_.
 
     Example: ::
 
@@ -61,7 +60,8 @@ class Cutout(Callback):
     def __init__(self, n_holes, length, constant=0., seed=None):
         super(Cutout, self).__init__()
         self.constant = constant
-        torch.manual_seed(seed)
+        if seed is not None:
+            torch.manual_seed(seed)
         self.cutter = BatchCutout(n_holes, length, length)
 
     def on_sample(self, state):
@@ -76,7 +76,7 @@ class Cutout(Callback):
 class RandomErase(Callback):
     """ Random erase callback which replaces random patches of image data with random noise.
     Implementation a modified version of the cutout code found
-    `here <https://github.com/uoguelph-mlrg/Cutout/blob/master/util/Cutout.py>`_.
+    `here <https://github.com/uoguelph-mlrg/Cutout>`_.
 
     Example: ::
 
@@ -97,7 +97,8 @@ class RandomErase(Callback):
     """
     def __init__(self, n_holes, length, seed=None):
         super(RandomErase, self).__init__()
-        torch.manual_seed(seed)
+        if seed is not None:
+            torch.manual_seed(seed)
         self.cutter = BatchCutout(n_holes, length, length)
 
     def on_sample(self, state):
@@ -119,9 +120,9 @@ class CutMix(Callback):
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import CutMix
 
-        # Example Trial which does Cutout regularisation
-        >>> erase = CutMix(1, classes=10)
-        >>> trial = Trial(None, callbacks=[erase], metrics=['acc'])
+        # Example Trial which does CutMix regularisation
+        >>> cutmix = CutMix(1, classes=10)
+        >>> trial = Trial(None, callbacks=[cutmix], metrics=['acc'])
 
     Args:
         alpha (float): The alpha value for the beta distribution.
@@ -135,8 +136,9 @@ class CutMix(Callback):
     def __init__(self, alpha, classes=-1, seed=None):
         super(CutMix, self).__init__()
         self.classes = classes
-        torch.manual_seed(seed)
-        self.dist = Beta(torch.tensor([alpha]), torch.tensor([alpha]))
+        if seed is not None:
+            torch.manual_seed(seed)
+        self.dist = Beta(torch.tensor([float(alpha)]), torch.tensor([float(alpha)]))
 
     def _to_one_hot(self, target):
         if target.dim() == 1:
@@ -148,11 +150,13 @@ class CutMix(Callback):
 
     def on_sample(self, state):
         super(CutMix, self).on_sample(state)
-        lam = self.dist.sample()
+
+        lam = self.dist.sample().to(state[torchbearer.DEVICE])
         length = (1 - lam).sqrt()
         cutter = BatchCutout(1, (length * state[torchbearer.X].size(-1)).round().item(), (length * state[torchbearer.X].size(-2)).round().item())
         mask = cutter(state[torchbearer.X])
         erase_locations = mask == 0
+
         permutation = torch.randperm(state[torchbearer.X].size(0))
 
         state[torchbearer.X][erase_locations] = state[torchbearer.X][permutation][erase_locations]

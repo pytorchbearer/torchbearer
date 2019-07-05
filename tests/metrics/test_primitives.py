@@ -141,7 +141,7 @@ class TestCategoricalAccuracy(unittest.TestCase):
                 [0.1, 0.1, 0.9], # Correct
                 [0.9, 0.1, 0.1], # Incorrect
                 [0.9, 0.1, 0.1], # Incorrect
-            ]))
+            ])),
         }
         self._targets = [1, 1, 1, 0, 0]
         self._metric = CategoricalAccuracy().root  # Get root node of Tree for testing
@@ -160,6 +160,23 @@ class TestCategoricalAccuracy(unittest.TestCase):
     def test_train_process(self):
         self._metric.train()
         result = self._metric.process(self._state)
+        for i in range(0, len(self._targets)):
+            self.assertEqual(result[i], self._targets[i],
+                             msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])
+                                 + ' in: ' + str(result))
+
+    def test_train_process_soft(self):
+        self._metric.train()
+        soft_targets = torch.FloatTensor([
+                [0.98, 0.01, 0.01], # Correct
+                [0.01, 0.98, 0.01], # Correct
+                [0.01, 0.01, 0.98], # Correct
+                [0.01, 0.01, 0.98], # Incorrect
+                [0.01, 0.98, 0.01], # Incorrect
+            ])
+        state = self._state.copy()
+        state[torchbearer.Y_TRUE] = soft_targets
+        result = self._metric.process(state)
         for i in range(0, len(self._targets)):
             self.assertEqual(result[i], self._targets[i],
                              msg='returned: ' + str(result[i]) + ' expected: ' + str(self._targets[i])

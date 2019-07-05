@@ -381,7 +381,7 @@ class MakeGrid(CachingImagingCallback):
                  norm_range=None,
                  scale_each=False,
                  pad_value=0):
-        super(MakeGrid, self).__init__(transform=transform)
+        super(MakeGrid, self).__init__(transform=transform, num_images=num_images, key=key)
         self.key = key
         self.num_images = num_images
         self.nrow = nrow

@@ -18,8 +18,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added a mixup callback with associated loss
 - Added Label Smoothing Regularisation (LSR) callback
 - Added CutMix regularisation
+- Added default metric from paper for when Mixup loss is used
 ### Changed
 - Changed history to now just be a list of records
+- Categorical Accuracy metric now also accepts tensors of size (B, C) and gets the max over C for the taget class
 ### Deprecated
 ### Removed
 - Removed the variational sub-package, this will now be packaged separately
@@ -30,9 +32,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where the caching imaging callback didn't reset data so couldn't be run in multiple trials
 - Fixed a bug in the `ClassAppearanceModel` callback
 - Fixed a bug where the state given to predict was not a State object
+- Fixed a bug with Cutout on gpu
+- Fixed a bug where MakeGrid callback wasn't passing all arguments correctly
 - Fixed a bug in `ImagingCallback` that would sometimes cause `make_grid` to throw an error
 - Fixed a bug where the verbose argument would not work unless given as a keyword argument
 - Fixed a bug where the data_key argument would sometimes not work as expected
+- Fixed a bug where cutout required a seed
+- Fixed a bug where cutmix wasn't sendign the beta distribution sample to the device
 
 ## [0.3.2] - 2019-05-28
 ### Added
