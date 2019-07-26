@@ -328,8 +328,18 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
         # Forward Pass
         try:
             state[y_pred] = state[model](state[x], state=state)
-        except TypeError:
-            state[y_pred] = state[model](state[x])
+        except Exception as e:
+            try:
+                state[y_pred] = state[model](state[x])
+            except Exception as e2:
+                error = []
+                if not isinstance(e, TypeError): # Show if we think it doesn't require state
+                    error.append(e)
+                # If this was TypeError but previous wasn't (might not be to do with state) or this wasn't to do with state
+                if (isinstance(e2, TypeError) and not isinstance(e, TypeError)) \
+                        or (not isinstance(e2, TypeError)):
+                    error.append(e2)
+                raise Exception(error)
 
         state[torchbearer.CALLBACK_LIST].on_forward(state)
 
