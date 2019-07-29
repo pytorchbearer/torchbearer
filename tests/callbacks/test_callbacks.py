@@ -1,3 +1,5 @@
+import warnings
+
 from unittest import TestCase
 from mock import MagicMock, Mock
 
@@ -42,7 +44,6 @@ class TestCallbackList(TestCase):
         state = self.list.state_dict()
         state[CallbackList.CALLBACK_TYPES] = list(reversed(state[CallbackList.CALLBACK_TYPES]))
 
-        import warnings
         with warnings.catch_warnings(record=True) as w:
             self.list.load_state_dict(state)
             self.assertTrue(len(w) == 1)
