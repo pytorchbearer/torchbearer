@@ -44,4 +44,9 @@ class TestAggregatePredictions(TestCase):
         aggregator.on_end_epoch(state_2)
         self.assertTrue(list(aggregator.predictions_list) == [])
 
+    def test_no_predictions(self):
+        aggregator = AggregatePredictions()
+        state_1 = {torchbearer.Y_PRED: []}
 
+        aggregator.on_step_validation(state_1)
+        self.assertTrue(list(aggregator.predictions_list[0]) == [])
