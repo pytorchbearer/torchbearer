@@ -1152,8 +1152,7 @@ class Trial(object):
             >>> from torchbearer import Trial
             >>> val_data = torch.rand(5, 5)
             >>> test_data = torch.rand(5, 5)
-            >>> t = Trial(None).with_val_data(val_data).with_test_data(test_data)
-            >>> val_predictions = t.predict(data_key=torchbearer.VALIDATION_DATA)
+            >>> t = Trial(None).with_test_data(test_data)
             >>> test_predictions = t.predict(data_key=torchbearer.TEST_DATA)
 
         Args:
