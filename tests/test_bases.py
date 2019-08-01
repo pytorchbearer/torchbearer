@@ -71,6 +71,19 @@ class TestCallback(unittest.TestCase):
 
 
 class TestBaseCrit(unittest.TestCase):
+
+    def state_model_with_e(self, e):
+        def model(x, state):
+            raise e
+            return x
+        return model
+
+    def stateless_model_with_e(self, e):
+        def model(x):
+            raise e
+            return x
+        return model
+
     def test_opt(self):
         opt = Mock()
         opt.zero_grad = Mock()
@@ -187,3 +200,54 @@ class TestBaseCrit(unittest.TestCase):
         self.assertTrue(callback_list.on_forward.call_count == 1)
         self.assertTrue(callback_list.on_criterion.call_count == 1)
         self.assertTrue(callback_list.on_backward.call_count == 1)
+
+
+    def test_stateless_type_error(self):
+        state = {torchbearer.X: None, torchbearer.MODEL: self.stateless_model_with_e(TypeError('test')), torchbearer.CRITERION: lambda state: MagicMock(),
+                 torchbearer.OPTIMIZER: Mock(), torchbearer.CALLBACK_LIST: Mock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+
+        with self.assertRaises(Exception) as context:
+            closure(state)
+
+        self.assertTrue(len(context.exception.args[0]) == 2)
+
+    def test_stateless_exception(self):
+        state = {torchbearer.X: None, torchbearer.MODEL: self.stateless_model_with_e(Exception('test')), torchbearer.CRITERION: lambda state: MagicMock(),
+                 torchbearer.OPTIMIZER: Mock(), torchbearer.CALLBACK_LIST: Mock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+
+        with self.assertRaises(Exception) as context:
+            closure(state)
+
+        self.assertTrue(len(context.exception.args[0]) == 1)
+        self.assertTrue('test' in context.exception.args[0][0].args)
+
+    def test_state_exception(self):
+        state = {torchbearer.X: None, torchbearer.MODEL: self.state_model_with_e(Exception('test')), torchbearer.CRITERION: lambda state: MagicMock(),
+                 torchbearer.OPTIMIZER: Mock(), torchbearer.CALLBACK_LIST: Mock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+
+        with self.assertRaises(Exception) as context:
+            closure(state)
+
+        self.assertTrue(len(context.exception.args[0]) == 1)
+        self.assertTrue('test' in context.exception.args[0][0].args)
+
+    def test_state_type_error(self):
+        state = {torchbearer.X: None, torchbearer.MODEL: self.state_model_with_e(TypeError('test')), torchbearer.CRITERION: lambda state: MagicMock(),
+                 torchbearer.OPTIMIZER: Mock(), torchbearer.CALLBACK_LIST: Mock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+
+        with self.assertRaises(Exception) as context:
+            closure(state)
+
+        self.assertTrue(len(context.exception.args[0]) == 2)
