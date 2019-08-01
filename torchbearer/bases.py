@@ -306,6 +306,28 @@ class Callback(object):
         pass
 
 
+def _forward_with_exceptions(x, model, y_pred, state):
+    dx = state[x]
+
+    # Forward Pass
+    try:
+        state[y_pred] = state[model](dx, state=state)
+    except Exception as e:
+        error = []
+        try:
+            state[y_pred] = state[model](dx)
+        except TypeError as e2:
+            if isinstance(e, TypeError):  # Both TypeErrors, show both errors
+                error.append(e2)
+            error.append(e)
+            raise Exception(error)
+        except Exception as e2:
+            if not isinstance(e, TypeError):  # Show if we think it doesn't require state
+                error.append(e)
+            error.append(e2)
+            raise Exception(error)
+
+
 def base_closure(x, model, y_pred, y_true, crit, loss, opt):
     """Function to create a standard pytorch closure using objects taken from state under the given keys.
 
@@ -325,23 +347,7 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
         # Zero grads
         state[opt].zero_grad()
 
-        # Forward Pass
-        try:
-            state[y_pred] = state[model](state[x], state=state)
-        except Exception as e:
-            error = []
-            try:
-                state[y_pred] = state[model](state[x])
-            except TypeError as e2:
-                if isinstance(e, TypeError): # Both TypeErrors, show both errors
-                    error.append(e2)
-                error.append(e)
-                raise Exception(error)
-            except Exception as e2:
-                if not isinstance(e, TypeError): # Show if we think it doesn't require state
-                    error.append(e)
-                error.append(e2)
-                raise Exception(error)
+        _forward_with_exceptions(x, model, y_pred, state)
 
         state[torchbearer.CALLBACK_LIST].on_forward(state)
 

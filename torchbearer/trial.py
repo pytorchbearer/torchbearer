@@ -24,7 +24,7 @@ from torchbearer import cite
 from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
-from torchbearer.bases import base_closure
+from torchbearer.bases import base_closure, _forward_with_exceptions
 
 bibtex = """
 @article{2018torchbearer,
@@ -1057,11 +1057,7 @@ class Trial(object):
                 state[torchbearer.SAMPLER](state)
                 state[torchbearer.CALLBACK_LIST].on_sample_validation(state)
 
-                # Forward Pass
-                try:
-                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X], state=state)
-                except TypeError:
-                    state[torchbearer.Y_PRED] = state[torchbearer.MODEL](state[torchbearer.X])
+                _forward_with_exceptions(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, state)
 
                 state[torchbearer.CALLBACK_LIST].on_forward_validation(state)
 
