@@ -77,7 +77,7 @@ def flatten(state):
     state[torchbearer.X] = state[torchbearer.X].view(state[torchbearer.X].shape[0], -1)
 
 
-def demo_basic():
+def worker():
     setup()
     print("Rank and node: {}-{}".format(args.rank, platform.node()))
 
@@ -120,5 +120,5 @@ def demo_basic():
 
 
 if __name__ == "__main__":
-    demo_basic()
+    worker()
     print('done')

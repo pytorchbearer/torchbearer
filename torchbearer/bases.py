@@ -366,6 +366,31 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
     return closure
 
 
+def apex_closure(state):
+    from apex import amp
+
+    # Zero grads
+    state[torchbearer.OPTIMIZER].zero_grad()
+
+    _forward_with_exceptions(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, state)
+
+    state[torchbearer.CALLBACK_LIST].on_forward(state)
+
+    # Loss Calculation
+    try:
+        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
+    except TypeError:
+        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
+
+    state[torchbearer.CALLBACK_LIST].on_criterion(state)
+
+    # Backwards pass
+    with amp.scale_loss(state[torchbearer.LOSS], state[torchbearer.OPTIMIZER]) as scaled_loss:
+        scaled_loss.backward(**state[torchbearer.BACKWARD_ARGS])
+
+    state[torchbearer.CALLBACK_LIST].on_backward(state)
+
+
 def cite(bibtex):
     """A decorator which adds a reference to the **Google style** docstring of the given object. The ``Args:`` or
     ``Returns:`` line is then prepended with the given bibtex string at runtime. Otherwise, the last line is used.
