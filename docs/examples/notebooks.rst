@@ -68,6 +68,13 @@ General
 
     |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb>`__   :download:`Download Notebook </_static/notebooks/pycm.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb>`__
 
+
+- **Nvidia Apex with Torchbearer**:
+
+    This guide shows how we can do half and mixed precision training in torchbearer.
+
+    |nbviewer| `Preview <https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/apex_torchbearer.ipynb>`__   :download:`Download Notebook </_static/notebooks/apex_torchbearer.ipynb>`   |colab| `Run on Colab <https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/apex_torchbearer.ipynb>`__
+
 Deep Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

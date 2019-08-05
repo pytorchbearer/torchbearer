@@ -306,6 +306,28 @@ class Callback(object):
         pass
 
 
+def _forward_with_exceptions(x, model, y_pred, state):
+    dx = state[x]
+
+    # Forward Pass
+    try:
+        state[y_pred] = state[model](dx, state=state)
+    except Exception as e:
+        error = []
+        try:
+            state[y_pred] = state[model](dx)
+        except TypeError as e2:
+            if isinstance(e, TypeError):  # If both are type errors, show both.
+                error.append(e2)
+            error.append(e)
+            raise Exception(error)
+        except Exception as e2:
+            if not isinstance(e, TypeError):
+                error.append(e)
+            error.append(e2)
+            raise Exception(error)
+
+
 def base_closure(x, model, y_pred, y_true, crit, loss, opt):
     """Function to create a standard pytorch closure using objects taken from state under the given keys.
 
@@ -325,11 +347,7 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
         # Zero grads
         state[opt].zero_grad()
 
-        # Forward Pass
-        try:
-            state[y_pred] = state[model](state[x], state=state)
-        except TypeError:
-            state[y_pred] = state[model](state[x])
+        _forward_with_exceptions(x, model, y_pred, state)
 
         state[torchbearer.CALLBACK_LIST].on_forward(state)
 
@@ -346,6 +364,37 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
 
         state[torchbearer.CALLBACK_LIST].on_backward(state)
     return closure
+
+
+standard_closure = lambda: base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                                torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+
+
+def apex_closure():
+    from apex import amp
+
+    def _apex_closure(state):
+        # Zero grads
+        state[torchbearer.OPTIMIZER].zero_grad()
+
+        _forward_with_exceptions(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, state)
+
+        state[torchbearer.CALLBACK_LIST].on_forward(state)
+
+        # Loss Calculation
+        try:
+            state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
+        except TypeError:
+            state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
+
+        state[torchbearer.CALLBACK_LIST].on_criterion(state)
+
+        # Backwards pass
+        with amp.scale_loss(state[torchbearer.LOSS], state[torchbearer.OPTIMIZER]) as scaled_loss:
+            scaled_loss.backward(**state[torchbearer.BACKWARD_ARGS])
+
+        state[torchbearer.CALLBACK_LIST].on_backward(state)
+    return _apex_closure
 
 
 def cite(bibtex):
