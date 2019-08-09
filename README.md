@@ -32,7 +32,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
             **Quickstart:** Get up and running with torchbearer, training a simple CNN on CIFAR-10.
         </td>
         <td>
-            [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb)
+            <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb"><img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34"></a>
             [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb)
             [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb)
         </td>
