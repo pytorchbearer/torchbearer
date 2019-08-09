@@ -25,10 +25,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 <table>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Quickstart:</b> Get up and running with torchbearer, training a simple CNN on CIFAR-10.
         </td>
         <td>
@@ -44,10 +44,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/callbacks.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Callbacks:</b> A detailed exploration of callbacks in torchbearer, with some useful visualisations.
         </td>
         <td>
@@ -63,7 +63,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td rowspan="3" colspan="2">
             <b>Serialization:</b> This guide gives an introduction to serializing and restarting training in torchbearer.
         </td>
         <td>
@@ -79,7 +79,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td rowspan="3" colspan="2">
             <b>History and Replay:</b> This guide gives an introduction to the history returned by a trial and the ability to replay training.
         </td>
         <td>
@@ -95,7 +95,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td rowspan="3" colspan="2">
             <b>Custom Data Loaders:</b> This guide gives an introduction on how to run custom data loaders in torchbearer.
         </td>
         <td>
@@ -111,7 +111,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td rowspan="3" colspan="2">
             <b>Data Parallel:</b> This guide gives an introduction to using torchbearer with DataParrallel.
         </td>
         <td>
@@ -127,10 +127,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/livelossplot.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>LiveLossPlot:</b> A demonstration of the LiveLossPlot callback included in torchbearer.
         </td>
         <td>
@@ -146,10 +146,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/pycm.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>PyCM:</b> A demonstration of the PyCM callback included in torchbearer for generating confusion matrices.
         </td>
         <td>
@@ -172,10 +172,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 <table>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/vae.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Training a VAE:</b> A demonstration of how to train (add do a simple visualisation of) a Variational Auto-Encoder (VAE) on MNIST with torchbearer.
         </td>
         <td>
@@ -191,10 +191,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/gan.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Training a GAN:</b> A demonstration of how to train (add do a simple visualisation of) a Generative Adversarial Network (GAN) on MNIST with torchbearer.
         </td>
         <td>
@@ -210,10 +210,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/adversarial.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Generating Adversarial Examples:</b> A demonstration of how to perform a simple adversarial attack with torchbearer.
         </td>
         <td>
@@ -229,10 +229,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/transfer.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Transfer Learning with Torchbearer:</b> A demonstration of how to perform transfer learning on STL10 with torchbearer.
         </td>
         <td>
@@ -248,10 +248,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/regulariser.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Regularisers in Torchbearer:</b> A demonstration of how to use all of the built-in regularisers in torchbearer (Mixup, CutOut, CutMix, Random Erase, Label Smoothing and Sample Pairing).
         </td>
         <td>
@@ -267,10 +267,10 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/cam.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Class Appearance Model:</b> A demonstration of the Class Appearance Model (CAM) callback in torchbearer.
         </td>
         <td>
@@ -293,38 +293,54 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 <table>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/optimisers.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Optimising Functions:</b> An example (and some fun visualisations) showing how torchbearer can be used for the purpose of optimising functions with respect to their parameters using gradient descent.
         </td>
-        <td>
+        <td align="center">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
             <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
             </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
             <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
             </a>
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/svm.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Linear SVM:</b> Train a linear support vector machine (SVM) using torchbearer, with an interactive visualisation!
         </td>
-        <td>
+        <td align="center">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/svm_linear.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
             <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/svm_linear.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
             </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
             <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/svm_linear.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
             </a>
