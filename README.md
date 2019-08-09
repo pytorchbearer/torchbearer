@@ -5,7 +5,6 @@
 <p align="center">
   <a href="http://pytorchbearer.org">Website</a> •
   <a href="https://torchbearer.readthedocs.io/en/latest/">Docs</a> •
-  <a href="#about">About</a> •
   <a href="#examples">Examples</a> •
   <a href="#install">Install</a> •
   <a href="#citing">Citing</a> •
