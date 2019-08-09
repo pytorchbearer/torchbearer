@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/pytorchbearer/torchbearer/master/docs/_static/img/logo_dark_text.svg?sanitize=true" width="100%"/>
+<img alt="logo" src="https://raw.githubusercontent.com/pytorchbearer/torchbearer/master/docs/_static/img/logo_dark_text.svg?sanitize=true" width="100%"/>
 
 [![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Python 2.7 | 3.5 | 3.6 | 3.7](https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7-brightgreen.svg)](https://www.python.org/) [![PyTorch 0.4.0 | 0.4.1 | 1.0.0 | 1.1.0](https://img.shields.io/badge/pytorch-0.4.0%20%7C%200.4.1%20%7C%201.0.0%20%7C%201.1.0-brightgreen.svg)](https://pytorch.org/) [![Build Status](https://travis-ci.com/pytorchbearer/torchbearer.svg?branch=master)](https://travis-ci.com/pytorchbearer/torchbearer) [![codecov](https://codecov.io/gh/pytorchbearer/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/pytorchbearer/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/torchbearer)](https://pepy.tech/project/torchbearer)
 
@@ -25,7 +25,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 <table>
     <tr>
-        <td rowspan="3">
+        <td rowspan="3" width="160">
             <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="256">
         </td>    
         <td rowspan="3">
@@ -236,7 +236,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 <table>
     <tr>
-        <td rowspan="3">
+        <td rowspan="3" width="160">
             <img src="http://www.pytorchbearer.org/assets/img/examples/vae.jpg" width="256">
         </td>    
         <td rowspan="3">
@@ -405,7 +405,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 <table>
     <tr>
-        <td rowspan="3">
+        <td rowspan="3" width="160">
             <img src="http://www.pytorchbearer.org/assets/img/examples/optimisers.jpg" width="256">
         </td>    
         <td rowspan="3">
