@@ -351,6 +351,11 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
     </tr>
 </table>
 
+| Left-aligned | Center-aligned | Right-aligned |
+| :---         |     :---:      |          ---: |
+| git status   | git status     | git status    |
+| git diff     | git diff       | git diff      |
+
 <a id="installation"></a>
 
 ## Install
