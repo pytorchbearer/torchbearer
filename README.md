@@ -331,19 +331,27 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
-        <td>
+        <td rowspan="3">
             <img src="http://www.pytorchbearer.org/assets/img/examples/amsgrad.jpg" width="256">
         </td>    
-        <td>
+        <td rowspan="3">
             <b>Breaking Adam:</b> The Adam optimiser doesn't always converge, in this example we reimplement some of the function optimisations from the AMSGrad paper showing this empirically.
         </td>
         <td align="center">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
             <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
             </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
             <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
             </a>
