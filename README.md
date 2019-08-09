@@ -337,7 +337,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         <td>
             <b>Breaking Adam:</b> The Adam optimiser doesn't always converge, in this example we reimplement some of the function optimisations from the AMSGrad paper showing this empirically.
         </td>
-        <td>
+        <td align="center">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
@@ -350,11 +350,6 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
 </table>
-
-| Left-aligned | Center-aligned | Right-aligned |
-| :---         |     :---:      |          ---: |
-| git status   | git status     | git status    |
-| git diff     | git diff       | git diff      |
 
 <a id="installation"></a>
 
