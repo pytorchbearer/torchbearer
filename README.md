@@ -6,6 +6,9 @@ A model fitting library for PyTorch
 ## Contents
 - [About](#about)
 - [Notebooks](#notebooks)
+    - [General](#general)
+    - [Deep Learning](#deep)
+    - [Differentiable Programming](#diff)
 - [Installation](#installation)
 - [Citing Torchbearer](#citing)
 - [Documentation](#docs)
@@ -23,6 +26,8 @@ Torchbearer is a PyTorch model fitting library designed for use by researchers (
 
 Below is a list of colab notebooks showing some of the things you can do with torchbearer.
 
+<a id="general"></a>
+
 ### General
 
 | | | |
@@ -36,6 +41,8 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | <img src="http://www.pytorchbearer.org/assets/img/examples/livelossplot.jpg" width="256"> | **LiveLossPlot:**  A demonstration of the LiveLossPlot callback included in torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) |
 | <img src="http://www.pytorchbearer.org/assets/img/examples/pycm.jpg" width="256"> | **PyCM:**  A demonstration of the PyCM callback included in torchbearer for generating confusion matrices. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) |
 
+<a id="deep"></a>
+
 ### Deep Learning
 
 | | | |
@@ -46,6 +53,8 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | <img src="http://www.pytorchbearer.org/assets/img/examples/transfer.jpg" width="256"> | **Transfer Learning with Torchbearer:** A demonstration of how to perform transfer learning on STL10 with torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb) |
 | <img src="http://www.pytorchbearer.org/assets/img/examples/regulariser.jpg" width="256"> | **Regularisers in Torchbearer:** A demonstration of how to use all of the built-in regularisers in torchbearer (Mixup, CutOut, CutMix, Random Erase, Label Smoothing and Sample Pairing). |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb) |
 | <img src="http://www.pytorchbearer.org/assets/img/examples/cam.jpg" width="256"> | **Class Appearance Model:** A demonstration of the Class Appearance Model (CAM) callback in torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb) |
+
+<a id="diff"></a>
 
 ### Differentiable Programming
 
@@ -81,6 +90,8 @@ If you find that torchbearer is useful to your research then please consider cit
   year = {2018}
 }
 ```
+
+<a id="docs"></a>
 
 ## Documentation
 
