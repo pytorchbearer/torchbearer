@@ -2,29 +2,25 @@
 
 [![PyPI version](https://badge.fury.io/py/torchbearer.svg)](https://badge.fury.io/py/torchbearer) [![Python 2.7 | 3.5 | 3.6 | 3.7](https://img.shields.io/badge/python-2.7%20%7C%203.5%20%7C%203.6%20%7C%203.7-brightgreen.svg)](https://www.python.org/) [![PyTorch 0.4.0 | 0.4.1 | 1.0.0 | 1.1.0](https://img.shields.io/badge/pytorch-0.4.0%20%7C%200.4.1%20%7C%201.0.0%20%7C%201.1.0-brightgreen.svg)](https://pytorch.org/) [![Build Status](https://travis-ci.com/pytorchbearer/torchbearer.svg?branch=master)](https://travis-ci.com/pytorchbearer/torchbearer) [![codecov](https://codecov.io/gh/pytorchbearer/torchbearer/branch/master/graph/badge.svg)](https://codecov.io/gh/pytorchbearer/torchbearer) [![Documentation Status](https://readthedocs.org/projects/torchbearer/badge/?version=latest)](https://torchbearer.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/torchbearer)](https://pepy.tech/project/torchbearer)
 
-A model fitting library for PyTorch
-## Contents
-- [About](#about)
-- [Notebooks](#notebooks)
-    - [General](#general)
-    - [Deep Learning](#deep)
-    - [Differentiable Programming](#diff)
-- [Installation](#installation)
-- [Citing Torchbearer](#citing)
-- [Documentation](#docs)
-- [Other Libraries](#others)
+<p align="center">
+  <a href="http://pytorchbearer.org">Website</a> •
+  <a href="https://torchbearer.readthedocs.io/en/latest/">Docs</a> •
+  <a href="#about">About</a> •
+  <a href="#examples">Examples</a> •
+  <a href="#install">Install</a> •
+  <a href="#citing">Citing</a> •
+  <a href="#related">Related</a>
+</p>
 
 <a id="about"></a>
 
 ## About
 
-Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you.
+Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, we aim to dramatically reduce the amount of boilerplate code you need to write without limiting the functionality and openness of PyTorch.
 
-<a id="notebooks"></a>
+<a id="examples"></a>
 
-## Notebooks
-
-Below is a list of colab notebooks showing some of the things you can do with torchbearer.
+## Examples
 
 <a id="general"></a>
 
@@ -66,7 +62,7 @@ Below is a list of colab notebooks showing some of the things you can do with to
 
 <a id="installation"></a>
 
-## Installation
+## Install
 
 The easiest way to install torchbearer is with pip:
 
@@ -91,15 +87,9 @@ If you find that torchbearer is useful to your research then please consider cit
 }
 ```
 
-<a id="docs"></a>
+<a id="related"></a>
 
-## Documentation
-
-Our documentation containing the API reference, examples and notes can be found at [torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
-
-<a id="others"></a>
-
-## Other Libraries
+## Related
 
 Torchbearer isn't the only library for training PyTorch models. Here are a few others that might better suit your needs (this is by no means a complete list, see the [awesome pytorch list](https://github.com/bharathgs/Awesome-pytorch-list) or [the incredible pytorch](https://github.com/ritchieng/the-incredible-pytorch) for more):
 - [skorch](https://github.com/dnouri/skorch), model wrapper that enables use with scikit-learn - crossval etc. can be very useful
