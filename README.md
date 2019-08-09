@@ -524,4 +524,4 @@ Torchbearer isn't the only library for training PyTorch models. Here are a few o
 - [ignite](https://github.com/pytorch/ignite), advanced model training from the makers of PyTorch, can need a lot of code for advanced functions (e.g. Tensorboard)
 - [TorchNetTwo (TNT)](https://github.com/pytorch/tnt), can be complex to use but well established, somewhat replaced by ignite
 - [Inferno](https://github.com/inferno-pytorch/inferno), training utilities and convenience classes for PyTorch   
-- [Pytorch Lightning](https://github.com/williamFalcon/pytorch-lightning), lightweight wrapper on top of PyTorch with advanced multi-gpu, cluster and best practice support out-of-the-box.    
+- [Pytorch Lightning](https://github.com/williamFalcon/pytorch-lightning), lightweight wrapper on top of PyTorch with advanced multi-gpu and cluster support    
