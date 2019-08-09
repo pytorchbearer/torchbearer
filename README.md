@@ -23,9 +23,25 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
 
 ### General
 
+<table>
+    <tr>
+        <td>
+            <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="256">
+        </td>    
+        <td>
+            **Quickstart:** Get up and running with torchbearer, training a simple CNN on CIFAR-10.
+        </td>
+        <td>
+            [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb)
+            [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb)
+            [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb)
+        </td>
+    </tr>
+</table>
+
 | | | |
 | ---- | ---- | ---- |
-| <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="256"> | **Quickstart:** Get up and running with torchbearer, training a simple CNN on CIFAR-10. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) |
+|  |  |   |
 | <img src="http://www.pytorchbearer.org/assets/img/examples/callbacks.jpg" width="256"> | **Callbacks:** A detailed exploration of callbacks in torchbearer, with some useful visualisations. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) |
 | | **Serialization:** This guide gives an introduction to serializing and restarting training in torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) |
 | | **History and Replay:** This guide gives an introduction to the history returned by a trial and the ability to replay training. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) |
