@@ -25,18 +25,18 @@ Below is a list of colab notebooks showing some of the things you can do with to
 
 ### Quickstart
 
-| <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="256"> | Get up and running with torchbearer, training a simple CNN on CIFAR-10. |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="128"> | Get up and running with torchbearer, training a simple CNN on CIFAR-10. |
 | ---- | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) |
 | ---- | ---- | ---- |
 
 ### Callbacks
 
-| <img src="http://www.pytorchbearer.org/assets/img/examples/callbacks.jpg" width="256"> | A detailed exploration of callbacks in torchbearer, with some useful visualisations. |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/callbacks.jpg" width="128"> | A detailed exploration of callbacks in torchbearer, with some useful visualisations. |
 | ---- | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/callbacks.ipynb) |
 | ---- | ---- | ---- |
 
 ### Serialization
@@ -44,7 +44,7 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | This guide gives an introduction to serializing and restarting training in torchbearer. |
 | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/serialization.ipynb) |
 | ---- | ---- | ---- |
 
 ### History and Replay
@@ -52,7 +52,7 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | This guide gives an introduction to the history returned by a trial and the ability to replay training. |
 | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/history.ipynb) |
 | ---- | ---- | ---- |
 
 ### Custom Data Loaders
@@ -60,7 +60,7 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | This guide gives an introduction on how to run custom data loaders in torchbearer. |
 | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/custom_loaders.ipynb) |
 | ---- | ---- | ---- |
 
 ### Data Parallel
@@ -68,23 +68,23 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | This guide gives an introduction to using torchbearer with DataParrallel. |
 | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/data_parallel.ipynb) |
 | ---- | ---- | ---- |
 
 ### LiveLossPlot
 
-| <img src="http://www.pytorchbearer.org/assets/img/examples/livelossplot.jpg" width="256"> | A demonstration of the LiveLossPlot callback included in torchbearer. |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/livelossplot.jpg" width="128"> | A demonstration of the LiveLossPlot callback included in torchbearer. |
 | ---- | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) |
 | ---- | ---- | ---- |
 
 ### PyCM
 
-| <img src="http://www.pytorchbearer.org/assets/img/examples/pycm.jpg" width="256"> | A demonstration of the PyCM callback included in torchbearer for generating confusion matrices. |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/pycm.jpg" width="128"> | A demonstration of the PyCM callback included in torchbearer for generating confusion matrices. |
 | ---- | ---- |
 
-| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) |
+| [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="32">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="32">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) |
 | ---- | ---- | ---- |
 
 <a name="installation"/>
