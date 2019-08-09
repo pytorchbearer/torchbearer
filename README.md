@@ -31,7 +31,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         <td rowspan="3">
             <b>Quickstart:</b> Get up and running with torchbearer, training a simple CNN on CIFAR-10.
         </td>
-        <td align="center">
+        <td align="center" width="80">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
@@ -242,7 +242,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         <td rowspan="3">
             <b>Training a VAE:</b> A demonstration of how to train (add do a simple visualisation of) a Variational Auto-Encoder (VAE) on MNIST with torchbearer.
         </td>
-        <td align="center">
+        <td align="center" width="80">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/vae.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
