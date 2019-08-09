@@ -25,14 +25,11 @@ Below is a list of colab notebooks showing some of the things you can do with to
 
 ### Quickstart
 
-|      |      |
-| ---- | ---- |
 | <img src="http://www.pytorchbearer.org/assets/img/examples/quickstart.jpg" width="128"> | Get up and running with torchbearer, training a simple CNN on CIFAR-10. |
+| ---- | ---- |
 
-|      |      |      |
-| ---- | ---- | ---- |
 | [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" width="50">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" width="50">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) | [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" width="50">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/quickstart.ipynb) |
-
+| ---- | ---- | ---- |
 
 <a name="installation"/>
 
