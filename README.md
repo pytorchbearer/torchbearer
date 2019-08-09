@@ -11,19 +11,19 @@ A model fitting library for PyTorch
 - [Documentation](#docs)
 - [Other Libraries](#others)
 
-<a name="about"/>
+<a id="about"></a>
 
 ## About
 
 Torchbearer is a PyTorch model fitting library designed for use by researchers (or anyone really) working in deep learning or differentiable programming. Specifically, if you occasionally want to perform advanced custom operations but generally don't want to write hundreds of lines of untested code then this is the library for you.
 
-<a name="notebooks"/>
+<a id="notebooks"></a>
 
 ## Notebooks
 
 Below is a list of colab notebooks showing some of the things you can do with torchbearer.
 
-### Quickstart
+### General
 
 | | | |
 | ---- | ---- | ---- |
@@ -36,8 +36,26 @@ Below is a list of colab notebooks showing some of the things you can do with to
 | <img src="http://www.pytorchbearer.org/assets/img/examples/livelossplot.jpg" width="256"> | **LiveLossPlot:**  A demonstration of the LiveLossPlot callback included in torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/livelossplot.ipynb) |
 | <img src="http://www.pytorchbearer.org/assets/img/examples/pycm.jpg" width="256"> | **PyCM:**  A demonstration of the PyCM callback included in torchbearer for generating confusion matrices. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb) |
 
+### Deep Learning
 
-<a name="installation"/>
+| | | |
+| ---- | ---- | ---- |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/vae.jpg" width="256"> | **Training a VAE:** A demonstration of how to train (add do a simple visualisation of) a Variational Auto-Encoder (VAE) on MNIST with torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/vae.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/vae.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/vae.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/gan.jpg" width="256"> | **Training a GAN:** A demonstration of how to train (add do a simple visualisation of) a Generative Adversarial Network (GAN) on MNIST with torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/gan.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/gan.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/gan.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/adversarial.jpg" width="256"> | **Generating Adversarial Examples:** A demonstration of how to perform a simple adversarial attack with torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/adversarial.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/transfer.jpg" width="256"> | **Transfer Learning with Torchbearer:** A demonstration of how to perform transfer learning on STL10 with torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/transfer_learning.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/regulariser.jpg" width="256"> | **Regularisers in Torchbearer:** A demonstration of how to use all of the built-in regularisers in torchbearer (Mixup, CutOut, CutMix, Random Erase, Label Smoothing and Sample Pairing). |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/cam.jpg" width="256"> | **Class Appearance Model:** A demonstration of the Class Appearance Model (CAM) callback in torchbearer. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/cam.ipynb) |
+
+### Differentiable Programming
+
+| | | |
+| ---- | ---- | ---- |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/optimisers.jpg" width="256"> | **Optimising Functions:** An example (and some fun visualisations) showing how torchbearer can be used for the purpose of optimising functions with respect to their parameters using gradient descent. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/svm.jpg" width="256"> | **Linear SVM:** Train a linear support vector machine (SVM) using torchbearer, with an interactive visualisation! |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/svm_linear.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/svm_linear.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/svm_linear.ipynb) |
+| <img src="http://www.pytorchbearer.org/assets/img/examples/amsgrad.jpg" width="256"> | **Breaking Adam:** The Adam optimiser doesn't always converge, in this example we reimplement some of the function optimisations from the AMSGrad paper showing this empirically. |  [<img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">](https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">](https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb) [<img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">](https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/amsgrad.ipynb) |
+
+<a id="installation"></a>
 
 ## Installation
 
@@ -49,7 +67,7 @@ Alternatively, build from source with:
 
 `pip install git+https://github.com/pytorchbearer/torchbearer`
 
-<a name="citing"/>
+<a id="citing"></a>
 
 ## Citing Torchbearer
 
@@ -68,7 +86,7 @@ If you find that torchbearer is useful to your research then please consider cit
 
 Our documentation containing the API reference, examples and notes can be found at [torchbearer.readthedocs.io](https://torchbearer.readthedocs.io)
 
-<a name="others"/>
+<a id="others"></a>
 
 ## Other Libraries
 
