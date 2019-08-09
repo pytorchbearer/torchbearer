@@ -299,7 +299,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         <td rowspan="3">
             <b>Optimising Functions:</b> An example (and some fun visualisations) showing how torchbearer can be used for the purpose of optimising functions with respect to their parameters using gradient descent.
         </td>
-        <td align="center">
+        <td align="center" width="80">
             <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/basic_opt.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
             </a>
