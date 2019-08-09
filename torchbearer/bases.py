@@ -329,7 +329,12 @@ def _forward_with_exceptions(x, model, y_pred, state):
             error.append(e2)
             raise Exception(error)
     finally:
-        traceback.print_exception(*exc_info)
+        none_count = 0
+        for exc in exc_info:
+            if exc is not None:
+                none_count+= 1
+
+        traceback.print_exception(*exc_info) if none_count > 0 else None
 
 
 def base_closure(x, model, y_pred, y_true, crit, loss, opt):
