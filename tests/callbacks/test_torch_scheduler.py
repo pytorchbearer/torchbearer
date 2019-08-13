@@ -210,3 +210,7 @@ class TestCyclicLR(TestCase):
                          last_epoch=-1)
                 self.assertTrue(scheduler._step_on_batch == 'batch')
                 self.assertTrue(scheduler._monitor == 'test')
+        else:
+            self.assertRaises(NotImplementedError, lambda: CyclicLR(0.01, 0.1, monitor='test', step_size_up=200, step_size_down=None, mode='triangular',
+                         gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
+                         last_epoch=-1, step_on_batch='batch'))
