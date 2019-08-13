@@ -185,3 +185,34 @@ class ReduceLROnPlateau(TorchScheduler):
                                                     threshold=threshold, threshold_mode=threshold_mode,
                                                     cooldown=cooldown, min_lr=min_lr, eps=eps), monitor=monitor,
                                                 step_on_batch=step_on_batch)
+
+
+class CyclicLR(TorchScheduler):
+    """
+    Example: ::
+
+        >>> from torchbearer import Trial
+        >>> from torchbearer.callbacks import CyclicLR
+
+        >>> # Example scheduler which cycles the learning rate between 0.01 and 0.1
+        >>> scheduler = CyclicLR(0.01, 0.1)
+        >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).for_val_steps(10).run(1)
+
+    Args:
+        monitor (str): The name of the quantity in metrics to monitor. (Default value = 'val_loss')
+        step_on_batch (bool): If True, step will be called on each training iteration rather than on each epoch
+
+    See:
+        `PyTorch ReduceLROnPlateau <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.ReduceLROnPlateau>`_
+    """
+    def __init__(self,  base_lr, max_lr, monitor='val_loss', step_size_up=2000, step_size_down=None, mode='triangular',
+                 gamma=1., scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9,
+                 last_epoch=-1, step_on_batch=False):
+        super(CyclicLR, self).__init__(lambda opt:
+                                                torch.optim.lr_scheduler.CyclicLR(
+                                                    opt, base_lr, max_lr, step_size_up=step_size_up,
+                                                    step_size_down=step_size_down, mode=mode, gamma=gamma,
+                                                    scale_fn=scale_fn, scale_mode=scale_mode,
+                                                    cycle_momentum=cycle_momentum, base_momentum=base_momentum,
+                                                    max_momentum=max_momentum, last_epoch=last_epoch),
+                                       monitor=monitor, step_on_batch=step_on_batch)
