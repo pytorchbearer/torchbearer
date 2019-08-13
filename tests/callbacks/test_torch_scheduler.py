@@ -197,7 +197,7 @@ class TestCyclicLR(TestCase):
         from distutils.version import LooseVersion
         import torch
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
-        if LooseVersion(version) > LooseVersion("1.1.0"): # CyclicLR is implemented
+        if LooseVersion(version) > LooseVersion("1.0.0"): # CyclicLR is implemented
             state = {torchbearer.OPTIMIZER: 'optimizer'}
 
             scheduler = CyclicLR(0.01, 0.1, monitor='test', step_size_up=200, step_size_down=None, mode='triangular',
