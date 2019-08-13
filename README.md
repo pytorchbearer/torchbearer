@@ -79,6 +79,33 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
         </td>
     </tr>
     <tr>
+        <td rowspan="3">
+            <img src="http://www.pytorchbearer.org/assets/img/examples/imaging.jpg" width="256">
+        </td>    
+        <td rowspan="3">
+            <b>Imaging:</b> A detailed exploration of the imaging sub-package in torchbearer, useful for showing visualisations during training.
+        </td>
+        <td align="center">
+            <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/imaging.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/imaging.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/imaging.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
+            </a>
+        </td>
+    </tr>
+    <tr>
         <td rowspan="3" colspan="2">
             <b>Serialization:</b> This guide gives an introduction to serializing and restarting training in torchbearer.
         </td>
@@ -224,6 +251,30 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
     <tr>
         <td align="center">
             <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/pycm.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="3" colspan="2">
+            <b>NVIDIA Apex:</b> A guide showing how to perform half and mixed precision training in torchbearer with NVIDIA Apex.
+        </td>
+        <td align="center">
+            <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/apex_torchbearer.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/apex_torchbearer.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/apex_torchbearer.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
             </a>
         </td>
