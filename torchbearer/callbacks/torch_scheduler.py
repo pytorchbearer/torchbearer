@@ -209,7 +209,7 @@ class CyclicLR(TorchScheduler):
                  gamma=1., scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9,
                  last_epoch=-1, step_on_batch=False):
         from distutils.version import LooseVersion
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "1.1.0"
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
         if LooseVersion(version) > LooseVersion("1.1.0"):  # CyclicLR is implemented
             super(CyclicLR, self).__init__(lambda opt:
                                                     torch.optim.lr_scheduler.CyclicLR(

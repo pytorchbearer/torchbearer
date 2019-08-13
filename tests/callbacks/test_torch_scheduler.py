@@ -196,7 +196,7 @@ class TestCyclicLR(TestCase):
     def test_lambda_lr(self, lr_mock):
         from distutils.version import LooseVersion
         import torch
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "1.1.0"
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
         if LooseVersion(version) > LooseVersion("1.1.0"): # CyclicLR is implemented
             state = {torchbearer.OPTIMIZER: 'optimizer'}
 
