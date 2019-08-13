@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Fixed bug where aggregate predictions couldn't handle empty list
 - Fixed a bug where Runtime Errors on forward weren't handled properly
+- Fixed a bug where exceptions on forward wouldn't print the traceback properly
 
 ## [0.4.0] - 2019-07-05
 ### Added

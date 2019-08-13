@@ -1,5 +1,6 @@
 from distutils.version import LooseVersion
 import functools
+import traceback
 
 import torch
 import torchbearer
@@ -311,6 +312,7 @@ def _forward_with_exceptions(x, model, y_pred, state):
 
     # Forward Pass
     try:
+        exc_info = sys.exc_info()
         state[y_pred] = state[model](dx, state=state)
     except Exception as e:
         error = []
@@ -326,6 +328,13 @@ def _forward_with_exceptions(x, model, y_pred, state):
                 error.append(e)
             error.append(e2)
             raise Exception(error)
+    finally:
+        print_trace = False
+        for exc in exc_info:
+            if exc is not None:
+                print_trace = True
+
+        traceback.print_exception(*exc_info) if print_trace else None
 
 
 def base_closure(x, model, y_pred, y_true, crit, loss, opt):
