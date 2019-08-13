@@ -208,11 +208,17 @@ class CyclicLR(TorchScheduler):
     def __init__(self,  base_lr, max_lr, monitor='val_loss', step_size_up=2000, step_size_down=None, mode='triangular',
                  gamma=1., scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9,
                  last_epoch=-1, step_on_batch=False):
-        super(CyclicLR, self).__init__(lambda opt:
-                                                torch.optim.lr_scheduler.CyclicLR(
-                                                    opt, base_lr, max_lr, step_size_up=step_size_up,
-                                                    step_size_down=step_size_down, mode=mode, gamma=gamma,
-                                                    scale_fn=scale_fn, scale_mode=scale_mode,
-                                                    cycle_momentum=cycle_momentum, base_momentum=base_momentum,
-                                                    max_momentum=max_momentum, last_epoch=last_epoch),
-                                       monitor=monitor, step_on_batch=step_on_batch)
+        from distutils.version import LooseVersion
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "1.1.0"
+        if LooseVersion(version) > LooseVersion("1.1.0"):  # CyclicLR is implemented
+            super(CyclicLR, self).__init__(lambda opt:
+                                                    torch.optim.lr_scheduler.CyclicLR(
+                                                        opt, base_lr, max_lr, step_size_up=step_size_up,
+                                                        step_size_down=step_size_down, mode=mode, gamma=gamma,
+                                                        scale_fn=scale_fn, scale_mode=scale_mode,
+                                                        cycle_momentum=cycle_momentum, base_momentum=base_momentum,
+                                                        max_momentum=max_momentum, last_epoch=last_epoch),
+                                           monitor=monitor, step_on_batch=step_on_batch)
+        else:
+            raise NotImplementedError('CyclicLR scheduler was not implemented in PyTorch versions less than 1.1.0. '
+                                      'Update PyTorch or use the CyclicLR callback from an older Torchbearer version.')
