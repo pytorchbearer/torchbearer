@@ -3,7 +3,7 @@ from mock import patch, Mock
 
 import torchbearer
 from torchbearer.callbacks import TorchScheduler, LambdaLR, StepLR, MultiStepLR, ExponentialLR, CosineAnnealingLR,\
-    ReduceLROnPlateau
+    ReduceLROnPlateau, CyclicLR
 
 
 class TestTorchScheduler(TestCase):
@@ -189,3 +189,28 @@ class TestReduceLROnPlateau(TestCase):
                                         threshold_mode='thresh', cooldown=5, min_lr=0.1, eps=1e-4)
         self.assertTrue(scheduler._step_on_batch == 'batch')
         self.assertTrue(scheduler._monitor == 'test')
+
+
+class TestCyclicLR(TestCase):
+    def test_lambda_lr(self):
+        from distutils.version import LooseVersion
+        import torch
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
+        if LooseVersion(version) > LooseVersion("1.0.0"): # CyclicLR is implemented
+            with patch('torch.optim.lr_scheduler.CyclicLR') as lr_mock:
+                state = {torchbearer.OPTIMIZER: 'optimizer'}
+
+                scheduler = CyclicLR(0.01, 0.1, monitor='test', step_size_up=200, step_size_down=None, mode='triangular',
+                         gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
+                         last_epoch=-1, step_on_batch='batch')
+                scheduler.on_start(state)
+
+                lr_mock.assert_called_once_with('optimizer', 0.01, 0.1, step_size_up=200, step_size_down=None, mode='triangular',
+                         gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
+                         last_epoch=-1)
+                self.assertTrue(scheduler._step_on_batch == 'batch')
+                self.assertTrue(scheduler._monitor == 'test')
+        else:
+            self.assertRaises(NotImplementedError, lambda: CyclicLR(0.01, 0.1, monitor='test', step_size_up=200, step_size_down=None, mode='triangular',
+                         gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
+                         last_epoch=-1, step_on_batch='batch'))

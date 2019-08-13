@@ -2,7 +2,6 @@ from torchbearer import Callback
 from .callbacks import *
 from .unpack_state import *
 from .cutout import Cutout, RandomErase, CutMix
-from .lr_finder import CyclicLR
 from .lsuv import LSUV
 from .checkpointers import *
 from .csv_logger import *
