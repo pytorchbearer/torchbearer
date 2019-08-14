@@ -307,17 +307,25 @@ class Callback(object):
         pass
 
 
+def _get_param_list(param):
+    if isinstance(param, list):
+        return param
+    if isinstance(param, tuple):
+        return list(param)
+    return [param]
+
+
 def _forward_with_exceptions(x, model, y_pred, state):
     dx = state[x]
 
     # Forward Pass
     try:
         exc_info = sys.exc_info()
-        state[y_pred] = state[model](dx, state=state)
+        state[y_pred] = state[model](*_get_param_list(dx), state=state)
     except Exception as e:
         error = []
         try:
-            state[y_pred] = state[model](dx)
+            state[y_pred] = state[model](*_get_param_list(dx))
         except TypeError as e2:
             if isinstance(e, TypeError):  # If both are type errors, show both.
                 error.append(e2)
@@ -364,7 +372,8 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
         try:
             state[loss] = state[crit](state)
         except TypeError:
-            state[loss] = state[crit](state[y_pred], state[y_true])
+            loss_function_params = _get_param_list(state[y_pred]) + _get_param_list(state[y_true])
+            state[loss] = state[crit](*loss_function_params)
 
         state[torchbearer.CALLBACK_LIST].on_criterion(state)
 
@@ -394,7 +403,8 @@ def apex_closure():
         try:
             state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
         except TypeError:
-            state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED], state[torchbearer.Y_TRUE])
+            loss_function_params = _get_param_list(state[torchbearer.Y_PRED]) + _get_param_list(state[torchbearer.Y_TRUE])
+            state[torchbearer.LOSS] = state[torchbearer.CRITERION](*loss_function_params)
 
         state[torchbearer.CALLBACK_LIST].on_criterion(state)
 
