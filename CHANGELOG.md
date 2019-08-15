@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added PyTorch CyclicLR scheduler
 ### Changed
+- Torchbearer now supports Modules with multiple inputs and multiple outputs
 ### Deprecated
 ### Removed
 - Cyclic LR callback in favour of torch cyclic lr scheduler

@@ -120,6 +120,26 @@ class TestBaseCrit(unittest.TestCase):
         closure(state)
         self.assertTrue(model.call_args[0][0] == x)
 
+    def test_forward_multiple_x(self):
+        opt = Mock()
+
+        def model_forward(x1, x2):
+            return None
+        model = create_autospec(model_forward)
+
+        x1 = 'test1'
+        x2 = 'test2'
+
+        state = {torchbearer.X: [x1, x2], torchbearer.MODEL: model, torchbearer.Y_TRUE: None,
+                 torchbearer.CRITERION: lambda x,y: MagicMock(), torchbearer.LOSS: None, torchbearer.OPTIMIZER: opt,
+                 torchbearer.CALLBACK_LIST: MagicMock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+        closure(state)
+        self.assertTrue(model.call_args[0][0] == x1)
+        self.assertTrue(model.call_args[0][1] == x2)
+
     def test_forward_state(self):
         opt = Mock()
 
@@ -139,6 +159,27 @@ class TestBaseCrit(unittest.TestCase):
         self.assertTrue(model.call_args[0][0] == x)
         self.assertDictEqual(model.call_args[1]['state'], state)
 
+    def test_forward_multiple_x_and_state(self):
+        opt = Mock()
+
+        def model_forward(x1, x2, state):
+            return None
+        model = create_autospec(model_forward)
+
+        x1 = 'test1'
+        x2 = 'test2'
+
+        state = {torchbearer.X: [x1, x2], torchbearer.MODEL: model, torchbearer.Y_TRUE: None,
+                 torchbearer.CRITERION: lambda x,y: MagicMock(), torchbearer.LOSS: None, torchbearer.OPTIMIZER: opt,
+                 torchbearer.CALLBACK_LIST: MagicMock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+        closure(state)
+        self.assertTrue(model.call_args[0][0] == x1)
+        self.assertTrue(model.call_args[0][1] == x2)
+        self.assertDictEqual(model.call_args[1]['state'], state)
+
     def test_loss_no_state(self):
         opt = Mock()
 
@@ -156,6 +197,26 @@ class TestBaseCrit(unittest.TestCase):
                                torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
         closure(state)
         self.assertTrue(crit.call_args[0] == (y_pred, y_true))
+
+    def test_loss_multiple_output_no_state(self):
+        opt = Mock()
+
+        y_pred1 = 'yp1'
+        y_pred2 = 'yp2'
+        y_true1 = 'yt1'
+        y_true2 = 'yt2'
+        def loss_sig(y_pred1, y_pred2, y_true1, y_true2):
+            return None
+        crit = create_autospec(loss_sig)
+
+        state = {torchbearer.X: None, torchbearer.MODEL: lambda x: (y_pred1, y_pred2), torchbearer.Y_TRUE: (y_true1, y_true2),
+                 torchbearer.CRITERION: crit, torchbearer.LOSS: None, torchbearer.OPTIMIZER: opt,
+                 torchbearer.CALLBACK_LIST: MagicMock(), torchbearer.BACKWARD_ARGS: {}}
+
+        closure = base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
+                               torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+        closure(state)
+        self.assertTrue(crit.call_args[0] == (y_pred1, y_pred2, y_true1, y_true2))
 
     def test_loss_state(self):
         opt = Mock()
