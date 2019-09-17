@@ -28,9 +28,9 @@ matrix:
       sudo: true
       env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
     - python: "3.7"
-     dist: xenial
-     sudo: true
-     env: TORCH_VERSION=1.2.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.2.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
+      dist: xenial
+      sudo: true
+      env: TORCH_VERSION=1.2.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.2.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
 before_install:
   - echo $TRAVIS_COMMIT_RANGE
 
