@@ -24,7 +24,7 @@ from torchbearer import cite
 from torchbearer import State
 from torchbearer.metrics import MetricList
 from torchbearer.callbacks import Callback, CallbackList, Tqdm, AggregatePredictions
-from torchbearer.bases import standard_closure, _forward_with_exceptions
+from torchbearer.bases import standard_closure, _forward_with_exceptions, _get_param_list
 
 bibtex = """
 @article{2018torchbearer,
@@ -1067,8 +1067,9 @@ class Trial(object):
                     try:
                         state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
                     except TypeError:
-                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](state[torchbearer.Y_PRED],
-                                                                           state[torchbearer.Y_TRUE])
+                        loss_function_params = _get_param_list(state[torchbearer.Y_PRED]) + _get_param_list(
+                            state[torchbearer.Y_TRUE])
+                        state[torchbearer.LOSS] = state[torchbearer.CRITERION](*loss_function_params)
                     state[torchbearer.CALLBACK_LIST].on_criterion_validation(state)
                     state[torchbearer.METRICS] = state[torchbearer.METRIC_LIST].process(state.data)
 

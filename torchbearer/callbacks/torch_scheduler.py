@@ -165,8 +165,8 @@ class ReduceLROnPlateau(TorchScheduler):
         >>> from torchbearer import Trial
         >>> from torchbearer.callbacks import ReduceLROnPlateau
 
-        >>> # Example scheduler which multiplies the learning rate by 10 on plateaus of 5 epochs without significant
-        >>> # validation loss decrease
+        >>> # Example scheduler which divides the learning rate by 10 on plateaus of 5 epochs without significant
+        >>> # validation loss decrease, in order to stop overshooting the local minima. new_lr = lr * factor
         >>> scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5)
         >>> trial = Trial(None, callbacks=[scheduler], metrics=['loss'], verbose=2).for_steps(10).for_val_steps(10).run(1)
 

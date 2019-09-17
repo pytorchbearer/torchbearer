@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added PyTorch CyclicLR scheduler
 ### Changed
+- Torchbearer now supports Modules with multiple inputs and multiple outputs
 ### Deprecated
 ### Removed
 - Cyclic LR callback in favour of torch cyclic lr scheduler
@@ -15,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed bug where aggregate predictions couldn't handle empty list
 - Fixed a bug where Runtime Errors on forward weren't handled properly
 - Fixed a bug where exceptions on forward wouldn't print the traceback properly
+- Fixed a documentation mistake whereby ReduceLROnPlateau was said to increase learning rate
 
 ## [0.4.0] - 2019-07-05
 ### Added
