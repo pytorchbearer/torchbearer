@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 - Cyclic LR callback in favour of torch cyclic lr scheduler
+- Removed support for PyTorch 0.4.x
 ### Fixed
 - Fixed bug where aggregate predictions couldn't handle empty list
 - Fixed a bug where Runtime Errors on forward weren't handled properly

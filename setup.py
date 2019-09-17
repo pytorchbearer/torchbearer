@@ -26,6 +26,6 @@ setup(
     description='A model training library for pytorch',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['torch>=0.4', 'numpy', 'tqdm'],
+    install_requires=['torch>=1.0.0', 'numpy', 'tqdm'],
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
 )
