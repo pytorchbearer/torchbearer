@@ -52,16 +52,13 @@ class Cutout(Callback):
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
         constant (float): Constant value for each square patch
-        seed: Random seed
 
     State Requirements:
         - :attr:`torchbearer.state.X`: State should have the current data stored
     """
-    def __init__(self, n_holes, length, constant=0., seed=None):
+    def __init__(self, n_holes, length, constant=0.):
         super(Cutout, self).__init__()
         self.constant = constant
-        if seed is not None:
-            torch.manual_seed(seed)
         self.cutter = BatchCutout(n_holes, length, length)
 
     def on_sample(self, state):
@@ -90,15 +87,12 @@ class RandomErase(Callback):
     Args:
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
-        seed: Random seed
 
     State Requirements:
         - :attr:`torchbearer.state.X`: State should have the current data stored
     """
-    def __init__(self, n_holes, length, seed=None):
+    def __init__(self, n_holes, length):
         super(RandomErase, self).__init__()
-        if seed is not None:
-            torch.manual_seed(seed)
         self.cutter = BatchCutout(n_holes, length, length)
 
     def on_sample(self, state):
@@ -127,17 +121,14 @@ class CutMix(Callback):
     Args:
         alpha (float): The alpha value for the beta distribution.
         classes (int): The number of classes for conversion to one hot.
-        seed: Random seed
 
     State Requirements:
         - :attr:`torchbearer.state.X`: State should have the current data stored
         - :attr:`torchbearer.state.Y_TRUE`: State should have the current data stored
     """
-    def __init__(self, alpha, classes=-1, seed=None):
+    def __init__(self, alpha, classes=-1):
         super(CutMix, self).__init__()
         self.classes = classes
-        if seed is not None:
-            torch.manual_seed(seed)
         self.dist = Beta(torch.tensor([float(alpha)]), torch.tensor([float(alpha)]))
 
     def _to_one_hot(self, target):
@@ -176,7 +167,6 @@ class BatchCutout(object):
         n_holes (int): Number of patches to cut out of each image.
         width (int): The width (in pixels) of each square patch.
         height (int): The height (in pixels) of each square patch.
-        seed: Random seed
     """
     def __init__(self, n_holes, width, height):
         self.n_holes = n_holes

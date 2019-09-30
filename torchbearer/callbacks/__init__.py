@@ -21,3 +21,4 @@ from .pycm import PyCM
 from .mixup import Mixup, MixupAcc
 from .sample_pairing import SamplePairing
 from .label_smoothing import LabelSmoothingRegularisation
+from .between_class import BCPlus
