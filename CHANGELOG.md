@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- Added BCPlus callback for between-class learning
+### Changed
+### Deprecated
+### Removed
+### Fixed
+
 ## [0.5.0] - 2019-09-17
 ### Added
 - Added PyTorch CyclicLR scheduler

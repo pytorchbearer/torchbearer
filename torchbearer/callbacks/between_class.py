@@ -26,7 +26,8 @@ class BCPlus(Callback):
 
     .. note::
 
-       This callback first sets all images to have zero mean. Add some offset (e.g. 0.5) back before visualising.
+       This callback first sets all images to have zero mean. Consider adding an offset (e.g. 0.5) back before
+       visualising.
 
     Example: ::
 
@@ -84,8 +85,8 @@ class BCPlus(Callback):
         permutation = torch.randperm(state[torchbearer.X].size(0))
 
         batch1 = state[torchbearer.X]
-        batch1 = batch1 - batch1.mean(list(range(1, batch1.dim())), keepdim=True)
-        g1 = batch1.std(list(range(1, batch1.dim())), keepdim=True)
+        batch1 = batch1 - batch1.view(batch1.size(0), -1).mean(1, keepdim=True).view(*tuple([batch1.size(0)] + [1] * (batch1.dim() - 1)))
+        g1 = batch1.view(batch1.size(0), -1).std(1, keepdim=True).view(*tuple([batch1.size(0)] + [1] * (batch1.dim() - 1)))
 
         batch2 = batch1[permutation]
         g2 = g1[permutation]

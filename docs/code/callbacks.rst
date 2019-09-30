@@ -123,6 +123,10 @@ Regularisers
         :members:
         :undoc-members:
 
+..  autoclass:: torchbearer.callbacks.between_class.BCPlus
+        :members:
+        :undoc-members:
+
 ..  autoclass:: torchbearer.callbacks.sample_pairing.SamplePairing
         :members:
         :undoc-members:
