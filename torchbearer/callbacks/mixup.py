@@ -66,7 +66,7 @@ class Mixup(Callback):
 
         # Example Trial which does Mixup regularisation
         >>> mixup = Mixup(0.9)
-        >>> trial = Trial(None, criterion=Mixup.loss, callbacks=[mixup], metrics=['acc'])
+        >>> trial = Trial(None, criterion=Mixup.mixup_loss, callbacks=[mixup], metrics=['acc'])
 
     Args:
         alpha (float): The alpha value to use in the beta distribution.
