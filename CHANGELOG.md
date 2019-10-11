@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added BCPlus callback for between-class learning
+- Added support for PyTorch 1.3
 ### Changed
 ### Deprecated
 ### Removed
