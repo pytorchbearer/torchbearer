@@ -192,10 +192,10 @@ class BatchCutout(object):
             y = torch.randint(h, (b,)).long()
             x = torch.randint(w, (b,)).long()
 
-            y1 = (y - self.height // 2).clamp(0, h)
-            y2 = (y + self.height // 2).clamp(0, h)
-            x1 = (x - self.width // 2).clamp(0, w)
-            x2 = (x + self.width // 2).clamp(0, w)
+            y1 = (y - self.height // 2).clamp(0, h).int()
+            y2 = (y + self.height // 2).clamp(0, h).int()
+            x1 = (x - self.width // 2).clamp(0, w).int()
+            x2 = (x + self.width // 2).clamp(0, w).int()
 
             for batch in range(b):
                 mask[batch, y1[batch]: y2[batch], x1[batch]: x2[batch]] = 0
