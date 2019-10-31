@@ -4,6 +4,7 @@ import torch
 from torch.distributions import Beta
 
 from torchbearer.bases import cite
+from torchbearer import MIXUP_LAMBDA, MIXUP_PERMUTATION
 
 cutout = """
 @article{devries2017improved,
@@ -126,10 +127,11 @@ class CutMix(Callback):
         - :attr:`torchbearer.state.X`: State should have the current data stored
         - :attr:`torchbearer.state.Y_TRUE`: State should have the current data stored
     """
-    def __init__(self, alpha, classes=-1):
+    def __init__(self, alpha, classes=-1, seed=None, mixup_loss=False):
         super(CutMix, self).__init__()
         self.classes = classes
         self.dist = Beta(torch.tensor([float(alpha)]), torch.tensor([float(alpha)]))
+        self.mixup_loss = mixup_loss
 
     def _to_one_hot(self, target):
         if target.dim() == 1:
@@ -149,15 +151,21 @@ class CutMix(Callback):
         erase_locations = mask == 0
 
         permutation = torch.randperm(state[torchbearer.X].size(0))
+        state[MIXUP_PERMUTATION] = permutation
+        state[MIXUP_LAMBDA] = lam
 
         state[torchbearer.X][erase_locations] = state[torchbearer.X][permutation][erase_locations]
 
-        target = self._to_one_hot(state[torchbearer.TARGET]).float()
-        state[torchbearer.TARGET] = lam * target + (1 - lam) * target[permutation]
+        if self.mixup_loss:
+            state[torchbearer.TARGET] = (state[torchbearer.TARGET], state[torchbearer.TARGET][state[torchbearer.MIXUP_PERMUTATION]])
+        else:
+            target = self._to_one_hot(state[torchbearer.TARGET]).float()
+            state[torchbearer.TARGET] = lam * target + (1 - lam) * target[permutation]
 
     def on_sample_validation(self, state):
         super(CutMix, self).on_sample_validation(state)
-        state[torchbearer.TARGET] = self._to_one_hot(state[torchbearer.TARGET]).float()
+        if not self.mixup_loss:
+            state[torchbearer.TARGET] = self._to_one_hot(state[torchbearer.TARGET]).float()
 
 
 class BatchCutout(object):
