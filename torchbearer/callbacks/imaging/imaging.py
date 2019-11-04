@@ -15,7 +15,7 @@ def _to_file(filename):
     return handler
 
 
-def _to_pyplot(title=None):
+def _to_pyplot(title=None, show=True):
     import matplotlib.pyplot as plt
 
     def handler(image, index, _):
@@ -23,7 +23,10 @@ def _to_pyplot(title=None):
         plt.imshow(ndarr)
         if title is not None:
             plt.title(title.format(index=str(index)))
-        plt.show()
+        plt.axis('off')
+
+        if show:
+            plt.show()
 
     return handler
 
@@ -168,7 +171,7 @@ class ImagingCallback(Callback):
 
         Args:
             handler: A function of image and state which stores the given image in some way
-            index (int or list or None): if not None, only apply the handler on this index / list of indices
+            index (int or list or None): If not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
@@ -180,31 +183,33 @@ class ImagingCallback(Callback):
         """Send images from this callback to the given file
 
         Args:
-            filename (str): the filename to store the image to
-            index (int or list or None): if not None, only apply the handler on this index / list of indices
+            filename (str): The filename to store the image to
+            index (int or list or None): If not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
         return self.with_handler(_to_file(filename), index=index)
 
-    def to_pyplot(self, index=None):
+    def to_pyplot(self, title=None, show=True, index=None):
         """Show images from this callback with pyplot
 
         Args:
-            index (int or list or None): if not None, only apply the handler on this index / list of indices
+            title (str or None): If not None, plt.title will be called with the given string
+            show (bool): If True (default), show will be called after each image is plotted
+            index (int or list or None): If not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self
         """
-        return self.with_handler(_to_pyplot(), index=index)
+        return self.with_handler(_to_pyplot(title=title, show=show), index=index)
 
     def to_state(self, keys, index=None):
         """Put images from this callback in state with the given key
 
         Args:
             keys (StateKey or list[StateKey]): The state key or keys to use for the images
-            index (int or list or None): if not None, only apply the handler on this index / list of indices
+            index (int or list or None): If not None, only apply the handler on this index / list of indices
 
         Returns:
             ImagingCallback: self

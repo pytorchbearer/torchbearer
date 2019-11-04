@@ -42,6 +42,7 @@ class TestHandlers(TestCase):
         plt.title.assert_called_once_with('test')
 
         plt.imshow.assert_called_once_with(mock.mul().clamp().byte().permute().cpu().numpy())
+        plt.axis.assert_called_once_with('off')
         self.assertTrue(plt.show.call_count == 1)
 
     @patch('torchbearer.callbacks.tensor_board')
