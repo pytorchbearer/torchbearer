@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed a bug when resuming an old state dict with tqdm enabled
 - Fixed a bug in imaging where passing a title to `to_pyplot` was not possible
 
 ## [0.5.0] - 2019-09-17

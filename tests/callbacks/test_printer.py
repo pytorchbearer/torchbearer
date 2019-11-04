@@ -130,6 +130,14 @@ class TestTqdm(TestCase):
         mock_tqdm.return_value.set_postfix_str.assert_called_once_with('test=0.9946')
         self.assertEqual(mock_tqdm.return_value.close.call_count, 1)
 
+    def test_tqdm_keys(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.MAX_EPOCHS: 10, torchbearer.HISTORY: [0, {'test': 0.99456}],
+                 torchbearer.METRICS: {'test': 0.99456}}
+        tqdm = Tqdm(validation_label_letter='e', on_epoch=True)
+        tqdm.tqdm_module = MagicMock()
+
+        tqdm.on_start(state)
+
     @patch('torchbearer.magics.is_notebook')
     def test_tqdm_module_init_notebook(self, mock_is_notebook):
         from tqdm import tqdm_notebook

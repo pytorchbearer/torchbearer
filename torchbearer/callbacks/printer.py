@@ -145,8 +145,15 @@ class Tqdm(Callback):
 
             if n > 0:
                 metrics = dict(state[torchbearer.HISTORY][-1])
-                del metrics[str(torchbearer.TRAIN_STEPS)]
-                del metrics[str(torchbearer.VALIDATION_STEPS)]
+                try:
+                    del metrics[str(torchbearer.TRAIN_STEPS)]
+                except KeyError:
+                    pass
+
+                try:
+                    del metrics[str(torchbearer.VALIDATION_STEPS)]
+                except KeyError:
+                    pass
                 state[torchbearer.METRICS] = metrics
                 self._update(state)
 
