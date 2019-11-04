@@ -7,11 +7,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added BCPlus callback for between-class learning
 - Added support for PyTorch 1.3
+- Added a show flag to the `ImagingCallback.to_pyplot` method, set to false to stop it from calling `plt.show` 
 ### Changed
+- Changed the default behaviour of `ImagingCallback.to_pyplot` to turn off the axis
 ### Deprecated
 ### Removed
 ### Fixed
 - Fixed a bug when resuming an old state dict with tqdm enabled
+- Fixed a bug in imaging where passing a title to `to_pyplot` was not possible
 
 ## [0.5.0] - 2019-09-17
 ### Added
