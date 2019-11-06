@@ -69,6 +69,7 @@ class Mixup(Callback):
         >>> trial = Trial(None, criterion=Mixup.mixup_loss, callbacks=[mixup], metrics=['acc'])
 
     Args:
+        lam (float): Mixup inputs by fraction lam. If RANDOM, choose lambda from Beta(alpha, alpha). Else, lambda=lam
         alpha (float): The alpha value to use in the beta distribution.
     """
     RANDOM = -10.0
