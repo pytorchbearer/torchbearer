@@ -407,7 +407,7 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
             </a>
         </td>
     </tr>
-    <tr>
+        <tr>
         <td align="center">
             <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
@@ -417,6 +417,30 @@ A PyTorch model fitting library designed for use by researchers (or anyone reall
     <tr>
         <td align="center">
             <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/regularisers.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="3" colspan="2">
+            <b>Manifold Mixup:</b> A demonstration of how to use the Manifold Mixup callback in Torchbearer.
+        </td>
+        <td align="center">
+            <a href="https://nbviewer.jupyter.org/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/manifold_mixup.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/nbviewer_logo.svg" height="34">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <a href="https://github.com/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/manifold_mixup.ipynb">
+                <img src="http://www.pytorchbearer.org/assets/img/github_logo.png" height="32">
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <a href="https://colab.research.google.com/github/pytorchbearer/torchbearer/blob/master/docs/_static/notebooks/manifold_mixup.ipynb">
                 <img src="http://www.pytorchbearer.org/assets/img/colab_logo.png" height="28">
             </a>
         </td>

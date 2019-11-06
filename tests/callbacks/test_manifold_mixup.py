@@ -15,6 +15,9 @@ class TestModule(nn.Module):
         self.bn = nn.BatchNorm1d(1)
 
     def forward(self, x):
+        x = self.conv(x.view(-1, 1, 1))
+        x = self.relu(x)
+        x = self.bn(x)
         return x
 
 
@@ -24,7 +27,7 @@ class TestModule2(nn.Module):
         self.layer1 = TestModule()
 
     def forward(self, x):
-        return x
+        return self.layer1(x)
 
 
 class TestModel(nn.Module):
@@ -38,7 +41,7 @@ class TestModel(nn.Module):
 
     def forward(self, x):
         x = self.fc1(x)
-        x = self.conv1(x.view(1,1,1))
+        x = self.conv1(x.view(-1,1,1))
         x = self.relu(x)
         x = self.layer1(x)
         x = self.layer2(x)
@@ -180,7 +183,7 @@ class TestManifoldMixup(TestCase):
 
         self.model.conv1.mixup()
         self.assertTrue(self.model.conv1.do_mixup)
-        self.model(torch.rand(1))
+        self.model(torch.rand(3, 1))
         self.assertFalse(self.model.conv1.do_mixup)
 
     @patch('torchbearer.callbacks.manifold_mixup._mixup')
@@ -199,6 +202,24 @@ class TestManifoldMixup(TestCase):
         state = {torchbearer.MODEL: self.model, torchbearer.X: torch.rand(3, 1), torchbearer.Y_TRUE: torch.rand(3, 1)}
         mm.on_sample(state)
         self.assertTrue(mix.call_count == 2)
+
+    @patch('torchbearer.callbacks.manifold_mixup._mixup_inputs', side_effect=lambda x, _: x)
+    def test_eval(self, mix):
+        mm = ManifoldMixup().at_depth(None).for_layers(['conv1', 'layer1_relu', 'layer2_layer1_conv'])
+
+        self.model.eval()
+        state = {torchbearer.MODEL: self.model, torchbearer.X: torch.rand(3, 1), torchbearer.Y_TRUE: torch.rand(3, 1)}
+        mm.on_start(state)
+
+        mm.on_sample(state)
+        self.model(torch.rand(3, 1))
+        self.assertTrue(mix.call_count == 0)
+
+        state = {torchbearer.MODEL: self.model, torchbearer.X: torch.rand(3, 1), torchbearer.Y_TRUE: torch.rand(3, 1)}
+        mm.on_sample(state)
+        self.model = self.model.train()
+        self.model(torch.rand(3, 1))
+        self.assertTrue(mix.call_count == 1)
 
     def test_mixup_inputs(self):
         from torchbearer.callbacks.manifold_mixup import _mixup_inputs

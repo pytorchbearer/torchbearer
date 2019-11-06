@@ -156,8 +156,8 @@ class ManifoldMixup(Callback):
             def new_forward(old_forward):
                 def new_forward_1(self, *args, **kwargs):
                     o = old_forward(*args, **kwargs)
-
-                    if self.do_mixup and not self.eval():
+                    
+                    if self.do_mixup and self.training:
                         o = _mixup_inputs(o, state)
 
                     self.do_mixup = False
