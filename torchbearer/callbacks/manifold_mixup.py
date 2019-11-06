@@ -107,7 +107,7 @@ class ManifoldMixup(Callback):
 
     def _wrap_layers(self, model, state):
         # Wrap the chosen layers with redefined forward that does mixup
-        self._recursive_wrap(model, '', state, 0, self._layers)
+        self._recursive_wrap(model, '', state, 0)
 
     def on_start(self, state):
         super(ManifoldMixup, self).on_start(state)
@@ -122,7 +122,7 @@ class ManifoldMixup(Callback):
 
         state[torchbearer.MIXUP_PERMUTATION] = torch.randperm(state[torchbearer.X].size(0))
         state[torchbearer.Y_TRUE] = (state[torchbearer.Y_TRUE], state[torchbearer.Y_TRUE][state[torchbearer.MIXUP_PERMUTATION]])
-
+        
     def _wrap_layer_check(self, module, name, nname):
         # Check for exclusions
         name_check = self._mixup_layers is None or nname in self._mixup_layers
@@ -132,8 +132,24 @@ class ManifoldMixup(Callback):
             any([isinstance(module, t) for t in self._layer_types]),
         ]
         return name_check and not any(filters)
+    
+    def get_selected_layers(self, model):
+        layer_names = []
+        return self._recursive_name_seach(layer_names, model, '', 0)
 
-    def _recursive_wrap(self, layer, pre_name, state, depth, filter=()):
+    def _recursive_name_seach(self, layer_names, layer, pre_name, depth):
+        for name, module in layer.named_children():
+            nname = pre_name + '_' + name if pre_name != '' else name
+            if depth == self.depth or self.depth is None:
+                if self._wrap_layer_check(module, name, nname):
+                    layer_names.append(nname)
+                
+            if self.depth is None or depth <= self.depth:
+                if len(list(layer.named_children())) > 0:
+                    self._recursive_name_seach(layer_names, module, nname, depth+1)
+        return layer_names
+
+    def _recursive_wrap(self, layer, pre_name, state, depth):
         for name, module in layer.named_children():
             nname = pre_name + '_' + name if pre_name != '' else name
 
@@ -141,7 +157,7 @@ class ManifoldMixup(Callback):
                 def new_forward_1(self, *args, **kwargs):
                     o = old_forward(*args, **kwargs)
 
-                    if self.do_mixup:
+                    if self.do_mixup and not self.eval():
                         o = _mixup_inputs(o, state)
 
                     self.do_mixup = False
@@ -166,7 +182,7 @@ class ManifoldMixup(Callback):
 
             if self.depth is None or depth <= self.depth:
                 if len(list(layer.named_children())) > 0:
-                    self._recursive_wrap(module, nname, state, depth+1, filter)
+                    self._recursive_wrap(module, nname, state, depth+1)
 
 
 def _mixup(self):

@@ -134,6 +134,14 @@ class TestManifoldMixup(TestCase):
         self.assertTrue(self.model.conv1 in mm._layers, self.model.layer1.conv in mm._layers and self.model.layer2.layer1.conv in mm._layers)
         self.assertTrue(len(mm._layers) == 3)
 
+    def test_get_selected_layers(self):
+        mm = ManifoldMixup().at_depth(None).for_layers(['conv1', 'layer1_conv', 'layer2_layer1_conv'])
+        found_layers = mm.get_selected_layers(self.model)
+        self.assertTrue(len(found_layers) == 3)
+        self.assertTrue('conv1' in found_layers)
+        self.assertTrue('layer1_conv' in found_layers)
+        self.assertTrue('layer2_layer1_conv' in found_layers)
+
     def test_layer_filter(self):
         mm = ManifoldMixup().at_depth(None).with_layer_filter(['conv1', 'layer1_conv', 'layer2_layer1_conv'])
         state = {torchbearer.MODEL: self.model}
@@ -233,6 +241,7 @@ class TestManifoldMixup(TestCase):
 
         item = 1.
         self.assertTrue(sl(item) == [item, ])
+
 
 
 
