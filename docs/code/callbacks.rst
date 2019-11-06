@@ -82,14 +82,6 @@ Learning Rate Schedulers
         :members:
         :undoc-members:
 
-
-Learning Rate Finders
-------------------------------------
-
-..  automodule:: torchbearer.callbacks.lr_finder
-        :members:
-        :undoc-members:
-
 Weight Decay
 ------------------------------------
 

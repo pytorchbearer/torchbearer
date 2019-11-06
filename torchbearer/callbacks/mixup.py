@@ -57,7 +57,7 @@ class Mixup(Callback):
     .. note::
 
         The accuracy metric for mixup is different on training to deal with the different targets,
-    but for validation it is exactly the categorical accuracy, despite being called "val_mixup_acc"
+        but for validation it is exactly the categorical accuracy, despite being called "val_mixup_acc"
 
     Example: ::
 

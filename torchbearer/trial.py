@@ -364,7 +364,7 @@ class Trial(object):
         >>> import torch
         >>> from torchbearer import Trial
 
-        # Example trial that attempts to aims the output of a linear layer.
+        # Example trial that attempts to minimise the output of a linear layer.
         # Makes use of a callback to input the random data at each batch and a loss that is the absolute value of the
         # linear layer output. Runs for 10 iterations and a single epoch.
         >>> model = torch.nn.Linear(2,1)
