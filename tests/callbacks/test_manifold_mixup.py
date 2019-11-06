@@ -163,7 +163,7 @@ class TestManifoldMixup(TestCase):
 
         self.assertRaises(AttributeError, lambda: self.model.relu.mixup())
 
-    @patch('torchbearer.callbacks.manifold_mixup.mixup_inputs', side_effect=lambda x, _: x)
+    @patch('torchbearer.callbacks.manifold_mixup._mixup_inputs', side_effect=lambda x, _: x)
     def test_call_mix(self, _):
         mm = ManifoldMixup().at_depth(None).for_layers(['conv1', 'layer1_relu', 'layer2_layer1_conv'])
 
@@ -175,7 +175,7 @@ class TestManifoldMixup(TestCase):
         self.model(torch.rand(1))
         self.assertFalse(self.model.conv1.do_mixup)
 
-    @patch('torchbearer.callbacks.manifold_mixup.mixup')
+    @patch('torchbearer.callbacks.manifold_mixup._mixup')
     def test_on_sample(self, mix):
         mm = ManifoldMixup().at_depth(None).for_layers(['conv1', 'layer1_relu', 'layer2_layer1_conv'])
 
