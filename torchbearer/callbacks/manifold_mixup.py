@@ -4,10 +4,24 @@ from torch.distributions.beta import Beta
 import random
 import torch
 import types
+from torchbearer import cite
 
 
+manifold_mixup = """
+@inproceedings{verma2019manifold,
+  title={Manifold Mixup: Better Representations by Interpolating Hidden States},
+  author={Verma, Vikas and Lamb, Alex and Beckham, Christopher and Najafi, Amir and Mitliagkas, Ioannis and Lopez-Paz, David and Bengio, Yoshua},
+  booktitle={International Conference on Machine Learning},
+  pages={6438--6447},
+  year={2019}
+}
+"""
+
+
+@cite(manifold_mixup)
 class ManifoldMixup(Callback):
-    """
+    """ Performs manifold mixup on desired layers. Requires use of :meth:`MixupInputs.loss`, otherwise lambdas can be found in
+    state under :attr:`.MIXUP_LAMBDA`. Model targets will be a tuple containing the original target and permuted target.
 
     Args:
         lam: Mixup lambda. If RANDOM, choose lambda from Beta(alpha, alpha). Else, lambda=lam
@@ -18,14 +32,14 @@ class ManifoldMixup(Callback):
     def __init__(self, alpha=1.0, lam=RANDOM):
         super(ManifoldMixup, self).__init__()
         self._layers = []
-        self.mixup_layers = None
+        self._mixup_layers = None
         self.alpha = alpha
         self.lam = lam
         self.distrib = Beta(self.alpha, self.alpha)
         self.layer_names = []
         self.depth = 0
-        self.layer_filter = []
-        self.layer_types = []
+        self._layer_filter = []
+        self._layer_types = []
 
     def _sample_lam(self):
         if self.lam is self.RANDOM:
@@ -51,7 +65,7 @@ class ManifoldMixup(Callback):
         Returns: self
         """
         layers = self._single_to_list(layers)
-        self.mixup_layers = layers
+        self._mixup_layers = layers
         return self
 
     def with_layer_filter(self, layer_filter=()):
@@ -63,7 +77,7 @@ class ManifoldMixup(Callback):
         Returns: self
         """
         layer_filter = self._single_to_list(layer_filter)
-        self.layer_filter = layer_filter
+        self._layer_filter = layer_filter
         return self
 
     def with_layer_type_filter(self, layer_types=()):
@@ -75,7 +89,7 @@ class ManifoldMixup(Callback):
         Returns: self
         """
         layer_types = self._single_to_list(layer_types)
-        self.layer_types = layer_types
+        self._layer_types = layer_types
         return self
 
     def at_depth(self, N):
@@ -97,14 +111,9 @@ class ManifoldMixup(Callback):
 
     def on_start(self, state):
         super(ManifoldMixup, self).on_start(state)
-
         self._wrap_layers(state[torchbearer.MODEL], state)
 
-        # if len(self._layers) == 0:
-        #     raise Exception('Could not find desired layers. Not running manifold mixup.')
-
     def on_sample(self, state):
-        # Choose layer to mixup and sample lambda
         lam = self._sample_lam()
         state[torchbearer.MIXUP_LAMBDA] = lam
 
@@ -116,13 +125,11 @@ class ManifoldMixup(Callback):
 
     def _wrap_layer_check(self, module, name, nname):
         # Check for exclusions
-
-        name_check = self.mixup_layers is None or nname in self.mixup_layers
+        name_check = self._mixup_layers is None or nname in self._mixup_layers
 
         filters = [
-            # Filters
-            any([f == nname for f in self.layer_filter]),
-            any([isinstance(module, t) for t in self.layer_types]),
+            any([f == nname for f in self._layer_filter]),
+            any([isinstance(module, t) for t in self._layer_types]),
         ]
         return name_check and not any(filters)
 
@@ -135,7 +142,7 @@ class ManifoldMixup(Callback):
                     o = old_forward(*args, **kwargs)
 
                     if self.do_mixup:
-                        o = mixup_inputs(o, state)
+                        o = _mixup_inputs(o, state)
 
                     self.do_mixup = False
                     return o
@@ -150,7 +157,7 @@ class ManifoldMixup(Callback):
                     nf = new_forward(module.forward)
 
                     bound_forward = types.MethodType(nf, module)
-                    bound_mixup = types.MethodType(mixup, module)
+                    bound_mixup = types.MethodType(_mixup, module)
 
                     module.__setattr__('forward', bound_forward)
                     module.__setattr__('mixup', bound_mixup)
@@ -162,11 +169,11 @@ class ManifoldMixup(Callback):
                     self._recursive_wrap(module, nname, state, depth+1, filter)
 
 
-def mixup(self):
+def _mixup(self):
     self.do_mixup = True
 
 
-def mixup_inputs(x, state):
+def _mixup_inputs(x, state):
     index = state[torchbearer.MIXUP_PERMUTATION]
     lam = state[torchbearer.MIXUP_LAMBDA]
     mixed_x = lam * x + (1 - lam) * x[index,:]

@@ -7,7 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added BCPlus callback for between-class learning
 - Added support for PyTorch 1.3
-- Added a show flag to the `ImagingCallback.to_pyplot` method, set to false to stop it from calling `plt.show` 
+- Added a show flag to the `ImagingCallback.to_pyplot` method, set to false to stop it from calling `plt.show`
+- Added manifold mixup  
 ### Changed
 - Changed the default behaviour of `ImagingCallback.to_pyplot` to turn off the axis
 ### Deprecated

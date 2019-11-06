@@ -193,14 +193,14 @@ class TestManifoldMixup(TestCase):
         self.assertTrue(mix.call_count == 2)
 
     def test_mixup_inputs(self):
-        from torchbearer.callbacks.manifold_mixup import mixup_inputs
+        from torchbearer.callbacks.manifold_mixup import _mixup_inputs
 
         x = torch.Tensor([[1, 2], [2, 3]])
         perm = torch.Tensor([1, 0]).long()
         lam = torch.Tensor([0.1])
 
         state = {torchbearer.X: x, torchbearer.MIXUP_PERMUTATION: perm, torchbearer.MIXUP_LAMBDA: lam}
-        mixed = mixup_inputs(x, state)
+        mixed = _mixup_inputs(x, state)
 
         self.assertFalse((mixed - torch.Tensor([[1.9, 2.9], [1.1, 2.1]]) > 1e-6).any())
 
