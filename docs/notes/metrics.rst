@@ -1,4 +1,4 @@
-Using the Metric API
+The Metric API
 ====================================
 
 There are a few levels of complexity to the metric API. You've probably already seen keys such as 'acc' and 'loss' can

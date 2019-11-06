@@ -114,7 +114,7 @@ class LsuvInit(Callback):
 
 @cite(__kaiming__)
 class KaimingNormal(WeightInit):
-    """Kaiming Normal weight initialisation. Uses ``torch.nn.init.kaiming_normal_`` on the ``weight`` attribute of the
+    """Kaiming Normal weight initialisation. Uses `torch.nn.init.kaiming_normal_` on the ``weight`` attribute of the
     filtered modules.
 
     Example: ::
@@ -134,9 +134,9 @@ class KaimingNormal(WeightInit):
         >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
 
     Args:
-        a (int): See `PyTorch kaiming_uniform_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.kaiming_uniform_>`_
-        mode (str): See `PyTorch kaiming_uniform_`_
-        nonlinearity (str): See `PyTorch kaiming_uniform_`_
+        a (int): See `PyTorch kaiming_normal_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.kaiming_normal_>`_
+        mode (str): See `PyTorch kaiming_normal_`_
+        nonlinearity (str): See `PyTorch kaiming_normal_`_
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a
             single nn.Module that will have weights initialised, otherwise this is retrieved from the model
         targets (list[String]): A list of lookup strings to match which modules will be initialised
@@ -154,7 +154,7 @@ class KaimingNormal(WeightInit):
 
 @cite(__kaiming__)
 class KaimingUniform(WeightInit):
-    """Kaiming Uniform weight initialisation. Uses ``torch.nn.init.kaiming_uniform_`` on the ``weight`` attribute of the
+    """Kaiming Uniform weight initialisation. Uses `torch.nn.init.kaiming_uniform_` on the ``weight`` attribute of the
     filtered modules.
 
     Example: ::
@@ -251,7 +251,7 @@ class XavierUniform(WeightInit):
         >>> trial = Trial(model, callbacks=[initialiser]).with_train_data(data, data+5)
 
     Args:
-        gain (int): See `PyTorch xavier_normal_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.xavier_normal_>`_
+        gain (int): See `PyTorch xavier_uniform_ <https://pytorch.org/docs/stable/nn.html#torch.nn.init.xavier_uniform_>`_
         modules (Iterable[nn.Module] or nn.Module, optional): an iterable of nn.Modules or a
             single nn.Module that will have weights initialised, otherwise this is retrieved from the model
         targets (list[String]): A list of lookup strings to match which modules will be initialised
