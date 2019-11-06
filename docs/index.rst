@@ -11,14 +11,12 @@ Welcome to torchbearer's documentation!
    :maxdepth: 1
    :caption: Notes
 
-   notes/*
-
-.. toctree::
-   :glob:
-   :maxdepth: 2
-   :caption: Examples
-
-   examples/notebooks
+   notes/trial
+   notes/metrics
+   notes/callbacks
+   notes/distributed
+   notes/tensorboard
+   notes/visdom
 
 .. toctree::
    :glob:
