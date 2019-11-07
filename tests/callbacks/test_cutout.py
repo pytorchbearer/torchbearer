@@ -113,3 +113,19 @@ class TestCutOut(TestCase):
         state = {torchbearer.X: random_image, torchbearer.Y_TRUE: target.long()}
         co.on_sample_validation(state)
         self.assertTrue(((state[torchbearer.TARGET] - target).abs() < 0.00001).all())
+
+    def test_target(self):
+        mixup = CutMix(-0.1, classes=2, mixup_loss=True)
+        X = torch.rand(2, 3, 100, 100)
+        Y_true = torch.Tensor([0., 1.])
+
+        state = {
+            torchbearer.X : X,
+            torchbearer.Y_TRUE : Y_true,
+            torchbearer.DEVICE: 'cpu'
+        }
+
+        mixup.on_sample(state)
+
+        self.assertTrue((state[torchbearer.Y_TRUE][0] == torch.Tensor([0., 1.])).all())
+        self.assertTrue((state[torchbearer.Y_TRUE][1] == torch.Tensor([0., 1.])).all() or (state[torchbearer.Y_TRUE][1] == torch.Tensor([1., 0.])).all())
