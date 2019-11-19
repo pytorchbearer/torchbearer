@@ -3,13 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- Added option to use mixup loss with cutmix
+### Changed
+### Deprecated
+### Removed
+### Fixed
+
 ## [0.5.1] - 2019-11-06
 ### Added
 - Added BCPlus callback for between-class learning
 - Added support for PyTorch 1.3
 - Added a show flag to the `ImagingCallback.to_pyplot` method, set to false to stop it from calling `plt.show`
-- Added manifold mixup  
-- Added option to use mixup loss with cutmix
+- Added manifold mixup
 ### Changed
 - Changed the default behaviour of `ImagingCallback.to_pyplot` to turn off the axis
 ### Deprecated
