@@ -181,77 +181,72 @@ class PyCM(Callback):
         """
         return self.with_handler(lambda cm, _: print(cm))
 
-    def to_pycm_file(self, filename, address=True, overall_param=None, class_param=None, class_name=None):
+    def to_pycm_file(self, filename, *args, **kwargs):
         """Save `ConfusionMatrix` objects from this callback to `.pycm` files
 
         Args:
             filename (str): The name of the file, will be formatted with state to create unique filenames if desired
 
         See:
-            `PyCM Source <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
+            `PyCM Source (save_stat) <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
 
         Returns:
             PyCM: self
         """
         def handler(cm, state):
             string_state = {str(key): state[key] for key in state.keys()}
-            cm.save_stat(filename.format(**string_state), address=address, overall_param=overall_param,
-                         class_param=class_param, class_name=class_name)
+            cm.save_stat(filename.format(**string_state), *args, **kwargs)
         return self.with_handler(handler)
 
-    def to_html_file(self, filename, address=True, overall_param=None, class_param=None, class_name=None,
-                     color=(0, 0, 0), normalize=False):
+    def to_html_file(self, filename, *args, **kwargs):
         """Save `ConfusionMatrix` objects from this callback to `.html` files
 
         Args:
             filename (str): The name of the file, will be formatted with state to create unique filenames if desired
 
         See:
-            `PyCM Source <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
+            `PyCM Source (save_html) <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
 
         Returns:
             PyCM: self
         """
         def handler(cm, state):
             string_state = {str(key): state[key] for key in state.keys()}
-            cm.save_html(filename.format(**string_state), address=address, overall_param=overall_param,
-                         class_param=class_param, class_name=class_name, color=color, normalize=normalize)
+            cm.save_html(filename.format(**string_state), *args, **kwargs)
         return self.with_handler(handler)
 
-    def to_csv_file(self, filename, address=True, overall_param=None, class_param=None, class_name=None,
-                    matrix_save=True, normalize=False):
+    def to_csv_file(self, filename, *args, **kwargs):
         """Save `ConfusionMatrix` objects from this callback to `.csv` files
 
         Args:
             filename (str): The name of the file, will be formatted with state to create unique filenames if desired
 
         See:
-            `PyCM Source <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
+            `PyCM Source (save_csv) <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
 
         Returns:
             PyCM: self
         """
         def handler(cm, state):
             string_state = {str(key): state[key] for key in state.keys()}
-            cm.save_csv(filename.format(**string_state), address=address, overall_param=overall_param,
-                        class_param=class_param, class_name=class_name, matrix_save=matrix_save, normalize=normalize)
+            cm.save_csv(filename.format(**string_state), *args, **kwargs)
         return self.with_handler(handler)
 
-    def to_obj_file(self, filename, address=True, save_stat=False, save_vector=True):
+    def to_obj_file(self, filename, *args, **kwargs):
         """Save `ConfusionMatrix` objects from this callback to `.obj` files
 
         Args:
             filename (str): The name of the file, will be formatted with state to create unique filenames if desired
 
         See:
-            `PyCM Source <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
+            `PyCM Source (save_obj) <https://github.com/sepandhaghighi/pycm/blob/master/pycm/pycm_obj.py>`_
 
         Returns:
             PyCM: self
         """
         def handler(cm, state):
             string_state = {str(key): state[key] for key in state.keys()}
-            cm.save_obj(filename.format(**string_state), address=address, save_stat=save_stat, save_vector=save_vector)
+            cm.save_obj(filename.format(**string_state), *args, **kwargs)
         return self.with_handler(handler)
 
     def to_pyplot(self, normalize=False, title='Confusion matrix', cmap=None):

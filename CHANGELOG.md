@@ -7,9 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Added option to use mixup loss with cutmix
 ### Changed
+- Changed PyCM save methods to use `*args` and `**kwargs`
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed a bug where the PyCM callback would fail when saving
 
 ## [0.5.1] - 2019-11-06
 ### Added
