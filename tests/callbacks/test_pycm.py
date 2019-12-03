@@ -120,31 +120,28 @@ class TestPyCM(TestCase):
             cm = MagicMock()
             callback._handlers[0](cm, {torchbearer.EPOCH: 1})
 
-            cm.save_stat.assert_called_once_with('test 1', address=True, overall_param=None, class_param=None,
-                                                 class_name=None)
+            cm.save_stat.assert_called_once_with('test 1')
 
             callback = PyCM()
             callback.to_html_file('test {epoch}')
             cm = MagicMock()
             callback._handlers[0](cm, {torchbearer.EPOCH: 2})
 
-            cm.save_html.assert_called_once_with('test 2', address=True, overall_param=None, class_param=None,
-                                                 class_name=None, color=(0, 0, 0), normalize=False)
+            cm.save_html.assert_called_once_with('test 2')
 
             callback = PyCM()
             callback.to_csv_file('test {epoch}')
             cm = MagicMock()
             callback._handlers[0](cm, {torchbearer.EPOCH: 3})
 
-            cm.save_csv.assert_called_once_with('test 3', address=True, overall_param=None, class_param=None,
-                                                class_name=None, matrix_save=True, normalize=False)
+            cm.save_csv.assert_called_once_with('test 3')
 
             callback = PyCM()
             callback.to_obj_file('test {epoch}')
             cm = MagicMock()
             callback._handlers[0](cm, {torchbearer.EPOCH: 4})
 
-            cm.save_obj.assert_called_once_with('test 4', address=True, save_stat=False, save_vector=True)
+            cm.save_obj.assert_called_once_with('test 4')
 
     @patch('torchbearer.callbacks.pycm._to_pyplot')
     def test_to_pyplot(self, mock_to_pyplot):
