@@ -21,7 +21,8 @@ class TorchScheduler(Callback):
 
     def on_step_training(self, state):
         if self._step_on_batch and self._monitor is not None:
-            self._scheduler.step(state[torchbearer.METRICS][self._monitor])
+            if self._monitor in state[torchbearer.METRICS]:
+                self._scheduler.step(state[torchbearer.METRICS][self._monitor])
 
     def on_start_training(self, state):
         if not self._step_on_batch and self._monitor is None:
@@ -29,7 +30,9 @@ class TorchScheduler(Callback):
 
     def on_end_epoch(self, state):
         if not self._step_on_batch and self._monitor is not None:
-            self._scheduler.step(state[torchbearer.METRICS][self._monitor], epoch=state[torchbearer.EPOCH])
+            if self._monitor in state[torchbearer.METRICS]:
+                self._scheduler.step(state[torchbearer.METRICS][self._monitor], epoch=state[torchbearer.EPOCH])
+
 
 
 class LambdaLR(TorchScheduler):
