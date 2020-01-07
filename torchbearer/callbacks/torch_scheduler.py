@@ -1,5 +1,5 @@
 import torchbearer
-
+import warnings
 from torchbearer.callbacks import Callback
 
 import torch
@@ -27,11 +27,15 @@ class TorchScheduler(Callback):
     def on_start_training(self, state):
         if not self._step_on_batch and self._monitor is None:
             self._scheduler.step(epoch=state[torchbearer.EPOCH])
+        else:
+            warnings.warn(f"Monitor key [{self._monitor}] was not found by the scheduler.", Warning)
 
     def on_end_epoch(self, state):
         if not self._step_on_batch and self._monitor is not None:
             if self._monitor in state[torchbearer.METRICS]:
                 self._scheduler.step(state[torchbearer.METRICS][self._monitor], epoch=state[torchbearer.EPOCH])
+            else:
+                warnings.warn(f"Monitor key [{self._monitor}] was not found by the scheduler.", Warning)
 
 
 
