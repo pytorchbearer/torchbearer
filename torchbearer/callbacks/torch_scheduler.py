@@ -23,19 +23,22 @@ class TorchScheduler(Callback):
         if self._step_on_batch and self._monitor is not None:
             if self._monitor in state[torchbearer.METRICS]:
                 self._scheduler.step(state[torchbearer.METRICS][self._monitor])
-
+            else:
+                warnings.warn("Monitor key [{}] was not found by the scheduler.".format(self._monitor), Warning)
+                
     def on_start_training(self, state):
         if not self._step_on_batch and self._monitor is None:
-            self._scheduler.step(epoch=state[torchbearer.EPOCH])
-        else:
-            warnings.warn(f"Monitor key [{self._monitor}] was not found by the scheduler.", Warning)
+             if self._monitor in state[torchbearer.METRICS]:
+                self._scheduler.step(epoch=state[torchbearer.EPOCH])
+            else:
+                warnings.warn("Monitor key [{}] was not found by the scheduler.".format(self._monitor), Warning)
 
     def on_end_epoch(self, state):
         if not self._step_on_batch and self._monitor is not None:
             if self._monitor in state[torchbearer.METRICS]:
                 self._scheduler.step(state[torchbearer.METRICS][self._monitor], epoch=state[torchbearer.EPOCH])
             else:
-                warnings.warn(f"Monitor key [{self._monitor}] was not found by the scheduler.", Warning)
+                warnings.warn("Monitor key [{}] was not found by the scheduler.".format(self._monitor), Warning)
 
 
 
