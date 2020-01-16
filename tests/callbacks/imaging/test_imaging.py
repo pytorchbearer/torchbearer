@@ -12,7 +12,7 @@ plt.ioff()
 
 
 class TestHandlers(TestCase):
-    @patch('PIL.Image')
+    @patch('PIL.Image.fromarray')
     def test_to_file(self, pil):
         handler = imaging.imaging._to_file('test')
         mock = MagicMock()
@@ -24,8 +24,8 @@ class TestHandlers(TestCase):
         self.assertTrue(mock.mul().clamp().byte().permute().cpu.call_count == 1)
         self.assertTrue(mock.mul().clamp().byte().permute().cpu().numpy.call_count == 1)
 
-        pil.fromarray.assert_called_once_with(mock.mul().clamp().byte().permute().cpu().numpy())
-        pil.fromarray().save.assert_called_once_with('test')
+        pil.assert_called_once_with(mock.mul().clamp().byte().permute().cpu().numpy())
+        pil().save.assert_called_once_with('test')
 
     @patch('matplotlib.pyplot')
     def test_to_pyplot(self, plt):
