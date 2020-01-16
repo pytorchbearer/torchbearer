@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Added option to use mixup loss with cutmix
+- Support for PyTorch 1.4.0
 ### Changed
 - Changed PyCM save methods to use `*args` and `**kwargs`
 ### Deprecated
