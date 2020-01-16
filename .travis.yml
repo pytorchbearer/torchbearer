@@ -70,7 +70,7 @@ install:
   - pip install -q coverage
   - pip install -q $TORCH_URL
   - pip install future
-  - pip install -q $PILLOW
+  - pip install $PILLOW
   - pip install -q $TORCHVISION
   - pip install -q -r requirements.txt
 # command to run tests
