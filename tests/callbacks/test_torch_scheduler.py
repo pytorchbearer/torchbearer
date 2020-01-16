@@ -130,7 +130,7 @@ class TestTorchScheduler(TestCase):
 
         with warnings.catch_warnings(record=True) as w:
             torch_scheduler.on_end_epoch(state)
-            self.assertTrue('[test] was not found' in w[0].message.message)
+            self.assertTrue('[test] was not found' in str(w[0].message))
 
     def test_monitor_found(self):
         state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
@@ -161,7 +161,7 @@ class TestTorchScheduler(TestCase):
 
         with warnings.catch_warnings(record=True) as w:
             torch_scheduler.on_step_training(state)
-            self.assertTrue('[test] was not found' in w[0].message.message)
+            self.assertTrue('[test] was not found' in str(w[0].message))
 
     def test_batch_monitor_found(self):
         state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
