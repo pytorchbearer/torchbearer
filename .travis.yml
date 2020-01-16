@@ -2,45 +2,55 @@ language: python
 matrix:
   include:
     - python: "2.7"
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3 PILLOW=pillow
     - python: "2.7"
-      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp27-cp27mu-linux_x86_64.whl
+      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp27-cp27mu-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp27-cp27mu-linux_x86_64.whl PILLOW=pillow
     - python: "2.7"
-      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW=pillow
     - python: "2.7"
-      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW=pillow
+    - python: "2.7"
+      env: TORCH_VERSION=1.4.0 TORCH_URL="torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW=pillow
     - python: "3.5"
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3 PILLOW="pillow<7.0.0"
     - python: "3.5"
-      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp35-cp35m-linux_x86_64.whl
+      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp35-cp35m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp35-cp35m-linux_x86_64.whl PILLOW="pillow<7.0.0"
     - python: "3.5"
-      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW="pillow<7.0.0"
     - python: "3.5"
-      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW="pillow<7.0.0"
+    - python: "3.5"
+      env: TORCH_VERSION=1.4.0 TORCH_URL="torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW=pillow
     - python: "3.6"
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3 PILLOW="pillow<7.0.0"
     - python: "3.6"
-      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
+      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl PILLOW="pillow<7.0.0"
     - python: "3.6"
-      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW="pillow<7.0.0"
     - python: "3.6"
-      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW="pillow<7.0.0"
+    - python: "3.6"
+      env: TORCH_VERSION=1.4.0 TORCH_URL="torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW=pillow
     - python: "3.7"
       dist: xenial
       sudo: true
-      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3
+      env: TORCH_VERSION=1.0.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.0.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=torchvision==0.2.2.post3 PILLOW="pillow<7.0.0"
     - python: "3.7"
       dist: xenial
       sudo: true
-      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
+      env: TORCH_VERSION=1.1.0 TORCH_URL=http://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl TORCHVISION=https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl PILLOW="pillow<7.0.0"
     - python: "3.7"
       dist: xenial
       sudo: true
-      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.2.0 TORCH_URL="torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW="pillow<7.0.0"
     - python: "3.7"
       dist: xenial
       sudo: true
-      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html"
+      env: TORCH_VERSION=1.3.0 TORCH_URL="torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW="pillow<7.0.0"
+    - python: "3.7"
+      dist: xenial
+      sudo: true
+      env: TORCH_VERSION=1.4.0 TORCH_URL="torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" TORCHVISION="torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html" PILLOW=pillow
 before_install:
   - echo $TRAVIS_COMMIT_RANGE
 
@@ -59,6 +69,8 @@ before_install:
 install:
   - pip install -q coverage
   - pip install -q $TORCH_URL
+  - pip install future
+  - pip install $PILLOW
   - pip install -q $TORCHVISION
   - pip install -q -r requirements.txt
 # command to run tests
