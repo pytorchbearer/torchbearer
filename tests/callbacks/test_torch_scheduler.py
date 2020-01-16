@@ -1,5 +1,6 @@
 from unittest import TestCase
 from mock import patch, Mock
+import warnings
 
 import torchbearer
 from torchbearer.callbacks import TorchScheduler, LambdaLR, StepLR, MultiStepLR, ExponentialLR, CosineAnnealingLR,\
@@ -89,7 +90,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_epoch_no_monitor(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {}}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -114,6 +115,65 @@ class TestTorchScheduler(TestCase):
         torch_scheduler.on_end_epoch(state)
         mock_scheduler.assert_not_called()
         mock_scheduler.reset_mock()
+
+    def test_monitor_not_found(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'not_test': 1.}}
+        mock_scheduler = Mock()
+        mock_scheduler.return_value = mock_scheduler
+
+        torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=False)
+        torch_scheduler.on_start(state)
+
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_start_validation(state)
+            self.assertTrue(len(w) == 0)
+
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_end_epoch(state)
+            self.assertTrue('[test] was not found' in str(w[0].message))
+
+    def test_monitor_found(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
+        mock_scheduler = Mock()
+        mock_scheduler.return_value = mock_scheduler
+
+        torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=False)
+        torch_scheduler.on_start(state)
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_start_training(state)
+            self.assertTrue(len(w) == 0)
+
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_start_validation(state)
+            self.assertTrue(len(w) == 0)
+
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_end_epoch(state)
+            self.assertTrue(len(w) == 0)
+
+    def test_batch_monitor_not_found(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'not_test': 1.}}
+        mock_scheduler = Mock()
+        mock_scheduler.return_value = mock_scheduler
+
+        torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=True)
+        torch_scheduler.on_start(state)
+
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_step_training(state)
+            self.assertTrue('[test] was not found' in str(w[0].message))
+
+    def test_batch_monitor_found(self):
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
+        mock_scheduler = Mock()
+        mock_scheduler.return_value = mock_scheduler
+
+        torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=True)
+        torch_scheduler.on_start(state)
+
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_step_training(state)
+            self.assertTrue(len(w) == 0)
 
 
 class TestLambdaLR(TestCase):
