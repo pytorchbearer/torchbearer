@@ -3,6 +3,7 @@ import torchbearer
 
 from torchbearer.callbacks import Callback
 from .decorators import only_if
+from torchbearer.bases import get_metric
 
 
 class EarlyStopping(Callback):
@@ -69,7 +70,7 @@ class EarlyStopping(Callback):
         self.best = state_dict['best']
 
     def step(self, state):
-        current = state[torchbearer.METRICS][self.monitor]
+        current = get_metric('Early Stopping', state, self.monitor)
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
             self.wait = 0

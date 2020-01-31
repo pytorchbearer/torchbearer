@@ -1,6 +1,7 @@
 import torchbearer
 import warnings
 from torchbearer.callbacks import Callback
+from torchbearer.bases import get_metric
 
 import torch
 
@@ -21,10 +22,7 @@ class TorchScheduler(Callback):
 
     def on_step_training(self, state):
         if self._step_on_batch and self._monitor is not None:
-            if self._monitor in state[torchbearer.METRICS]:
-                self._scheduler.step(state[torchbearer.METRICS][self._monitor])
-            else:
-                warnings.warn("Monitor key [{}] was not found by the scheduler.".format(self._monitor), Warning)
+            self._scheduler.step(get_metric('Scheduler', state, self._monitor))
                 
     def on_start_training(self, state):
         if not self._step_on_batch and self._monitor is None:
@@ -32,10 +30,7 @@ class TorchScheduler(Callback):
 
     def on_end_epoch(self, state):
         if not self._step_on_batch and self._monitor is not None:
-            if self._monitor in state[torchbearer.METRICS]:
-                self._scheduler.step(state[torchbearer.METRICS][self._monitor], epoch=state[torchbearer.EPOCH])
-            else:
-                warnings.warn("Monitor key [{}] was not found by the scheduler.".format(self._monitor), Warning)
+            self._scheduler.step(get_metric('Scheduler', state, self._monitor), epoch=state[torchbearer.EPOCH])
 
 
 class LambdaLR(TorchScheduler):

@@ -2,6 +2,7 @@ from __future__ import print_function
 import torchbearer
 
 from torchbearer.callbacks import Callback
+from torchbearer.bases import get_metric
 
 import math
 
@@ -37,7 +38,7 @@ class TerminateOnNaN(Callback):
 
     def _check(self, state):
         if self._monitor in state[torchbearer.METRICS]:
-            value = state[torchbearer.METRICS][self._monitor]
+            value = get_metric('TerminateOnNaN', state, self._monitor)
             if value is not None:
                 if math.isnan(value) or math.isinf(value):
                     print('Invalid ' + self._monitor + ', terminating')
