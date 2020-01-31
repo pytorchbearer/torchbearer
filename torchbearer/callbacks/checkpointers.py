@@ -5,6 +5,7 @@ import torch
 from torchbearer.callbacks.callbacks import Callback
 import os
 import warnings
+from torchbearer.bases import get_metric
 
 
 class _Checkpointer(Callback):
@@ -225,7 +226,7 @@ class Best(_Checkpointer):
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
 
-            current = state[torchbearer.METRICS][self.monitor]
+            current = get_metric('Best Checkpoint', state, self.monitor)
 
             if self.monitor_op(current, self.best):
                 self.best = current

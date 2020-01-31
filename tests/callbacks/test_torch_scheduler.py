@@ -8,6 +8,14 @@ from torchbearer.callbacks import TorchScheduler, LambdaLR, StepLR, MultiStepLR,
 
 
 class TestTorchScheduler(TestCase):
+    def setUp(self):
+        super(TestTorchScheduler, self).setUp()
+        warnings.filterwarnings('always')
+
+    def tearDown(self):
+        super(TestTorchScheduler, self).tearDown()
+        warnings.filterwarnings('default')
+
     def test_torch_scheduler_on_batch_with_monitor(self):
         state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer'}
         mock_scheduler = Mock()
@@ -130,7 +138,7 @@ class TestTorchScheduler(TestCase):
 
         with warnings.catch_warnings(record=True) as w:
             torch_scheduler.on_end_epoch(state)
-            self.assertTrue('[test] was not found' in str(w[0].message))
+            self.assertTrue('Failed to retrieve key `test`' in str(w[0].message))
 
     def test_monitor_found(self):
         state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
@@ -161,7 +169,7 @@ class TestTorchScheduler(TestCase):
 
         with warnings.catch_warnings(record=True) as w:
             torch_scheduler.on_step_training(state)
-            self.assertTrue('[test] was not found' in str(w[0].message))
+            self.assertTrue('Failed to retrieve key `test`' in str(w[0].message))
 
     def test_batch_monitor_found(self):
         state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
