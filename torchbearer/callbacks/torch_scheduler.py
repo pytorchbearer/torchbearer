@@ -1,5 +1,4 @@
 import torchbearer
-import warnings
 from torchbearer.callbacks import Callback
 from torchbearer.bases import get_metric
 
@@ -22,7 +21,11 @@ class TorchScheduler(Callback):
 
     def on_step_training(self, state):
         if self._step_on_batch and self._monitor is not None:
-            self._scheduler.step(get_metric('Scheduler', state, self._monitor))
+            current = get_metric('Scheduler', state, self._monitor)
+            if current is None:
+                return
+
+            self._scheduler.step(current)
                 
     def on_start_training(self, state):
         if not self._step_on_batch and self._monitor is None:
@@ -30,7 +33,10 @@ class TorchScheduler(Callback):
 
     def on_end_epoch(self, state):
         if not self._step_on_batch and self._monitor is not None:
-            self._scheduler.step(get_metric('Scheduler', state, self._monitor), epoch=state[torchbearer.EPOCH])
+            current = get_metric('Scheduler', state, self._monitor)
+            if current is None:
+                return
+            self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
 
 
 class LambdaLR(TorchScheduler):
