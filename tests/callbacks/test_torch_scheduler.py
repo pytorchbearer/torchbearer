@@ -44,7 +44,8 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_epoch_with_monitor(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer',
+                 torchbearer.DATA: None}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -106,10 +107,6 @@ class TestTorchScheduler(TestCase):
 
         torch_scheduler.on_start(state)
         mock_scheduler.assert_called_once_with('optimizer')
-        mock_scheduler.reset_mock()
-
-        torch_scheduler.on_start_training(state)
-        mock_scheduler.step.assert_called_once_with(epoch=1)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_sample(state)

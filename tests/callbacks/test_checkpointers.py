@@ -6,6 +6,7 @@ from torchbearer import Trial
 from torchbearer.callbacks.checkpointers import _Checkpointer, ModelCheckpoint, MostRecent, Interval, Best
 import warnings
 
+
 class TestCheckpointer(TestCase):
     @patch('os.makedirs')
     def test_make_dirs(self, mock_dirs):
