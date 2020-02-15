@@ -73,6 +73,7 @@ class EarlyStopping(Callback):
         current = get_metric('Early Stopping', state, self.monitor)
         if current is None:
             return 
+
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
             self.wait = 0

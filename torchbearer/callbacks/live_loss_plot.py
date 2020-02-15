@@ -67,9 +67,9 @@ class LiveLossPlot(Callback):
         self.batch_plt = PlotLosses(**self._kwargs)
 
     def _on_step_training(self, state):
-        # These checks shouldn't fail 
+        # These checks shouldn't fail
         self.batch_plt.update({k: get_metric('LiveLossPlot', state, k) for k in state[torchbearer.METRICS]})
-        
+
         if state[torchbearer.BATCH] % self.batch_step_size == 0 and not self.draw_once:
             with no_print():
                 self.batch_plt.draw()

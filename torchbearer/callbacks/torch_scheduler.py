@@ -24,7 +24,6 @@ class TorchScheduler(Callback):
             current = get_metric('Scheduler', state, self._monitor)
             if current is None:
                 return
-
             self._scheduler.step(current)
                 
     def on_start_training(self, state):
