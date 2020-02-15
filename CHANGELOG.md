@@ -10,9 +10,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
-- Bug in access metrics function and callbacks that use it
+- Fixed a bug in access metrics function and callbacks that use it
 - Fixed bug where schedulers were called before optimisers 
-
+- Fixed a bug where the csv logger closed the file too early
 
 ## [0.5.3] - 2020-01-31
 ### Added
