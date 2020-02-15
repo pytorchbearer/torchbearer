@@ -77,9 +77,11 @@ class TestEndToEnd(unittest.TestCase):
         trial.run(2)
         trial.predict()
         trial.evaluate(data_key=torchbearer.TEST_DATA)
+        trial.evaluate()
 
         import os
         os.remove('test.pt')
+        os.remove('test_csv.pt')
 
     def test_zero_model(self):
         model = Linear(3, 1)
