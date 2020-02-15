@@ -42,13 +42,16 @@ class CSVLogger(Callback):
             filemode = 'a'
         else:
             filemode = 'w'
+        self.filemode = filemode
 
-        if sys.version_info[0] < 3:
-            filemode += 'b'
-            self.csvfile = open(self.filename, filemode)
-        else:
-            self.csvfile = open(self.filename, filemode, newline='')
         self.write_header = write_header
+
+    def on_start(self, state):
+        if sys.version_info[0] < 3:
+            self.filemode += 'b'
+            self.csvfile = open(self.filename, self.filemode)
+        else:
+            self.csvfile = open(self.filename, self.filemode, newline='')
 
     def on_step_training(self, state):
         super(CSVLogger, self).on_step_training(state)

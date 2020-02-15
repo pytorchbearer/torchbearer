@@ -5,6 +5,7 @@ from torch.nn import Module, Linear
 import torch.nn.init as init
 
 import torchbearer
+from torchbearer import callbacks as c
 
 
 class Net(Module):
@@ -56,6 +57,29 @@ class TestEndToEnd(unittest.TestCase):
         self.assertAlmostEqual(model.pars[0].item(), 5.0, places=4)
         self.assertAlmostEqual(model.pars[1].item(), 0.0, places=4)
         self.assertAlmostEqual(model.pars[2].item(), 1.0, places=4)
+
+    def test_callbacks(self):
+        from torch.utils.data import TensorDataset
+        traingen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1))
+        valgen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1))
+        testgen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1))
+
+        model = torch.nn.Linear(3, 1)
+        optim = torch.optim.SGD(model.parameters(), lr=0.01)
+        cbs = []
+        cbs.extend([c.EarlyStopping(), c.GradientClipping(10, model.parameters()), c.Best('test.pt'),
+                    c.MostRecent('test.pt'), c.ReduceLROnPlateau(), c.CosineAnnealingLR(0.1, 0.01),
+                    c.ExponentialLR(1), c.Interval('test.pt'), c.CSVLogger('test_csv.pt'),
+                    c.L1WeightDecay(), c.L2WeightDecay(), c.TerminateOnNaN(monitor='fail_metric')])
+
+        trial = torchbearer.Trial(model, optim, torch.nn.MSELoss(), metrics=['loss'], callbacks=cbs)
+        trial = trial.with_generators(traingen, valgen, testgen)
+        trial.run(2)
+        trial.predict()
+        trial.evaluate(data_key=torchbearer.TEST_DATA)
+
+        import os
+        os.remove('test.pt')
 
     def test_zero_model(self):
         model = Linear(3, 1)

@@ -778,6 +778,7 @@ class Trial(object):
         self.with_train_data(x_train, y_train, batch_size, shuffle, num_workers, train_steps)
         self.with_val_data(x_val, y_val, batch_size, shuffle, num_workers, val_steps)
         self.with_test_data(x_test, batch_size, num_workers, test_steps)
+        return self
 
     # Infinite steps and loading
 

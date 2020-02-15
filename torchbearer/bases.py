@@ -452,6 +452,9 @@ def cite(bibtex):
 
 
 def get_metric(self_tag, state, metric_key):
+    if state[torchbearer.DATA] == 'test_data' and 'val_' in metric_key:
+        return None
+
     if metric_key in state[torchbearer.METRICS]:
         return state[torchbearer.METRICS][metric_key]
     else:

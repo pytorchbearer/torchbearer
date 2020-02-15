@@ -72,7 +72,7 @@ class EarlyStopping(Callback):
     def step(self, state):
         current = get_metric('Early Stopping', state, self.monitor)
         if current is None:
-            return 
+            return
 
         if self.monitor_op(current - self.min_delta, self.best):
             self.best = current
