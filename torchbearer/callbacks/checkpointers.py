@@ -227,6 +227,8 @@ class Best(_Checkpointer):
             self.epochs_since_last_save = 0
 
             current = get_metric('Best Checkpoint', state, self.monitor)
+            if current is None:
+                return
 
             if self.monitor_op(current, self.best):
                 self.best = current

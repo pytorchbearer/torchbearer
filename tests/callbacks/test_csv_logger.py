@@ -16,7 +16,7 @@ class TestCSVLogger(TestCase):
         }
 
         logger = CSVLogger('test_file.log')
-
+        logger.on_start(state)
         logger.on_step_training(state)
         logger.on_end_epoch(state)
         logger.on_end(state)
@@ -35,7 +35,7 @@ class TestCSVLogger(TestCase):
         }
 
         logger = CSVLogger('test_file.log', write_header=False)
-
+        logger.on_start(state)
         logger.on_step_training(state)
         logger.on_end_epoch(state)
         logger.on_end(state)
@@ -54,7 +54,7 @@ class TestCSVLogger(TestCase):
         }
 
         logger = CSVLogger('test_file.log', write_header=False)
-
+        logger.on_start(state)
         logger.on_step_training(state)
         logger.on_end_epoch(state)
         logger.on_end(state)
@@ -70,7 +70,7 @@ class TestCSVLogger(TestCase):
         }
 
         logger = CSVLogger('test_file.log', append=True)
-
+        logger.on_start(state)
         logger.on_step_training(state)
         logger.on_end_epoch(state)
         logger.on_end(state)
@@ -111,7 +111,7 @@ class TestCSVLogger(TestCase):
         }
 
         logger = CSVLogger('test_file.log')
-
+        logger.on_start(state)
         logger.on_step_training(state)
         logger.on_end_epoch(state)
         logger.on_end(state)
@@ -128,7 +128,7 @@ class TestCSVLogger(TestCase):
         }
 
         logger = CSVLogger('test_file.log', batch_granularity=True)
-
+        logger.on_start(state)
         logger.on_step_training(state)
         logger.on_step_training(state)
         logger.on_end_epoch(state)

@@ -37,12 +37,11 @@ class TerminateOnNaN(Callback):
         self._monitor = monitor
 
     def _check(self, state):
-        if self._monitor in state[torchbearer.METRICS]:
-            value = get_metric('TerminateOnNaN', state, self._monitor)
-            if value is not None:
-                if math.isnan(value) or math.isinf(value):
-                    print('Invalid ' + self._monitor + ', terminating')
-                    state[torchbearer.STOP_TRAINING] = True
+        value = get_metric('TerminateOnNaN', state, self._monitor)
+        if value is not None:
+            if math.isnan(value) or math.isinf(value):
+                print('Invalid ' + self._monitor + ', terminating')
+                state[torchbearer.STOP_TRAINING] = True
 
     def on_step_training(self, state):
         self._check(state)

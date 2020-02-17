@@ -6,6 +6,7 @@ from torchbearer import Trial
 from torchbearer.callbacks.checkpointers import _Checkpointer, ModelCheckpoint, MostRecent, Interval, Best
 import warnings
 
+
 class TestCheckpointer(TestCase):
     @patch('os.makedirs')
     def test_make_dirs(self, mock_dirs):
@@ -337,6 +338,18 @@ class TestBest(TestCase):
 
         check.on_checkpoint(state)
         self.assertTrue(check.mode == 'max')
+
+    @patch('torchbearer.callbacks.checkpointers._Checkpointer.save_checkpoint')
+    def test_bad_monitor(self, _):
+        state = {torchbearer.METRICS: {'acc_loss': 0.1}}
+
+        file_path = 'test_file_{acc_loss:.2f}'
+        check = Best(file_path, monitor='test_fail')
+        check.on_start(state)
+
+        with warnings.catch_warnings(record=True) as w:
+            check.on_checkpoint(state)
+            self.assertTrue(len(w) == 1)
 
     def test_state_dict(self):
         check = Best('test')
