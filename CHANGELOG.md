@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Added
+- Allow imaging callback's `to_file` to use state information in the file name
 ### Changed
 ### Deprecated
 ### Removed
