@@ -7,10 +7,16 @@ import torch
 def _to_file(filename):
     from PIL import Image
 
-    def handler(image, index, _):
+    def handler(image, index, model_state):
+        state = {}
+        state.update(model_state)
+        state.update(model_state[torchbearer.METRICS])
+
+        string_state = {str(key): state[key] for key in state.keys()}
+
         ndarr = image.mul(255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
         im = Image.fromarray(ndarr)
-        im.save(filename.format(index=str(index)))
+        im.save(filename.format(index=str(index), **string_state))
 
     return handler
 
