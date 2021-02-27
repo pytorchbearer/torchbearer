@@ -16,7 +16,7 @@ class TestHandlers(TestCase):
     def test_to_file(self, pil):
         handler = imaging.imaging._to_file('test')
         mock = MagicMock()
-        handler(mock, 0, '')
+        handler(mock, 0, {torchbearer.METRICS: {}})
         mock.mul.assert_called_once_with(255)
         mock.mul().clamp.assert_called_once_with(0, 255)
         self.assertTrue(mock.mul().clamp().byte.call_count == 1)
