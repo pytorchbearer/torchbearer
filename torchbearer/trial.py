@@ -966,6 +966,7 @@ class Trial(object):
         """
         state = State()
         state.update({
+            torchbearer.EPOCH: 0,
             torchbearer.MAX_EPOCHS: epochs,
             torchbearer.STOP_TRAINING: False,
         })
