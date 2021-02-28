@@ -49,7 +49,7 @@ class TorchScheduler(Callback):
 
     def on_start_training(self, state):
         if not self._newstyle and not self._step_on_batch and self._monitor is None:
-            self._step(state, epoch=state[torchbearer.EPOCH])
+            self._step(state)
 
     def on_end_epoch(self, state):
         if not self._step_on_batch:
@@ -57,9 +57,9 @@ class TorchScheduler(Callback):
                 current = get_metric('Scheduler', state, self._monitor)
                 if current is None:
                     return
-                self._step(state, current, epoch=state[torchbearer.EPOCH])
+                self._step(state, current)
             else:
-                self._step(state, epoch=state[torchbearer.EPOCH])
+                self._step(state)
 
 
 class LambdaLR(TorchScheduler):
