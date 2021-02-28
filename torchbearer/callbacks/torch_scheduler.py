@@ -29,7 +29,7 @@ class TorchScheduler(Callback):
                 self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
 
     def on_start(self, state):
-        self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER])
+        self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER], last_epoch=state[torchbearer.EPOCH] - 1)
 
     def on_sample(self, state):
         if not self._newstyle and self._step_on_batch and self._monitor is None:

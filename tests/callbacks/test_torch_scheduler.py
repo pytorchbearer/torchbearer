@@ -25,7 +25,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
@@ -53,7 +53,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = False
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
@@ -82,7 +82,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
@@ -111,7 +111,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = False
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
@@ -139,7 +139,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
@@ -167,7 +167,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = False
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
@@ -195,7 +195,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_sample(state)
@@ -219,7 +219,7 @@ class TestTorchScheduler(TestCase):
         torch_scheduler._newstyle = False
 
         torch_scheduler.on_start(state)
-        mock_scheduler.assert_called_once_with('optimizer')
+        mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_start_training(state)
