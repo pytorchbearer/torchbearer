@@ -43,7 +43,7 @@ class TorchScheduler(Callback):
                 if current is None:
                     return
                 self._step(state, current)
-            else:
+            elif self._newstyle:
                 self._step(state)
 
     def on_start_training(self, state):
