@@ -12,12 +12,30 @@ class TorchScheduler(Callback):
         self._scheduler = None
         self._step_on_batch = step_on_batch
 
+        from distutils.version import LooseVersion
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
+        self._newstyle = LooseVersion(version) > LooseVersion("1.1.0")
+
+    def _step(self, state, current=None):
+        print("HERE", self._newstyle, current)
+        if self._newstyle:
+            if current is None:
+                self._scheduler.step()
+            else:
+                self._scheduler.step(current)
+        else:
+            if current is None:
+                self._scheduler.step(epoch=state[torchbearer.EPOCH])
+            else:
+                self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
+
+
     def on_start(self, state):
         self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER])
 
     def on_sample(self, state):
-        if self._step_on_batch and self._monitor is None:
-            self._scheduler.step()
+        if not self._newstyle and self._step_on_batch and self._monitor is None:
+            self._step(state)
 
     def on_step_training(self, state):
         if self._step_on_batch:
@@ -25,9 +43,13 @@ class TorchScheduler(Callback):
                 current = get_metric('Scheduler', state, self._monitor)
                 if current is None:
                     return
-                self._scheduler.step(current)
+                self._step(state, current)
             else:
-                self._scheduler.step()
+                self._step(state)
+
+    def on_start_training(self, state):
+        if not self._newstyle and not self._step_on_batch and self._monitor is None:
+            self._step(state, epoch=state[torchbearer.EPOCH])
 
     def on_end_epoch(self, state):
         if not self._step_on_batch:
@@ -35,9 +57,9 @@ class TorchScheduler(Callback):
                 current = get_metric('Scheduler', state, self._monitor)
                 if current is None:
                     return
-                self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
+                self._step(state, current, epoch=state[torchbearer.EPOCH])
             else:
-                self._scheduler.step(epoch=state[torchbearer.EPOCH])
+                self._step(state, epoch=state[torchbearer.EPOCH])
 
 
 class LambdaLR(TorchScheduler):
