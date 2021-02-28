@@ -303,11 +303,11 @@ class TestLambdaLR(TestCase):
     def test_lambda_lr(self, lr_mock):
         state = {torchbearer.OPTIMIZER: 'optimizer'}
 
-        scheduler = LambdaLR(0.1, last_epoch=-4, step_on_batch='batch')
+        scheduler = LambdaLR(0.1, last_epoch=-4, step_on_batch=True)
         scheduler.on_start(state)
 
         lr_mock.assert_called_once_with('optimizer', 0.1, last_epoch=-4)
-        self.assertTrue(scheduler._step_on_batch == 'batch')
+        self.assertTrue(scheduler._step_on_batch)
 
 
 class TestStepLR(TestCase):
@@ -315,11 +315,11 @@ class TestStepLR(TestCase):
     def test_lambda_lr(self, lr_mock):
         state = {torchbearer.OPTIMIZER: 'optimizer'}
 
-        scheduler = StepLR(10, gamma=0.4, last_epoch=-4, step_on_batch='batch')
+        scheduler = StepLR(10, gamma=0.4, last_epoch=-4, step_on_batch=True)
         scheduler.on_start(state)
 
         lr_mock.assert_called_once_with('optimizer', 10, gamma=0.4, last_epoch=-4)
-        self.assertTrue(scheduler._step_on_batch == 'batch')
+        self.assertTrue(scheduler._step_on_batch)
 
 
 class TestMultiStepLR(TestCase):
@@ -327,11 +327,11 @@ class TestMultiStepLR(TestCase):
     def test_lambda_lr(self, lr_mock):
         state = {torchbearer.OPTIMIZER: 'optimizer'}
 
-        scheduler = MultiStepLR(10, gamma=0.4, last_epoch=-4, step_on_batch='batch')
+        scheduler = MultiStepLR(10, gamma=0.4, last_epoch=-4, step_on_batch=True)
         scheduler.on_start(state)
 
         lr_mock.assert_called_once_with('optimizer', 10, gamma=0.4, last_epoch=-4)
-        self.assertTrue(scheduler._step_on_batch == 'batch')
+        self.assertTrue(scheduler._step_on_batch)
 
 
 class TestExponentialLR(TestCase):
@@ -339,11 +339,11 @@ class TestExponentialLR(TestCase):
     def test_lambda_lr(self, lr_mock):
         state = {torchbearer.OPTIMIZER: 'optimizer'}
 
-        scheduler = ExponentialLR(0.4, last_epoch=-4, step_on_batch='batch')
+        scheduler = ExponentialLR(0.4, last_epoch=-4, step_on_batch=True)
         scheduler.on_start(state)
 
         lr_mock.assert_called_once_with('optimizer', 0.4, last_epoch=-4)
-        self.assertTrue(scheduler._step_on_batch == 'batch')
+        self.assertTrue(scheduler._step_on_batch)
 
 
 class TestCosineAnnealingLR(TestCase):
@@ -351,11 +351,11 @@ class TestCosineAnnealingLR(TestCase):
     def test_lambda_lr(self, lr_mock):
         state = {torchbearer.OPTIMIZER: 'optimizer'}
 
-        scheduler = CosineAnnealingLR(4, eta_min=10, last_epoch=-4, step_on_batch='batch')
+        scheduler = CosineAnnealingLR(4, eta_min=10, last_epoch=-4, step_on_batch=True)
         scheduler.on_start(state)
 
         lr_mock.assert_called_once_with('optimizer', 4, eta_min=10, last_epoch=-4)
-        self.assertTrue(scheduler._step_on_batch == 'batch')
+        self.assertTrue(scheduler._step_on_batch)
 
 
 class TestReduceLROnPlateau(TestCase):
@@ -364,12 +364,12 @@ class TestReduceLROnPlateau(TestCase):
         state = {torchbearer.OPTIMIZER: 'optimizer'}
 
         scheduler = ReduceLROnPlateau(monitor='test', mode='max', factor=0.2, patience=100, verbose=True, threshold=10,
-                                      threshold_mode='thresh', cooldown=5, min_lr=0.1, eps=1e-4, step_on_batch='batch')
+                                      threshold_mode='thresh', cooldown=5, min_lr=0.1, eps=1e-4, step_on_batch=True)
         scheduler.on_start(state)
 
         lr_mock.assert_called_once_with('optimizer', mode='max', factor=0.2, patience=100, verbose=True, threshold=10,
                                         threshold_mode='thresh', cooldown=5, min_lr=0.1, eps=1e-4)
-        self.assertTrue(scheduler._step_on_batch == 'batch')
+        self.assertTrue(scheduler._step_on_batch)
         self.assertTrue(scheduler._monitor == 'test')
 
 
@@ -384,15 +384,15 @@ class TestCyclicLR(TestCase):
 
                 scheduler = CyclicLR(0.01, 0.1, monitor='test', step_size_up=200, step_size_down=None, mode='triangular',
                          gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
-                         last_epoch=-1, step_on_batch='batch')
+                         last_epoch=-1, step_on_batch=True)
                 scheduler.on_start(state)
 
                 lr_mock.assert_called_once_with('optimizer', 0.01, 0.1, step_size_up=200, step_size_down=None, mode='triangular',
                          gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
                          last_epoch=-1)
-                self.assertTrue(scheduler._step_on_batch == 'batch')
+                self.assertTrue(scheduler._step_on_batch)
                 self.assertTrue(scheduler._monitor == 'test')
         else:
             self.assertRaises(NotImplementedError, lambda: CyclicLR(0.01, 0.1, monitor='test', step_size_up=200, step_size_down=None, mode='triangular',
                          gamma=2., scale_fn=None, scale_mode='cycle', cycle_momentum=False, base_momentum=0.7, max_momentum=0.9,
-                         last_epoch=-1, step_on_batch='batch'))
+                         last_epoch=-1, step_on_batch=True))
