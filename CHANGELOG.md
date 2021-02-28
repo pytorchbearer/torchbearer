@@ -11,8 +11,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Deprecated
 ### Removed
 ### Fixed
+- Fixed warnings about the `epoch` argument in schedulers in newer versions of pytorch
 - Fixed a bug in access metrics function and callbacks that use it
-- Fixed bug where schedulers were called before optimisers 
+- Fixed bug where schedulers were called before optimisers with newer versions of pytorch
 - Fixed a bug where the csv logger closed the file too early
 
 ## [0.5.3] - 2020-01-31

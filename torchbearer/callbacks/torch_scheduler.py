@@ -1,8 +1,12 @@
+import functools
+
 import torchbearer
 from torchbearer.callbacks import Callback
 from torchbearer.bases import get_metric
 
 import torch
+
+import warnings
 
 
 class TorchScheduler(Callback):
@@ -12,12 +16,36 @@ class TorchScheduler(Callback):
         self._scheduler = None
         self._step_on_batch = step_on_batch
 
+        from distutils.version import LooseVersion
+        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
+        self._newstyle = LooseVersion(version) > LooseVersion("1.1.0")
+
+    def _step(self, state, current=None):
+        if self._newstyle or self._step_on_batch:
+            if current is None:
+                self._scheduler.step()
+            else:
+                self._scheduler.step(current)
+        else:
+            if current is None:
+                self._scheduler.step(epoch=state[torchbearer.EPOCH])
+            else:
+                self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
+
     def on_start(self, state):
-        self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER])
+        try:
+            self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER],
+                                                      last_epoch=state[torchbearer.EPOCH] - 1)
+        except TypeError:
+            self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER])
+
+        if state[torchbearer.EPOCH] > 0 and self._step_on_batch:
+            warnings.warn('Resuming schedulers with the `step_on_batch` option is not currently supported and may cause'
+                          ' unexpected behaviour.')
 
     def on_sample(self, state):
-        if self._step_on_batch and self._monitor is None:
-            self._scheduler.step()
+        if not self._newstyle and self._step_on_batch and self._monitor is None:
+            self._step(state)
 
     def on_step_training(self, state):
         if self._step_on_batch:
@@ -25,9 +53,13 @@ class TorchScheduler(Callback):
                 current = get_metric('Scheduler', state, self._monitor)
                 if current is None:
                     return
-                self._scheduler.step(current)
-            else:
-                self._scheduler.step()
+                self._step(state, current)
+            elif self._newstyle:
+                self._step(state)
+
+    def on_start_training(self, state):
+        if not self._newstyle and not self._step_on_batch and self._monitor is None:
+            self._step(state)
 
     def on_end_epoch(self, state):
         if not self._step_on_batch:
@@ -35,9 +67,9 @@ class TorchScheduler(Callback):
                 current = get_metric('Scheduler', state, self._monitor)
                 if current is None:
                     return
-                self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
+                self._step(state, current)
             else:
-                self._scheduler.step(epoch=state[torchbearer.EPOCH])
+                self._step(state)
 
 
 class LambdaLR(TorchScheduler):
@@ -59,9 +91,8 @@ class LambdaLR(TorchScheduler):
     See:
         `PyTorch LambdaLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.LambdaLR>`_
     """
-    def __init__(self, lr_lambda, last_epoch=-1, step_on_batch=False):
-        super(LambdaLR, self).__init__(lambda opt:
-                                       torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda, last_epoch=last_epoch),
+    def __init__(self, lr_lambda, step_on_batch=False):
+        super(LambdaLR, self).__init__(functools.partial(torch.optim.lr_scheduler.LambdaLR, lr_lambda=lr_lambda),
                                        step_on_batch=step_on_batch)
 
 
@@ -85,10 +116,9 @@ class StepLR(TorchScheduler):
     See:
         `PyTorch StepLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.StepLR>`_
     """
-    def __init__(self, step_size, gamma=0.1, last_epoch=-1, step_on_batch=False):
-        super(StepLR, self).__init__(lambda opt:
-                                     torch.optim.lr_scheduler.StepLR(opt, step_size, gamma=gamma,
-                                                                     last_epoch=last_epoch),
+    def __init__(self, step_size, gamma=0.1, step_on_batch=False):
+        super(StepLR, self).__init__(functools.partial(torch.optim.lr_scheduler.StepLR,
+                                                       step_size=step_size, gamma=gamma),
                                      step_on_batch=step_on_batch)
 
 
@@ -112,10 +142,9 @@ class MultiStepLR(TorchScheduler):
     See:
         `PyTorch MultiStepLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.MultiStepLR>`_
     """
-    def __init__(self, milestones, gamma=0.1, last_epoch=-1, step_on_batch=False):
-        super(MultiStepLR, self).__init__(lambda opt:
-                                          torch.optim.lr_scheduler.MultiStepLR(opt, milestones, gamma=gamma,
-                                                                               last_epoch=last_epoch),
+    def __init__(self, milestones, gamma=0.1, step_on_batch=False):
+        super(MultiStepLR, self).__init__(functools.partial(torch.optim.lr_scheduler.MultiStepLR,
+                                                            milestones=milestones, gamma=gamma),
                                           step_on_batch=step_on_batch)
 
 
@@ -136,9 +165,8 @@ class ExponentialLR(TorchScheduler):
     See:
         `PyTorch ExponentialLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.ExponentialLR>`_
     """
-    def __init__(self, gamma, last_epoch=-1, step_on_batch=False):
-        super(ExponentialLR, self).__init__(lambda opt:
-                                            torch.optim.lr_scheduler.ExponentialLR(opt, gamma, last_epoch=last_epoch),
+    def __init__(self, gamma, step_on_batch=False):
+        super(ExponentialLR, self).__init__(functools.partial(torch.optim.lr_scheduler.ExponentialLR, gamma=gamma),
                                             step_on_batch=step_on_batch)
 
 
@@ -159,10 +187,9 @@ class CosineAnnealingLR(TorchScheduler):
     See:
         `PyTorch CosineAnnealingLR <http://pytorch.org/docs/master/optim.html#torch.optim.lr_scheduler.CosineAnnealingLR>`_
     """
-    def __init__(self, T_max, eta_min=0, last_epoch=-1, step_on_batch=False):
-        super(CosineAnnealingLR, self).__init__(lambda opt:
-                                                torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max, eta_min=eta_min,
-                                                                                           last_epoch=last_epoch),
+    def __init__(self, T_max, eta_min=0, step_on_batch=False):
+        super(CosineAnnealingLR, self).__init__(functools.partial(torch.optim.lr_scheduler.CosineAnnealingLR,
+                                                                  T_max=T_max, eta_min=eta_min),
                                                 step_on_batch=step_on_batch)
 
 
@@ -187,11 +214,10 @@ class ReduceLROnPlateau(TorchScheduler):
     """
     def __init__(self,  monitor='val_loss', mode='min', factor=0.1, patience=10, verbose=False, threshold=1e-4,
                  threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-8, step_on_batch=False):
-        super(ReduceLROnPlateau, self).__init__(lambda opt:
-                                                torch.optim.lr_scheduler.ReduceLROnPlateau(
-                                                    opt, mode=mode, factor=factor, patience=patience, verbose=verbose,
-                                                    threshold=threshold, threshold_mode=threshold_mode,
-                                                    cooldown=cooldown, min_lr=min_lr, eps=eps), monitor=monitor,
+        super(ReduceLROnPlateau, self).__init__(functools.partial(torch.optim.lr_scheduler.ReduceLROnPlateau,
+                                                mode=mode, factor=factor, patience=patience, verbose=verbose,
+                                                threshold=threshold, threshold_mode=threshold_mode,
+                                                cooldown=cooldown, min_lr=min_lr, eps=eps), monitor=monitor,
                                                 step_on_batch=step_on_batch)
 
 
@@ -215,17 +241,16 @@ class CyclicLR(TorchScheduler):
     """
     def __init__(self,  base_lr, max_lr, monitor='val_loss', step_size_up=2000, step_size_down=None, mode='triangular',
                  gamma=1., scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9,
-                 last_epoch=-1, step_on_batch=False):
+                 step_on_batch=False):
         from distutils.version import LooseVersion
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
         if LooseVersion(version) > LooseVersion("1.0.0"):  # CyclicLR is implemented
-            super(CyclicLR, self).__init__(lambda opt:
-                                                    torch.optim.lr_scheduler.CyclicLR(
-                                                        opt, base_lr, max_lr, step_size_up=step_size_up,
-                                                        step_size_down=step_size_down, mode=mode, gamma=gamma,
-                                                        scale_fn=scale_fn, scale_mode=scale_mode,
-                                                        cycle_momentum=cycle_momentum, base_momentum=base_momentum,
-                                                        max_momentum=max_momentum, last_epoch=last_epoch),
+            super(CyclicLR, self).__init__(functools.partial(torch.optim.lr_scheduler.CyclicLR,
+                                           base_lr=base_lr, max_lr=max_lr, step_size_up=step_size_up,
+                                           step_size_down=step_size_down, mode=mode, gamma=gamma,
+                                           scale_fn=scale_fn, scale_mode=scale_mode,
+                                           cycle_momentum=cycle_momentum, base_momentum=base_momentum,
+                                           max_momentum=max_momentum),
                                            monitor=monitor, step_on_batch=step_on_batch)
         else:
             raise NotImplementedError('CyclicLR scheduler was not implemented in PyTorch versions less than 1.1.0. '
