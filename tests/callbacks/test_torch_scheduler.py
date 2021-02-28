@@ -24,7 +24,11 @@ class TestTorchScheduler(TestCase):
         torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=True)
         torch_scheduler._newstyle = True
 
-        torch_scheduler.on_start(state)
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_start(state)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
         mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 
@@ -52,7 +56,11 @@ class TestTorchScheduler(TestCase):
         torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=True)
         torch_scheduler._newstyle = False
 
-        torch_scheduler.on_start(state)
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            torch_scheduler.on_start(state)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
         mock_scheduler.assert_called_once_with('optimizer', last_epoch=0)
         mock_scheduler.reset_mock()
 

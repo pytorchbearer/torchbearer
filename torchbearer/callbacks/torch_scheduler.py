@@ -4,6 +4,8 @@ from torchbearer.bases import get_metric
 
 import torch
 
+import warnings
+
 
 class TorchScheduler(Callback):
     def __init__(self, scheduler_builder, monitor=None, step_on_batch=False):
@@ -30,6 +32,9 @@ class TorchScheduler(Callback):
 
     def on_start(self, state):
         self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER], last_epoch=state[torchbearer.EPOCH] - 1)
+        if state[torchbearer.EPOCH] > 0 and self._step_on_batch:
+            warnings.warn('Resuming schedulers with the `step_on_batch` option is not currently supported and may cause'
+                          'unexpected behaviour')
 
     def on_sample(self, state):
         if not self._newstyle and self._step_on_batch and self._monitor is None:
