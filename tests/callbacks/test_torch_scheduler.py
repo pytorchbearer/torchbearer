@@ -22,6 +22,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.return_value = mock_scheduler
 
         torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=True)
+        torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
         mock_scheduler.assert_called_once_with('optimizer')
@@ -64,7 +65,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_step_training(state)
-        mock_scheduler.step.assert_called_once_with(101, epoch=1)
+        mock_scheduler.step.assert_called_once_with(101)
         mock_scheduler.reset_mock()
 
         torch_scheduler.on_end_epoch(state)
@@ -78,6 +79,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.return_value = mock_scheduler
 
         torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor='test', step_on_batch=False)
+        torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
         mock_scheduler.assert_called_once_with('optimizer')
@@ -134,6 +136,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.return_value = mock_scheduler
 
         torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor=None, step_on_batch=True)
+        torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
         mock_scheduler.assert_called_once_with('optimizer')
@@ -189,6 +192,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.return_value = mock_scheduler
 
         torch_scheduler = TorchScheduler(lambda opt: mock_scheduler(opt), monitor=None, step_on_batch=False)
+        torch_scheduler._newstyle = True
 
         torch_scheduler.on_start(state)
         mock_scheduler.assert_called_once_with('optimizer')

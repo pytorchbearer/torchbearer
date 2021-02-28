@@ -28,7 +28,6 @@ class TorchScheduler(Callback):
             else:
                 self._scheduler.step(current, epoch=state[torchbearer.EPOCH])
 
-
     def on_start(self, state):
         self._scheduler = self._scheduler_builder(state[torchbearer.OPTIMIZER])
 
