@@ -17,7 +17,6 @@ class TorchScheduler(Callback):
         self._newstyle = LooseVersion(version) > LooseVersion("1.1.0")
 
     def _step(self, state, current=None):
-        print("HERE", self._newstyle, current)
         if self._newstyle:
             if current is None:
                 self._scheduler.step()
