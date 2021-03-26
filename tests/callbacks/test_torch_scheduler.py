@@ -17,7 +17,7 @@ class TestTorchScheduler(TestCase):
         warnings.filterwarnings('default')
 
     def test_torch_scheduler_on_batch_with_monitor(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer', torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -49,7 +49,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_batch_with_monitor_oldstyle(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer', torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -82,7 +82,7 @@ class TestTorchScheduler(TestCase):
 
     def test_torch_scheduler_on_epoch_with_monitor(self):
         state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer',
-                 torchbearer.DATA: None}
+                 torchbearer.DATA: None, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -111,7 +111,7 @@ class TestTorchScheduler(TestCase):
 
     def test_torch_scheduler_on_epoch_with_monitor_oldstyle(self):
         state = {torchbearer.EPOCH: 1, torchbearer.METRICS: {'test': 101}, torchbearer.OPTIMIZER: 'optimizer',
-                 torchbearer.DATA: None}
+                 torchbearer.DATA: None, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -139,7 +139,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_batch_no_monitor(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -167,7 +167,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_batch_no_monitor_oldstyle(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer'}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -195,7 +195,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_epoch_no_monitor(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {}}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {}, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -219,7 +219,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()
 
     def test_torch_scheduler_on_epoch_no_monitor_oldstyle(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {}}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {}, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -247,7 +247,7 @@ class TestTorchScheduler(TestCase):
         mock_scheduler.reset_mock()        
 
     def test_monitor_not_found(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'not_test': 1.}}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'not_test': 1.}, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -263,7 +263,7 @@ class TestTorchScheduler(TestCase):
             self.assertTrue('Failed to retrieve key `test`' in str(w[0].message))
 
     def test_monitor_found(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -282,7 +282,7 @@ class TestTorchScheduler(TestCase):
             self.assertTrue(len(w) == 0)
 
     def test_batch_monitor_not_found(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'not_test': 1.}}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'not_test': 1.}, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -294,7 +294,7 @@ class TestTorchScheduler(TestCase):
             self.assertTrue('Failed to retrieve key `test`' in str(w[0].message))
 
     def test_batch_monitor_found(self):
-        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}}
+        state = {torchbearer.EPOCH: 1, torchbearer.OPTIMIZER: 'optimizer', torchbearer.METRICS: {'test': 1.}, torchbearer.MODEL: Mock()}
         mock_scheduler = Mock()
         mock_scheduler.return_value = mock_scheduler
 
@@ -309,7 +309,7 @@ class TestTorchScheduler(TestCase):
 class TestLambdaLR(TestCase):
     @patch('torch.optim.lr_scheduler.LambdaLR')
     def test_lambda_lr(self, lr_mock):
-        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
         scheduler = LambdaLR(lr_lambda=0.1, step_on_batch=True)
         scheduler.on_start(state)
@@ -321,7 +321,7 @@ class TestLambdaLR(TestCase):
 class TestStepLR(TestCase):
     @patch('torch.optim.lr_scheduler.StepLR')
     def test_lambda_lr(self, lr_mock):
-        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
         scheduler = StepLR(step_size=10, gamma=0.4, step_on_batch=True)
         scheduler.on_start(state)
@@ -333,7 +333,7 @@ class TestStepLR(TestCase):
 class TestMultiStepLR(TestCase):
     @patch('torch.optim.lr_scheduler.MultiStepLR')
     def test_lambda_lr(self, lr_mock):
-        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
         scheduler = MultiStepLR(milestones=10, gamma=0.4, step_on_batch=True)
         scheduler.on_start(state)
@@ -345,7 +345,7 @@ class TestMultiStepLR(TestCase):
 class TestExponentialLR(TestCase):
     @patch('torch.optim.lr_scheduler.ExponentialLR')
     def test_lambda_lr(self, lr_mock):
-        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
         scheduler = ExponentialLR(gamma=0.4, step_on_batch=True)
         scheduler.on_start(state)
@@ -357,7 +357,7 @@ class TestExponentialLR(TestCase):
 class TestCosineAnnealingLR(TestCase):
     @patch('torch.optim.lr_scheduler.CosineAnnealingLR')
     def test_lambda_lr(self, lr_mock):
-        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
         scheduler = CosineAnnealingLR(T_max=4, eta_min=10, step_on_batch=True)
         scheduler.on_start(state)
@@ -369,7 +369,7 @@ class TestCosineAnnealingLR(TestCase):
 class TestReduceLROnPlateau(TestCase):
     @patch('torch.optim.lr_scheduler.ReduceLROnPlateau')
     def test_lambda_lr(self, lr_mock):
-        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+        state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
         scheduler = ReduceLROnPlateau(monitor='test', mode='max', factor=0.2, patience=100, verbose=True, threshold=10,
                                       threshold_mode='thresh', cooldown=5, min_lr=0.1, eps=1e-4, step_on_batch=True)
@@ -388,7 +388,7 @@ class TestCyclicLR(TestCase):
         version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
         if LooseVersion(version) > LooseVersion("1.0.0"):  # CyclicLR is implemented
             with patch('torch.optim.lr_scheduler.CyclicLR') as lr_mock:
-                state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0}
+                state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 
                 scheduler = CyclicLR(base_lr=0.01, max_lr=0.1, monitor='test', step_size_up=200, step_size_down=None,
                                      mode='triangular', gamma=2., scale_fn=None, scale_mode='cycle',

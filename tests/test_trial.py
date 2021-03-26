@@ -1894,6 +1894,7 @@ class TestTrialValEvalPred(TestCase):
         state = {torchbearer.VALIDATION_GENERATOR: generator, torchbearer.VALIDATION_STEPS: steps, torchbearer.METRICS: 1}
         t = Trial(MagicMock())
         eval_mock = t.eval = Mock()
+        train_mock = t.train = Mock()
         test_pass_mock = t._test_pass = Mock()
         t.state = {torchbearer.VALIDATION_GENERATOR: generator, torchbearer.CALLBACK_LIST: None,
                    torchbearer.VALIDATION_DATA: (generator, steps), torchbearer.LOADER: None}
