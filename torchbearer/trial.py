@@ -1092,6 +1092,8 @@ class Trial(object):
             self.eval()
 
             self._test_pass(state)
+
+            self.train()
         return state[torchbearer.METRICS]
 
     @inject_sampler(torchbearer.VALIDATION_DATA, load_batch_standard)

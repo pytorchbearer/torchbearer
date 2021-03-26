@@ -21,6 +21,9 @@ class TorchScheduler(Callback):
         self._newstyle = LooseVersion(version) > LooseVersion("1.1.0")
 
     def _step(self, state, current=None):
+        if state[torchbearer.MODEL].training is False:
+            return
+
         if self._newstyle or self._step_on_batch:
             if current is None:
                 self._scheduler.step()
