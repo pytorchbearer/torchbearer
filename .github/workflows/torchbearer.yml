@@ -243,7 +243,7 @@ jobs:
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v4.7.0
       with:
-        python-version: '3.6.15'
+        python-version: '3.7.17'
     - run: echo ${{ github.sha }}_RANGE
     - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
         '
@@ -286,7 +286,7 @@ jobs:
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v4.7.0
       with:
-        python-version: '3.6.15'
+        python-version: '3.7.17'
     - run: echo ${{ github.sha }}_RANGE
     - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
         '
@@ -329,7 +329,7 @@ jobs:
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v4.7.0
       with:
-        python-version: '3.6.15'
+        python-version: '3.7.17'
     - run: echo ${{ github.sha }}_RANGE
     - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
         '
@@ -372,7 +372,7 @@ jobs:
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v4.7.0
       with:
-        python-version: '3.6.15'
+        python-version: '3.7.17'
     - run: echo ${{ github.sha }}_RANGE
     - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
         '
@@ -415,7 +415,7 @@ jobs:
         restore-keys: "${{ runner.os }}-pip-"
     - uses: actions/setup-python@v4.7.0
       with:
-        python-version: '3.6.15'
+        python-version: '3.7.17'
     - run: echo ${{ github.sha }}_RANGE
     - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
         '
