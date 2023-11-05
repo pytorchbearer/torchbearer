@@ -384,7 +384,6 @@ class TestReduceLROnPlateau(TestCase):
 
 class TestCyclicLR(TestCase):
     def test_lambda_lr(self):
-        import torch
         if not _pytorch_version_lt("1.0.0"):  # CyclicLR is implemented
             with patch('torch.optim.lr_scheduler.CyclicLR') as lr_mock:
                 state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}

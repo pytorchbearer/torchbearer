@@ -2,7 +2,6 @@ import functools
 import warnings
 
 import torch
-from packaging import version
 
 import torchbearer
 from torchbearer.bases import get_metric, _pytorch_version_lt
