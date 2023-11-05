@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed a bug in access metrics function and callbacks that use it
 - Fixed bug where schedulers were called before optimisers with newer versions of pytorch
 - Fixed a bug where the csv logger closed the file too early
+- Fixed compat with pytorch > 1.1.0 versioning
+- Fixed typos in doc strings
+- Fixes for tests where pytorch >2 Tensors were causing issues with mocks
 
 ## [0.5.3] - 2020-01-31
 ### Added

@@ -96,7 +96,7 @@ def close_writer(log_dir, logger):
     if log_dir in __writers__:
         __writers__[log_dir]['references'].discard(logger)
 
-        if len(__writers__[log_dir]['references']) is 0:
+        if len(__writers__[log_dir]['references']) == 0:
             if 'writer' in __writers__[log_dir]:
                 __writers__[log_dir]['writer'].close()
 
