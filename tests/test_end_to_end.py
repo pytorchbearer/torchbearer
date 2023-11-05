@@ -60,9 +60,9 @@ class TestEndToEnd(unittest.TestCase):
 
     def test_callbacks(self):
         from torch.utils.data import TensorDataset
-        traingen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1))
-        valgen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1))
-        testgen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1))
+        traingen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1, 1))
+        valgen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1, 1))
+        testgen = TensorDataset(torch.rand(10, 1, 3), torch.rand(10, 1, 1))
 
         model = torch.nn.Linear(3, 1)
         optim = torch.optim.SGD(model.parameters(), lr=0.01)

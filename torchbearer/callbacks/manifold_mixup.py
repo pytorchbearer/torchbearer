@@ -35,7 +35,8 @@ class ManifoldMixup(Callback):
         self._mixup_layers = None
         self.alpha = alpha
         self.lam = lam
-        self.distrib = Beta(self.alpha, self.alpha)
+        if alpha > 0:
+            self.distrib = Beta(self.alpha, self.alpha)
         self.layer_names = []
         self.depth = 0
         self._layer_filter = []

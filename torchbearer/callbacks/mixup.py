@@ -78,7 +78,8 @@ class Mixup(Callback):
         super(Mixup, self).__init__()
         self.alpha = alpha
         self.lam = lam
-        self.distrib = Beta(self.alpha, self.alpha)
+        if alpha > 0:
+            self.distrib = Beta(self.alpha, self.alpha)
 
     @staticmethod
     def mixup_loss(state):

@@ -12,7 +12,7 @@ import torch
 
 class ToDict(AdvancedMetric):
     """The :class:`ToDict` class is an :class:`.AdvancedMetric` which will put output from the inner :class:`.Metric` in
-    a dict (mapping metric name to value) before returning. When in `eval` mode, 'val\_' will be prepended to the metric
+    a dict (mapping metric name to value) before returning. When in `eval` mode, 'val_' will be prepended to the metric
     name.
 
     Example: ::
