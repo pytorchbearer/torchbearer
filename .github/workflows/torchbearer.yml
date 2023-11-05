@@ -39,7 +39,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -82,6 +83,7 @@ jobs:
           exit
         fi
     - run: pip install -q coverage
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -123,7 +125,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -165,7 +168,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -207,7 +211,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -249,7 +254,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -291,7 +297,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -333,7 +340,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -375,7 +383,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -417,7 +426,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -460,7 +470,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -503,7 +514,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -546,7 +558,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -589,7 +602,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
@@ -632,7 +646,8 @@ jobs:
           echo "Only docs were updated, not running the CI."
           exit
         fi
-    - run: pip install -q coverage
+    - run: pip install -q coverage 
+    - run: pip install -q nose
     - run: pip install -q $TORCH_URL
     - run: pip install future
     - run: pip install $PILLOW
