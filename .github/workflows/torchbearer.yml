@@ -1,0 +1,857 @@
+name: pytorchbearer/torchbearer
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+  group: "${{ github.ref }}"
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_VERSION: 1.0.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.0.0-cp27-cp27mu-linux_x86_64.whl
+      TORCHVISION: torchvision==0.2.2.post3
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '2.7'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_VERSION: 1.1.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.1.0-cp27-cp27mu-linux_x86_64.whl
+      TORCHVISION: https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp27-cp27mu-linux_x86_64.whl
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '2.7'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCH_VERSION: 1.2.0
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '2.7'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCH_VERSION: 1.3.0
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '2.7'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCH_VERSION: 1.4.0
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '2.7'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.0.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.0.0-cp35-cp35m-linux_x86_64.whl
+      TORCHVISION: torchvision==0.2.2.post3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.5'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.1.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.1.0-cp35-cp35m-linux_x86_64.whl
+      TORCHVISION: https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp35-cp35m-linux_x86_64.whl
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.5'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_8:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.2.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.5'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_9:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.3.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.5'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_10:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCH_VERSION: 1.4.0
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.5'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_11:
+    runs-on: ubuntu-latest
+    env:
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.0.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl
+      TORCHVISION: torchvision==0.2.2.post3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.6'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_12:
+    runs-on: ubuntu-latest
+    env:
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.1.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
+      TORCHVISION: https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.6'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_13:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.2.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.6'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_14:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.3.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.6'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_15:
+    runs-on: ubuntu-latest
+    env:
+      TORCH_URL: torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCH_VERSION: 1.4.0
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.6'
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_16:
+    runs-on: ubuntu-16.04
+    env:
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.0.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.0.0-cp37-cp37m-linux_x86_64.whl
+      TORCHVISION: torchvision==0.2.2.post3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_17:
+    runs-on: ubuntu-16.04
+    env:
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.1.0
+      TORCH_URL: http://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
+      TORCHVISION: https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_18:
+    runs-on: ubuntu-16.04
+    env:
+      TORCH_URL: torch==1.2.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.2.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_19:
+    runs-on: ubuntu-16.04
+    env:
+      TORCH_URL: torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      PILLOW: pillow<7.0.0
+      TORCH_VERSION: 1.3.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
+  test_20:
+    runs-on: ubuntu-16.04
+    env:
+      TORCH_URL: torch==1.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCHVISION: torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      TORCH_VERSION: 1.4.0
+      PILLOW: pillow
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v4.7.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo ${{ github.sha }}_RANGE
+    - run: 'if [ -z "${{ github.sha }}_RANGE"]; then COMMIT_RANGE="HEAD~..HEAD"; else COMMIT_RANGE=${{ github.sha }}_RANGE;  fi;
+        '
+    - run: echo $COMMIT_RANGE
+    - run: |
+        if ! git diff --name-only $COMMIT_RANGE | grep -qE '^(torchbearer/|tests/|.travis.yml)'
+        then
+          echo "Only docs were updated, not running the CI."
+          exit
+        fi
+    - run: pip install -q coverage
+    - run: pip install -q $TORCH_URL
+    - run: pip install future
+    - run: pip install $PILLOW
+    - run: pip install -q $TORCHVISION
+    - run: pip install -q -r requirements.txt
+    - run: nosetests tests -v --with-coverage --cover-package=torchbearer
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email:
+#         on_success: never
+#         on_failure: always
