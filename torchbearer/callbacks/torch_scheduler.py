@@ -1,12 +1,11 @@
 import functools
-
-import torchbearer
-from torchbearer.callbacks import Callback
-from torchbearer.bases import get_metric
+import warnings
 
 import torch
 
-import warnings
+import torchbearer
+from torchbearer.bases import get_metric, _pytorch_version_lt
+from torchbearer.callbacks import Callback
 
 
 class TorchScheduler(Callback):
@@ -16,9 +15,7 @@ class TorchScheduler(Callback):
         self._scheduler = None
         self._step_on_batch = step_on_batch
 
-        from distutils.version import LooseVersion
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
-        self._newstyle = LooseVersion(version) > LooseVersion("1.1.0")
+        self._newstyle = not _pytorch_version_lt("1.1.0")
 
     def _step(self, state, current=None):
         if state[torchbearer.MODEL].training is False:
@@ -245,9 +242,7 @@ class CyclicLR(TorchScheduler):
     def __init__(self,  base_lr, max_lr, monitor='val_loss', step_size_up=2000, step_size_down=None, mode='triangular',
                  gamma=1., scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9,
                  step_on_batch=False):
-        from distutils.version import LooseVersion
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
-        if LooseVersion(version) > LooseVersion("1.0.0"):  # CyclicLR is implemented
+        if not _pytorch_version_lt("1.0.0"):  # CyclicLR is implemented
             super(CyclicLR, self).__init__(functools.partial(torch.optim.lr_scheduler.CyclicLR,
                                            base_lr=base_lr, max_lr=max_lr, step_size_up=step_size_up,
                                            step_size_down=step_size_down, mode=mode, gamma=gamma,

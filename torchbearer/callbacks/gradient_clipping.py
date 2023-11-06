@@ -6,7 +6,7 @@ import torch
 
 
 class GradientNormClipping(Callback):
-    """GradientNormClipping callback, which uses 'torch.nn.utils.clip_grad_norm\_' to clip the gradient norms to the
+    """GradientNormClipping callback, which uses 'torch.nn.utils.clip_grad_norm_' to clip the gradient norms to the
     given value. If params is None they will be retrieved from state.
 
     Example: ::
@@ -57,7 +57,7 @@ class GradientNormClipping(Callback):
 
 
 class GradientClipping(Callback):
-    """GradientClipping callback, which uses 'torch.nn.utils.clip_grad_value\_' to clip the gradients of the given
+    """GradientClipping callback, which uses 'torch.nn.utils.clip_grad_value_' to clip the gradients of the given
     parameters to the given value. If params is None they will be retrieved from state.
 
     Example: ::

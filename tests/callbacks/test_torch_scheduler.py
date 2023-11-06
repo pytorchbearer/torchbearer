@@ -3,6 +3,7 @@ from mock import patch, Mock
 import warnings
 
 import torchbearer
+from torchbearer.bases import _pytorch_version_lt
 from torchbearer.callbacks import TorchScheduler, LambdaLR, StepLR, MultiStepLR, ExponentialLR, CosineAnnealingLR,\
     ReduceLROnPlateau, CyclicLR
 
@@ -383,10 +384,7 @@ class TestReduceLROnPlateau(TestCase):
 
 class TestCyclicLR(TestCase):
     def test_lambda_lr(self):
-        from distutils.version import LooseVersion
-        import torch
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.0"
-        if LooseVersion(version) > LooseVersion("1.0.0"):  # CyclicLR is implemented
+        if not _pytorch_version_lt("1.0.0"):  # CyclicLR is implemented
             with patch('torch.optim.lr_scheduler.CyclicLR') as lr_mock:
                 state = {torchbearer.OPTIMIZER: 'optimizer', torchbearer.EPOCH: 0, torchbearer.MODEL: Mock()}
 

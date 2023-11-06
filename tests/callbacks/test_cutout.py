@@ -115,7 +115,7 @@ class TestCutOut(TestCase):
         self.assertTrue(((state[torchbearer.TARGET] - target).abs() < 0.00001).all())
 
     def test_target(self):
-        mixup = CutMix(-0.1, classes=2, mixup_loss=True)
+        mixup = CutMix(0.1, classes=2, mixup_loss=True)
         X = torch.rand(2, 3, 100, 100)
         Y_true = torch.Tensor([0., 1.])
 

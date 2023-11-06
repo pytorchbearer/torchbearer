@@ -248,7 +248,7 @@ def var(clazz=None, unbiased=True, dim=None):
 def running_mean(clazz=None, batch_size=50, step_size=10, dim=None):
     """The :func:`running_mean` decorator is used to add a :class:`.RunningMean` to the :class:`.MetricTree`. If the
     inner class is not a :class:`.MetricTree` then one will be created. The :class:`.RunningMean` will be wrapped in a
-    :class:`.ToDict` (with 'running\_' prepended to the name) for simplicity.
+    :class:`.ToDict` (with 'running_' prepended to the name) for simplicity.
 
     .. note::
         The decorator function does not need to be called if not desired, both: `@running_mean` and `@running_mean()`

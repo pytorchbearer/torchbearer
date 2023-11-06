@@ -1,12 +1,14 @@
-from distutils.version import LooseVersion
 import functools
 import traceback
 import warnings
 
 import torch
+from packaging import version
+
 import torchbearer
 
 import sys
+
 if sys.version_info[0] < 3:
     def set_doc(inner, doc):
         return None  # Not simple to do in Python 2.7 so we can leave it for now, just build docs with Python 3+
@@ -15,14 +17,21 @@ else:
         inner.__doc__ = doc
 
 
+def _pytorch_version_lt(version_string):
+    ver = torch.__version__ if 'TorchVersion' in str(type(torch.__version__)) or str(
+        torch.__version__) is torch.__version__ else "0.4.0"
+
+    return version.parse(ver) < version.parse(version_string)
+
+
 class no_grad(torch.no_grad):
     """ Context-manager and decorator that disables gradient calculation.
     See `torch.autograd.no_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.no_grad>`_
     """
+
     def __init__(self):
         super(no_grad, self).__init__()
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-        if LooseVersion(version) < LooseVersion("0.4.1"):  # No grad is not a decorator
+        if _pytorch_version_lt("0.4.1"):  # No grad is not a decorator
             _patch_call(self, self.call)
 
     def call(self, func):
@@ -38,6 +47,7 @@ def _patch_call(instance, func):
     class _(type(instance)):
         def __call__(self, *arg, **kwarg):
             return func(*arg, **kwarg)
+
     instance.__class__ = _
 
 
@@ -45,10 +55,10 @@ class enable_grad(torch.enable_grad):
     """ Context-manager and decorator that enables gradient calculation.
     See `torch.autograd.enable_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.enable_grad>`_
     """
+
     def __init__(self):
         super(enable_grad, self).__init__()
-        version = torch.__version__ if str(torch.__version__) is torch.__version__ else "0.4.1"
-        if LooseVersion(version) < LooseVersion("0.4.1"):  # Enable grad is not a decorator
+        if _pytorch_version_lt("0.4.1"):  # Enable grad is not a decorator
             _patch_call(self, self.call)
 
     def call(self, func):
@@ -361,6 +371,7 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
     Returns:
         function: Standard closure function
     """
+
     def closure(state):
         # Zero grads
         state[opt].zero_grad()
@@ -382,11 +393,12 @@ def base_closure(x, model, y_pred, y_true, crit, loss, opt):
         state[loss].backward(**state[torchbearer.BACKWARD_ARGS])
 
         state[torchbearer.CALLBACK_LIST].on_backward(state)
+
     return closure
 
 
 standard_closure = lambda: base_closure(torchbearer.X, torchbearer.MODEL, torchbearer.Y_PRED, torchbearer.Y_TRUE,
-                                torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
+                                        torchbearer.CRITERION, torchbearer.LOSS, torchbearer.OPTIMIZER)
 
 
 def apex_closure():
@@ -404,7 +416,8 @@ def apex_closure():
         try:
             state[torchbearer.LOSS] = state[torchbearer.CRITERION](state)
         except TypeError:
-            loss_function_params = _get_param_list(state[torchbearer.Y_PRED]) + _get_param_list(state[torchbearer.Y_TRUE])
+            loss_function_params = _get_param_list(state[torchbearer.Y_PRED]) + _get_param_list(
+                state[torchbearer.Y_TRUE])
             state[torchbearer.LOSS] = state[torchbearer.CRITERION](*loss_function_params)
 
         state[torchbearer.CALLBACK_LIST].on_criterion(state)
@@ -414,6 +427,7 @@ def apex_closure():
             scaled_loss.backward(**state[torchbearer.BACKWARD_ARGS])
 
         state[torchbearer.CALLBACK_LIST].on_backward(state)
+
     return _apex_closure
 
 
@@ -427,6 +441,7 @@ def cite(bibtex):
     Returns:
         The decorator
     """
+
     def decorator(inner):
         doc = inner.__doc__.split('\n')
         i = 0
@@ -448,6 +463,7 @@ def cite(bibtex):
         doc.insert(i, to_insert)
         set_doc(inner, '\n'.join(doc))
         return inner
+
     return decorator
 
 

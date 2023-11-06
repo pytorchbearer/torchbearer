@@ -2750,8 +2750,8 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(c_inj.call_args[0][0] == test_callback)
 
     def test_deep_to_tensor(self):
-        base_tensor = torch.Tensor([1])
-        tensor = MagicMock(spec=base_tensor)
+        tensor = torch.Tensor([1])
+        tensor.to = Mock()
         new_dtype = torch.float16
         new_device = 'cuda:1'
 
@@ -2760,9 +2760,8 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(tensor.to.call_args[0][1] == new_dtype)
 
     def test_deep_to_tensor_int_dtype(self):
-        base_tensor = torch.Tensor([1])
-        tensor = MagicMock(spec=base_tensor)
-        tensor.dtype = torch.uint8
+        tensor = torch.tensor([1], dtype=torch.uint8)
+        tensor.to = Mock()
         new_device = 'cuda:1'
         new_dtype = torch.uint8
 
@@ -2771,9 +2770,10 @@ class TestTrialFunctions(TestCase):
         self.assertTrue(len(tensor.to.call_args[0]) == 1)
 
     def test_deep_to_list(self):
-        base_tensor = torch.Tensor([1])
-        tensor_1 = MagicMock(spec=base_tensor)
-        tensor_2 = MagicMock(spec=base_tensor)
+        tensor_1 = torch.Tensor([1])
+        tensor_1.to = Mock()
+        tensor_2 = torch.Tensor([1])
+        tensor_2.to = Mock()
         tensors = [tensor_1, tensor_2]
         new_dtype = torch.float16
         new_device = 'cuda:1'
