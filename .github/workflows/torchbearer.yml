@@ -33,19 +33,19 @@ jobs:
             pillow: pillow<7.0.0
             python: '3.5.10'
           - os: ubuntu-20.04
-            torch_url: torch==1.0.0+cpu -f http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl
+            torch_url: torch==1.0.0 -f http://download.pytorch.org/whl/cpu/torch-1.0.0-cp36-cp36m-linux_x86_64.whl
             torchvision_url: torchvision==0.2.2.post3 -f https://download.pytorch.org/whl/torch_stable.html
             torch_version: 1.0.0
             pillow: pillow<7.0.0
             python: '3.6.15'
           - os: ubuntu-20.04
-            torch_url: torch==1.1.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+            torch_url: torch==1.1.0 -f http://download.pytorch.org/whl/cpu/torch-1.1.0-cp35-cp35m-linux_x86_64.whl
             torchvision_url: torchvision==0.3.0 -f https://download.pytorch.org/whl/torch_stable.html
             torch_version: 1.1.0
             pillow: pillow<7.0.0
             python: '3.5.10'
           - os: ubuntu-20.04
-            torch_url: torch==1.1.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+            torch_url: torch==1.1.0 http://download.pytorch.org/whl/cpu/torch-1.1.0-cp36-cp36m-linux_x86_64.whl
             torchvision_url: torchvision==0.3.0 -f https://download.pytorch.org/whl/torch_stable.html
             torch_version: 1.1.0
             pillow: pillow<7.0.0
