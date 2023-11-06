@@ -15,13 +15,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
-            torch_url: torch==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+            torch_url: torch==0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
             torchvision_url: torchvision==0.2.0 -f https://download.pytorch.org/whl/torch_stable.html
             torch_version: 0.4.0
             pillow: pillow
             python: '3.5.10'
           - os: ubuntu-20.04
-            torch_url: torch==0.4.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+            torch_url: torch==0.4.1 -f https://download.pytorch.org/whl/torch_stable.html
             torchvision_url: torchvision==0.2.0 -f https://download.pytorch.org/whl/torch_stable.html
             torch_version: 0.4.1
             pillow: pillow
