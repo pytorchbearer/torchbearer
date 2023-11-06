@@ -88,7 +88,7 @@ jobs:
             python: '3.7.17'
           - os: ubuntu-latest
             torch_url: torch==1.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-            torchvision_url: torchvision==0.8.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+            torchvision_url: torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
             torch_version: 1.7.0
             pillow: pillow
             python: '3.7.17'
