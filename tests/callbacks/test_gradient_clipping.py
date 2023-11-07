@@ -83,7 +83,7 @@ class TestGradientClipping(TestCase):
     @patch('torch.nn.utils.clip_grad_value_')
     def test_given_params(self, mock_clip):
         model = nn.Sequential(nn.Conv2d(3, 3, 3))
-        model.parameters = Mock(return_value=-1)
+        model.parameters = Mock(return_value=[-1])
         state = {torchbearer.MODEL: model}
 
         clipper = GradientClipping(5, params=model.parameters())
@@ -91,4 +91,4 @@ class TestGradientClipping(TestCase):
         clipper.on_start(state)
         clipper.on_backward(state)
 
-        self.assertTrue(mock_clip.mock_calls[0][1][0] == -1)
+        self.assertTrue(mock_clip.mock_calls[0][1][0] == [-1])
