@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed compat with pytorch > 1.1.0 versioning
 - Fixed typos in doc strings
 - Fixes for tests where pytorch >2 Tensors were causing issues with mocks
+- Fix bug in gradient clipping where the parameter generator was consumed on the first pass
 
 ## [0.5.3] - 2020-01-31
 ### Added

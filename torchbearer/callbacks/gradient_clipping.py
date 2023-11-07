@@ -85,7 +85,7 @@ class GradientClipping(Callback):
         super(GradientClipping, self).__init__()
 
         self.clip_value = clip_value
-        self.params = list(params)
+        self.params = list(params) if params is not None else None
 
     def on_start(self, state):
         """If params is None then retrieve from the model.
