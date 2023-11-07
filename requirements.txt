@@ -10,4 +10,4 @@ Pillow
 matplotlib
 torchvision
 pycm;python_version>="3.5"
-packaging~=23.1
+packaging

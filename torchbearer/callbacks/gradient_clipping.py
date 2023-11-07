@@ -85,7 +85,7 @@ class GradientClipping(Callback):
         super(GradientClipping, self).__init__()
 
         self.clip_value = clip_value
-        self.params = params
+        self.params = list(params) if params is not None else None
 
     def on_start(self, state):
         """If params is None then retrieve from the model.
@@ -94,7 +94,7 @@ class GradientClipping(Callback):
             state (dict): The :class:`.Trial` state
         """
         if self.params is None:
-            self.params = filter(lambda p: p.requires_grad, state[torchbearer.MODEL].parameters())
+            self.params = list(filter(lambda p: p.requires_grad, state[torchbearer.MODEL].parameters()))
 
     def on_backward(self, state):
         """Between the backward pass (which computes the gradients) and the step call (which updates the parameters),

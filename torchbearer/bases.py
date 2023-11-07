@@ -24,6 +24,13 @@ def _pytorch_version_lt(version_string):
     return version.parse(ver) < version.parse(version_string)
 
 
+def _pytorch_version_gt(version_string):
+    ver = torch.__version__ if 'TorchVersion' in str(type(torch.__version__)) or str(
+        torch.__version__) is torch.__version__ else "0.4.0"
+
+    return version.parse(ver) > version.parse(version_string)
+
+
 class no_grad(torch.no_grad):
     """ Context-manager and decorator that disables gradient calculation.
     See `torch.autograd.no_grad <https://pytorch.org/docs/stable/autograd.html#torch.autograd.no_grad>`_
