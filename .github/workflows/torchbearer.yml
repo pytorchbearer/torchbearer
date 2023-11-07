@@ -80,12 +80,12 @@ jobs:
             torch_version: 1.8.0
             pillow: pillow
             python: '3.7.17'
-          - os: ubuntu-latest
-            torch_url: torch==1.9.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-            torchvision_url: torchvision==0.9.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-            torch_version: 1.9.1
-            pillow: pillow
-            python: '3.7.17'
+          # - os: ubuntu-latest
+          #   torch_url: torch==1.9.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+          #   torchvision_url: torchvision==0.9.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+          #   torch_version: 1.9.1
+          #   pillow: pillow
+          #   python: '3.7.17'
           - os: ubuntu-latest
             torch_url: torch==1.10.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
             torchvision_url: torchvision==0.11.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
