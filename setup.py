@@ -27,5 +27,5 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     install_requires=['torch>=1.0.0', 'numpy', 'tqdm'],
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.7.*,!=3.8.*,!=3.9.*,!=3.10.*',
+    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
 )
